@@ -776,7 +776,11 @@ typedef struct macro
   double cooling_normalisation;
   double cooling_bbtot, cooling_bftot, cooling_bf_coltot;
   double cooling_ff;
-
+  
+  int n_crit;					// the level above which we treat all our levels as one 'super level'
+  double lte_pops[NLEVELS_MACRO];	/* a store of LTE level populations for the macro atom. 
+  									   should sum to one over n_crit<m<nlevels_macro */
+  
 } macro_dummy, *MacroPtr;
 
 MacroPtr macromain;
