@@ -780,6 +780,7 @@ typedef struct macro
   int n_crit;					// the level above which we treat all our levels as one 'super level'
   double lte_pops[NLEVELS_MACRO];	/* a store of LTE level populations for the macro atom. 
   									   should sum to one over n_crit<m<nlevels_macro */
+  double lte_pops_norm;
   
 } macro_dummy, *MacroPtr;
 
