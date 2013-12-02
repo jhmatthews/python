@@ -3104,6 +3104,10 @@ q_recomb (cont_ptr, electron_temperature)
 
 
 
+
+
+
+
 /************************************************************
                                     University of Southampton
                                     
@@ -3130,23 +3134,48 @@ History:
 ************************************************************/
 
 // threshold at which we set superlevel
-#define SUPERLEVEL_THRESHOLD 0.95
+#define SUPERLEVEL_THRESHOLD 1000.0
+#define COLL_THRESHOLD 1000.0
 #define N_CRIT_MIN 6
+#define N_CRIT_MAX 16
+
+
 
 int
 create_superlevels (mode)
      int mode;
 {
+  struct lines *line_ptr;
+  struct topbase_phot *cont_ptr;
+
   double jprbs[2 * (NBBJUMPS + NBFJUMPS)];
-  int n, nplasma, uplvl;
-  int n_crit, n_crit_store;
+  double eprbs[NBBJUMPS + NBFJUMPS];
+  int n, m, nplasma, uplvl;
+  int n_crit, n_crit_store, n_superlevels;
   //double lte_pops;
   double t_e, ne;
   double run_tot, threshold;
-  double pjnorm;
+  double pjnorm, penorm;
+  int nbbu, nbbd, nbfd, nbfu;
+  double bb_cont, bf_cont;
+  double sp_rec_rate;
+  double rad_rate, coll_rate;
+  double rad_tot, coll_tot;
 
   PlasmaPtr xplasma;
   MacroPtr mplasma;
+
+  if (geo.wcycle == 0)
+    { 
+  	for (nplasma = 0; nplasma < NPLASMA; nplasma++)
+  	  {
+  	  	mplasma = &macromain[nplasma];
+
+        mplasma->n_crit = nlevels_macro;
+
+  	  }
+    return 0;
+    }
 
   for (nplasma = 0; nplasma < NPLASMA; nplasma++)
     {
@@ -3158,55 +3187,240 @@ create_superlevels (mode)
 
       mplasma = &macromain[nplasma];
 
-      uplvl = nlevels_macro - 2;
-      n_crit_store = 0;
 
-      while (uplvl > n_crit_store)
+      //uplvl = nlevels_macro - 2;
+      n_crit_store = nlevels_macro;
+      mplasma->n_crit = n_crit_store;
+      mplasma->lte_pops_norm = 0.0;
+
+      for (uplvl = N_CRIT_MAX; uplvl > N_CRIT_MIN; uplvl--)
 	{
-
+ 
+      get_je_probs (jprbs, eprbs, uplvl, xplasma, pjnorm, penorm, m);
 	  /* Now compute all the probabilities of deactivation
-	     jumping from this configuration. Then choose one. */
+	     jumping from this configuration. */
 
-	  pjnorm = get_jump_probs (jprbs, uplvl, xplasma);
+	  nbbd = config[uplvl].n_bbd_jump;	//store these for easy access -- number of bb downward jumps
+	  nbbu = config[uplvl].n_bbu_jump;	// number of bb upward jump from this configuration
+	  nbfd = config[uplvl].n_bfd_jump;	// number of bf downward jumps from this transition
+	  nbfu = config[uplvl].n_bfu_jump;	// number of bf upward jumps from this transiion
+
+
+	  /* Start by setting everything to 0  */
+
+	  m = 0;		//m counts the total number of possible ways to leave the level
+	  pjnorm = 0.0;		//stores the total jump probability
+	  penorm = 0.0;
+
+	  coll_tot = 0.0;
+	  rad_tot = 0.0;
+
+	  for (n = 0; n < nbbd + nbfd; n++)
+	    {
+	      jprbs[n] = 0.0;	//stores the individual jump probabilities SS
+	      eprbs[n] = 0.0;
+	    }
+	  for (n = nbbd + nbfd; n < nbbd + nbfd + nbbu + nbfu; n++)
+	    {
+	      jprbs[n] = 0;	/*slots for upward jumps */
+	    }
+	  /* Finished zeroing. */
+
+
+
+
+	  /* First downward jumps. */
+
+
+	  /* bb */
+	  /* For bound-bound decays the jump probability is A-coeff * escape-probability * energy */
+	  /* At present the escape probability is only approximated (p_escape). This should be improved. */
+
+	  for (n = 0; n < nbbd; n++)
+	    {
+
+	      line_ptr = &line[config[uplvl].bbd_jump[n]];
+
+	      rad_rate = a21 (line_ptr) * 1.0;	// p_escape set to 1.0, conservative estimate
+	      coll_rate = q21 (line_ptr, t_e);	// this is multiplied by ne below
+
+	      if (coll_rate < 0)
+		{
+		  coll_rate = 0;
+		}
+
+	      coll_tot += coll_rate * ne;
+	      rad_tot += rad_rate;
+
+	      bb_cont = rad_rate + (coll_rate * ne);
+	      jprbs[m] = bb_cont * config[line_ptr->nconfigl].ex;	//energy of lower state
+
+	      eprbs[m] = bb_cont * (config[uplvl].ex - config[line[config[uplvl].bbd_jump[n]].nconfigl].ex);	//energy difference
+
+
+	      if (jprbs[m] < 0.)	//test (can be deleted eventually SS)
+		{
+		  Error ("Negative probability (get_je_probs). Abort.");
+		  exit (0);
+		}
+
+
+	      pjnorm += jprbs[m];
+	      penorm += eprbs[m];
+	      m++;
+	    }
+
+
+	  /* bf */
+	  for (n = 0; n < nbfd; n++)
+	    {
+
+	      cont_ptr = &phot_top[config[uplvl].bfd_jump[n]];	//pointer to continuum
+
+	      if (n < 25)
+		{
+		  sp_rec_rate = mplasma->recomb_sp[config[uplvl].bfd_indx_first + n];	//need this twice so store it
+		  bf_cont =
+		    (sp_rec_rate + q_recomb (cont_ptr, t_e) * ne) * ne;
+		}
+	      else
+		{
+		  bf_cont = 0.0;
+		}
+
+	      jprbs[m] = bf_cont * config[phot_top[config[uplvl].bfd_jump[n]].nlev].ex;	//energy of lower state
+
+	      eprbs[m] = bf_cont * (config[uplvl].ex - config[phot_top[config[uplvl].bfd_jump[n]].nlev].ex);;	//energy difference
+
+
+	      if (jprbs[m] < 0.)	//test (can be deleted eventually SS)
+		{
+		  Error ("Negative probability (get_je_probs). Abort.");
+		  exit (0);
+		}
+	      pjnorm += jprbs[m];
+	      penorm += eprbs[m];
+	      m++;
+	    }
+
+
+
+
+
+	  /* Now upwards jumps. */
+
+	  /* bb */
+	  /* For bound-bound excitation the jump probability is B-coeff times Jbar with a correction 
+	     for stimulated emission. To avoid the need for recalculation all the time, the code will
+	     be designed to include the stimulated correction in Jbar - i.e. the stimulated correction
+	     factor will NOT be included here. (SS) */
+
+	  for (n = 0; n < nbbu; n++)
+	    {
+
+	      line_ptr = &line[config[uplvl].bbu_jump[n]];
+	      rad_rate =
+		(b12 (line_ptr) *
+		 mplasma->jbar_old[config[uplvl].bbu_indx_first + n]);
+	      // This should probably be set to non attenuated field (just by dilution factor)
+
+	      coll_rate = q12 (line_ptr, t_e);	// this is multiplied by ne below
+
+	      if (coll_rate < 0)
+		{
+		  coll_rate = 0;
+		}
+
+
+	      coll_tot += coll_rate * ne;
+	      rad_tot += rad_rate;
+
+	      jprbs[m] = ((rad_rate) + (coll_rate * ne)) * config[uplvl].ex;	//energy of lower state
+
+
+	      if (jprbs[m] < 0.)	//test (can be deleted eventually SS)
+		{
+		  Error ("Negative probability (get_je_probs). Abort.");
+		  exit (0);
+		}
+	      pjnorm += jprbs[m];
+	      m++;
+	    }
+
+
+
+	  /* bf */
+	  for (n = 0; n < nbfu; n++)
+	    {
+
+	      /* For bf ionization the jump probability is just gamma * energy
+	         gamma is the photoionisation rate. Stimulated recombination also included. */
+	      cont_ptr = &phot_top[config[uplvl].bfu_jump[n]];	//pointer to continuum
+
+	      jprbs[m] = (mplasma->gamma_old[config[uplvl].bfu_indx_first + n] - (mplasma->alpha_st_old[config[uplvl].bfu_indx_first + n] * xplasma->ne * den_config (xplasma, cont_ptr->uplev) / den_config (xplasma, cont_ptr->nlev)) + (q_ioniz (cont_ptr, t_e) * ne)) * config[uplvl].ex;	//energy of lower state
+
+
+	      if (jprbs[m] < 0.)	//test (can be deleted eventually SS)
+		{
+		  Error ("Negative probability (get_je_probs). Abort?\n");
+		  jprbs[m] = 0.0;
+
+		}
+	      pjnorm += jprbs[m];
+	      m++;
+	    }
 
 
 	  /* Have now calculated probabilities for this level in this macro atom. */
 
-	  threshold = SUPERLEVEL_THRESHOLD;
+	  /*if ( pjnorm <= SUPERLEVEL_THRESHOLD * penorm)
+	     Log("nplasma %i uplvl %i pjnorm %8.4e penorm %8.4e\n",
+	     nplasma, uplvl, pjnorm, penorm); */
 
-	  run_tot = 0;
-	  n = nlevels_macro - 2;
-	  threshold = threshold * pjnorm;	//normalise to total jumping prob.
-	  while (run_tot < threshold)
+	  Log
+		("JMsp: nplasma %i uplvl %i pjnorm %8.4e penorm %8.4e coll_tot %8.4e rad_tot %8.4e\n",
+		 nplasma, uplvl, pjnorm, penorm, coll_tot, rad_tot);
+
+	  if (pjnorm > SUPERLEVEL_THRESHOLD * penorm
+	      && coll_tot > COLL_THRESHOLD * rad_tot)
 	    {
-	      run_tot += jprbs[n];
-	      if (nplasma == 48)
-		Log ("uplvl %i n %i jprbs %.3f\n", uplvl, n,
-		     jprbs[n] / pjnorm);
-	      n--;
+	      //n_crit_store = uplvl;
+	    	n_crit_store = nlevels_macro;
 	    }
 
-	  n_crit = n;
-
-	  if (n_crit < N_CRIT_MIN)
-	    n_crit = nlevels_macro;
-
-	  if (n_crit > n_crit_store)
-	    {
-	      n_crit_store = n_crit;
-	    }
-
-	  Log ("Cell %i, level %i n_crit %i n_crit_store %i \n", nplasma,
-	       uplvl, n_crit, n_crit_store);
-	  uplvl--;		// cycle down to next level
-
-	  n_crit_store = 2;
 
 	}			// end of loop down over levels in matom
 
 
-      Log ("Cell %i, n_crit %i\n", nplasma, n_crit_store);
-      mplasma->n_crit = n_crit_store;
+      /* now we need to store n_crit and calculate boltzmann populations for the 
+         superlevel */
+
+
+
+
+      if (n_crit_store < nlevels_macro - 1)
+	{
+	  Log ("create_superlevels: cell %i, n_crit %i\n", nplasma,
+	       n_crit_store);
+	  mplasma->n_crit = n_crit_store;
+
+	  n_superlevels = nlevels_macro - 1 - n_crit_store;
+
+	  for (n = 0; n < nlevels_macro; n++)
+	    {
+
+	      if (n >= n_crit_store && n < nlevels_macro - 1)
+		{
+		  //mplasma->lte_pops[n] = exp ((H * freq) / (BOLTZMANN * qromb_temp));
+		  mplasma->lte_pops[n] = 1.0 / n_superlevels;
+		  mplasma->lte_pops_norm += mplasma->lte_pops[n];
+		}
+	      else
+		{
+		  mplasma->lte_pops[n] = 0.0;
+		}
+	    }
+	}
 
 
     }				// end of loop over plasma cells
@@ -3221,7 +3435,7 @@ create_superlevels (mode)
                                     University of Southampton
                                     
 Synopsis:
-	get_jumps_probs works out the jumping probabilities for 
+	get_je_probs works out the jumping and emission probabilities for 
 	a given uplvl in a macro atom 
 
 
@@ -3235,8 +3449,14 @@ Arguments:
 	xplasma		PlasmaPtr
 				Plasma ptr to macro atom/cell
 
+	pjnorm 		Jumping probability normalisation
+
+	penorm 		Emission probability normalisation
+
+	m 			total number of ways to leave uplvl
+
 Returns:
-	pjnorm, sum of jumping probabilities for this configuration
+
       
 Description:
 
@@ -3250,23 +3470,27 @@ History:
 
 
 double
-get_jump_probs (jprbs, uplvl, xplasma)
+get_je_probs (jprbs, eprbs, uplvl, xplasma, pjnorm, penorm, m)
      double jprbs[2 * (NBBJUMPS + NBFJUMPS)];
+     double eprbs[NBBJUMPS + NBFJUMPS];
      int uplvl;
      PlasmaPtr xplasma;
+     double pjnorm;
+     double penorm;
+     int m;
 {
   struct lines *line_ptr;
   struct topbase_phot *cont_ptr;
-  int n, m, nplasma;
+  int n, nplasma;
   int nbbu, nbbd, nbfd, nbfu;
   double t_e, ne;
   double bb_cont, bf_cont;
   double sp_rec_rate;
-  double rad_rate, coll_rate, pjnorm;
+  double rad_rate, coll_rate;
   MacroPtr mplasma;
 
-  t_e = xplasma->t_e;			//electron temperature 
-  ne = xplasma->ne;				//electron number density
+  t_e = xplasma->t_e;		//electron temperature 
+  ne = xplasma->ne;		//electron number density
   nplasma = xplasma->nplasma;
   mplasma = &macromain[nplasma];
 
@@ -3280,12 +3504,14 @@ get_jump_probs (jprbs, uplvl, xplasma)
 
   /* Start by setting everything to 0  */
 
-  m = 0;				//m counts the total number of possible ways to leave the level
-  pjnorm = 0.0;			//stores the total jump probability
+  m = 0;			//m counts the total number of possible ways to leave the level
+  //pjnorm = 0.0;                       //stores the total jump probability
+  //penorm = 0.0;
 
   for (n = 0; n < nbbd + nbfd; n++)
     {
-      jprbs[n] = 0;		//stores the individual jump probabilities SS
+      jprbs[n] = 0.0;		//stores the individual jump probabilities SS
+      eprbs[n] = 0.0;
     }
   for (n = nbbd + nbfd; n < nbbd + nbfd + nbbu + nbfu; n++)
     {
@@ -3294,7 +3520,7 @@ get_jump_probs (jprbs, uplvl, xplasma)
   /* Finished zeroing. */
 
 
-  
+
 
   /* First downward jumps. */
 
@@ -3317,17 +3543,29 @@ get_jump_probs (jprbs, uplvl, xplasma)
 	}
 
       bb_cont = rad_rate + (coll_rate * ne);
-      jprbs[m] = bb_cont * config[line_ptr->nconfigl].ex;	//energy of lower state
+
+      if (uplvl >= mplasma->n_crit && line_ptr->nconfigl >= mplasma->n_crit)
+	{
+	  jprbs[m] = 0.0;
+	  eprbs[m] = 0.0;
+	}
+      else
+	{
+	  jprbs[m] = bb_cont * config[line_ptr->nconfigl].ex;	//energy of lower state
+
+	  eprbs[m] = bb_cont * (config[uplvl].ex - config[line[config[uplvl].bbd_jump[n]].nconfigl].ex);	//energy difference
+	}
 
 
       if (jprbs[m] < 0.)	//test (can be deleted eventually SS)
 	{
-	  Error ("Negative probability (get_trans_probs). Abort.");
+	  Error ("Negative probability (get_je_probs). Abort.");
 	  exit (0);
 	}
 
 
       pjnorm += jprbs[m];
+      penorm += eprbs[m];
       m++;
     }
 
@@ -3347,16 +3585,28 @@ get_jump_probs (jprbs, uplvl, xplasma)
 	{
 	  bf_cont = 0.0;
 	}
+      if (uplvl >= mplasma->n_crit
+	  && phot_top[config[uplvl].bfd_jump[n]].nlev >= mplasma->n_crit)
+	{
+	  jprbs[m] = 0.0;
+	  eprbs[m] = 0.0;
+	}
 
-      jprbs[m] = bf_cont * config[phot_top[config[uplvl].bfd_jump[n]].nlev].ex;	//energy of lower state
+      else
+	{
+	  jprbs[m] = bf_cont * config[phot_top[config[uplvl].bfd_jump[n]].nlev].ex;	//energy of lower state
+
+	  eprbs[m] = bf_cont * (config[uplvl].ex - config[phot_top[config[uplvl].bfd_jump[n]].nlev].ex);;	//energy difference
+	}
 
 
       if (jprbs[m] < 0.)	//test (can be deleted eventually SS)
 	{
-	  Error ("Negative probability (get_trans_probs). Abort.");
+	  Error ("Negative probability (get_je_probs). Abort.");
 	  exit (0);
 	}
       pjnorm += jprbs[m];
+      penorm += eprbs[m];
       m++;
     }
 
@@ -3380,6 +3630,8 @@ get_jump_probs (jprbs, uplvl, xplasma)
 	(b12 (line_ptr) *
 	 mplasma->jbar_old[config[uplvl].bbu_indx_first + n]);
 
+	  Log("JBAR %8.4e\n", mplasma->jbar_old[config[uplvl].bbu_indx_first]);
+
       coll_rate = q12 (line_ptr, t_e);	// this is multiplied by ne below
 
       if (coll_rate < 0)
@@ -3387,13 +3639,19 @@ get_jump_probs (jprbs, uplvl, xplasma)
 	  coll_rate = 0;
 	}
 
-      jprbs[m] = ((rad_rate) + (coll_rate * ne)) * config[uplvl].ex;	//energy of lower state
-
+      if (uplvl >= mplasma->n_crit)
+	{
+	  jprbs[m] = 0.0;
+	}
+      else
+	{
+	  jprbs[m] = ((rad_rate) + (coll_rate * ne)) * config[uplvl].ex;	//energy of lower state
+	}
 
 
       if (jprbs[m] < 0.)	//test (can be deleted eventually SS)
 	{
-	  Error ("Negative probability (get_trans_probs). Abort.");
+	  Error ("Negative probability (get_je_probs). Abort.");
 	  exit (0);
 	}
       pjnorm += jprbs[m];
@@ -3410,12 +3668,19 @@ get_jump_probs (jprbs, uplvl, xplasma)
          gamma is the photoionisation rate. Stimulated recombination also included. */
       cont_ptr = &phot_top[config[uplvl].bfu_jump[n]];	//pointer to continuum
 
-      jprbs[m] = (mplasma->gamma_old[config[uplvl].bfu_indx_first + n] - (mplasma->alpha_st_old[config[uplvl].bfu_indx_first + n] * xplasma->ne * den_config (xplasma, cont_ptr->uplev) / den_config (xplasma, cont_ptr->nlev)) + (q_ioniz (cont_ptr, t_e) * ne)) * config[uplvl].ex;	//energy of lower state
 
+      if (uplvl >= mplasma->n_crit)
+	{
+	  jprbs[m] = 0.0;
+	}
+      else
+	{
+	  jprbs[m] = (mplasma->gamma_old[config[uplvl].bfu_indx_first + n] - (mplasma->alpha_st_old[config[uplvl].bfu_indx_first + n] * xplasma->ne * den_config (xplasma, cont_ptr->uplev) / den_config (xplasma, cont_ptr->nlev)) + (q_ioniz (cont_ptr, t_e) * ne)) * config[uplvl].ex;	//energy of lower state
+	}
 
       if (jprbs[m] < 0.)	//test (can be deleted eventually SS)
 	{
-	  Error ("Negative probability (create_superlevels). Abort?\n");
+	  Error ("Negative probability (get_je_probs). Abort?\n");
 	  jprbs[m] = 0.0;
 
 	}
@@ -3423,8 +3688,27 @@ get_jump_probs (jprbs, uplvl, xplasma)
       m++;
     }
 
+  
+  for (n = 0; n < m; n++)
+     {
 
+
+     if (n < nbbd )
+     {
+       Log("jeprbs: nplasma %i uplvl %i n %i jprbs %.3f eprbs %.3f\n", 
+            nplasma, uplvl, line[config[uplvl].bbd_jump[n]].nconfigl, jprbs[n] / pjnorm, eprbs[n] / penorm);
+     }
+     else if (n >= (nbbd + nbfd) && n < (nbbd + nbfd + nbbu))
+     {
+       Log("jeprbs: nplasma %i uplvl %i n %i jprbs %.3f eprbs %.3f\n", 
+            nplasma, uplvl, line[config[uplvl].bbu_jump[n - nbbd - nbfd]].nconfigl, jprbs[n] / pjnorm, 0.0);
+     }
+     } 
   // return the sum over the jprbs array as probability normalisation 
-  return (pjnorm);
+  // return 0 now
+  //if (nplasma == 48)
+  Log ("je: nplasma %i uplvl %i pjnorm %8.4e penorm %8.4e\n",
+       nplasma, uplvl, pjnorm, penorm);
+  return (0);
 
 }
