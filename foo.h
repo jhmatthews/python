@@ -319,7 +319,7 @@ int photo_gen_matom(PhotPtr p, double weight, int photstart, int nphot);
 int emit_matom(WindPtr w, PhotPtr p, int *nres, int upper);
 double q_ioniz(struct topbase_phot *cont_ptr, double electron_temperature);
 double q_recomb(struct topbase_phot *cont_ptr, double electron_temperature);
-int create_superlevels(int mode);
+int create_superlevels(int mode, int my_nmin, int my_nmax);
 double get_je_probs(double jprbs[2 * (30 + 30)], double eprbs[30 + 30], int uplvl, PlasmaPtr xplasma, double pjnorm, double penorm, int m);
 /* estimators.c */
 int bf_estimators_increment(WindPtr one, PhotPtr p, double ds);

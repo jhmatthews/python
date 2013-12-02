@@ -158,6 +158,10 @@ WindPtr (w);
 	  mc_estimator_normalise (nwind);
 	  /* Store some information so one can determine how much the temps are changing */
 	  macromain[n].kpkt_rates_known = -1;
+
+	  /* if we are in macro atom mode, create superlevels for next cycle */
+	  create_superlevels(1, my_nmin, my_nmax);
+
 	}
 
       t_r_old = plasmamain[n].t_r;
@@ -412,6 +416,9 @@ WindPtr (w);
 	      MPI_Pack(&t_r_ave_old, 1, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
 	      MPI_Pack(&t_e_ave_old, 1, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
 	      MPI_Pack(&iave, 1, MPI_INT, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
+	      MPI_Pack(&macromain[n].n_crit, 1, MPI_INT, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
+	      MPI_Pack(&macromain[n].lte_pops, NLEVELS_MACRO, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
+	      MPI_Pack(&macromain[n].lte_pops_norm, 1, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
 
 	    }
 	  
@@ -537,6 +544,9 @@ WindPtr (w);
 	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, &t_r_ave_old, 1, MPI_DOUBLE, MPI_COMM_WORLD);
 	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, &t_e_ave_old, 1, MPI_DOUBLE, MPI_COMM_WORLD);
 	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, &iave, 1, MPI_INT, MPI_COMM_WORLD);
+	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, &macromain[n].n_crit, 1, MPI_INT, MPI_COMM_WORLD);
+	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, &macromain[n].lte_pops, NLEVELS_MACRO, MPI_DOUBLE, MPI_COMM_WORLD);
+	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, &macromain[n].lte_pops_norm, 1, MPI_DOUBLE, MPI_COMM_WORLD);
 
 	      t_r_ave_old += plasmamain[n].t_r;
 	      t_e_ave_old += plasmamain[n].t_e;

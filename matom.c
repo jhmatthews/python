@@ -135,7 +135,7 @@ matom (p, nres, escape)
   check_plasma (xplasma, "matom");
 
   mplasma = &macromain[xplasma->nplasma];
-  n_crit = mplasma->n_crit;	// level above which levels are in 'superlevel'
+  n_crit = nlevels_macro;	// level above which levels are in 'superlevel'
 
 
   t_e = xplasma->t_e;		//electron temperature 
@@ -169,7 +169,7 @@ matom (p, nres, escape)
 
       /* first we need to check if this level is a member of the superlevel 
          if it is, we need to choose a random uplvl according a boltzmann distribution */
-      if (uplvl > mplasma->n_crit)
+   /*   if (uplvl > mplasma->n_crit)
 	{
 	  n = 0;
 	  threshold = ((rand () + 0.5) / MAXRAND);
@@ -180,7 +180,7 @@ matom (p, nres, escape)
 	      n++;
 	    }
 	  uplvl = n;
-	}
+	}*/
 
 
       /*  The excited configuration is now known. Now compute all the probabilities of deactivation
@@ -3142,8 +3142,10 @@ History:
 
 
 int
-create_superlevels (mode)
+create_superlevels (mode, my_nmin, my_nmax)
      int mode;
+     int my_nmin;
+     int my_nmax;
 {
   struct lines *line_ptr;
   struct topbase_phot *cont_ptr;
@@ -3165,7 +3167,7 @@ create_superlevels (mode)
   PlasmaPtr xplasma;
   MacroPtr mplasma;
 
-  if (geo.wcycle == 0)
+  /*if (mode == 0)
     { 
   	for (nplasma = 0; nplasma < NPLASMA; nplasma++)
   	  {
@@ -3175,9 +3177,9 @@ create_superlevels (mode)
 
   	  }
     return 0;
-    }
+    }*/
 
-  for (nplasma = 0; nplasma < NPLASMA; nplasma++)
+  for (nplasma = my_nmin; nplasma < my_nmax; nplasma++)
     {
 
       xplasma = &plasmamain[nplasma];
@@ -3376,10 +3378,13 @@ create_superlevels (mode)
 	  /*if ( pjnorm <= SUPERLEVEL_THRESHOLD * penorm)
 	     Log("nplasma %i uplvl %i pjnorm %8.4e penorm %8.4e\n",
 	     nplasma, uplvl, pjnorm, penorm); */
-
-	  Log
+      if (geo.wcycle == 1)
+      {
+	    Log
 		("JMsp: nplasma %i uplvl %i pjnorm %8.4e penorm %8.4e coll_tot %8.4e rad_tot %8.4e\n",
 		 nplasma, uplvl, pjnorm, penorm, coll_tot, rad_tot);
+      }
+
 
 	  if (pjnorm > SUPERLEVEL_THRESHOLD * penorm
 	      && coll_tot > COLL_THRESHOLD * rad_tot)
@@ -3630,7 +3635,7 @@ get_je_probs (jprbs, eprbs, uplvl, xplasma, pjnorm, penorm, m)
 	(b12 (line_ptr) *
 	 mplasma->jbar_old[config[uplvl].bbu_indx_first + n]);
 
-	  Log("JBAR %8.4e\n", mplasma->jbar_old[config[uplvl].bbu_indx_first]);
+	  Log("JBAR %8.4e\n", mplasma->jbar_old[config[uplvl].bbu_indx_first + n]);
 
       coll_rate = q12 (line_ptr, t_e);	// this is multiplied by ne below
 
@@ -3701,7 +3706,7 @@ get_je_probs (jprbs, eprbs, uplvl, xplasma, pjnorm, penorm, m)
      else if (n >= (nbbd + nbfd) && n < (nbbd + nbfd + nbbu))
      {
        Log("jeprbs: nplasma %i uplvl %i n %i jprbs %.3f eprbs %.3f\n", 
-            nplasma, uplvl, line[config[uplvl].bbu_jump[n - nbbd - nbfd]].nconfigl, jprbs[n] / pjnorm, 0.0);
+            nplasma, uplvl, line[config[uplvl].bbu_jump[n - nbbd - nbfd]].nconfigu, jprbs[n] / pjnorm, 0.0);
      }
      } 
   // return the sum over the jprbs array as probability normalisation 

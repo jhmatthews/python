@@ -1738,13 +1738,6 @@ run -- 07jul -- ksl
 	  nphot_to_define = (long) photons_per_cycle;
 
 	  define_phot (p, freqmin, freqmax, nphot_to_define, 0, iwind, 1);
-	  
-	  
-	  /* if we are in macro atom mode, create superlevels */
-	  if (geo.rt_mode == 2)
-	    {
-	      create_superlevels(1);		// 1 means boltzmann populations
-	    }
 
 
 	  photon_checks (p, freqmin, freqmax, "Check before transport");
