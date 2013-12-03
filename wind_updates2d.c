@@ -140,6 +140,11 @@ WindPtr (w);
   ndo = my_nmax-my_nmin;
 #endif
 
+  if (geo.rt_mode == 2)
+    {
+      /* if we are in macro atom mode, create superlevels for next cycle */
+      create_superlevels(1, my_nmin, my_nmax);
+    }
 
   for (n = my_nmin; n < my_nmax; n++)
     {
@@ -158,10 +163,6 @@ WindPtr (w);
 	  mc_estimator_normalise (nwind);
 	  /* Store some information so one can determine how much the temps are changing */
 	  macromain[n].kpkt_rates_known = -1;
-
-	  /* if we are in macro atom mode, create superlevels for next cycle */
-	  create_superlevels(1, my_nmin, my_nmax);
-
 	}
 
       t_r_old = plasmamain[n].t_r;

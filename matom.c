@@ -3195,7 +3195,7 @@ create_superlevels (mode, my_nmin, my_nmax)
       mplasma->n_crit = n_crit_store;
       mplasma->lte_pops_norm = 0.0;
 
-      for (uplvl = N_CRIT_MAX; uplvl > N_CRIT_MIN; uplvl--)
+      for (uplvl = nlevels_macro - 1; uplvl >=0; uplvl--)
 	{
  
       get_je_probs (jprbs, eprbs, uplvl, xplasma, pjnorm, penorm, m);
