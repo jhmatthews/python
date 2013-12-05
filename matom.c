@@ -3378,12 +3378,11 @@ create_superlevels (mode, my_nmin, my_nmax)
 	  /*if ( pjnorm <= SUPERLEVEL_THRESHOLD * penorm)
 	     Log("nplasma %i uplvl %i pjnorm %8.4e penorm %8.4e\n",
 	     nplasma, uplvl, pjnorm, penorm); */
-      if (geo.wcycle == 1)
-      {
+
 	    Log
 		("JMsp: nplasma %i uplvl %i pjnorm %8.4e penorm %8.4e coll_tot %8.4e rad_tot %8.4e\n",
 		 nplasma, uplvl, pjnorm, penorm, coll_tot, rad_tot);
-      }
+
 
 
 	  if (pjnorm > SUPERLEVEL_THRESHOLD * penorm
