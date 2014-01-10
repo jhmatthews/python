@@ -64,9 +64,9 @@ int nlines;			/* Actual number of lines that were read in */
 int nlines_macro;		/* Actual number of Macro Atom lines that were read in.  New version of get_atomic
 				   data assumes that macro lines are read in before non-macro lines */
 
-#define NBBJUMPS         30	/* Maximum number of Macro Atom bound-bound jumps from any one configuration (SS) */
+#define NBBJUMPS         100	/* Maximum number of Macro Atom bound-bound jumps from any one configuration (SS) */
 
-#define NBFJUMPS         30	/* Maximum number of Macro Atom Bound-free jumps from any one configuration (SS) */
+#define NBFJUMPS         100	/* Maximum number of Macro Atom Bound-free jumps from any one configuration (SS) */
 
 #define MAXJUMPS          1000000	/* The maximum number of Macro Atom jumps before emission (if this is exceeded
 					   it gives up (SS) */
