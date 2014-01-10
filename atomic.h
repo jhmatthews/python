@@ -239,9 +239,10 @@ typedef struct lines
 				   upper configuration (nconfigu) and then down_index (for deexcitation) or the lower
 				   configuration (nconfigl) and then up_index. (SS) */
   int up_index;
+
+  int spline_index; 
 }
 line_dummy, *LinePtr;
-
 
 LinePtr line, lin_ptr[NLINES];	/* line[] is the actual structure array that contains all the data, *lin_ptr
 				   is an array which contains a frequency ordered set of ptrs to line */
@@ -251,6 +252,25 @@ struct lines fast_line;
 
 int nline_min, nline_max, nline_delt;	/*For calculating which line are likely to be in resonance, see
 					   the routine limit_lines */
+
+
+/* coll_splines is a structure to hold collisional data for forbidden transitions */
+typedef struct coll_spline 
+{
+  int type;     // type of spline fit
+
+  double C_scale;     // scaling parameter
+
+  double P1, P2, P3, P4, P5;    // spline knots
+
+  int line_index;
+}
+coll_spline_dummy, *CollSplinePtr;
+
+CollSplinePtr coll_spline;
+
+
+
 
 
 

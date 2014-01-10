@@ -197,8 +197,6 @@ pdf_x[m]-1
 
 
 
-#define ECS_CONSTANT 4.773691e16	//(8*PI)/(sqrt(3) *nu_1Rydberg
-
 /* 
 
    q21 calculates and returns the collisional de-excitation coefficient q21
@@ -222,6 +220,8 @@ pdf_x[m]-1
 struct lines *q21_line_ptr;
 double q21_a, q21_t_old;
 
+#define ECS_CONSTANT 4.773691e16  //(8*PI)/(sqrt(3) *nu_1Rydberg
+
 double
 q21 (line_ptr, t)
      struct lines *line_ptr;
@@ -229,13 +229,15 @@ q21 (line_ptr, t)
 {
   double gaunt;
   double omega;
+  int ON_OFF;          // 0 means use old method, no forbidden transition collisions
 
+  ON_OFF = 0;
 
   if (q21_line_ptr != line_ptr || t != q21_t_old)
     {
 
-/*NSH 121024 - the followinglines implement the approximate gaunt factor as described in eq 4.21 in hazy 2*/
-/* NSH 121026 commented out in py74a - not certain that this approximate gaunt factor actually inmproves anything */
+      /*  NSH 121024 - the followinglines implement the approximate gaunt factor as described in eq 4.21 in hazy 2 */
+      /*  NSH 121026 commented out in py74a - not certain that this approximate gaunt factor actually inmproves anything */
       /*     if (line_ptr->istate == 1) //Neutral
          {
          gaunt = ((BOLTZMANN*t)/(H*line_ptr->freq))/10.0;
@@ -246,15 +248,32 @@ q21 (line_ptr, t)
          } */
 
 
+      /* JM 140110 -- added so we can still get collisional strengths for forbidden transitions */
+      if (line_ptr->f == 0 && ON_OFF)
+	{
+    /* this is a forbidden transition, so we should have spline data
+        for collision strength omega */
+    
+    omega = get_spline_omega (t, line_ptr);
 
-      gaunt = 1;
-      omega =
-	ECS_CONSTANT * line_ptr->gl * gaunt * line_ptr->f / line_ptr->freq;
+	}
+
+      /* JM 140110 -- if the oscillator strength is non zero, use the Van Regemorter approximation */
+      else
+	{
+	  gaunt = 1;
+	  omega =
+	    ECS_CONSTANT * line_ptr->gl * gaunt * line_ptr->f /
+	    line_ptr->freq;
+	}
+
+
       q21_a = 8.629e-6 / (sqrt (t) * line_ptr->gu) * omega;
       q21_t_old = t;
     }
 
-  return (q21_a);
+
+return (q21_a);
 }
 
 double
@@ -273,6 +292,95 @@ q12 (line_ptr, t)
 
   return (x);
 }
+
+
+/* get_spline_omega is a function which uses Chianti data for
+the spline fits of Burgess & Tully 1992, A&A to get collision 
+strengths. It is designed to be used for forbidden transitions 
+i.e. when oscillator strength is zero
+
+History:
+14jan   JM    Initial coding
+*/
+
+double 
+get_spline_omega(t, line_ptr)
+     struct lines *line_ptr;
+     double t;
+{
+  CollSplinePtr spline_params;
+  double omega, x;
+  int type;
+  double C_scale, E12;
+
+
+  if (line_ptr -> spline_index == -1)
+    {
+      Error("get_spline_omega: no collision strength information but should be, Exiting.\n");
+      exit (0);
+    }
+
+  spline_params = &coll_spline[line_ptr -> spline_index];
+
+  type = spline_params->type;   // type of spline fit
+  C_scale = spline_params->C_scale;     // scaling parameter for spline
+
+  E12 = line_ptr->freq * H;   // energy difference of transition
+
+  
+  if (type == 1 || type == 4)
+  {
+
+    x = log10( (E12 + C_scale) / C_scale);
+    x /= log10(E12 + C_scale);
+
+  }
+
+  else if (type == 2 || type == 3)
+  {
+    x = E12 / (E12 + C_scale);
+  }
+
+  else
+  {
+    Error("get_spline_omega: misunderstood type for spline fit, returning 0 collision strength.");
+    return (0);
+  }
+
+  /* do actual spline interpolation */
+  omega = do_spline (spline_params, x);
+
+
+  /* add extra scaling according to type of spline fit */
+  if (type == 1)
+  {
+    omega *= log10 (E12 + 2.71828);
+  }
+  else if (type == 3)
+  {
+    omega /= ( (E12+1) * (E12+1) );
+  }
+  else if (type == 4)
+  {
+    omega *= log10 (E12 + C_scale);
+  }
+
+  return omega;  
+}
+
+double do_spline(spline_params, x)
+CollSplinePtr spline_params;
+double x;
+{
+  return (1);
+}
+
+
+
+
+
+
+
 
 
 /* 
@@ -565,7 +673,7 @@ scattering_fraction (line_ptr, xplasma)
 //Populate variable from previous calling structure
   ne = xplasma->ne;
   te = xplasma->t_e;
-  tr = xplasma->t_r;	//JM1308 in pre 76b versions this was incorrectly set to xplasma->t_e
+  tr = xplasma->t_r;		//JM1308 in pre 76b versions this was incorrectly set to xplasma->t_e
   w = xplasma->w;
   dvds = wmain[xplasma->nwind].dvds_ave;
   dd = xplasma->density[line_ptr->nion];
@@ -635,7 +743,7 @@ p_escape (line_ptr, xplasma)
 //Populate variable from previous calling structure
   ne = xplasma->ne;
   te = xplasma->t_e;
-  tr = xplasma->t_r;	//JM1308 in pre 76b versions this was incorrectly set to xplasma->t_e
+  tr = xplasma->t_r;		//JM1308 in pre 76b versions this was incorrectly set to xplasma->t_e
   w = xplasma->w;
   dd = xplasma->density[line_ptr->nion];
   dvds = wmain[xplasma->nwind].dvds_ave;
@@ -730,3 +838,9 @@ line_heat (xplasma, pp, nres)
   return (0);
 
 }
+
+
+
+
+
+

@@ -213,6 +213,8 @@ double lum_lines(WindPtr one, int nmin, int nmax);
 int lum_pdf(PlasmaPtr xplasma, double lumlines);
 double q21(struct lines *line_ptr, double t);
 double q12(struct lines *line_ptr, double t);
+double get_spline_omega(double t, struct lines *line_ptr);
+double do_spline(CollSplinePtr spline_params, double x);
 double a21(struct lines *line_ptr);
 double two_level_atom(struct lines *line_ptr, PlasmaPtr xplasma, double *d1, double *d2);
 double line_nsigma(struct lines *line_ptr, PlasmaPtr xplasma);
