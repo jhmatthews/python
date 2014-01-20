@@ -181,7 +181,7 @@ get_atomic_data (masterfile)
   char choice;
   int lineno;			/* the line number in the file beginning with 1 */
   int index_collisions (), index_lines (), index_phot_top (),
-    index_phot_verner (), tabulate_verner();
+    index_phot_verner (), tabulate_verner ();
   int nwords;
   int nlte, nmax;
   //  
@@ -209,6 +209,9 @@ get_atomic_data (masterfile)
   char gsflag, drflag;		//Flags to say what part of data is being read in for DR and RR
   double gstmin, gstmax;	//The range of temperatures for which all ions have GS RR rates
   double gsqrdtemp, gfftemp, s1temp, s2temp, s3temp;	//Temporary storage for gaunt factors
+  int nc_coeff;
+  double coeff[NCOEFFS];
+  int type, pqn, il, jl;
 
   /* define which files to read as data files */
 
@@ -345,6 +348,7 @@ get_atomic_data (masterfile)
     }
 
   nlevels = nxphot = ntop_phot = nauger = ndrecomb = ncpart = 0;	//Added counter for DR//
+  nc_coeff  = 0;    // counter for he collisional coefficients
 
   for (i = 0; i < NIONS; i++)
     {
@@ -419,6 +423,22 @@ get_atomic_data (masterfile)
 	  drecomb[n].e[n1] = 0.0;
 	}
     }
+/* 0113 jm The following lines initialise the collisional coefficients structure */
+  for (n = 0; n < NFORBIDDEN; n++)
+    {
+       ccoeff[n].n = -1;
+       ccoeff[n].istate = -1; 
+       ccoeff[n].z = -1; 
+       ccoeff[n].type = -1;
+       ccoeff[n].il = -1;
+       ccoeff[n].jl = -1;
+       
+       for (j = 0; j< NCOEFFS; j++)
+       {
+        ccoeff[n].coeff[j] = -1;
+       }
+    }
+
 
 /* 0612 nsh The following lines initialise the cardona partition function  structure */
   for (n = 0; n < NIONS; n++)
@@ -581,6 +601,8 @@ structure does not have this property! */
 		choice = 'G';
 	      else if (strncmp (word, "FF_GAUNT", 8) == 0)	/*Its a data file giving the temperature averaged gaunt factors from Sutherland (1997) */
 		choice = 'g';
+	      else if (strncmp (word, "CollMacro", 9) == 0)	/*It's a collisional coefficient for forbidden transitions */
+		choice = 'C';
 	      else if (strncmp (word, "*", 1) == 0);	/* It's a continuation so record type remains same */
 
 	      else
@@ -1423,11 +1445,12 @@ for the ionstate.
 /*NSH 0312 - next line sees if the topbase level just read in is the ground state - if it is, the ion structure element ntop_ground is set to that topbase level number */
 			      if (islp ==
 				  config[ion
-					 [config[n].nion].
-					 first_nlte_level].isp
+					 [config[n].nion].first_nlte_level].
+				  isp
 				  && ilv ==
-				  config[ion[config[n].nion].
-					 first_nlte_level].ilv)
+				  config[ion
+					 [config[n].nion].first_nlte_level].
+				  ilv)
 				{
 				  ion[config[n].nion].ntop_ground = ntop_phot;
 				}
@@ -2085,6 +2108,58 @@ would like to have simple lines for macro-ions */
 
 
 
+
+
+/* Collisional coefficients for He approximations for forbidden transitions 
+
+#           z   istate  n    type       c0          c1          c-2   (spacers)  iconf  jconf     ilv     jlv
+CollMacro   2   1       2      2     9.6367493  -2.2294083   -17.301025  0.0 0.0 0.0 0.0 0.0   2S3    2S1       2       3
+
+#           z   istate    n    type alpha   a0    a1     b1   c1       a2     b2    c2   iconf  jconf    ilv    2S+1_upper
+CollMacro   2     1       1    1    1.125  1.535  2.76   1.2  0.494   0.108  2.50  1.50   1S1    nS1      1      1
+
+2 types, depending on whether we are talking about transitions from the ground state or 
+
+*/
+		case 'C':
+		  sscanf (aline, "%*s %d %d %d %d %lf %lf %lf %lf %lf %lf %lf %lf %d %d",
+			  &z, &istate, &pqn, &type, &coeff[0], &coeff[1],
+			  &coeff[2], &coeff[3], &coeff[4], &coeff[5], &coeff[6],
+			  &coeff[7], &il, &jl);
+
+		  if (z == 2)
+		    {
+		      if (pqn == 1 || pqn == 2)
+			{
+			  /* its coefficients for He I n=2 transitions */
+			  ccoeff[nc_coeff].z = z;
+			  ccoeff[nc_coeff].istate = istate;
+			  ccoeff[nc_coeff].n = pqn;
+			  ccoeff[nc_coeff].type = type;
+			  ccoeff[nc_coeff].il = il;
+			  ccoeff[nc_coeff].jl = jl;
+
+        for ( n = 0; n < NCOEFFS; n++)
+        {
+          ccoeff[nc_coeff].coeff[n] = coeff[n];
+        }
+			  nc_coeff += 1;
+			}
+		      else
+			{
+			  Error
+			    ("get_atomicdata: coll coeffs: can't deal with shells other than n=1,2 yet.\n");
+			}
+		    }
+		  else
+		    {
+		      Error
+			("get_atomicdata: Can only deal with Helium collisional approximations at the moment\n");
+		    }
+		  break;
+
+
+
 /* Parametrised partition function data read in. At the moment, the data we are using comes from Cardona et al (2010). The file currently used(paert_cardona.dat) is saved from the internet, with a couple of changes. The word CPART is prepended to each line of data, and any comment lines are prepended with an #. This is the general format:
 
 CPART   1       0       150991.49       278     2
@@ -2372,6 +2447,7 @@ BAD_T_RR  5  0  1  1  4.647E-10  0.7484  6.142E+01  1.753E+07*/
 
 	  fclose (fptr);
 	}
+
       /*End of do loop for reading a particular file of data */
     }
 
@@ -2405,8 +2481,9 @@ BAD_T_RR  5  0  1  1  4.647E-10  0.7484  6.142E+01  1.753E+07*/
   Log
     ("We have read in %3d Badnell GS   Radiative rate coefficients over the temp range %e to %e\n",
      n_bad_gs_rr, gstmin, gstmax);
-  Log ("We have read in %3d Scaled electron temperature frequency averaged gaunt factors\n",
-       gaunt_n_gsqrd);
+  Log
+    ("We have read in %3d Scaled electron temperature frequency averaged gaunt factors\n",
+     gaunt_n_gsqrd);
   Log ("The minimum frequency for photoionization is %8.2e\n", phot_freq_min);
 
 
@@ -2673,10 +2750,10 @@ or zero so that simple checks of true and false can be used for them */
 /* Index the verner photionization structure by threshold frequecy -- 57h -- 06jul ksl */
 
   if (nxphot > 0)
-	{
-    index_phot_verner ();
-tabulate_verner(); //Create a tabulated version of the data
-	}
+    {
+      index_phot_verner ();
+      tabulate_verner ();	//Create a tabulated version of the data
+    }
 /* Index the topbase photoionization structure by threshold freqeuncy */
   if (ntop_phot > 0)
     index_phot_top ();
@@ -3075,7 +3152,7 @@ History:
  
 **************************************************************/
 
-#define N_VERNER_TAB 100  // The number of points we will tabulate the verner function over
+#define N_VERNER_TAB 100	// The number of points we will tabulate the verner function over
 
 
 struct photoionization *xver;	//Verner & Ferland description of a photoionization x-section
@@ -3083,38 +3160,36 @@ int
 tabulate_verner ()
 {
 
-  double f1,f2,dlogf,lf1,lf2,freq;
-  double sigma_phot();
-  int  j,n;
-  double very_small; //This is a small number (set to be the same as epsilon - but get_atomic_data doesn't have access to python.h
+  double f1, f2, dlogf, lf1, lf2, freq;
+  double sigma_phot ();
+  int j, n;
+  double very_small;		//This is a small number (set to be the same as epsilon - but get_atomic_data doesn't have access to python.h
 
-very_small=1e-6;
+  very_small = 1e-6;
 
 
-for (j=0; j < nxphot; j++)
-	{	
-	xver=&xphot[j];
-	xphot_tab[j].z = xphot->z;
-	xphot_tab[j].istate = xphot->istate;
-	xphot_tab[j].nion = xphot->nion;
-	f1=xver->freq_t*(1+very_small); //We need to start our tabulation just a tiny way up from from the threshold, otherwise it is equal to zero.
-	f2=xver->freq_max*(1-very_small); //We need to start our tabulation just a tiny way up from from the threshold, otherwise it is equal to zero.
-	lf1=log(f1);
-	lf2=log(f2);
-	dlogf=(lf2-lf1)/(N_VERNER_TAB);
+  for (j = 0; j < nxphot; j++)
+    {
+      xver = &xphot[j];
+      xphot_tab[j].z = xphot->z;
+      xphot_tab[j].istate = xphot->istate;
+      xphot_tab[j].nion = xphot->nion;
+      f1 = xver->freq_t * (1 + very_small);	//We need to start our tabulation just a tiny way up from from the threshold, otherwise it is equal to zero.
+      f2 = xver->freq_max * (1 - very_small);	//We need to start our tabulation just a tiny way up from from the threshold, otherwise it is equal to zero.
+      lf1 = log (f1);
+      lf2 = log (f2);
+      dlogf = (lf2 - lf1) / (N_VERNER_TAB);
 
-	for (n=0;n<N_VERNER_TAB+1;n++)
-		{
-		xphot_tab[j].freq[n]=freq=exp(lf1+(n*dlogf));
-		xphot_tab[j].x[n]=sigma_phot (xver, freq);
-		}
-
-	xphot_tab[j].np=N_VERNER_TAB;
-	xphot_tab[j].nlast = -1;
-
+      for (n = 0; n < N_VERNER_TAB + 1; n++)
+	{
+	  xphot_tab[j].freq[n] = freq = exp (lf1 + (n * dlogf));
+	  xphot_tab[j].x[n] = sigma_phot (xver, freq);
 	}
+
+      xphot_tab[j].np = N_VERNER_TAB;
+      xphot_tab[j].nlast = -1;
+
+    }
 
   return (0);
 }
-
-

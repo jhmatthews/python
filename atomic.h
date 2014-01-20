@@ -478,3 +478,32 @@ typedef struct gaunt_total
 } Gaunt_total, *Gaunt_totalptr;
 
 Gaunt_total gaunt_total[MAX_GAUNT_N_GSQRD];	//Set up the structure
+
+
+
+
+/* coll_coeff is the structure definition to store collisional rate
+coefficients for approximations for He as described by Mihalas & Stone 1968 */
+
+#define NCOEFFS 8  //number of coefficients for collisional approximations for forbidden transitions
+#define NFORBIDDEN 50 //Space set aside for the number of forbidden transitions which have collisional rates
+
+typedef struct coll_coeff
+{
+  int z;           // atomic number
+  int n;           // principal quantum number
+  int type;       // type of approximation
+  int istate;      // ionisation stage
+  double coeff[NCOEFFS];     // array of coefficients
+  int il;           // initial level
+  int jl;           // final level, or 2s+1 value of final level if type 1 (as can transition to multiple levels)
+} Coll_coeff, *coll_coeff_ptr;
+
+Coll_coeff ccoeff[NFORBIDDEN]; //Set up the structure
+
+
+
+
+
+
+
