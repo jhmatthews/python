@@ -81,12 +81,12 @@ bf_estimators_increment (one, p, ds)
 
   /* JM -- 1310 -- the loop below is if the user requires extra diagnostics and
      has provided a file diag_cells.dat to store photons stats for cells they have specified
-  */
+   */
   if (diag_on_off == 1 && ncstat > 0)
     {
       for (i = 0; i < ncstat; i++)
 	{
-          /* check if the cell is in the specified list */
+	  /* check if the cell is in the specified list */
 	  if (one->nplasma == ncell_stats[i])
 	    {
 	      fprintf (pstatptr,
@@ -136,6 +136,31 @@ bf_estimators_increment (one, p, ds)
     }
 
 
+  /* 1401 JM -- Similarly to the above routines, this is another bit of code added to radiation
+     which therefore did not get called in macro atom mode. Duplicating code is bad practice and
+     we should probably condense these updates of MC estimators into a single subroutine
+     which gets called by both routines -- for the moment I'm leaving as is */
+
+  /* NSH had implemented a scattered and direct contribution to the IP. This doesn't really work 
+     in the same way due to the nature of macro atoms, so should instead be thought of as 
+     'direct from source' and 'reprocessed' radiation */
+  if (HEV * p->freq > 13.6)	// only record if above H ionization edge
+    {
+
+      /* IP needs to be radiation density in the cell. We sum wcontributions from
+         each photon, then it is normalised in wind_update. */
+      xplasma->ip += ((p->w * ds) / (H * p->freq));
+      if (p->nscat == 0)
+	{
+	  xplasma->ip_direct += ((p->w * ds) / (H * p->freq));
+	}
+      else
+	{
+	  xplasma->ip_scatt += ((p->w * ds) / (H * p->freq));
+	}
+    }
+
+
 
   for (nn = 0; nn < xplasma->kbf_nuse; nn++)
     {
@@ -152,7 +177,7 @@ bf_estimators_increment (one, p, ds)
        * if (kap_bf[nn] > 0.0 && (freq_av > ft) && phot_top[n].macro_info == 1
        *          && geo.macro_simple == 0)
        */
-      if ( kap_bf[nn] > 0.0 && (freq_av > ft) )	// does the photon cause bf heating?
+      if (kap_bf[nn] > 0.0 && (freq_av > ft))	// does the photon cause bf heating?
 	{
 
 	  if (phot_top[n].macro_info == 1 && geo.macro_simple == 0)	// it is a macro atom
@@ -232,26 +257,26 @@ bf_estimators_increment (one, p, ds)
 
   y = weight_of_packet * kappa_ff (xplasma, freq_av) * ds;
 
-  xplasma->heat_ff += heat_contribution = y;	// record ff hea	
-  
+  xplasma->heat_ff += heat_contribution = y;	// record ff hea        
+
 
   /* Now for contribution to heating due to compton processes. (JM, Sep 013) */
-  
+
   y = weight_of_packet * kappa_comp (xplasma, freq_av) * ds;
-  
+
   xplasma->heat_comp += y;	// record the compton heating
   heat_contribution += y;	// add compton to the heat contribution
- 
-  
+
+
   /* Now for contribution to heating due to induced compton processes. (JM, Sep 013) */
 
   y = weight_of_packet * kappa_ind_comp (xplasma, freq_av) * ds;
-  
-  xplasma->heat_ind_comp += y;          // record the induced compton heating
-  heat_contribution += y;               // add induced compton to the heat contribution
-  
- 
- 
+
+  xplasma->heat_ind_comp += y;	// record the induced compton heating
+  heat_contribution += y;	// add induced compton to the heat contribution
+
+
+
   xplasma->heat_tot += heat_contribution;	// heat contribution is the contribution from compton, ind comp and ff processes
 
 
