@@ -246,7 +246,7 @@ q21 (line_ptr, t)
          } */
 
       if (config[line_ptr->nconfigl].z && config[line_ptr->nconfigl].nion == 2
-	  && line_ptr->nconfigl < 2 && line_ptr->f == 0)
+	  && line_ptr->nconfigl < 2 && line_ptr->f == 0.0)
 	{
 	  omega = get_he_forbidden_omega (line_ptr, t);
 	}
@@ -783,8 +783,8 @@ get_he_forbidden_omega (line_ptr, t)
 
 
 
-  while (ccoeff[m].il != line_ptr->nconfigl
-	 || ccoeff[m].jl != line_ptr->nconfigu || ccoeff[m].z != line_ptr->z
+  while (ccoeff[m].levl != line_ptr->levl
+	 || ccoeff[m].levu != line_ptr->levu || ccoeff[m].z != line_ptr->z
 	 || ccoeff[m].istate != line_ptr->istate)
     {
       m++;
@@ -792,8 +792,8 @@ get_he_forbidden_omega (line_ptr, t)
 
 
   /* return 0 if we don't find it */
-  if (ccoeff[m].il != line_ptr->nconfigl
-   || ccoeff[m].jl != line_ptr->nconfigu || ccoeff[m].z != line_ptr->z
+  if (ccoeff[m].levl != line_ptr->levl
+   || ccoeff[m].levu != line_ptr->levu || ccoeff[m].z != line_ptr->z
    || ccoeff[m].istate != line_ptr->istate)
   {
     Error("Entered get_he_forbidden_omega but no data for this ion, returning 0.");
@@ -817,14 +817,15 @@ get_he_forbidden_omega (line_ptr, t)
       /* then it is a forbidden transition from the ground state */
       /* here we use an approximation for the collision rate obtained from Mihalas & Stone 1968 */
 
-      log_gamma =
+      /*log_gamma =
 	ccoeff[m].coeff[0] + (ccoeff[m].coeff[1] * logT) +
 	(ccoeff[m].coeff[2] / (logT * logT));
       gamma = pow (10.0, log_gamma);
 
       q12 = exp ((H * line_ptr->freq) / (BOLTZMANN * t));
 
-      q12 *= 5.465e-11 * pow (t, 0.5);
+      q12 *= 5.465e-11 * pow (t, 0.5);*/
+      q12 = 0.0; // don't do ground state excitation for the moment
     }
 
 

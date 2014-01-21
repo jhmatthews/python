@@ -211,7 +211,7 @@ get_atomic_data (masterfile)
   double gsqrdtemp, gfftemp, s1temp, s2temp, s3temp;	//Temporary storage for gaunt factors
   int nc_coeff;
   double coeff[NCOEFFS];
-  int type, pqn, il, jl;
+  int type, pqn;
 
   /* define which files to read as data files */
 
@@ -348,7 +348,7 @@ get_atomic_data (masterfile)
     }
 
   nlevels = nxphot = ntop_phot = nauger = ndrecomb = ncpart = 0;	//Added counter for DR//
-  nc_coeff  = 0;    // counter for he collisional coefficients
+  nc_coeff = 0;			// counter for he collisional coefficients
 
   for (i = 0; i < NIONS; i++)
     {
@@ -426,17 +426,17 @@ get_atomic_data (masterfile)
 /* 0113 jm The following lines initialise the collisional coefficients structure */
   for (n = 0; n < NFORBIDDEN; n++)
     {
-       ccoeff[n].n = -1;
-       ccoeff[n].istate = -1; 
-       ccoeff[n].z = -1; 
-       ccoeff[n].type = -1;
-       ccoeff[n].il = -1;
-       ccoeff[n].jl = -1;
-       
-       for (j = 0; j< NCOEFFS; j++)
-       {
-        ccoeff[n].coeff[j] = -1;
-       }
+      ccoeff[n].n = -1;
+      ccoeff[n].istate = -1;
+      ccoeff[n].z = -1;
+      ccoeff[n].type = -1;
+      ccoeff[n].levl = -1;
+      ccoeff[n].levu = -1;
+
+      for (j = 0; j < NCOEFFS; j++)
+	{
+	  ccoeff[n].coeff[j] = -1;
+	}
     }
 
 
@@ -2112,49 +2112,150 @@ would like to have simple lines for macro-ions */
 
 /* Collisional coefficients for He approximations for forbidden transitions 
 
-#           z   istate  n    type       c0          c1          c-2   (spacers)  iconf  jconf     ilv     jlv
+#           z   istate  n    type       c0          c1          c-2   (spacers)  iconf  jconf     levl levu
 CollMacro   2   1       2      2     9.6367493  -2.2294083   -17.301025  0.0 0.0 0.0 0.0 0.0   2S3    2S1       2       3
 
-#           z   istate    n    type alpha   a0    a1     b1   c1       a2     b2    c2   iconf  jconf    ilv    2S+1_upper
+#           z   istate    n    type alpha   a0    a1     b1   c1       a2     b2    c2   iconf  jconf    levl levu
 CollMacro   2     1       1    1    1.125  1.535  2.76   1.2  0.494   0.108  2.50  1.50   1S1    nS1      1      1
 
 2 types, depending on whether we are talking about transitions from the ground state or 
 
 */
 		case 'C':
-		  sscanf (aline, "%*s %d %d %d %d %lf %lf %lf %lf %lf %lf %lf %lf %d %d",
+		  sscanf (aline,
+			  "%*s %d %d %d %d %lf %lf %lf %lf %lf %lf %lf %lf %*s %*s %d %d",
 			  &z, &istate, &pqn, &type, &coeff[0], &coeff[1],
-			  &coeff[2], &coeff[3], &coeff[4], &coeff[5], &coeff[6],
-			  &coeff[7], &il, &jl);
+			  &coeff[2], &coeff[3], &coeff[4], &coeff[5],
+			  &coeff[6], &coeff[7], &levl, &levu);
 
-		  if (z == 2)
+		  /* has a forbidden line been read in for this transition? */
+		  n = 0;
+		  while ((line[n].z != z || line[n].istate != istate
+			  || line[n].levl != levl || line[n].levl != levu)
+			 && n < nlines)
+		    n++;
+
+
+		  if (n == nlines)	// then we didn't find a line, 'create' one
 		    {
-		      if (pqn == 1 || pqn == 2)
-			{
-			  /* its coefficients for He I n=2 transitions */
-			  ccoeff[nc_coeff].z = z;
-			  ccoeff[nc_coeff].istate = istate;
-			  ccoeff[nc_coeff].n = pqn;
-			  ccoeff[nc_coeff].type = type;
-			  ccoeff[nc_coeff].il = il;
-			  ccoeff[nc_coeff].jl = jl;
+		      Log
+			("Get_atomic_data: Adding forbidden line, level %d to %d\n",
+			 levl, levu);
 
-        for ( n = 0; n < NCOEFFS; n++)
-        {
-          ccoeff[nc_coeff].coeff[n] = coeff[n];
-        }
-			  nc_coeff += 1;
-			}
-		      else
+		    }
+
+
+
+		  if (z == 2 && (pqn == 1 || pqn == 2) && istate == 1)
+		    {
+
+		      /* these are coefficients for He I n=2 or n=1 transitions */
+
+          /* check this ion is being treated as a macro ion */
+		      if (ion[n].macro_info == -1)
 			{
 			  Error
-			    ("get_atomicdata: coll coeffs: can't deal with shells other than n=1,2 yet.\n");
+			    ("Getatomic_data: Macro Atom line data supplied for ion %d\n but there is no suitable level data\n",
+			     n);
+			  exit (0);
 			}
+
+
+		      /* find the configurations associated with the lower level  */
+		      nconfigl = 0;
+		      while ((config[nconfigl].z != z
+			      || config[nconfigl].istate != istate
+			      || config[nconfigl].ilv != levl)
+			     && nconfigl < nlevels)
+			nconfigl++;
+
+
+		      /* find the configurations associated with the upper level  */
+		      nconfigu = 0;
+		      while ((config[nconfigu].z != z
+			      || config[nconfigu].istate != istate
+			      || config[nconfigu].ilv != levu)
+			     && nconfigu < nlevels)
+			nconfigu++;
+
+		      if (nconfigl == nlevels)
+			{
+			  Error_silent
+			    ("Get_atomic_data: No configuration found to match lower level of forbidden transition\n",
+			     lineno);
+			  break;
+			}
+
+		      if (nconfigu == nlevels)
+			{
+			  Error_silent
+			    ("Get_atomic_data: No configuration found to match lower level of forbidden transition\n",
+			     lineno);
+			  break;
+			}
+
+
+
+		      /* populate structure that stores coefficients */
+		      ccoeff[nc_coeff].z = z;
+		      ccoeff[nc_coeff].istate = istate;
+		      ccoeff[nc_coeff].n = pqn;
+		      ccoeff[nc_coeff].type = type;
+		      ccoeff[nc_coeff].levl = levl;
+		      ccoeff[nc_coeff].levu = levu;
+
+		      for (n = 0; n < NCOEFFS; n++)
+			{
+			  ccoeff[nc_coeff].coeff[n] = coeff[n];
+			}
+		      nc_coeff += 1;
+
+		      if (n != nlines)
+			{
+
+
+			  /* find the ion number for this transition */
+			  m = 0;
+			  while ((ion[m].z != z || ion[m].istate == istate)
+				 && m < nions)
+			    m++;
+
+
+			  /* we have now matched the upper and lower levels and can create a line */
+			  line[nlines].nion = m;
+			  line[nlines].z = z;
+			  line[nlines].istate = istate;
+			  line[nlines].freq = 0.0;	      // fudge
+			  line[nlines].f = 0.0;	         // f is zero, as transition is forbidden
+			  line[nlines].gl = config[nconfigl].g;
+			  line[nlines].gu = config[nconfigu].g;
+			  line[nlines].levl = levl;
+			  line[nlines].levu = levu;
+			  line[nlines].el = config[nconfigl].ex;
+			  line[nlines].eu = config[nconfigu].ex;
+			  line[nlines].nconfigl = nconfigl;
+			  line[nlines].nconfigu = nconfigu;
+
+			  line[nlines].macro_info = 1;	//It's a macro line
+
+        // finally, increase counters
+			  nlines_macro++;
+			  nlines++;
+
+			  if (nlines > NLINES)
+			    {
+			      Error
+				("getatomic_data: file %s line %d: More lines than allowed. Increase NLINES in atomic.h\n",
+				 file, lineno);
+			      exit (0);
+			    }
+			}
+
 		    }
 		  else
 		    {
 		      Error
-			("get_atomicdata: Can only deal with Helium collisional approximations at the moment\n");
+			("get_atomicdata: Can only deal with Helium 1 collisional approximations at the moment\n");
 		    }
 		  break;
 

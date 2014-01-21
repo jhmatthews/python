@@ -495,8 +495,8 @@ typedef struct coll_coeff
   int type;       // type of approximation
   int istate;      // ionisation stage
   double coeff[NCOEFFS];     // array of coefficients
-  int il;           // initial level
-  int jl;           // final level, or 2s+1 value of final level if type 1 (as can transition to multiple levels)
+  int levl;           // initial level
+  int levu;           // final level, or 2s+1 value of final level if type 1 (as can transition to multiple levels)
 } Coll_coeff, *coll_coeff_ptr;
 
 Coll_coeff ccoeff[NFORBIDDEN]; //Set up the structure
