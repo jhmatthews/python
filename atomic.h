@@ -486,7 +486,7 @@ Gaunt_total gaunt_total[MAX_GAUNT_N_GSQRD];	//Set up the structure
 coefficients for approximations for He as described by Mihalas & Stone 1968 */
 
 #define NCOEFFS 8  //number of coefficients for collisional approximations for forbidden transitions
-#define NFORBIDDEN 50 //Space set aside for the number of forbidden transitions which have collisional rates
+#define NFORBIDDEN 100 //Space set aside for the number of forbidden transitions which have collisional rates
 
 typedef struct coll_coeff
 {

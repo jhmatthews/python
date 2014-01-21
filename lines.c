@@ -245,13 +245,20 @@ q21 (line_ptr, t)
          gaunt = 0.2;
          } */
 
-
-
-      gaunt = 1;
-      omega =
-	ECS_CONSTANT * line_ptr->gl * gaunt * line_ptr->f / line_ptr->freq;
-      q21_a = 8.629e-6 / (sqrt (t) * line_ptr->gu) * omega;
-      q21_t_old = t;
+      if (config[line_ptr->nconfigl].z && config[line_ptr->nconfigl].nion == 2
+	  && line_ptr->nconfigl < 2 && line_ptr->f == 0)
+	{
+	  omega = get_he_forbidden_omega (line_ptr, t);
+	}
+      else
+	{
+	  gaunt = 1;
+	  omega =
+	    ECS_CONSTANT * line_ptr->gl * gaunt * line_ptr->f /
+	    line_ptr->freq;
+	  q21_a = 8.629e-6 / (sqrt (t) * line_ptr->gu) * omega;
+	  q21_t_old = t;
+	}
     }
 
   return (q21_a);
@@ -565,7 +572,7 @@ scattering_fraction (line_ptr, xplasma)
 //Populate variable from previous calling structure
   ne = xplasma->ne;
   te = xplasma->t_e;
-  tr = xplasma->t_r;	//JM1308 in pre 76b versions this was incorrectly set to xplasma->t_e
+  tr = xplasma->t_r;		//JM1308 in pre 76b versions this was incorrectly set to xplasma->t_e
   w = xplasma->w;
   dvds = wmain[xplasma->nwind].dvds_ave;
   dd = xplasma->density[line_ptr->nion];
@@ -635,7 +642,7 @@ p_escape (line_ptr, xplasma)
 //Populate variable from previous calling structure
   ne = xplasma->ne;
   te = xplasma->t_e;
-  tr = xplasma->t_r;	//JM1308 in pre 76b versions this was incorrectly set to xplasma->t_e
+  tr = xplasma->t_r;		//JM1308 in pre 76b versions this was incorrectly set to xplasma->t_e
   w = xplasma->w;
   dd = xplasma->density[line_ptr->nion];
   dvds = wmain[xplasma->nwind].dvds_ave;
@@ -729,4 +736,119 @@ line_heat (xplasma, pp, nres)
 
   return (0);
 
+}
+
+
+
+
+
+/***********************************************************
+                Southampton University
+
+Synopsis: get_he_forbidden_omega
+    this is routine which uses Mihalas & Stone's (1968)
+    approximations for He forbidden transitions. This is required
+    because the Van Regemorter approximation has an oscillator strenght dependence
+
+Arguments:    
+    pe_line_ptr   line pointer
+    te            temperature in cell
+
+Returns:
+    C_ij / ne, analogous to q12, follows Mihalas & Stone
+
+Notes:
+
+
+History:
+   130120 JM  --  Initial coding
+ 
+**************************************************************/
+
+double
+get_he_forbidden_omega (line_ptr, t)
+     LinePtr line_ptr;
+     double t;
+{
+  double logT;
+  double gamma, log_gamma;
+  double q12;
+  int m, type;
+
+
+  logT = log10 (t);
+
+  /* first locate the level in the coefficient list */
+  m = 0;
+
+
+
+  while (ccoeff[m].il != line_ptr->nconfigl
+	 || ccoeff[m].jl != line_ptr->nconfigu || ccoeff[m].z != line_ptr->z
+	 || ccoeff[m].istate != line_ptr->istate)
+    {
+      m++;
+    }
+
+
+  /* return 0 if we don't find it */
+  if (ccoeff[m].il != line_ptr->nconfigl
+   || ccoeff[m].jl != line_ptr->nconfigu || ccoeff[m].z != line_ptr->z
+   || ccoeff[m].istate != line_ptr->istate)
+  {
+    Error("Entered get_he_forbidden_omega but no data for this ion, returning 0.");
+    return (0);
+  }
+
+
+  /* this is the type of approximation used. 
+     type 1 is for He I transitions from the ground state, and uses 
+     MS1968 Equation 
+     type 2 is for He I transitions between n=2 subshells, and uses
+     MS1968 Equations A7 and A17 */
+  type = ccoeff[m].type;
+
+
+
+
+  if (type == 1)
+    {
+
+      /* then it is a forbidden transition from the ground state */
+      /* here we use an approximation for the collision rate obtained from Mihalas & Stone 1968 */
+
+      log_gamma =
+	ccoeff[m].coeff[0] + (ccoeff[m].coeff[1] * logT) +
+	(ccoeff[m].coeff[2] / (logT * logT));
+      gamma = pow (10.0, log_gamma);
+
+      q12 = exp ((H * line_ptr->freq) / (BOLTZMANN * t));
+
+      q12 *= 5.465e-11 * pow (t, 0.5);
+    }
+
+
+
+
+  else if (type == 2)
+    {
+
+      /* then it is a forbidden transition between the n = 2 subshells */
+      /* here we use an approximation for the collision rate obtained from Mihalas & Stone 1968 */
+
+      /* Equation A17 MS1968 */
+      log_gamma =
+  ccoeff[m].coeff[0] + (ccoeff[m].coeff[1] * logT) +
+  (ccoeff[m].coeff[2] / (logT * logT));
+
+      gamma = pow (10.0, log_gamma);
+
+
+
+      q12 = exp ((H * line_ptr->freq) / (BOLTZMANN * t));
+
+      q12 *= 5.465e-11 * pow (t, 0.5) * gamma;
+    }
+
+  return q12;
 }
