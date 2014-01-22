@@ -248,7 +248,7 @@ q21 (line_ptr, t)
       if (config[line_ptr->nconfigl].z && config[line_ptr->nconfigl].nion == 2
 	  && line_ptr->nconfigl < 2 && line_ptr->f == 0.0)
 	{
-	  omega = get_he_forbidden_omega (line_ptr, t);
+	  q21_a = get_he_forbidden_omega (line_ptr, t);
 	}
       else
 	{
