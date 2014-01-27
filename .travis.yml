@@ -13,7 +13,7 @@ branches:
 install:
     # First make cfitsio library
     - echo $PYTHON
-    - export PYTHON = $PWD
+    - export PYTHON=$PWD
     - cd software/cfitsio3040
     -  ./configure 
     - make
