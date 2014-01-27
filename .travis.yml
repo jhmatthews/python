@@ -1,0 +1,33 @@
+language: c
+compiler:
+    - gcc
+
+env:
+    - PYTHON = $(TRAVIS_BUILD_DIR)
+    - CFITSIO = $(PYTHON)/software/cfitsio3040
+    - GSL = $(PYTHON)/software/gsl-1.15
+
+branches:
+  only:
+    - structure
+
+
+install:
+    # First make cfitsio library
+    - cd $(CFITSIO)
+	-  ./configure 
+    - make
+    - mv libcfitsio.a ../../lib
+    - make clean
+
+    # Then make GSL library
+    - cd $(GSL)
+    - ./configure --disable-shared --prefix=$(PYTHON)/gsl
+    - make
+    - make check 2>&1
+    - make install
+    - make clean
+
+script:
+    - cd $(PYTHON)
+    - make test
