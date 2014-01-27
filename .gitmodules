@@ -1,6 +1,0 @@
-[submodule "kpar"]
-	path = kpar
-	url = https://github.com/jhmatthews/kpar
-[submodule "progs"]
-	path = progs
-	url = ./origin/progs
