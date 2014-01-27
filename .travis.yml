@@ -4,8 +4,6 @@ compiler:
 
 env:
     - PYTHON = $(TRAVIS_BUILD_DIR)
-    - CFITSIO = $(PYTHON)/software/cfitsio3040
-    - GSL = $(PYTHON)/software/gsl-1.15
 
 branches:
   only:
@@ -14,14 +12,14 @@ branches:
 
 install:
     # First make cfitsio library
-    - cd $(CFITSIO)
+    - cd $(PYTHON)/software/cfitsio3040
     -  ./configure 
     - make
     - mv libcfitsio.a ../../lib
     - make clean
 
     # Then make GSL library
-    - cd $(GSL)
+    - cd $(PYTHON)/software/gsl-1.15
     - ./configure --disable-shared --prefix=$(PYTHON)/gsl
     - make
     - make check 2>&1
