@@ -42,3 +42,11 @@ clean:
 	rm -f *.o *~
 	cd $(CFITSIO); make clean
 	cd $(GSL); make clean 
+
+
+test:
+	cd $(PYTHON)/progs
+	git clone https://github.com/agnwinds/python.git 
+	cd python
+	make python
+	make py_wind
