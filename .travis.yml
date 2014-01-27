@@ -15,7 +15,7 @@ branches:
 install:
     # First make cfitsio library
     - cd $(CFITSIO)
-	-  ./configure 
+    -  ./configure 
     - make
     - mv libcfitsio.a ../../lib
     - make clean
