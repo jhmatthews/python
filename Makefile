@@ -40,10 +40,14 @@ endif
 
 INCLUDE = ../../include
 INCLUDE2 = ../../gsl/include
+INCLUDE_TEST = gsl/include
 
 LIB = ../../lib
 LIB2 = ../../gsl/lib
 BIN = ../../bin
+
+
+TESTFLAGS = -O3 -Wall -I$(INCLUDE_TEST)
 
 ifeq (D,$(firstword $(MAKECMDGOALS)))
 # use pg when you want to use gprof the profiler
@@ -124,9 +128,17 @@ prototypes:
 	cproto -I$(INCLUDE)  -I$(INCLUDE2) $(kpar_source) > log.h 
 
 python: startup  python.o $(python_objects)
-	$(CC)  ${CFLAGS} python.o $(python_objects) $(kpar_objects) $(LDFLAGS) -o python
+	$(CC)  ${TESTFLAGS} python.o $(python_objects) $(kpar_objects) $(LDFLAGS) -o python
 		cp $@ $(BIN)/py
 		mv $@ $(BIN)/py$(VERSION)
+
+test: startup python.o $(python_objects)
+    $(CC)  ${CFLAGS} python.o $(python_objects) $(kpar_objects) $(LDFLAGS) -o python
+        cp $@ $(BIN)/py
+        mv $@ $(BIN)/py$(VERSION)
+
+
+
 
 #This line is jsut so you can use make D python for debugging
 D:	
