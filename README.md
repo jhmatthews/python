@@ -1,7 +1,6 @@
 #Python
 
 README, structure branch
-=========
 
 ###Directory Structure
 
@@ -27,30 +26,17 @@ Consult the [wiki](https://github.com/agnwinds/python/wiki/_pages "Wiki") for ho
 
 You will also have to install cfitsio and gsl- instructions on doing this are also in the wiki.
 
+### Build Status
 
-===========
+TARDIS
+======
 
-### Basic Git Instructions
+[![Build Status](https://travis-ci.org/jhmatthews/python.png?branch=structure)](https://travis-ci.org/jhmatthews/python)
 
-clone this repository:
-$ git clone https://github.com/agnwinds/python.git 
+TARDIS code to create synthetic spectra for supernova ejecta
 
-add files to be tracked:
-$ git add filename
+Documentation at tardis.readthedocs.org
 
-pull changes from github site:
-$ git pull origin branchname
-
-push changes to github site:
-$ git push origin branchname
-
-check git status:
-$ git status
-
-commit all changes to local repo with commit message:
-$ git commit -am 'Changed something in file.c'
-
-============
 
 ### Contact / Usage
 
