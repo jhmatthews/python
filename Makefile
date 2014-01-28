@@ -45,6 +45,7 @@ clean:
 
 
 test:
+	mkdir $(PYTHON)/progs
 	cd $(PYTHON)/progs
 	git clone https://github.com/agnwinds/python.git 
 	cd python
