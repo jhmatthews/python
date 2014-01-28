@@ -13,7 +13,7 @@ branches:
 install:
     # First make cfitsio library
     - echo $PYTHON
-    - export PYTHON=$PWD
+    - export PYTHON=$TRAVIS_BUILD_DIR
     - cd software/cfitsio3040
     -  ./configure 
     - make
@@ -29,5 +29,5 @@ install:
     - make clean
 
 script:
-    - cd $PYTHON
+    - cd $TRAVIS_BUILD_DIR
     - make test
