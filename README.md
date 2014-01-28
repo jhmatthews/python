@@ -28,14 +28,7 @@ You will also have to install cfitsio and gsl- instructions on doing this are al
 
 ### Build Status
 
-TARDIS
-======
-
 [![Build Status](https://travis-ci.org/jhmatthews/python.png?branch=structure)](https://travis-ci.org/jhmatthews/python)
-
-TARDIS code to create synthetic spectra for supernova ejecta
-
-Documentation at tardis.readthedocs.org
 
 
 ### Contact / Usage
