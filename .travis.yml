@@ -11,9 +11,9 @@ git:
 #env:
 #    - PYTHON = $TRAVIS_BUILD_DIR
 
-#branches:
-#  only:
-#    - structure
+branches:
+  only:
+    - Travis
 
 
 install:
