@@ -35,6 +35,5 @@ install:
 
 script:
     - cd progs/python
-    - make CC=gcc python
+    - make test
     - make clean
-    - make CC=gcc py_wind

@@ -133,7 +133,7 @@ python: startup  python.o $(python_objects)
 		mv $@ $(BIN)/py$(VERSION)
 
 test: startup python.o $(python_objects)
-    $(CC)  ${CFLAGS} python.o $(python_objects) $(kpar_objects) $(LDFLAGS) -o python
+    gcc ${CFLAGS} python.o $(python_objects) $(kpar_objects) $(LDFLAGS) -o python
         cp $@ $(BIN)/py
         mv $@ $(BIN)/py$(VERSION)
 
