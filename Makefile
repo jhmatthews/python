@@ -47,7 +47,8 @@ clean:
 test:
 	mkdir $(PYTHON)/progs
 	cd $(PYTHON)/progs
-	git clone https://github.com/agnwinds/python.git 
+	git clone https://github.com/agnwinds/python.git -b Travis
 	cd python
-	make python
+	make test
+	make clean
 	make py_wind
