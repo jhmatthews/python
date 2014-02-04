@@ -35,8 +35,7 @@ install:
     - make clean
 
 script:
-    - export PYTHON=$TRAVIS_BUILD_DIR
-    - cd $PYTHON/progs/python
+    - cd progs/python
     - make CC=gcc python
     - make clean
     - make CC=gcc py_wind
