@@ -4,24 +4,19 @@ compiler:
 
 git:
     - git clone --depth=50 --branch=structure git://github.com/jhmatthews/python.git jhmatthews/python
-    - mkdir progs
-    - cd progs
-    - git clone git://github.com/jhmatthews/python.git
-
-#env:
-#    - PYTHON = $TRAVIS_BUILD_DIR
+ #   - mkdir progs
+ #   - cd progs
+ #   - git clone git://github.com/jhmatthews/python.git
 
 branches:
   only:
     - Travis
 
-
 install:
     # First make cfitsio library
-    - echo $PYTHON
     - export PYTHON=$TRAVIS_BUILD_DIR
     - cd software/cfitsio3040
-    -  ./configure 
+    - ./configure 
     - make
     - mv libcfitsio.a ../../lib
     - make clean
