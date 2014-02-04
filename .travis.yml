@@ -30,7 +30,6 @@ install:
     - cd ../../software/gsl-1.15
     - ./configure --disable-shared --prefix=$PYTHON/gsl
     - make
-    - make check 2>&1
     - make install
     - make clean
 
