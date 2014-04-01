@@ -689,7 +689,8 @@ p_escape (line_ptr, xplasma)
     }
 
 
-  return (pe_escape);
+  //return (pe_escape);
+  return(1.0);     // this is a thin shell model so I want to be optically thin in lines  
 }
 
 /* line_heat calculates the amount of line heating that occurs after a resonance. It is called

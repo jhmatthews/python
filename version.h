@@ -1,2 +1,2 @@
-#define VERSION  "77a_dev"
+#define VERSION  "thin"
 #define CHOICE 1 // Compress plasma as much as possible
