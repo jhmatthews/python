@@ -1657,6 +1657,35 @@ macro_pops (xplasma, xne)
 	     thing is to replace one of the rows of the matrix (say the first row) with the constraint
 	     that the sum of all the populations is 1.0 (this will let us get population fractions). */
 
+       // if (index_element == 1)
+       // {
+	     /* add abritrarily fast line to 2-1 and 1-2 */
+	     /*	fast_line.gl = 1;
+			fast_line.gu = 3;
+			fast_line.freq =
+			  (19.54403 -
+			   0.00000) / H;
+			fast_line.f = 1e4;
+			rate = q12 (&fast_line, xplasma->t_e) * xne;
+			lower = 0;
+			upper = 1;
+			rate_matrix[lower][lower] += -1. * rate;
+			rate_matrix[upper][lower] += rate;
+			rate = q21 (&fast_line, xplasma->t_e) * xne;
+			rate_matrix[upper][upper] += -1. * rate;
+			rate_matrix[lower][upper] += rate;
+		}*/
+
+	    for (nn = 0; nn < n_macro_lvl; nn++)
+	    {
+	      for (mm = 0; mm < n_macro_lvl; mm++)
+		{
+		  Log(" %8.4e ", rate_matrix[nn][mm]);
+		}
+		Log("\nRATES");
+	    }
+	    
+
 	  for (index_lvl = 0; index_lvl < n_macro_lvl; index_lvl++)
 	    {
 	      rate_matrix[0][index_lvl] = 1.0;
@@ -1713,7 +1742,7 @@ macro_pops (xplasma, xne)
 	     Therefor let's follow Leon's procedure (Lucy 2003) and remove inversions. */
 
 
-
+       
 	  for (index_ion = ele[index_element].firstion;
 	       index_ion <
 	       (ele[index_element].firstion + ele[index_element].nions);
@@ -1740,7 +1769,7 @@ macro_pops (xplasma, xne)
 			}
 		    }
 		}
-	    }
+	    } 
 
 
 	  /* The populations are now known. The populations need to be stored
