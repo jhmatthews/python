@@ -1404,6 +1404,7 @@ macro_pops (xplasma, xne)
   gsl_vector_view b;		//NEWKSL
   gsl_vector *populations;	//NEWKSL
   int index_fast_col;
+  double diag_sum, column_sum, offdiag_sum, matrix_sum;
 
   MacroPtr mplasma;
   mplasma = &macromain[xplasma->nplasma];
@@ -1420,7 +1421,7 @@ macro_pops (xplasma, xne)
 	{
 	  for (mm = 0; mm < NLEVELS_MACRO; mm++)
 	    {
-	      rate_matrix[mm][nn] = 0.0;
+	      rate_matrix[mm][nn] = -999;
 	    }
 	}
 
@@ -1463,6 +1464,14 @@ macro_pops (xplasma, xne)
 		  n_macro_lvl++;
 		}
 	    }
+
+	  for (nn = 0; nn < n_macro_lvl; nn++)
+	  {
+	      for (mm = 0; mm < n_macro_lvl; mm++)
+		{
+			rate_matrix[mm][nn] = 0.0;
+	    }
+	  }
 
 	  /* We now know how many levels there are and therefore how big the matrix we
 	     need to invert will be. */
@@ -1532,7 +1541,12 @@ macro_pops (xplasma, xne)
 			b12 (line_ptr) *
 			mplasma->jbar_old[config[index_lvl].bbu_indx_first +
 					  index_bbu];
+
+			  Log("Radiative upwards %8.4e %8.4e ", rate, mplasma->jbar_old[config[index_lvl].bbu_indx_first +
+					  index_bbu]);
 		      rate += q12 (line_ptr, xplasma->t_e) * xne;
+              Log("Collisional upwards %8.4e\n", q12 (line_ptr, xplasma->t_e) * xne);
+
 
 		      /* This is the rate out of the level in question. We need to add it
 		         to the matrix in two places: firstly as a -ve contribution to the
@@ -1543,6 +1557,9 @@ macro_pops (xplasma, xne)
 
 		      lower = conf_to_matrix[index_lvl];
 		      upper = conf_to_matrix[line_ptr->nconfigu];
+
+		      if (rate < 0.0 || sane_check(rate) )
+		      	Error("macro pops: RATE IS %8.4e\n!", rate);
 
 		      rate_matrix[lower][lower] += -1. * rate;
 		      rate_matrix[upper][lower] += rate;
@@ -1569,6 +1586,9 @@ macro_pops (xplasma, xne)
 		      upper = conf_to_matrix[index_lvl];
 		      lower = conf_to_matrix[line_ptr->nconfigl];
 
+		      if (rate < 0.0 || sane_check(rate) )
+		      	Error("macro pops: RATE IS %8.4e\n!", rate);
+
 		      rate_matrix[upper][upper] += -1. * rate;
 		      rate_matrix[lower][upper] += rate;
 		    }
@@ -1586,7 +1606,10 @@ macro_pops (xplasma, xne)
 		      rate =
 			mplasma->gamma_old[config[index_lvl].bfu_indx_first +
 					   index_bfu];
+			Log("Radiative bfu %8.4e %8.4e ", rate, mplasma->gamma_old[config[index_lvl].bfu_indx_first +
+					   index_bfu]);
 		      rate += q_ioniz (cont_ptr, xplasma->t_e) * xne;
+		      Log("Collisional bfu %8.4e\n", q_ioniz (cont_ptr, xplasma->t_e) * xne);
 
 		      /* This is the rate out of the level in question. We need to add it
 		         to the matrix in two places: firstly as a -ve contribution to the
@@ -1597,6 +1620,9 @@ macro_pops (xplasma, xne)
 
 		      lower = conf_to_matrix[index_lvl];
 		      upper = conf_to_matrix[cont_ptr->uplev];
+
+		      if (rate < 0.0 || sane_check(rate) )
+		      	Error("macro pops: RATE IS %8.4e\n!", rate);
 
 		      rate_matrix[lower][lower] += -1. * rate;
 		      rate_matrix[upper][lower] += rate;
@@ -1610,8 +1636,11 @@ macro_pops (xplasma, xne)
 			alpha_st_old[config[index_lvl].bfu_indx_first +
 				     index_bfu] * xne;
 
-		      rate_matrix[upper][upper] += -1. * rate;
-		      rate_matrix[lower][upper] += rate;
+			  if (rate < 0.0 || sane_check(rate) )
+		      	Error("macro pops: RATE IS %8.4e\n!", rate);
+
+		      //rate_matrix[upper][upper] += -1. * rate;
+		      // rate_matrix[lower][upper] += rate;
 
 		    }
 
@@ -1647,6 +1676,9 @@ macro_pops (xplasma, xne)
 		      upper = conf_to_matrix[index_lvl];
 		      lower = conf_to_matrix[cont_ptr->nlev];
 
+		      if (rate < 0.0 || sane_check(rate) )
+		      	Error("macro pops: RATE IS %8.4e\n!", rate);
+
 		      rate_matrix[upper][upper] += -1. * rate;
 		      rate_matrix[lower][upper] += rate;
 		    }
@@ -1676,14 +1708,45 @@ macro_pops (xplasma, xne)
 			rate_matrix[lower][upper] += rate;
 		}*/
 
-	    for (nn = 0; nn < n_macro_lvl; nn++)
+	    /*for (nn = 0; nn < n_macro_lvl; nn++)
 	    {
 	      for (mm = 0; mm < n_macro_lvl; mm++)
 		{
 		  Log(" %8.4e ", rate_matrix[nn][mm]);
 		}
 		Log("\nRATES");
+	    }*/
+
+	  /* JM -- this section is to check the contents of the matrix. We need to check that the 
+	     columns sum to zero and the overall matrix sums to zero.
+	  */
+
+	  matrix_sum = 0.0;
+	  offdiag_sum = diag_sum = 0.0;
+	  for (mm = 0; mm < n_macro_lvl; mm++)
+	    {
+	      column_sum = 0.0;
+	      //Log("RATES ", mm);
+	      for (nn = 0; nn < n_macro_lvl; nn++)
+		{
+		  //Log(" %20.20e ", rate_matrix[nn][mm]);
+		  if (nn == mm)
+		  {
+		  	diag_sum += rate_matrix[nn][mm];
+		  }
+		  else
+		  	offdiag_sum += rate_matrix[nn][mm];
+
+          
+		  column_sum += rate_matrix[nn][mm];
+		  matrix_sum += rate_matrix[nn][mm];
+		}
+		//matrix_sum += column_sum;
+		//Log("\n");
 	    }
+
+      //Log("diagsum %8.12e offdiags %8.12e\n", diag_sum, offdiag_sum);
+	  //Log("diags = %8.12e total= %8.12e\n\n", diag_sum + offdiag_sum, matrix_sum, column_sum);
 	    
 
 	  for (index_lvl = 0; index_lvl < n_macro_lvl; index_lvl++)
@@ -1709,6 +1772,9 @@ macro_pops (xplasma, xne)
 	      for (mm = 0; mm < n_macro_lvl; mm++)
 		{
 		  a_data[nn * n_macro_lvl + mm] = rate_matrix[nn][mm];
+
+		  if (a_data[nn * n_macro_lvl + mm] == -999)
+		  	Error("macro_pops: accessing wrong element of matrix, there'sa  problem here.\n");
 		}
 	    }
 
@@ -1728,6 +1794,10 @@ macro_pops (xplasma, xne)
 	  p = gsl_permutation_alloc (n_macro_lvl);	//NEWKSL
 
 	  gsl_linalg_LU_decomp (&m.matrix, p, &s);
+
+	  double det = gsl_linalg_LU_det(&m.matrix, s);
+
+	  Log("The determinant of the matrix is %8.4e\n", det);
 
 	  gsl_linalg_LU_solve (&m.matrix, p, &b.vector, populations);
 
@@ -1780,6 +1850,7 @@ macro_pops (xplasma, xne)
 
 	  nn = 0;
 	  mm = 0;
+	  Log ("xne is %8.4e\n", xne);
 	  for (index_ion = ele[index_element].firstion;
 	       index_ion <
 	       (ele[index_element].firstion + ele[index_element].nions);
@@ -1792,6 +1863,12 @@ macro_pops (xplasma, xne)
 		   index_lvl++)
 		{
 		  this_ion_density += gsl_vector_get (populations, nn);
+		  //Log("nn %i index_lvl %i conf_to_matrix %i\n", nn, index_lvl, conf_to_matrix[index_lvl]);
+		  Log ("POPS %i %i %8.4e %8.4e\n", index_lvl,
+		       conf_to_matrix[index_lvl], gsl_vector_get (populations,
+								  conf_to_matrix
+								  [index_lvl]),
+		       gsl_vector_get (populations, nn));
 		  nn++;
 		}
 

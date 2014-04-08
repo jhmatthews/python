@@ -256,7 +256,7 @@ q21 (line_ptr, t)
       q21_t_old = t;
     }
 
-  return (q21_a);
+  return (0.0);
 }
 
 double
@@ -273,7 +273,7 @@ q12 (line_ptr, t)
 				       t) * exp (-H_OVER_K * line_ptr->freq /
 						 t);
 
-  return (x);
+  return (0.0);
 }
 
 
@@ -689,8 +689,8 @@ p_escape (line_ptr, xplasma)
     }
 
 
-  //return (pe_escape);
-  return(1.0);     // this is a thin shell model so I want to be optically thin in lines  
+  return (pe_escape);
+  //return(1.0);     // this is a thin shell model so I want to be optically thin in lines  
 }
 
 /* line_heat calculates the amount of line heating that occurs after a resonance. It is called
