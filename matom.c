@@ -9,7 +9,6 @@
 #include <gsl/gsl_block.h>
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
-//#include <gsl/gsl_blas.h>
 #include "my_linalg.h"
 
 /*****************************************************************************
@@ -1538,6 +1537,9 @@ macro_pops (xplasma, xne)
 					  index_bbu];
 		      rate += q12 (line_ptr, xplasma->t_e) * xne;
 
+
+		      rate = b12 (line_ptr) * xplasma->w * jblue_bb(xplasma->t_r, line_ptr->freq);
+
 		      /* This is the rate out of the level in question. We need to add it
 		         to the matrix in two places: firstly as a -ve contribution to the
 		         diagonal and secondly as a +ve contribution for the off-diagonal
@@ -1682,6 +1684,50 @@ macro_pops (xplasma, xne)
 		}
 	    }
 
+	   if (index_element == 1)
+        {
+	        xne *= 1e8;
+	        fast_line.gl = 1;
+			fast_line.gu = 3;
+			fast_line.freq =
+			  (19.54403 -
+			   0.00000) / HEV;
+			fast_line.f = 1e4;
+			rate = q12 (&fast_line, xplasma->t_e) * xne;
+			lower = 0;
+			upper = 1;
+			rate_matrix[lower][lower] += -1. * rate;
+			rate_matrix[upper][lower] += rate;
+			rate = q21 (&fast_line, xplasma->t_e) * xne;
+			rate_matrix[upper][upper] += -1. * rate;
+			rate_matrix[lower][upper] += rate;
+
+			fast_line.gu = 1;
+			fast_line.gl = 3;
+			fast_line.freq = (20.36881 - 19.54403) / HEV;
+			rate = q12 (&fast_line, xplasma->t_e) * xne;
+			lower = 1;
+			upper = 2;
+			rate_matrix[lower][lower] += -1. * rate;
+			rate_matrix[upper][lower] += rate;
+			rate = q21 (&fast_line, xplasma->t_e) * xne;
+			rate_matrix[upper][upper] += -1. * rate;
+			rate_matrix[lower][upper] += rate;
+
+			fast_line.gu = 1;
+			fast_line.gl = 1;
+			fast_line.freq = (20.36881) / HEV;
+			rate = q12 (&fast_line, xplasma->t_e) * xne;
+			lower = 0;
+			upper = 2;
+			rate_matrix[lower][lower] += -1. * rate;
+			rate_matrix[upper][lower] += rate;
+			rate = q21 (&fast_line, xplasma->t_e) * xne;
+			rate_matrix[upper][upper] += -1. * rate;
+			rate_matrix[lower][upper] += rate;
+
+		}
+
 	  /* The rate matrix is now filled up. Since the problem is not closed as it stands, the next
 	     thing is to replace one of the rows of the matrix (say the first row) with the constraint
 	     that the sum of all the populations is 1.0 (this will let us get population fractions). */
@@ -1798,7 +1844,7 @@ macro_pops (xplasma, xne)
 
 
 
-	  for (index_ion = ele[index_element].firstion;
+	  /*for (index_ion = ele[index_element].firstion;
 	       index_ion <
 	       (ele[index_element].firstion + ele[index_element].nions);
 	       index_ion++)
@@ -1807,10 +1853,10 @@ macro_pops (xplasma, xne)
 		   index_lvl <
 		   ion[index_ion].first_nlte_level + ion[index_ion].nlte;
 		   index_lvl++)
-		{		/* Start loop with lowest level of the ion. For each level in turn check to see if there's a population 
+		{*/	    /* Start loop with lowest level of the ion. For each level in turn check to see if there's a population 
 				   inversion i.e. is  upper_pop > lower_pop * g_upper / g_lower. If it is then replace upper_pop with
 				   lower_pop * g_upper / g_lower. We loop over all levels higher than the currently chosen lower level. */
-		  for (nn = index_lvl + 1;
+		/*  for (nn = index_lvl + 1;
 		       nn <
 		       (ion[index_ion].first_nlte_level +
 			ion[index_ion].nlte); nn++)
@@ -1824,7 +1870,7 @@ macro_pops (xplasma, xne)
 			}
 		    }
 		}
-	    }
+	    }*/
 
 
 	  /* The populations are now known. The populations need to be stored
@@ -3206,5 +3252,24 @@ q_recomb (cont_ptr, electron_temperature)
 
   return (coeff);
 }
+
+
+
+
+
+double jblue_bb(t, nu)
+	double t;
+	double nu;
+{
+	double x, term;
+
+	term = exp(H_OVER_K * nu / t) - 1.0;
+
+	x = 2.0 * H * nu * nu * nu / C / C / term;
+
+	return x;
+}
+
+
 
 

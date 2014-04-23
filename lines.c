@@ -689,7 +689,7 @@ p_escape (line_ptr, xplasma)
     }
 
 
-  return (pe_escape);
+  return (1.0);
 }
 
 /* line_heat calculates the amount of line heating that occurs after a resonance. It is called
