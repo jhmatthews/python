@@ -1376,6 +1376,7 @@ History:
 	06may	ksl	57+ -- Modified to reflect plasma structue
     1404 	jm  77a -- Added test to check that populations are solution to rate matrix equation in macro_pops
                        + more robust erro reporting in general. See pull request #75.
+    1404  	jm  77a -- Now only clean for population inversions if levels have a radiative transition between them #76
 ************************************************************/
 
 int
@@ -1388,6 +1389,7 @@ macro_pops (xplasma, xne)
   int n_macro_lvl;
   double rate;
   double rate_matrix[NLEVELS_MACRO][NLEVELS_MACRO];
+  int radiative_flag[NLEVELS_MACRO][NLEVELS_MACRO];	// 140423 JM flag if two levels are radiatively linked
   int matrix_to_conf[NLEVELS_MACRO];
   int conf_to_matrix[NLEVELS_MACRO];
   struct lines *line_ptr;
@@ -1424,6 +1426,10 @@ macro_pops (xplasma, xne)
 	  for (mm = 0; mm < NLEVELS_MACRO; mm++)
 	    {
 	      rate_matrix[mm][nn] = 0.0;
+
+	      /* 140423 JM -- new int array to flag if  two levels are radiatively linked
+	         initialize to 0 */
+	      radiative_flag[mm][nn] = 0; 
 	    }
 	}
 
@@ -1553,6 +1559,10 @@ macro_pops (xplasma, xne)
 		      rate_matrix[lower][lower] += -1. * rate;
 		      rate_matrix[upper][lower] += rate;
 
+		      /* There's a radiative jump between these levels, so we want to clean
+		         for popualtion inversions. Flag this jump */
+		      radiative_flag[index_lvl][line_ptr->nconfigu] = 1;
+
 		      if (rate < 0.0 || sane_check(rate))
 		      {
 		      	Error("macro_pops: bbu rate is %8.4e in cell/matom %i\n", rate, xplasma->nplasma);
@@ -1582,6 +1592,11 @@ macro_pops (xplasma, xne)
 
 		      rate_matrix[upper][upper] += -1. * rate;
 		      rate_matrix[lower][upper] += rate;
+
+
+		      /* There's a radiative jump between these levels, so we want to clean
+		         for popualtion inversions. Flag this jump */
+		      radiative_flag[line_ptr->nconfigl][index_lvl] = 1;
 
 		      if (rate < 0.0 || sane_check(rate))
 		      {
@@ -1861,13 +1876,18 @@ macro_pops (xplasma, xne)
 		       (ion[index_ion].first_nlte_level +
 			ion[index_ion].nlte); nn++)
 		    {
-		      inversion_test = gsl_vector_get (populations, conf_to_matrix[index_lvl]) * config[nn].g / config[index_lvl].g * 0.999999;	//include a correction factor 
-		      if (gsl_vector_get (populations, conf_to_matrix[nn]) >
-			  inversion_test)
-			{
-			  gsl_vector_set (populations, conf_to_matrix[nn],
+
+              /* this if statement means we only clean if there's a radiative jump between the levels */
+              if (radiative_flag[index_lvl][nn])
+              {
+		        inversion_test = gsl_vector_get (populations, conf_to_matrix[index_lvl]) * config[nn].g / config[index_lvl].g * 0.999999;	//include a correction factor 
+		        if (gsl_vector_get (populations, conf_to_matrix[nn]) >
+			    inversion_test)
+			  {
+			    gsl_vector_set (populations, conf_to_matrix[nn],
 					  inversion_test);
-			}
+			  }
+		      }
 		    }
 		}
 	    }*/
