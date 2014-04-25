@@ -1717,7 +1717,7 @@ macro_pops (xplasma, xne)
 			rate_matrix[upper][upper] += -1. * rate;
 			rate_matrix[lower][upper] += rate;
 
-			fast_line.gu = 1;
+			/*fast_line.gu = 1;
 			fast_line.gl = 3;
 			fast_line.freq = (20.36881 - 19.54403) / HEV;
 			rate = q12 (&fast_line, xplasma->t_e) * xne;
@@ -1739,7 +1739,7 @@ macro_pops (xplasma, xne)
 			rate_matrix[upper][lower] += rate;
 			rate = q21 (&fast_line, xplasma->t_e) * xne;
 			rate_matrix[upper][upper] += -1. * rate;
-			rate_matrix[lower][upper] += rate;
+			rate_matrix[lower][upper] += rate;*/
 
 		}
 
@@ -1859,7 +1859,7 @@ macro_pops (xplasma, xne)
 
 
 
-	  /*for (index_ion = ele[index_element].firstion;
+	  for (index_ion = ele[index_element].firstion;
 	       index_ion <
 	       (ele[index_element].firstion + ele[index_element].nions);
 	       index_ion++)
@@ -1868,10 +1868,10 @@ macro_pops (xplasma, xne)
 		   index_lvl <
 		   ion[index_ion].first_nlte_level + ion[index_ion].nlte;
 		   index_lvl++)
-		{*/	    /* Start loop with lowest level of the ion. For each level in turn check to see if there's a population 
+		{    /* Start loop with lowest level of the ion. For each level in turn check to see if there's a population 
 				   inversion i.e. is  upper_pop > lower_pop * g_upper / g_lower. If it is then replace upper_pop with
 				   lower_pop * g_upper / g_lower. We loop over all levels higher than the currently chosen lower level. */
-		/*  for (nn = index_lvl + 1;
+		  for (nn = index_lvl + 1;
 		       nn <
 		       (ion[index_ion].first_nlte_level +
 			ion[index_ion].nlte); nn++)
@@ -1890,7 +1890,7 @@ macro_pops (xplasma, xne)
 		      }
 		    }
 		}
-	    }*/
+	    }
 
 
 	  /* The populations are now known. The populations need to be stored
