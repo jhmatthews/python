@@ -16,10 +16,13 @@ GSL = $(PYTHON)/software/gsl-1.15
 
 GIT = True
 
+
 ifeq (True, $(GIT))
-	CLONE_RELEASE = mkdir $(PYTHON)/progs; cd $(PYTHON)/progs; git clone https://github.com/agnwinds/python.git; cd python; make CC=$(CMAKE) python; make CC=$(CMAKE) py_wind
+	CLONE_DATA =  cd $(PYTHON)/data; git clone https://github.com/agnwinds/python.git -b data .
+	CLONE_RELEASE = cd $(PYTHON)/progs; git clone https://github.com/agnwinds/python.git; cd python; make CC=$(CMAKE) python; make CC=$(CMAKE) py_wind
 	PRINT_CLONE = 'Cloning Git Release'
 else
+	CLONE_DATA = 
 	CLONE_RELEASE = 
 	PRINT_CLONE = 'No git installed- have to obtain release manually from releases page on github. Exiting.'
 endif
@@ -34,6 +37,10 @@ install:
 	# Then make GSL library
 	@echo 'Installing GSL library...'
 	cd $(GSL); ./configure --disable-shared --prefix=$(PYTHON)/gsl; make; make check 2>&1; make install; make clean
+
+	@echo 'Installing Atomic data'
+	$(CLONE_DATA)
+
 	
 	#finally, make the latest release
 	@echo 'Making latest release...'

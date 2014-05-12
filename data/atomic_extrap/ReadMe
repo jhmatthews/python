@@ -1,2 +1,0 @@
-130731 - JM This is a data set which is identical except the topbase photoionization cross sections are extrapolated up to 100KeV using the extrapolate_log.py script. This is done by taking the gradient in log-log space at the maximum energy in topbase and carrying out an extrapolation in logarithmically space energy. This can be improved, probably, and has not been tested in any detail.
-

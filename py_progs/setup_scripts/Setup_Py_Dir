@@ -16,11 +16,11 @@ xdata=data
 # and standard73 then links to the subfolder atomic73
 
 ln -s -f $top/$xdata
-ln -s -f $top/$xdata atomic   
+#ln -s -f $top/$xdata atomic   
 
 ## the other data is the same
-ln -s -f $top/$xdata/kurucz91
-ln -s -f $top/$xdata/hutdisk93
-ln -s -f $top/$xdata/disk06
+#ln -s -f $top/$xdata/kurucz91
+#ln -s -f $top/$xdata/hutdisk93
+#ln -s -f $top/$xdata/disk06
 
 

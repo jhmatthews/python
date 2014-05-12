@@ -1,9 +1,0 @@
-04aug -- ksl -- This directory contains the kurucz models in an ascii format that is suitable for use
-with python52 and beyond.  It should be the same as the data that is contained in binary form
-in data.91.  kurucz91.ls is the file that must be read into python and other programs like kslfit.
-The basic files were created with ascii_expand from the original ascii files (in Kurucz's format).
-The units are converted to be identical those calculated with Tlusty/Synspec, e.g ergs/cm**2/s/A,
-and the normalization should be identical.
-9988 Fri Aug 6 13:18:39 EDT 2004 sierra.stsci.edu
-11616 Mon Nov 22 07:35:32 EST 2004 perch.stsci.edu
-11616 Thu Dec 9 12:41:28 EST 2004 perch.stsci.edu

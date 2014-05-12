@@ -1,8 +1,0 @@
-11644 Sat Oct 4 11:38:07 EDT 2008 sierra.stsci.edu
-11M Tue Jun 2 09:20:09 EDT 2009 Macintosh-10.local
-11M Tue Jun 2 09:33:59 EDT 2009 Macintosh-10.local
-11M Sun Aug 30 19:20:27 EDT 2009 Macintosh-140.local
-11M Mon Aug 31 08:20:07 EDT 2009 Macintosh-140.local
-11M Mon Aug 31 08:29:28 EDT 2009 Macintosh-140.local
-13344 Mon Aug 31 09:20:01 EDT 2009 sierra.stsci.edu
-13344 Mon Aug 31 10:04:58 EDT 2009 sockeye.stsci.edu
