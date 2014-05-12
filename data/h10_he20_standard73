@@ -1,0 +1,30 @@
+#This is a standard atomic data set for a 20 level hydrogen model and 20 level helium atom
+#and lines/continua of other elements from the usual standard 73 set.
+#It be treated with or without the full macro atom formalism for hydrogen and helium only.
+#first macro atom data is read in
+data/atomic_macro/h10_he20_standard73_elem_ions.py
+data/atomic_macro/h10_levels.py
+data/atomic_macro/h10_lines.py
+data/atomic_macro/h10_phot.py
+data/atomic_macro/he20_levels.py
+data/atomic_macro/he20_lines.py
+data/atomic_macro/he20_phot.py
+#then read the non macro atom data for all except hydrogen and helium
+data/atomic73/topbase_levels_cno.py
+data/atomic73/topbase_levels_fe.py
+data/atomic73/levels_ver_2.py
+data/atomic73/lines_linked_ver_2.py
+data/atomic73/excited.py
+data/atomic73/recomb.data
+data/atomic73/topbase_cno_phot.py
+data/atomic73/topbase_fe_phot.py
+data/atomic73/photo_fkvy.data
+data/atomic73/coll.data
+#Next is dielectronic recombination data from chianti.
+data/atomic73/chianti_dr.dat
+#Next is badnell style total radiative recombinaion rate
+data/atomic73/chianti_rr.dat
+#Next is badnell style ground state radiative recombinaion rate
+data/atomic73/Badnell_GS_RR.txt
+#Necxt if gaunt factor data from sutherland (1997)
+data/atomic73/gffint.dat

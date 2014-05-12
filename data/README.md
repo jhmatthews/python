@@ -5,6 +5,9 @@ models for use with python as well as atomic data and linelists
 
 * atomicxx:  The directories that contain all of the atomic data that python uses directly.
 			 highest number is latest version
+	* atomic77: The version of atomic data which has XSections extrapolated to higher energies
+				in order to remove artificial edges in spectra caused to topbase XSections running out.
+				Identical to standard73 otherwise.
 	* atomic73: The version of atomic data used for the benchmark model in Higginbottom et al. 2013. 
 				masterfile, standard73.
 	* atomic39: The version of atomic data used for Long & Knigge 2002

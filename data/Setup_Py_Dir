@@ -1,0 +1,26 @@
+#! /bin/bash
+
+# This is a simple routine to set up links so that python can be run in
+# a directory
+# 05aug		ksl   	Coded
+# 0603	  	ksl		Modified so others could use this as well
+# 1306  	jm		Modified structure to close issue #13 
+
+
+# please make sure your $PYTHON path is setup to use this script
+top=$PYTHON
+xdata=data
+
+# Note that we now have standard73, standard39, h20 and so on in the top level data directory
+# that way atomic/standard73 now links to $PYTHON/data/standard73
+# and standard73 then links to the subfolder atomic73
+
+ln -s -f $top/$xdata
+ln -s -f $top/$xdata atomic   
+
+## the other data is the same
+ln -s -f $top/$xdata/kurucz91
+ln -s -f $top/$xdata/hutdisk93
+ln -s -f $top/$xdata/disk06
+
+

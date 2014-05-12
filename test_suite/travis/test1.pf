@@ -1,0 +1,5 @@
+Wind_type(0=SV,1=Sphere,2=Previous,3=Proga,4=Corona,5=knigge,6=homologous,7=yso,8=elvis,9=shell) 0
+Atomic_data(data/standard73) data/standard77
+photons_per_cycle (20000) 10000
+Ionization_cycles 0
+spectrum_cycles 0

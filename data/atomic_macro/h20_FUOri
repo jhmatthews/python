@@ -1,0 +1,16 @@
+#This is a standard atomic data set for a 20 level hydrogen model,
+#a macro atom model for Na I and Ca I, II and the "FUOri" atomic dataset 
+atomic/h20_big_elem_ions.py
+atomic/h20_levels.py
+atomic/h20_lines.py
+atomic/h20_phot.py
+atomic/topbase_levels_hhe.py
+atomic/topbase_levels_cno.py
+atomic/FUOri_levels_kur.py
+atomic/FUOri_lines_linked_kur.py
+atomic/recomb.data
+atomic/topbase_he1_phot.py
+atomic/topbase_he2_phot.py
+atomic/topbase_cno_phot.py
+atomic/photo_fkvy.data
+atomic/coll.data

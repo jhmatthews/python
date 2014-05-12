@@ -3,108 +3,84 @@ WIKI AND MORE DETAIL CAN BE FOUND AT
 https://github.com/agnwinds/python/wiki
 
 
-
-
-
-RETRIEVING THE SOFTWARE
-======================================================
+### Retrieving the software the first time:
 Python and the various routines associated are set up in a self-contained directory structure. The basic directory structure and the data files that one needs to run Python need to be retrieved (and most likely recompiled).  
 
-To obtin the directory sturctue, simply retrieve it using git as follows to clone the directory structure:
 
-Then you will clone the latest release of python into the python/progs directory. 
+**If you have git installed:** To obtain the directory structure, simply retrieve it using git as follows to clone the directory structure:
 
     $ git clone https://github.com/agnwinds/python.git -b structure
 
-You can also do this simply using the ZIP function under the structure branch, and then download .tar.gz versions of python under releases.
+You then need to cd to the new directory and set your environment variables
+    
+    $ export PYTHON = /path/to/python/
+    $ cd $PYTHON 
+    $ make install
+    $ make clean            # this can take a while, cleaning gsl is a little laborious
 
-Stable versions are released in the progs branch of the git repository, along with a git README and release notes in the releases section.
+note that export syntax is for bash- for csh use 
+  
+    $ setenv PYTHON /path/to/python/
 
-Setting up environment variables
-=================================
 
-The only environment variables that is needed is to define PYTHON. For bash or sh users simply place the following::
+**Without git:** Use the ZIP function under the [structures](https://github.com/agnwinds/python/tree/structure "Structure") branch, and then download .tar.gz versions of the python source under [releases](https://github.com/agnwinds/python/releases).
 
-    export PYTHON=$HOME/Python
+Once you have a directory /path/to/python/ which contains the structure, place the unpacked tar.gz python source folder under /path/to/python/progs/
 
-where $HOME is you would modify $HOME to read something else if you are not installing putting this in your top level directory
-You also need to add $PYTHON/bin to your path, e.g::
+    $ export PYTHON = /path/to/python/
+    $ cd $PYTHON 
+    $ make GIT=False install
+    $ make clean
+    $ cd progs/python_xx #replace xx  version you download
+    $ make clean
+    $ make CC=gcc python       # if you want to use mpicc, ignore the CC=gcc
+    $ make clean
+
+Again, for csh use 
+  
+    $ setenv PYTHON /path/to/python/
+
+As you can tell, the git install is simpler!
+
+### Setting up environment variables
+The only environment variables that is needed is to define PYTHON. For bash or sh users simply place the following:
+
+    export PYTHON=/path/to/python/
+
+where $HOME is you would modify $HOME to read something else if you are not installing putting this in your top level directory. You also need to add $PYTHON/bin to your path, e.g::
 
     PATH = $PATH:$PYTHON/bin
 
+for c shell, use the following commands
+
+    setenv PYTHON /path/to/python/
+    setenv PATH "${PATH}:${PYTHON}"
+
+### Running Python
+
+Once you have added PYTHON to your path, copy the script Setup_Py_Dir to $PYTHON/bin/:
+
+    $ cp $PYTHON/py_progs/setup_scripts/Setup_Py_Dir $PYTHON/bin
+
+Then go to a directory where you want to do a run with parameter file root.pf
+
+    $ Setup_Py_Dir
+    $ py root.pf
+
+The code will now run!
 
 
+### Directory structure
 
+The python directory structure is fairly simple:
 
+* progs: location of source code for various fully debugged version of the code
+* bin: location of excutables
+* data: location for all datafiles. Files that are mainly for reference should be gzipped to save space. Such files are not recreated in
+* bin: The location of the executables. (It is a good idea to put this directory in your path)
+* software: This directory contains libraries which are used in in python that must be recompiled when creating an installation on a new machine, primarily Bill Pence's cfitsio package and the GNU scientific library gsl
+* Example: A directory with a few examples of python runs. (Note that the input files will have changed and so one may not be able to run these examples without some changes in the input files.)
 
-COMPILING PYTHON, INCLUDING CFITSIO AND GSL LIBRARIES
-======================================================
-
-It may or may not be necessary to recompile python and the associated programs on your machine depending on how closely it matches the linux cluster at STScI . This section describes how to do a clean install on your machine.
-
-
-
-Compile Bill Pence's cfitsio library
-====================================
-
-Cfitsio is a a c library for reading and writing fits files. It is used in python by the routine py_wind. 
-
-To install the version which is part of the Python directory tree, cd software and then to the highest version number of the cfitsio library. There is a README file with instruction about how to do this, but basically the commands are as follows::
-
-    ./configure
-    make
-    mv libcfitsio.a ../../lib
-    make clean  -  Assure that you have left a clean directory
-
-The last set is required, because although the README indicates you can set the install directory as part of the configuration step, ksl has never succeeded
-in accomplishing this.
-
-
-
-
-Install the GNU scientific libraries if this is necessary.
-==================================================================
-The GNU scientific libararies are used in python, and must be either installed or available on your machine. If they are already available you may be able to skip this step. The latest version of gal can be retrieved from "here": http://www.gnu.org/software/gsl/. If you need to install gsl yourself, here is the basic procedure
-
-cd software, and then to the highest version of gsl which you see there.
-
-Once in the gsl directory, the basic procedure for installation is, if $PYTHON is defined
-
-      ./configure --disable-shared --prefix=$PYTHON/gsl
-
-where --disable-shared eliminates shared libraries, /Users/long/Python/ must be replaced with the appropriate path to your location. ksl thinks we might be able to create binaries that are more resistant to configuration changes if we do not use shared libraries, but has had problems succeeding with shared libraries, in part because there are other shared libraries. --prefix indicates where gsl is going to be installed. If missing there is a default location which requires root priveleges. The remainder of the installation is::
-
-    make
-    make check 2>&1  - this is csh version of the command to check that everything is OK, and can probably be skipped
-    make install
-    make clean - Make sure you have left a pristine directory.  If the install fails, the person before you may not have done this, and so do a clean and try again.
-
-Note that the gsl libraries take a while to compile If you are suspicious that the process of compilation proceeded too quickly., you are probably write and some miscreant did not clean the previous installation
-
-At this point you should check to see that the $PYTHON/gsl directory has been updated.
-
-Note that this has been been the biggest problem we have had installing python, and so if you have problems or solutions please comment on them on this page.
-
-
-Finally, compile python and associated programs
-================================================
-
-    cd $PYTHON/progs
-    git clone https://github.com/agnwinds/python.git
-
-You can then make the various routines with:
-
-    cd $PYTHON/progs/python
-    make [CC=...] [D] python
-    make py_wind
-    ... etc
-
-Note that for python and py_wind, the makefile copies two versions of the executable to ../../bin, one with the version number attached and one without.
-This is so that one can run multiple versions of the code.
-
-This completes the installation
-
-At this point you should be ready to try Running Python.
 
 
 

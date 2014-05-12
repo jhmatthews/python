@@ -10,13 +10,15 @@
 
 CFITSIO = $(PYTHON)/software/cfitsio3040
 
+CMAKE = mpicc
+
 GSL = $(PYTHON)/software/gsl-1.15
 
 GIT = True
 
 ifeq (True, $(GIT))
-	CLONE_RELEASE = cd $(PYTHON)/progs; git clone https://github.com/agnwinds/python.git; cd python; make python
-	PRINT CLONE = 'Cloning Git Release'
+	CLONE_RELEASE = mkdir $(PYTHON)/progs; cd $(PYTHON)/progs; git clone https://github.com/agnwinds/python.git; cd python; make CC=$(CMAKE) python; make CC=$(CMAKE) py_wind
+	PRINT_CLONE = 'Cloning Git Release'
 else
 	CLONE_RELEASE = 
 	PRINT_CLONE = 'No git installed- have to obtain release manually from releases page on github. Exiting.'
@@ -38,17 +40,13 @@ install:
 	@echo $(PRINT_CLONE)
 	$(CLONE_RELEASE)
 
+	@echo 'Copying Setup_Py_dir to scripts directory'
+	cp $(PYTHON)/py_progs/setup_scripts/Setup_Py_Dir $(PYTHON)/bin
+
+	@echo 'all done'
+
 clean: 
 	rm -f *.o *~
 	cd $(CFITSIO); make clean
 	cd $(GSL); make clean 
-
-
-test:
-	mkdir $(PYTHON)/progs
-	cd $(PYTHON)/progs
-	git clone https://github.com/agnwinds/python.git -b Travis
-	cd python
-	make test
-	make clean
-	make py_wind
+	cd $(PYTHON)/progs/python; make clean

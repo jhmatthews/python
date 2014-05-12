@@ -1,0 +1,25 @@
+#This is a standard atomic data set for a 20 level hydrogen model,
+#a macro atom model for Na I and Ca I, II and the "big" atomic dataset 
+atomic/h20_ca_na_big_elem_ions.py
+atomic/h20_levels.py
+atomic/h20_lines.py
+atomic/h20_phot.py
+atomic/naI_levels.py
+atomic/naI_lines.py
+atomic/naI_phot.py
+atomic/ca_levels.py
+atomic/ca_lines.py
+atomic/caI_phot.py
+atomic/caII_phot.py
+atomic/topbase_levels_hhe.py
+atomic/topbase_levels_cno.py
+atomic/levels_kur.py
+atomic/lines_linked_kur.py
+atomic/excited.py
+atomic/recomb.data
+atomic/topbase_h1_phot.py
+atomic/topbase_he1_phot.py
+atomic/topbase_he2_phot.py
+atomic/topbase_cno_phot.py
+atomic/photo_fkvy.data
+atomic/coll.data
