@@ -9,12 +9,10 @@
 # for manual install.
 
 CFITSIO = $(PYTHON)/software/cfitsio3040
-
 CMAKE = mpicc
-
 GSL = $(PYTHON)/software/gsl-1.15
-
 GIT = True
+LIBS = True
 
 
 ifeq (True, $(GIT))
@@ -24,7 +22,15 @@ ifeq (True, $(GIT))
 else
 	CLONE_DATA = 
 	CLONE_RELEASE = 
-	PRINT_CLONE = 'No git installed- have to obtain release manually from releases page on github. Exiting.'
+	PRINT_CLONE = 'No git installed- have to obtain release and data manually from releases page on github. Exiting.'
+endif
+
+ifeq (True, $(LIBS))
+	INSTALL_CFITSIO = cd $(CFITSIO); ./configure; make; mv libcfitsio.a ../../lib; make clean
+	INSTALL_GSL = cd $(GSL); ./configure --disable-shared --prefix=$(PYTHON)/gsl; make; make check 2>&1; make install; make clean
+else
+	INSTALL_CFITSIO = 
+	INSTALL_GSL = 
 endif
 
 install:
@@ -32,12 +38,13 @@ install:
 	@echo 'Installing in directory '$(PYTHON)
 	# First make cfitsio library
 	@echo 'Installing CFITSIO library...'
-	cd $(CFITSIO); ./configure; make; mv libcfitsio.a ../../lib; make clean
+	$(INSTALL_CFITSIO)
 	
 	# Then make GSL library
 	@echo 'Installing GSL library...'
-	cd $(GSL); ./configure --disable-shared --prefix=$(PYTHON)/gsl; make; make check 2>&1; make install; make clean
+	$(INSTALL_GSL)
 
+	# get atomic data from git
 	@echo 'Installing Atomic data'
 	$(CLONE_DATA)
 
