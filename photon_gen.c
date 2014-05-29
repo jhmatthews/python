@@ -407,6 +407,7 @@ xmake_phot (p, f1, f2, ioniz_or_final, iwind, weight, iphot_start, nphotons)
 
   int nphot, nn;
   int nstar, nbl, nwind, ndisk, nmatom, nagn, nkpkt;
+  double f_free_free;
 
 /* Determine the number of photons of each type 
 Error ?? -- This is a kluge.  It is intended to preserve what was done with versions earlier than
@@ -425,7 +426,7 @@ python 40 but it is not really what one wants.
     }
   if (iwind >= 0)
     {
-      nwind = geo.f_wind / geo.f_tot * nphotons;
+      nwind = f_free_free / geo.f_tot * nphotons;
     }
   if (geo.disk_radiation)
     {

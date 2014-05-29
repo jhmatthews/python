@@ -120,7 +120,14 @@ bands_init (imode, band)
   int ii;
 
   // 59 - Increased to 20,000 A so could go further into NIR 
-  freqmin = C / 12000e-8;	/*20000 A */
+
+  //if (geo.ioniz_or_extract == 1)
+  //  freqmin = C / 12000e-8;	/*20000 A */
+  //else
+  //{
+    freqmin = 1e9;    // set freqmin to 1 GHz
+   // Log("WARNING: YOU ARE IN RADIO MODE! LOW FREQUENCIES BEING USED!!!\n");
+  //}
   tmax = TSTAR;
   if (geo.twind > tmax)
     tmax = geo.twind;
@@ -141,8 +148,10 @@ bands_init (imode, band)
   geo.tmax = tmax;		/*NSH 120817 NSH made this a global varaible so it is available to the code to make informed guesses as to the possible location of any BB driven exponential dropoff in the spectrum */
   t = tmax;
   f1 = freqmin;
-  f2 = freqmax;
+  f2 = 12e9;
 
+
+  imode = 1;
   /* end of import */
 
   if (imode == -1)
@@ -499,7 +508,7 @@ bands_init (imode, band)
       Log ("Highest photon energy is ev (freq) is %f (%.2e)\n", f2 * HEV,
 	      f2);
 
-      band->nbands = 5;
+      band->nbands = 10;
       rdint ("Num.of.frequency.bands", &band->nbands);
 
       if (band->nbands>NBANDS){
