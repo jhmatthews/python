@@ -1,4 +1,4 @@
-prefix=/Users/jmatthews/test_isntall/python/software/cfitsio3040
+prefix=/Users/jmatthews/Documents/git_tests/python/software/cfitsio3040
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include

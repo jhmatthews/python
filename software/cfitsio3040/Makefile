@@ -18,7 +18,7 @@
 # testprog targets. See also changes and comments in configure.in
 #
 
-prefix		= /Users/jmatthews/test_isntall/python/software/cfitsio3040
+prefix		= /Users/jmatthews/Documents/git_tests/python/software/cfitsio3040
 exec_prefix	= ${prefix}
 CFITSIO_PREFIX	= $(prefix)
 CFITSIO_LIB	= $(exec_prefix)/lib
