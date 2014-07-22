@@ -43,7 +43,7 @@ for line in f:
 		elif data[0] == "Macro":
 			if data[1] == "Atom" and data[2] == "level":
 				for i in len(data):
-					if data[i] == "n":\
+					if data[i] == "n":
 						if data[i+1] == "3":
 							n3 = float(data[-1])
 						if data[i+1] == "4":
