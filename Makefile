@@ -16,8 +16,8 @@ LIBS = True
 
 
 ifeq (True, $(GIT))
-	CLONE_DATA =  cd $(PYTHON)/data; git clone https://github.com/agnwinds/python.git -b data .
-	CLONE_RELEASE = cd $(PYTHON)/progs; git clone https://github.com/agnwinds/python.git; cd python; make CC=$(CMAKE) python; make CC=$(CMAKE) py_wind
+	CLONE_DATA =  mkdir $(PYTHON)/data; cd $(PYTHON)/data; git clone https://github.com/agnwinds/python.git -b data .
+	CLONE_RELEASE = mkdir $(PYTHON)/progs; cd $(PYTHON)/progs; git clone https://github.com/agnwinds/python.git; cd python; make CC=$(CMAKE) python; make CC=$(CMAKE) py_wind
 	PRINT_CLONE = 'Cloning Git Release'
 else
 	CLONE_DATA = 

@@ -2,11 +2,8 @@
 run simple test of python- check it runs and read sin atomic data
 '''
 
-import os
-import numpy as np 
 
-
-f = open("test2.out")
+f = open("test1.out")
 
 nerror = 0
 
@@ -74,5 +71,3 @@ if nerror > 0:
 else:
 	print "Ran python OK"
 	exit(0)		# test was success
-
-
