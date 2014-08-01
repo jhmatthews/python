@@ -80,6 +80,9 @@ History:
    	13jul	nsh	76: added lines to deal with the case when adiacaitc cooling becomes heating in
 			complex wind geometries
 	13nov	nsh	77: Some changes in the parallel communications for new variables.
+	14jul	nsh	78a: Changed the length of the communications array to take account of
+			dynamically allocated arrays in plasma structure. Also changed some of the pack
+			and unpack commands for the same reason.
 
 
 **************************************************************/
@@ -111,8 +114,9 @@ WindPtr (w);
   int size_of_commbuffer;
   char *commbuffer;
 
-  /* the commbuffer needs to be larger enough to pack all variables in MPI_Pack and MPI_Unpack routines */
-  size_of_commbuffer = 8 * (12*NIONS + NLTE_LEVELS + 2*NTOP_PHOT + 12*NXBANDS + 2*LPDF + NAUGER + 104)*(floor(NPLASMA/np_mpi_global)+1);
+  /* the commbuffer needs to be larger enough to pack all variables in MPI_Pack and MPI_Unpack routines NSH 1407 - the 
+NIONS changed to nions for the 12 arrays in plasma that are now dynamically allocated*/
+  size_of_commbuffer = 8 * (12*nions + NLTE_LEVELS + 2*NTOP_PHOT + 12*NXBANDS + 2*LPDF + NAUGER + 104)*(floor(NPLASMA/np_mpi_global)+1);
       
   commbuffer = (char *) malloc(size_of_commbuffer*sizeof(char));
       
@@ -330,13 +334,13 @@ WindPtr (w);
 	      MPI_Pack(&plasmamain[n].ne, 1, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
 	      MPI_Pack(&plasmamain[n].rho, 1, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
 	      MPI_Pack(&plasmamain[n].vol, 1, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
-	      MPI_Pack(plasmamain[n].density, NIONS, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
-	      MPI_Pack(plasmamain[n].partition, NIONS, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
+	      MPI_Pack(plasmamain[n].density, nions, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
+	      MPI_Pack(plasmamain[n].partition, nions, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
 	      MPI_Pack(plasmamain[n].levden, NLTE_LEVELS, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
-	      MPI_Pack(plasmamain[n].PWdenom, NIONS, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
-	      MPI_Pack(plasmamain[n].PWdtemp, NIONS, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
-	      MPI_Pack(plasmamain[n].PWnumer, NIONS, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
-	      MPI_Pack(plasmamain[n].PWntemp, NIONS, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
+	      MPI_Pack(plasmamain[n].PWdenom, nions, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
+	      MPI_Pack(plasmamain[n].PWdtemp, nions, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
+	      MPI_Pack(plasmamain[n].PWnumer, nions, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
+	      MPI_Pack(plasmamain[n].PWntemp, nions, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
 	      MPI_Pack(&plasmamain[n].kappa_ff_factor, 1, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
 	      MPI_Pack(&plasmamain[n].nscat_es, 1, MPI_INT, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD); 
 	      MPI_Pack(plasmamain[n].recomb_simple, NTOP_PHOT, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
@@ -371,12 +375,12 @@ WindPtr (w);
 	      MPI_Pack(&plasmamain[n].n_ds, 1, MPI_INT, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
 	      MPI_Pack(&plasmamain[n].nrad, 1, MPI_INT, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
 	      MPI_Pack(&plasmamain[n].nioniz, 1, MPI_INT, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
-	      MPI_Pack(plasmamain[n].ioniz, NIONS, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
-	      MPI_Pack(plasmamain[n].recomb, NIONS, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
-	      MPI_Pack(plasmamain[n].scatters, NIONS, MPI_INT, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
-	      MPI_Pack(plasmamain[n].xscatters, NIONS, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
-	      MPI_Pack(plasmamain[n].heat_ion, NIONS, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
-	      MPI_Pack(plasmamain[n].lum_ion, NIONS, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
+	      MPI_Pack(plasmamain[n].ioniz, nions, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
+	      MPI_Pack(plasmamain[n].recomb, nions, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
+	      MPI_Pack(plasmamain[n].scatters, nions, MPI_INT, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
+	      MPI_Pack(plasmamain[n].xscatters, nions, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
+	      MPI_Pack(plasmamain[n].heat_ion, nions, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
+	      MPI_Pack(plasmamain[n].lum_ion, nions, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
 	      MPI_Pack(&plasmamain[n].j, 1, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
 	      MPI_Pack(&plasmamain[n].j_direct, 1, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
 	      MPI_Pack(&plasmamain[n].j_scatt, 1, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
@@ -459,13 +463,13 @@ WindPtr (w);
 	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, &plasmamain[n].ne, 1, MPI_DOUBLE, MPI_COMM_WORLD);
 	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, &plasmamain[n].rho, 1, MPI_DOUBLE, MPI_COMM_WORLD);
 	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, &plasmamain[n].vol, 1, MPI_DOUBLE, MPI_COMM_WORLD);
-	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, plasmamain[n].density, NIONS, MPI_DOUBLE, MPI_COMM_WORLD);
-	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, plasmamain[n].partition, NIONS, MPI_DOUBLE, MPI_COMM_WORLD);
+	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, plasmamain[n].density, nions, MPI_DOUBLE, MPI_COMM_WORLD);
+	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, plasmamain[n].partition, nions, MPI_DOUBLE, MPI_COMM_WORLD);
 	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, plasmamain[n].levden, NLTE_LEVELS, MPI_DOUBLE, MPI_COMM_WORLD);
-	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, plasmamain[n].PWdenom, NIONS, MPI_DOUBLE, MPI_COMM_WORLD);
-	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, plasmamain[n].PWdtemp, NIONS, MPI_DOUBLE, MPI_COMM_WORLD);
-	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, plasmamain[n].PWnumer, NIONS, MPI_DOUBLE, MPI_COMM_WORLD);
-	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, plasmamain[n].PWntemp, NIONS, MPI_DOUBLE, MPI_COMM_WORLD);	  
+	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, plasmamain[n].PWdenom, nions, MPI_DOUBLE, MPI_COMM_WORLD);
+	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, plasmamain[n].PWdtemp, nions, MPI_DOUBLE, MPI_COMM_WORLD);
+	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, plasmamain[n].PWnumer, nions, MPI_DOUBLE, MPI_COMM_WORLD);
+	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, plasmamain[n].PWntemp, nions, MPI_DOUBLE, MPI_COMM_WORLD);	  
 	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, &plasmamain[n].kappa_ff_factor, 1, MPI_DOUBLE, MPI_COMM_WORLD);
 	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, &plasmamain[n].nscat_es, 1, MPI_INT, MPI_COMM_WORLD);
 	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, plasmamain[n].recomb_simple, NTOP_PHOT, MPI_DOUBLE, MPI_COMM_WORLD);	  
@@ -500,12 +504,12 @@ WindPtr (w);
 	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, &plasmamain[n].n_ds, 1, MPI_INT, MPI_COMM_WORLD);
 	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, &plasmamain[n].nrad, 1, MPI_INT, MPI_COMM_WORLD);
 	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, &plasmamain[n].nioniz, 1, MPI_INT, MPI_COMM_WORLD);
-	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, plasmamain[n].ioniz, NIONS, MPI_DOUBLE, MPI_COMM_WORLD);	  
-	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, plasmamain[n].recomb, NIONS, MPI_DOUBLE, MPI_COMM_WORLD);	  
-	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, plasmamain[n].scatters, NIONS, MPI_INT, MPI_COMM_WORLD);	  
-	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, plasmamain[n].xscatters, NIONS, MPI_DOUBLE, MPI_COMM_WORLD);	  
-	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, plasmamain[n].heat_ion, NIONS, MPI_DOUBLE, MPI_COMM_WORLD);	  
-	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, plasmamain[n].lum_ion, NIONS, MPI_DOUBLE, MPI_COMM_WORLD);	  
+	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, plasmamain[n].ioniz, nions, MPI_DOUBLE, MPI_COMM_WORLD);	  
+	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, plasmamain[n].recomb, nions, MPI_DOUBLE, MPI_COMM_WORLD);	  
+	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, plasmamain[n].scatters, nions, MPI_INT, MPI_COMM_WORLD);	  
+	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, plasmamain[n].xscatters, nions, MPI_DOUBLE, MPI_COMM_WORLD);	  
+	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, plasmamain[n].heat_ion, nions, MPI_DOUBLE, MPI_COMM_WORLD);	  
+	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, plasmamain[n].lum_ion, nions, MPI_DOUBLE, MPI_COMM_WORLD);	  
 	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, &plasmamain[n].j, 1, MPI_DOUBLE, MPI_COMM_WORLD);
 	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, &plasmamain[n].j_direct, 1, MPI_DOUBLE, MPI_COMM_WORLD);
 	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, &plasmamain[n].j_scatt, 1, MPI_DOUBLE, MPI_COMM_WORLD);

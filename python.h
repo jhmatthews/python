@@ -517,6 +517,8 @@ plasma in regions of the geometry that are actually included n the wind
 /* ksl - It would probably make more sense to define these in the same ways that bands are done for the generation of photons, or to
  * do both the same way at least.  Choosing to do this in two different ways makes the program confusing. The structure that has
  * the photon generation is called xband */
+/* 78 - 1407 - NSH - changed several elements (initially those of size nions) in the plasma array to by dynamically allocated.
+They are now pointers in the array. */
 
 
 typedef struct plasma
@@ -527,21 +529,21 @@ typedef struct plasma
   double rho;			/*density at the center of the cell */
   double vol;			/* valid volume of this cell (more specifically the volume of one of the
 				   two annular regions that this cell represents). */
-  double density[NIONS];	/*The number density of a specific ion.  This needs to correspond
-				   to the ion order obtained by get_atomic_data */
-  double partition[NIONS];	/*The partition function for each  ion */
+  double *density;	/*The number density of a specific ion.  This needs to correspond
+				   to the ion order obtained by get_atomic_data. 78 - changed to dynamic allocation*/
+  double *partition;	/*The partition function for each  ion. 78 - changed to dynamic allocation */
   double levden[NLTE_LEVELS];	/*The number density (occupation number?) of a specific level */
 
-  double PWdenom[NIONS];	/*The denominator in the pairwise ionization solver. Sicne this is computed at a temperature 
+  double *PWdenom;	/*The denominator in the pairwise ionization solver. Sicne this is computed at a temperature 
 				   chosen from basic ioinzation proerties to be good for this ion, it should not change
 				   very much from cycle to cycle - hence we shold be able to speed up the code by storing 
-				   it and refering to it if the temperature has not changed much */
-  double PWdtemp[NIONS];	/*The temperature at which the pairwise denominator was calculated last */
-  double PWnumer[NIONS];	/* The numberator in the pairwise approach. When we are chasing the true density
+				   it and refering to it if the temperature has not changed much. 78 - changed to dynamic allocation */
+  double *PWdtemp;	/*The temperature at which the pairwise denominator was calculated last. 78 - changed to dynamic allocation */
+  double *PWnumer;	/* The numberator in the pairwise approach. When we are chasing the true density
 				   by carying n_e - this value will not change, so we canspeed things up a lot
-				   by not recomputing it! */
-  double PWntemp[NIONS];	/* The temperature at which the stored pairwise numerator was last computed at. This
-				   is used in the BB version of the pairwise correction factor */
+				   by not recomputing it!. 78 - changed to dynamic allocation */
+  double *PWntemp;	/* The temperature at which the stored pairwise numerator was last computed at. This
+				   is used in the BB version of the pairwise correction factor. 78 - changed to dynamic allocation */
 
   double kappa_ff_factor;	/* Multiplicative factor for calculating the FF heating for                                      a photon. */
 
@@ -605,15 +607,15 @@ typedef struct plasma
   int n_ds;			/* NSH 6/9/12 Added to allow the mean dsto be computed */
   int nrad;			/* Total number of photons radiated within the cell */
   int nioniz;			/* Total number of photons capable of ionizing H */
-  double ioniz[NIONS], recomb[NIONS];	/* Number of ionizations and recombinations for each ion.
+  double *ioniz, *recomb;	/* Number of ionizations and recombinations for each ion.
 					   The sense is ionization from ion[n], and recombinations 
-					   to each ion[n] */
-  int scatters[NIONS];		/* 68b - The number of scatters in this cell for each ion. */
-  double xscatters[NIONS];	/* 68b - Diagnostic measure of energy scattered out of beam on extract */
-  double heat_ion[NIONS];	/* The amount of energy being transferred to the electron pool
-				   sby this ion via photoionization */
-  double lum_ion[NIONS];	/* The amount of energy being released from the electron pool
-				   by this ion via recombination */
+					   to each ion[n] . 78 - changed to dynamic allocation*/
+  int *scatters;		/* 68b - The number of scatters in this cell for each ion. 78 - changed to dynamic allocation*/
+  double *xscatters;	/* 68b - Diagnostic measure of energy scattered out of beam on extract. 78 - changed to dynamic allocation */
+  double *heat_ion;	/* The amount of energy being transferred to the electron pool
+				   sby this ion via photoionization. 78 - changed to dynamic allocation */
+  double *lum_ion;	/* The amount of energy being released from the electron pool
+				   by this ion via recombination. 78 - changed to dynamic allocation */
   double j, ave_freq, lum;	/*Respectively mean intensity, intensity_averaged frequency, 
 				   luminosity and absorbed luminosity of shell */
   double xj[NXBANDS], xave_freq[NXBANDS];	/* 1108 NSH frequency limited versions of j and ave_freq */

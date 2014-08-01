@@ -846,6 +846,7 @@ History:
    1212	ksl	Added sane check; note that this routine
    		is poorly documented.  Somewhere this 
 		should be discribed better.  
+   1407 nsh	changed loop to only go over NPLASMA cells not NPLASMA+1
  
 **************************************************************/
 
@@ -858,7 +859,7 @@ pop_kappa_ff_array ()
   int i, j;
 
 
-  for (i = 0; i < NPLASMA + 1; i++)
+  for (i = 0; i < NPLASMA ; i++)  //Changed to loop only up to NPLASMA, not NPLASMA+1
     {
       sum = 0.0;
       for (j = 0; j < nions; j++)

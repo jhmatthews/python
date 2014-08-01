@@ -71,6 +71,8 @@ History:
 	13sep	nsh	small change to avoid the muliplicatoin by 0.9 (lucy guess) from giving us the 				wrong zeus temperature.
 	13nov	nsh	changes to take account of log formulation of power law
 			also initialise the min and max frequencies seen in a band.
+	14jul	nsh	added call to calloc_dyn_plasma to allocate space for arrays of variable size - currently
+			those with length nion.
 
 **************************************************************/
 
@@ -306,10 +308,10 @@ recreated when a windfile is read into the program
   else				/* Force NPLASMA to equal NDIM2 (for diagnostic reasons) */
     {
       NPLASMA = NDIM2;
-
     }
 
   calloc_plasma (NPLASMA);
+  calloc_dyn_plasma (NPLASMA); /*78a NSH 1407 - allocate space for dynamically sized arrays*/
   xplasma = plasmamain;
   create_maps (CHOICE);		// Populate the maps from plasmamain & wmain
 
@@ -325,12 +327,10 @@ be optional which variables beyond here are moved to structures othere than Wind
 
   for (n = 0; n < NPLASMA; n++)
     {
-	
       nwind = plasmamain[n].nwind;
       stuff_v (w[nwind].xcen, x);
       plasmamain[n].rho = model_rho (x);
       plasmamain[n].vol = w[nwind].vol;	// Copy volumes
-
 /* NSH 120817 This is where we initialise the spectral models for the wind. The pl stuff is old, I've put new things in here to initialise the exponential models */
       for (nn = 0; nn < NXBANDS; nn++)
 	{
@@ -342,8 +342,10 @@ be optional which variables beyond here are moved to structures othere than Wind
 	     plasmamain[n].pl_w[nn] /= 4.*PI;   // take account of solid angle NSH 120817 removed - if PL not suitable, it will be set to zero anyway, so safe to keep it at zero from the outset! */
 //	  plasmamain[n].pl_w[nn] = 0.0;
 	  plasmamain[n].pl_log_w[nn] = -1e99; /*131114 - a tiny weight - just to fill the variable */ 
-          plasmamain[n].fmin_mod[nn] = geo.xfreq[i+1]; /* Set the minium model frequency to the max frequency in the band - means it will never be used which is correct at this time - there is no model */
-          plasmamain[n].fmax_mod[nn] = geo.xfreq[i]; /* Set the maximum model frequency to the min frequency in the band */
+
+
+          plasmamain[n].fmin_mod[nn] = 1e99; /* Set the minium model frequency to the max frequency in the band - means it will never be used which is correct at this time - there is no model */
+          plasmamain[n].fmax_mod[nn] = 1e-99; /* Set the maximum model frequency to the min frequency in the band */
 	}
 
       nh = plasmamain[n].rho * rho2nh;
@@ -387,7 +389,7 @@ be optional which variables beyond here are moved to structures othere than Wind
 	}
       else
 	plasmamain[n].w = 0.5;	//Modification to allow for possibility that grid point is inside star
-
+printf ("about to do initial concentrations\n");
       /* Determine the initial ionizations, either LTE or  fixed_concentrations */
       if (geo.ioniz_mode != IONMODE_FIXED)
 	{			/* Carry out an LTE determination of the ionization */
@@ -408,7 +410,8 @@ be optional which variables beyond here are moved to structures othere than Wind
       /* 68b - Initialize the scatters array 73d - and the pariwise ionization denominator and temperature
        */
 
-      for (j = 0; j < NIONS; j++)
+      for (j = 0; j < nions; j++) /* NSH 1107 - changed this loop to loop over nions rather than NIONS. Dynamic
+	allocation means that these arrays are no longer of length NIONS */
 	{
 	  plasmamain[n].PWdenom[j] = 0.0;
 	  plasmamain[n].PWnumer[j] = 0.0;
@@ -1042,9 +1045,10 @@ zero_scatters ()
 {
   int n, j;
 
-  for (n = 0; n < NPLASMA; n++)
+  for (n = 0; n < NPLASMA; n++) /*NSH 1107 - changed loop to only run over nions to avoid running over the 
+	end of the array after the arry was dynamically allocated in 78a */
     {
-      for (j = 0; j < NIONS; j++)
+      for (j = 0; j < nions; j++)
 	{
 	  plasmamain[n].scatters[j] = 0;
 	}

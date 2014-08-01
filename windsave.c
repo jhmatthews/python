@@ -40,6 +40,8 @@ History:
 			to allow python to restart. Modified the call to
 			wind_save to eliminate superfluous passing of
 			the wind ptr.
+	14jul	nsh	78a - Added code to allow dynamically allocated arrays
+			in the plasma structure to be read in and written out.
  
 **************************************************************/
 
@@ -72,6 +74,32 @@ wind_save (filename)
   n += fwrite (&geo, sizeof (geo), 1, fptr);
   n += fwrite (wmain, sizeof (wind_dummy), NDIM2, fptr);
   n += fwrite (plasmamain, sizeof (plasma_dummy), NPLASMA, fptr);
+
+/* NSH 1407 - The following loop writes out the variable length arrays
+in the plasma structure */
+      for (m = 0; m < NPLASMA; m++)
+{
+  n += fwrite (plasmamain[m].density,sizeof(double),nions,fptr);
+  n += fwrite (plasmamain[m].partition,sizeof(double),nions,fptr);
+
+  n += fwrite (plasmamain[m].PWdenom,sizeof(double),nions,fptr);
+  n += fwrite (plasmamain[m].PWdtemp,sizeof(double),nions,fptr);
+  n += fwrite (plasmamain[m].PWnumer,sizeof(double),nions,fptr);
+  n += fwrite (plasmamain[m].PWntemp,sizeof(double),nions,fptr);
+
+  n += fwrite (plasmamain[m].ioniz,sizeof(double),nions,fptr);
+  n += fwrite (plasmamain[m].recomb,sizeof(double),nions,fptr);
+
+  n += fwrite (plasmamain[m].scatters,sizeof(int),nions,fptr);
+  n += fwrite (plasmamain[m].xscatters,sizeof(double),nions,fptr);
+
+  n += fwrite (plasmamain[m].heat_ion,sizeof(double),nions,fptr);
+  n += fwrite (plasmamain[m].lum_ion,sizeof(double),nions,fptr);
+}
+
+
+
+
   if (geo.nmacro)
     {
       n += fwrite (macromain, sizeof (macro_dummy), NPLASMA, fptr);
@@ -138,6 +166,7 @@ wind_save (filename)
 11dec	ksl	Updated so returns -1 if it cannot open the windsave file.  This
 		was done to enable one to handle missing files differently in
 		different cases
+14jul	nsh	Code added to read in variable length arrays in plasma structure
 */
 int
 wind_read (filename)
@@ -184,7 +213,32 @@ wind_read (filename)
   n += fread (wmain, sizeof (wind_dummy), NDIM2, fptr);
 
   calloc_plasma (NPLASMA);
+
   n += fread (plasmamain, sizeof (plasma_dummy), NPLASMA, fptr);
+
+  calloc_dyn_plasma (NPLASMA); /*NSH 1407 allocate space for the dynamically allocated plasma arrays */
+  for (m = 0; m < NPLASMA; m++)
+{
+
+  n += fread (plasmamain[m].density,sizeof(double),nions,fptr);
+  n += fread (plasmamain[m].partition,sizeof(double),nions,fptr);
+
+  n += fread (plasmamain[m].PWdenom,sizeof(double),nions,fptr);
+  n += fread (plasmamain[m].PWdtemp,sizeof(double),nions,fptr);
+  n += fread (plasmamain[m].PWnumer,sizeof(double),nions,fptr);
+  n += fread (plasmamain[m].PWntemp,sizeof(double),nions,fptr);
+
+  n += fread (plasmamain[m].ioniz,sizeof(double),nions,fptr);
+  n += fread (plasmamain[m].recomb,sizeof(double),nions,fptr);
+
+  n += fread (plasmamain[m].scatters,sizeof(int),nions,fptr);
+  n += fread (plasmamain[m].xscatters,sizeof(double),nions,fptr);
+
+  n += fread (plasmamain[m].heat_ion,sizeof(double),nions,fptr);
+  n += fread (plasmamain[m].lum_ion,sizeof(double),nions,fptr);
+}
+
+
 
   if (geo.nmacro > 0)
     {
