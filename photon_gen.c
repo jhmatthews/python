@@ -327,9 +327,18 @@ iwind = -1 	Don't generate any wind photons at all
   /* New block follow for dealing with emission via k-packets and macro atoms. SS */
   if (geo.matom_radiation)
     {
-      geo.f_matom = get_matom_f ();
-      geo.f_kpkt = get_kpkt_f ();   /* This returns the specific luminosity 
-                                       in the spectral band of interest */	
+      /* JM 1408 -- only calculate macro atom emissivity if first cycle. 
+         Otherwise have restarted run and can use saved emissivities */
+      if (geo.pcycle == 0) 
+        {
+          geo.f_matom = get_matom_f ();
+          geo.f_kpkt = get_kpkt_f ();   /* This returns the specific luminosity 
+                                           in the spectral band of interest */	
+        }
+      
+      else
+        Log("geo.pcycle (%i) > 0, so using saved level emissivities for macro atoms\n");
+
       matom_emiss_report ();	    // function which logs the macro atom level emissivites 
      
     }

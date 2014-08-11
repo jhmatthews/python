@@ -221,6 +221,7 @@ double two_level_atom(struct lines *line_ptr, PlasmaPtr xplasma, double *d1, dou
 double line_nsigma(struct lines *line_ptr, PlasmaPtr xplasma);
 double scattering_fraction(struct lines *line_ptr, PlasmaPtr xplasma);
 double p_escape(struct lines *line_ptr, PlasmaPtr xplasma);
+double p_escape_from_tau(double tau);
 int line_heat(PlasmaPtr xplasma, PhotPtr pp, int nres);
 /* continuum.c */
 double one_continuum(int spectype, double t, double g, double freqmin, double freqmax);

@@ -212,7 +212,8 @@ trans_phot (w, p, iextract)
 				  wmain[pextract.grid].dvds_max);
 
 	      /* then turn into a probability */
-	      p_norm = NNSCAT_SAFETY * (1. - exp (-tau_norm)) / tau_norm;
+          p_norm = p_escape_from_tau(tau_norm);
+
 	    }
 	  else
 	    {
@@ -231,6 +232,13 @@ trans_phot (w, p, iextract)
 	     probability along a given direction, but we also need to divide the weight
 	     by the mean escape probability, which is equal to 1/nnscat */
 	  pextract.w *= p[nphot].nnscat / p_norm;
+
+	  if (sane_check (pextract.w))
+		{
+		  Error
+			("trans_phot: sane_check photon %d has weight %e before extract\n",
+			 nphot, pextract.w);
+		}
 	  extract (w, &pextract, pextract.origin);
 
 
@@ -519,8 +527,7 @@ been initialized. 02may ksl.  This seems to be OK at present.*/
 				 wmain[pextract.grid].dvds_max);
 
 		      /* then turn into a probability */
-		      p_norm =
-			NNSCAT_SAFETY * (1. - exp (-tau_norm)) / tau_norm;
+              p_norm = p_escape_from_tau(tau_norm);
 
 		    }
 		  else
@@ -539,6 +546,13 @@ been initialized. 02may ksl.  This seems to be OK at present.*/
 		     probability along a given direction, but we also need to divide the weight
 		     by the mean escape probability, which is equal to 1/nnscat */
 		  pextract.w *= nnscat / p_norm;
+
+		  if (sane_check (pextract.w))
+		{
+		  Error
+			("trans_phot: sane_check photon %d has weight %e before extract\n",
+			 nphot, pextract.w);
+		}
 		  extract (w, &pextract, PTYPE_WIND);	// Treat as wind photon for purpose of extraction
 		}
 

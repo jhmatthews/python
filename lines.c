@@ -677,12 +677,8 @@ p_escape (line_ptr, xplasma)
       tau = (d1 - line_ptr->gl / line_ptr->gu * d2);
       tau *= PI_E2_OVER_M * line_ptr->f / line_ptr->freq / dvds;
 
-      if (tau < 1e-6)
-	escape = 1.;
-      else if (tau < 10.0)
-	escape = (1. - exp (-tau)) / tau;
-      else
-	escape = 1. / tau;
+      /* JM 1408 -- moved calculation of p_escape to subroutine below */
+      escape = p_escape_from_tau (tau);
 
 
 
@@ -700,6 +696,42 @@ p_escape (line_ptr, xplasma)
 
   return (pe_escape);
 }
+
+/* p_escape_from_tau calculates the probability of escape
+   given an actual tau. It simple returns the equation
+
+   (1. - exp (-tau)) / tau;
+
+   Except for high and low tau where it returns 1/tau and
+   1.0 respectively. This is used by p_escape above, which 
+   calculates the sobolev escape probability, and 
+   also by the anisotropic scattering routines. 
+
+   History:
+   1408 JM  Moved here to avoid code duplication
+ */
+
+
+double
+p_escape_from_tau(tau)
+double tau;
+{
+  double escape;
+
+  /* TAU_MIN is defined in python.h
+     this is to stop numerical problems when tau is low */
+  if (tau < TAU_MIN)
+    escape = 1.;
+
+  else if (tau < 10.0)
+    escape = (1. - exp (-tau)) / tau;
+
+  else
+    escape = 1. / tau;
+
+  return (escape);
+}
+
 
 /* line_heat calculates the amount of line heating that occurs after a resonance. It is called
    by trans_phot in python 
