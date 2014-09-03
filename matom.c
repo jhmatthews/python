@@ -9,6 +9,7 @@
 #include <gsl/gsl_block.h>
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_matrix.h>
+//#include <gsl/gsl_blas.h>
 #include "my_linalg.h"
 
 /*****************************************************************************
@@ -689,6 +690,7 @@ History:
           July04  SS   Modified to use recomb_sp(_e) rather than alpha_sp(_e) to speed up.
 	06may	ksl	57+ -- Modified to use new plasma array.  Eliminated passing
 			entire w array
+	131030	JM 		-- Added adiabatic cooling as possible kpkt destruction choice
           
 ************************************************************/
 
@@ -704,6 +706,7 @@ kpkt (p, nres, escape)
   double cooling_bf[NTOP_PHOT];
   double cooling_bf_col[NTOP_PHOT];	//collisional cooling in bf transitions
   double cooling_bb[NLINES];
+  double cooling_adiabatic;
   struct topbase_phot *cont_ptr;
   struct lines *line_ptr;
   double cooling_normalisation;
@@ -918,12 +921,43 @@ kpkt (p, nres, escape)
 	  cooling_normalisation += cooling_ff;
 	}
 
+
+      /* JM -- 1310 -- we now want to add adiabatic cooling as another way of destroying kpkts
+         this should have already been calculated and stored in the plasma structure. Note that 
+         adiabatic cooling does not depend on type of macro atom excited */
+
+      /* note the units here- we divide the total luminosity of the cell by volume and ne to give cooling rate */
+
+      cooling_adiabatic = xplasma->lum_adiabatic / one->vol / xplasma->ne;
+
+      if (geo.adiabatic == 0 && cooling_adiabatic > 0.0)
+        {
+      	  Error("Adiabatic cooling turned off, but non zero in cell %d", xplasma->nplasma);
+        }
+
+
+      /* JM 1302 -- Negative adiabatic coooling- this used to happen due to issue #70, where we incorrectly calculated dvdy, 
+         but this is now resolved. Now it should only happen for cellspartly in wind, because we don't treat these very well.
+         Now, if cooling_adiabatic < 0 then set it to zero to avoid runs exiting for part in wind cells. */
+      if (cooling_adiabatic < 0)
+        {
+          Error("kpkt: Adiabatic cooling negative! Major problem if inwind (%d) == 0\n",
+          	     one->inwind);
+	      Log ("kpkt: Setting adiabatic kpkt destruction probability to zero for this matom.\n");
+	      cooling_adiabatic = 0.0;
+        }
+
+
+      cooling_normalisation += cooling_adiabatic;
+
+
+ 
       mplasma->cooling_bbtot = cooling_bbtot;
       mplasma->cooling_bftot = cooling_bftot;
       mplasma->cooling_bf_coltot = cooling_bf_coltot;
+      mplasma->cooling_adiabatic = cooling_adiabatic;
       mplasma->cooling_normalisation = cooling_normalisation;
       mplasma->kpkt_rates_known = 1;
-
 
     }
 
@@ -1035,12 +1069,34 @@ kpkt (p, nres, escape)
 
       return (0);
     }
+
+
+  /* JM 1310 -- added loop to check if destruction occurs via adiabatic cooling */
+  else if (destruction_choice <
+	   (mplasma->cooling_bftot +
+	    mplasma->cooling_bbtot + mplasma->cooling_ff + mplasma->cooling_adiabatic))
+    {
+
+      if (geo.adiabatic == 0)
+      {
+      	Error("Destroying kpkt by adiabatic cooling even though it is turned off.");
+      }
+      *escape = 1;		// we want to escape but set photon weight to zero
+      *nres = -2;		
+      //p->w = 0.0;		// JM131030 set photon weight to zero as energy is taken up in adiabatic expansion
+
+      p->istat = P_ADIABATIC; 	// record that this photon went into a kpkt destruction from adiabatic cooling
+
+      return (0);
+    }
+
+
   else
     {
       /* We want destruction by collisional ionization in a macro atom. */
       destruction_choice =
 	destruction_choice - mplasma->cooling_bftot -
-	mplasma->cooling_bbtot - mplasma->cooling_ff;
+	mplasma->cooling_bbtot - mplasma->cooling_ff - mplasma->cooling_adiabatic;
 
       for (i = 0; i < ntop_phot; i++)
 	{
@@ -1077,9 +1133,9 @@ kpkt (p, nres, escape)
 
   Error ("matom.c: Failed to select a destruction process in kpkt. Abort.\n");
   Error
-    ("matom.c: cooling_bftot %g, cooling_bbtot %g, cooling_ff %g, cooling_bf_coltot %g\n",
+    ("matom.c: cooling_bftot %g, cooling_bbtot %g, cooling_ff %g, cooling_bf_coltot %g cooling_adiabatic %g\n",
      mplasma->cooling_bftot, mplasma->cooling_bbtot,
-     mplasma->cooling_ff, mplasma->cooling_bf_coltot);
+     mplasma->cooling_ff, mplasma->cooling_bf_coltot, mplasma->cooling_adiabatic);
 
   exit (0);
 
@@ -1319,7 +1375,9 @@ History:
                        - some treatment of metastables is needed for 
                        doing CNO macro atoms.
 	06may	ksl	57+ -- Modified to reflect plasma structue
-
+    1404 	jm  77a -- Added test to check that populations are solution to rate matrix equation in macro_pops
+                       + more robust erro reporting in general. See pull request #75.
+    1404  	jm  77a -- Now only clean for population inversions if levels have a radiative transition between them #76
 ************************************************************/
 
 int
@@ -1332,14 +1390,14 @@ macro_pops (xplasma, xne)
   int n_macro_lvl;
   double rate;
   double rate_matrix[NLEVELS_MACRO][NLEVELS_MACRO];
-  int matrix_to_conf[NLEVELS_MACRO];
+  int radiative_flag[NLEVELS_MACRO][NLEVELS_MACRO];	// 140423 JM flag if two levels are radiatively linked
   int conf_to_matrix[NLEVELS_MACRO];
   struct lines *line_ptr;
   struct topbase_phot *cont_ptr;
   int nn, mm;
   int index_bbu, index_bbd, index_bfu, index_bfd;
   int lower, upper;
-  double this_ion_density;
+  double this_ion_density, level_population;
   double inversion_test;
   double q_ioniz (), q_recomb ();
   int s;			//NEWKSL
@@ -1347,8 +1405,10 @@ macro_pops (xplasma, xne)
   gsl_permutation *p;		//NEWKSL
   gsl_matrix_view m;		//NEWKSL
   gsl_vector_view b;		//NEWKSL
-  gsl_vector *populations;	//NEWKSL
-  int index_fast_col;
+  gsl_vector *populations, *test_vector;	//NEWKSL
+  gsl_matrix *test_matrix;
+  int index_fast_col, ierr;
+  double test_val;
 
   MacroPtr mplasma;
   mplasma = &macromain[xplasma->nplasma];
@@ -1366,6 +1426,10 @@ macro_pops (xplasma, xne)
 	  for (mm = 0; mm < NLEVELS_MACRO; mm++)
 	    {
 	      rate_matrix[mm][nn] = 0.0;
+
+	      /* 140423 JM -- new int array to flag if  two levels are radiatively linked
+	         initialize to 0 */
+	      radiative_flag[mm][nn] = 0; 
 	    }
 	}
 
@@ -1404,7 +1468,6 @@ macro_pops (xplasma, xne)
 		     two arrays here that allow the mapping between these indices to be done easily.
 		   */
 		  conf_to_matrix[index_lvl] = n_macro_lvl;
-		  matrix_to_conf[n_macro_lvl] = index_lvl;
 		  n_macro_lvl++;
 		}
 	    }
@@ -1491,6 +1554,15 @@ macro_pops (xplasma, xne)
 
 		      rate_matrix[lower][lower] += -1. * rate;
 		      rate_matrix[upper][lower] += rate;
+
+		      /* There's a radiative jump between these levels, so we want to clean
+		         for popualtion inversions. Flag this jump */
+		      radiative_flag[index_lvl][line_ptr->nconfigu] = 1;
+
+		      if (rate < 0.0 || sane_check(rate))
+		      {
+		      	Error("macro_pops: bbu rate is %8.4e in cell/matom %i\n", rate, xplasma->nplasma);
+		      }
 		    }
 
 		  for (index_bbd = 0;
@@ -1516,6 +1588,16 @@ macro_pops (xplasma, xne)
 
 		      rate_matrix[upper][upper] += -1. * rate;
 		      rate_matrix[lower][upper] += rate;
+
+
+		      /* There's a radiative jump between these levels, so we want to clean
+		         for popualtion inversions. Flag this jump */
+		      radiative_flag[line_ptr->nconfigl][index_lvl] = 1;
+
+		      if (rate < 0.0 || sane_check(rate))
+		      {
+		      	Error("macro_pops: bbd rate is %8.4e in cell/matom %i\n", rate, xplasma->nplasma);
+		      }
 		    }
 
 
@@ -1546,6 +1628,11 @@ macro_pops (xplasma, xne)
 		      rate_matrix[lower][lower] += -1. * rate;
 		      rate_matrix[upper][lower] += rate;
 
+		      if (rate < 0.0 || sane_check(rate))
+		      {
+		      	Error("macro_pops: bfu rate is %8.4e in cell/matom %i\n", rate, xplasma->nplasma);
+		      }
+
 		      /* Now deal with the stimulated emission. */
 		      /* Lower and upper are the same, but now it contributes in the
 		         other direction. */
@@ -1557,6 +1644,11 @@ macro_pops (xplasma, xne)
 
 		      rate_matrix[upper][upper] += -1. * rate;
 		      rate_matrix[lower][upper] += rate;
+
+		      if (rate < 0.0 || sane_check(rate))
+		      {
+		      	Error("macro_pops: st. recomb rate is %8.4e in cell/matom %i\n", rate, xplasma->nplasma);
+		      }
 
 		    }
 
@@ -1594,6 +1686,11 @@ macro_pops (xplasma, xne)
 
 		      rate_matrix[upper][upper] += -1. * rate;
 		      rate_matrix[lower][upper] += rate;
+
+		      if (rate < 0.0 || sane_check(rate))
+		      {
+		      	Error("macro_pops: bfd rate is %8.4e in cell/matom %i\n", rate, xplasma->nplasma);
+		      }
 		    }
 		}
 	    }
@@ -1612,8 +1709,10 @@ macro_pops (xplasma, xne)
 
 	  /********************************************************************************/
 	  /* The block that follows (down to next line of ***s) is to do the
-	     matix inversion. It uses LU decomposition - the
-	     code for doing this is taken from the GSL manual with very few modifications. */
+	     matrix inversion. It uses LU decomposition - the code for doing this is 
+	     taken from the GSL manual with very few modifications. */
+	  /* here we solve the matrix equation M x = b, where x is our vector containing
+	     level populations as a fraction w.r.t the whole element */
 
 	  /* Replaced inline array allocaation with calloc, which will work with older version of c compilers */
 
@@ -1628,17 +1727,28 @@ macro_pops (xplasma, xne)
 		}
 	    }
 
-	  /* Replaced inline array allocaation with calloc, which will work with older version of c compilers */
+
+	  /* Replaced inline array allocaation with calloc, which will work with older version of c compilers 
+	     calloc also sets the elements to zero, which is required */
 
 	  b_data = (double *) calloc (sizeof (rate), n_macro_lvl);
+
+	  /* replace the first entry with 1.0- this is part of the normalisation constraint */
 	  b_data[0] = 1.0;
 
+      /* create gsl matrix/vector views of the arrays of rates */
 	  m = gsl_matrix_view_array (a_data, n_macro_lvl, n_macro_lvl);	//KSLNEW
+
+	  /* these are used for testing the solution below */
+	  test_matrix = gsl_matrix_alloc(n_macro_lvl, n_macro_lvl);
+	  test_vector = gsl_vector_alloc (n_macro_lvl);
+
+	  gsl_matrix_memcpy(test_matrix, &m.matrix); 	// create copy for testing 
 
 	  b = gsl_vector_view_array (b_data, n_macro_lvl);	//KSLNEW
 
+	  /* the populations vector will be a gsl vector which stores populations */
 	  populations = gsl_vector_alloc (n_macro_lvl);	//KSLNEW
-
 
 
 	  p = gsl_permutation_alloc (n_macro_lvl);	//NEWKSL
@@ -1649,10 +1759,52 @@ macro_pops (xplasma, xne)
 
 	  gsl_permutation_free (p);
 
-	  free (a_data);	//NEWKSL
-	  free (b_data);	//NEWKSL
 
 	  /**********************************************************/
+
+      /* JM 140414 -- before we clean, we should check that the populations vector we 
+         have just created really is a solution to the matrix equation */
+      
+      /* declaration contained in my_linalg.h, taken from gsl library */
+      ierr = gsl_blas_dgemv(CblasNoTrans, 1.0, test_matrix, populations, 0.0, test_vector);
+
+      if (ierr != 0)
+        {
+      	  Error("macro_pops: bad return when testing matrix solution to rate equations.\n");
+        }
+
+      /* now cycle through and check the solution to y = m * populations really is
+         (1, 0, 0 ... 0) */
+
+      for (mm = 0; mm < n_macro_lvl; mm++)
+        {
+
+          /* get the element of the vector we want to check */
+          test_val = gsl_vector_get (test_vector, mm);
+          
+          if (mm == 0)		// 0th element should be 1
+          {
+      	    if ( (fabs(test_val - 1.0)) > EPSILON)
+      	      Error("macro_pops: test vector has first element = %8.4e, should be 1.0\n",
+      	      	     test_val);    
+          }     
+
+          else 				// all other elements should be zero
+          {
+          	if ( fabs(test_val)  > EPSILON)
+      	      Error("macro_pops: test vector has element %i = %8.4e, should be 0.0\n",
+      	      	     mm, test_val);    
+          }
+        }
+
+        /* free memory */
+        free (a_data);	
+	    free (b_data);	
+	    free (test_vector);
+	    free (test_matrix);
+
+
+
 	  /* MC noise can cause population inversions (particularly amongst highly excited states)
 	     which are never a good thing and most likely unphysical.
 	     Therefor let's follow Leon's procedure (Lucy 2003) and remove inversions. */
@@ -1676,13 +1828,18 @@ macro_pops (xplasma, xne)
 		       (ion[index_ion].first_nlte_level +
 			ion[index_ion].nlte); nn++)
 		    {
-		      inversion_test = gsl_vector_get (populations, conf_to_matrix[index_lvl]) * config[nn].g / config[index_lvl].g * 0.999999;	//include a correction factor 
-		      if (gsl_vector_get (populations, conf_to_matrix[nn]) >
-			  inversion_test)
-			{
-			  gsl_vector_set (populations, conf_to_matrix[nn],
+
+              /* this if statement means we only clean if there's a radiative jump between the levels */
+              if (radiative_flag[index_lvl][nn])
+              {
+		        inversion_test = gsl_vector_get (populations, conf_to_matrix[index_lvl]) * config[nn].g / config[index_lvl].g * 0.999999;	//include a correction factor 
+		        if (gsl_vector_get (populations, conf_to_matrix[nn]) >
+			    inversion_test)
+			  {
+			    gsl_vector_set (populations, conf_to_matrix[nn],
 					  inversion_test);
-			}
+			  }
+		      }
 		    }
 		}
 	    }
@@ -1707,7 +1864,14 @@ macro_pops (xplasma, xne)
 		   ion[index_ion].first_nlte_level + ion[index_ion].nlte;
 		   index_lvl++)
 		{
-		  this_ion_density += gsl_vector_get (populations, nn);
+		  level_population = gsl_vector_get (populations, conf_to_matrix[index_lvl]);	
+		  this_ion_density += level_population;
+
+		  /* JM 140409 -- add error check for negative populations */
+		  if (level_population < 0.0 || sane_check(level_population))
+		    Error("macro_pops: level %i has frac. pop. %8.4e in cell %i\n", 
+		    	   index_lvl, level_population, xplasma->nplasma);
+
 		  nn++;
 		}
 
@@ -2082,6 +2246,7 @@ get_matom_f ()
   my_nmax = NPLASMA;
 
 #ifdef MPI_ON
+
   num_mpi_cells = floor(NPLASMA/np_mpi_global);  // divide the cells between the threads
   num_mpi_extra = NPLASMA - (np_mpi_global*num_mpi_cells);  // the remainder from the above division
   
@@ -2098,7 +2263,6 @@ get_matom_f ()
       my_nmax = num_mpi_extra*(num_mpi_cells+1) + (rank_global-num_mpi_extra+1)*(num_mpi_cells);
     }
   ndo = my_nmax-my_nmin;
- 
 
   Log_parallel
     ("Thread %d is calculating macro atom emissivities for macro atoms %d to %d\n",
@@ -2481,7 +2645,6 @@ photo_gen_kpkt (p, weight, photstart, nphot)
   int wind_n_to_ij (), stuff_v (), randvec ();
   int get_random_location ();
   double test;
-  double ztest, dvds, z, tau;
   int nnscat;
   double dvwind_ds (), sobolev ();
   int nplasma;
@@ -2568,23 +2731,7 @@ photo_gen_kpkt (p, weight, photstart, nphot)
       else if (geo.scatter_mode == 2)
 	{			//It was a line photon and we want the thermal trapping anisotropic model
 
-	  ztest = 1.0;
-	  z = 0.0;
-	  nnscat = 0;
-	  while (ztest > z)
-	    {
-	      nnscat = nnscat + 1;
-	      randvec (p[n].lmn, 1.0);	//Get a new direction
-	      ztest = (rand () + 0.5) / MAXRAND;
-	      dvds = dvwind_ds (&p[n]);	//Here w is entire wind
-	      tau =
-		sobolev (&wmain[icell], &p[n], -1.0, lin_ptr[p[n].nres],
-			 dvds);
-	      if (tau < 1.0e-5)
-		z = 1.0;
-	      else
-		z = (1. - exp (-tau)) / tau;	/* probability to see if it escapes in that direction */
-	    }
+	  randwind_thermal_trapping(&p[n], &nnscat);
 	}
 
       p[n].nnscat = nnscat;
@@ -2670,7 +2817,6 @@ photo_gen_matom (p, weight, photstart, nphot)
   int emit_matom ();
   double test;
   int upper;
-  double ztest, dvds, z, tau;
   int nnscat;
   double dvwind_ds (), sobolev ();
   int nplasma;
@@ -2782,23 +2928,7 @@ photo_gen_matom (p, weight, photstart, nphot)
       else if (geo.scatter_mode == 2)
 	{			//It was a line photon and we want the thermal trapping anisotropic model
 
-	  ztest = 1.0;
-	  z = 0.0;
-	  nnscat = 0;
-	  while (ztest > z)
-	    {
-	      nnscat = nnscat + 1;
-	      randvec (p[n].lmn, 1.0);	//Get a new direction
-	      ztest = (rand () + 0.5) / MAXRAND;
-	      dvds = dvwind_ds (&p[n]);	//Here w is entire wind
-	      tau =
-		sobolev (&wmain[icell], &p[n], -1.0, lin_ptr[p[n].nres],
-			 dvds);
-	      if (tau < 1.0e-5)
-		z = 1.0;
-	      else
-		z = (1. - exp (-tau)) / tau;	/* probability to see if it escapes in that direction */
-	    }
+      randwind_thermal_trapping(&p[n], &nnscat);
 	}
       p[n].nnscat = nnscat;
 
@@ -2943,7 +3073,7 @@ emit_matom (w, p, nres, upper)
       if (cont_ptr->freq[0] < em_rnge.fmax)	//means that it may contribute
 	{
 	  sp_rec_rate = alpha_sp (cont_ptr, xplasma, 0);
-	  eprbs[m] = sp_rec_rate * xplasma->ne * (config[uplvl].ex - config[phot_top[config[uplvl].bfd_jump[n]].nlev].ex);	//energy difference
+	  eprbs[m] = sp_rec_rate * ne * (config[uplvl].ex - config[phot_top[config[uplvl].bfd_jump[n]].nlev].ex);	//energy difference
 	  if (eprbs[m] < 0.)	//test (can be deleted eventually SS)
 	    {
 	      Error ("Negative probability (matom, 4). Abort.");
@@ -2987,7 +3117,7 @@ emit_matom (w, p, nres, upper)
       *nres = config[uplvl].bfd_jump[n - nbbd] + NLINES + 1;
       /* continuua are indicated by nres > NLINES */
       p->freq = phot_top[config[uplvl].bfd_jump[n - nbbd]].freq[0]
-	- (log (1. - (rand () + 0.5) / MAXRAND) * xplasma->t_e / H_OVER_K);
+	- (log (1. - (rand () + 0.5) / MAXRAND) * t_e / H_OVER_K);
       /* Co-moving frequency - changed to rest frequency by doppler */
       /*Currently this assumed hydrogenic shape cross-section - Improve */
     }
@@ -3033,6 +3163,13 @@ q_ioniz (cont_ptr, electron_temperature)
 
 /* q_recomb. This returns the collisional recombination co-efficient
 Calculated from inverse of q_ioniz.
+
+JM 1301 -- Edited this to avoid need to call q_ioniz and exponential.
+Should improve speed and stability
+
+This equation comes from considering TE and getting the expression
+q_recomb = 2.07e-16 * gl/gu * exp(E/kT) * q_ioniz
+then substituting the above expression for q_ioniz.
 */
 
 double
@@ -3041,15 +3178,17 @@ q_recomb (cont_ptr, electron_temperature)
      double electron_temperature;
 {
   double coeff;
-  double root_etemp;
-  double q_ioniz ();
+  double gaunt;
 
-  root_etemp = sqrt (electron_temperature);
-  coeff = 2.07e-16 / (root_etemp * root_etemp * root_etemp);
-  coeff *= exp (cont_ptr->freq[0] * H_OVER_K / electron_temperature);
+
+  gaunt = 0.1;			//for now - from Mihalas for hydrogen
+
+  coeff = 3.2085e-3  / electron_temperature * gaunt * cont_ptr->x[0];	// normal constants * 1/T times gaunt * cross section
+
+  coeff /= cont_ptr->freq[0] * H_OVER_K;			// divide by h nu / k
   coeff *= config[cont_ptr->nlev].g / config[cont_ptr->uplev].g;
-  coeff *= q_ioniz (cont_ptr, electron_temperature);
-
 
   return (coeff);
 }
+
+

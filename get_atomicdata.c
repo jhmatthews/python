@@ -1332,7 +1332,7 @@ for the ionstate.
 		      if (config[n].n_bfd_jump > NBFJUMPS)
 			{
 			  Error
-			    ("get_atomic_data: Too many downward b-f jump for ion %s\n",
+			    ("get_atomic_data: Too many downward b-f jump for ion %d\n",
 			     config[n].istate);
 			  exit (0);
 			}
@@ -1346,7 +1346,7 @@ for the ionstate.
 		      if (config[m].n_bfu_jump > NBFJUMPS)
 			{
 			  Error
-			    ("get_atomic_data: Too many upward b-f jump for ion %s\n",
+			    ("get_atomic_data: Too many upward b-f jump for ion %d\n",
 			     config[m].istate);
 			  exit (0);
 			}
@@ -1808,7 +1808,7 @@ Col
 		      if (config[n].n_bbu_jump > NBBJUMPS)
 			{
 			  Error
-			    ("get_atomic_data: Too many upward b-b jumps for ion %s\n",
+			    ("get_atomic_data: Too many upward b-b jumps for ion %d\n",
 			     config[n].istate);
 			  exit (0);
 			}
@@ -1820,7 +1820,7 @@ Col
 		      if (config[m].n_bbd_jump > NBBJUMPS)
 			{
 			  Error
-			    ("get_atomic_data: Too many downward b-b jumps for ion %s\n",
+			    ("get_atomic_data: Too many downward b-b jumps for ion %d\n",
 			     config[m].istate);
 			  exit (0);
 			}

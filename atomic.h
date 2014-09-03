@@ -402,7 +402,7 @@ int nxcol_min, nxcol_max, nxcol_delt;	/*For calculating a frequency range within
 //OLD 091103   double cooling_ff;
 //OLD 091103 };
 
-typedef struct coolstruct COOLSTR;
+//OLD 140720 typedef struct coolstruct COOLSTR;
 
 
 //081115 nsh New structure and variables to hold the dielectronic recombination rate data

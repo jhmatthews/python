@@ -121,7 +121,6 @@ lum_lines (one, nmin, nmax)
       if (dd > LDEN_MIN)
 	{			/* potentially dangerous step to avoid lines with no power */
 	  two_level_atom (lin_ptr[n], xplasma, &d1, &d2);
-
 	  x = foo1 = lin_ptr[n]->gu / lin_ptr[n]->gl * d1 - d2;
 
 	  z = exp (-H_OVER_K * lin_ptr[n]->freq / t_e);
@@ -157,6 +156,8 @@ lum_lines (one, nmin, nmax)
       else
 	lin_ptr[n]->pow = 0;
     }
+
+
   return (lum);
 }
 
@@ -346,6 +347,9 @@ a21 (line_ptr)
 	07mar	ksl	58c -- Tried to address problems associated with our 
 			inconsistent treatment of level populations for two
 			level atoms, This is at best a bandaide.
+	14jul	nsh	78 -- changed to allow the use of a computed model for
+			the mean intensity in a cell to calualate influence of radiation
+			on the upper state population of a two level atom.
  */
 
 struct lines *old_line_ptr;
@@ -371,7 +375,7 @@ two_level_atom (line_ptr, xplasma, d1, d2)
   double xw;
   double ne, te, w, tr, dd;
   int nion;
-
+  double J; //Model of the specific intensity
 
 
   //Check and exit if this routine is called for a macro atom, since this should never happen
@@ -426,15 +430,22 @@ in the configuration structure. 01dec ksl */
 	  c21 = ne * q;
 	  c12 = c21 * g2_over_g1 * exp (-H_OVER_K * freq / te);
 
-	  if (w < 1.e-6)
-	    {			// Radiation is unimportant
-	      n2_over_n1 = c12 / (c21 + a);
-	    }
-	  else
-	    {			//Include effects of stimulated emission
-	      z = w / (exp (H_OVER_K * freq / tr) - 1.);
-	      n2_over_n1 = (c12 + g2_over_g1 * a * z) / (c21 + a * (1. + z));
-	    }
+//	  if (w < 1.e-6) //NSH this if block removed to simplify code - if can be reinstated if runtimes are a problem, but it will need an additional if statement to avoid missing it out if we are using a modelled specific intensity.
+//	    {			// Radiation is unimportant
+//	      n2_over_n1 = c12 / (c21 + a);
+//	    }
+//	  else
+//	    {			//Include effects of stimulated emission
+//	      z = w / (exp (H_OVER_K * freq / tr) - 1.); //original
+	      z=(C*C)/(2.*H*freq*freq*freq); //This is the factor which relates the A coefficient to the b coefficient
+//	      n2_over_n1 = (c12 + g2_over_g1 * a * z) / (c21 + a * (1. + z)); //original
+
+	   J = mean_intensity (xplasma, freq, 1);/* we call mean intensity with mode 1 - this means we are happy to use the dilute blackbody approximation even if we havent run enough spectral cycles to have a model for J*/
+
+           n2_over_n1 = (c12 + g2_over_g1 * a * z * J) / (c21 + a*(1. + (J * z)));  //this equation is equivalent to equation 4.29 in NSH's thesis with the einstein b coefficients replaced by a multiplied by suitable conversion factors from the einstein relations.
+
+
+//	    }
 
 
 	  *d1 = dd;
@@ -496,9 +507,6 @@ line_nsigma (line_ptr, xplasma)
      PlasmaPtr xplasma;
 {
   double d1, d2, x;
-  int ion;
-
-  ion = line_ptr->nion;
 
   two_level_atom (line_ptr, xplasma, &d1, &d2);	//xxxx
 
@@ -559,9 +567,7 @@ scattering_fraction (line_ptr, xplasma)
   double a, c, z;
   double sf;
   double ne, te;
-  double dd;			/* density of the relevent ion */
-  double dvds;
-  double w, tr;			/* the radiative weight, and radiation tempeature */
+  double w;			/* the radiative weight, and radiation tempeature */
 
   if (geo.line_mode == 0)
     return (0.0);		//purely absorbing atmosphere
@@ -572,10 +578,7 @@ scattering_fraction (line_ptr, xplasma)
 //Populate variable from previous calling structure
   ne = xplasma->ne;
   te = xplasma->t_e;
-  tr = xplasma->t_r;		//JM1308 in pre 76b versions this was incorrectly set to xplasma->t_e
   w = xplasma->w;
-  dvds = wmain[xplasma->nwind].dvds_ave;
-  dd = xplasma->density[line_ptr->nion];
 
   c = (-H_OVER_K * line_ptr->freq / te);
   a = exp (c);
@@ -673,12 +676,8 @@ p_escape (line_ptr, xplasma)
       tau = (d1 - line_ptr->gl / line_ptr->gu * d2);
       tau *= PI_E2_OVER_M * line_ptr->f / line_ptr->freq / dvds;
 
-      if (tau < 1e-6)
-	escape = 1.;
-      else if (tau < 10.0)
-	escape = (1. - exp (-tau)) / tau;
-      else
-	escape = 1. / tau;
+      /* JM 1408 -- moved calculation of p_escape to subroutine below */
+      escape = p_escape_from_tau (tau);
 
 
 
@@ -697,6 +696,42 @@ p_escape (line_ptr, xplasma)
   return (pe_escape);
 }
 
+/* p_escape_from_tau calculates the probability of escape
+   given an actual tau. It simple returns the equation
+
+   (1. - exp (-tau)) / tau;
+
+   Except for high and low tau where it returns 1/tau and
+   1.0 respectively. This is used by p_escape above, which 
+   calculates the sobolev escape probability, and 
+   also by the anisotropic scattering routines. 
+
+   History:
+   1408 JM  Moved here to avoid code duplication
+ */
+
+
+double
+p_escape_from_tau(tau)
+double tau;
+{
+  double escape;
+
+  /* TAU_MIN is defined in python.h
+     this is to stop numerical problems when tau is low */
+  if (tau < TAU_MIN)
+    escape = 1.;
+
+  else if (tau < 10.0)
+    escape = (1. - exp (-tau)) / tau;
+
+  else
+    escape = 1. / tau;
+
+  return (escape);
+}
+
+
 /* line_heat calculates the amount of line heating that occurs after a resonance. It is called
    by trans_phot in python 
 
@@ -712,12 +747,10 @@ line_heat (xplasma, pp, nres)
      PhotPtr pp;
      int nres;
 {
-  double dd, x, sf;
+  double x, sf;
 
 
   check_plasma (xplasma, "line_heat");
-
-  dd = xplasma->density[lin_ptr[nres]->nion];
 
   sf = scattering_fraction (lin_ptr[nres], xplasma);
 

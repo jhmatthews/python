@@ -1,0 +1,73 @@
+#####################################################################################
+#
+#       James Matthews, University of Southampton
+#                   6 Feb 2014
+#
+# This is the travis yml file which controls the test builds 
+# for Python, the radiative transfer code hosted at https://github.com/agnwinds/python
+#
+# Procedure:
+#       - travis automatically clones the main dev branch of the repository
+#       - we clone the rest of the directory structure into a folder called structure
+#       - note this is different from normal directory layout, but facilitates the build
+#       - Cfitsio and gsl are built
+#       - we then cd into the main build directory and do make test_tr. 
+#   
+#####################################################################################
+
+language: c
+
+compiler:
+    - gcc
+
+# only want to run this test when we commit to dev
+branches:
+  only:
+      dev
+
+install:
+    # clone the structure branch into a sub directory
+    - git clone --depth=50 --branch=structure git://github.com/agnwinds/python.git structure
+    - cd structure
+    - export PYTHON=$TRAVIS_BUILD_DIR/structure
+    - echo $PYTHON
+    - echo $PWD
+
+    # make cfitsio library
+    - cd software/cfitsio3040
+    - ./configure 
+    - make
+    - mv libcfitsio.a ../../lib
+    - make clean
+
+    # Then make GSL library
+    - cd ../../software/gsl-1.15
+    - ./configure --disable-shared --prefix=$PYTHON/gsl
+    - make
+    - make install
+    - make clean
+
+    #Then clone data
+    - cd ../..
+    - mkdir data
+    - cd data
+    - git clone --depth=50 --branch=data git://github.com/agnwinds/python.git .
+    # cd back into right directory for making source code
+    - cd ../../
+    - cp $PYTHON/py_progs/setup_scripts/Setup_Py_Dir $PYTHON/bin
+    - export PATH=$PATH:$PYTHON/bin 
+
+
+
+script:
+    - echo $PWD
+    # these long strings of variables are required because we have a different directory layout to normal
+    - make CC=gcc LIB=structure/lib LIB2=structure/gsl/lib BIN=structure/bin INCLUDE=structure/include INCLUDE2=structure/gsl/include python
+    - make clean
+    - make CC=gcc LIB=structure/lib LIB2=structure/gsl/lib BIN=structure/bin INCLUDE=structure/include INCLUDE2=structure/gsl/include py_wind
+    - make clean
+    - cd structure/test_suite/travis 
+    - Setup_Py_Dir
+    - py test1 > test1.out
+    - py balmer_test > balmer_test.out
+    - python check_travis_test.py 

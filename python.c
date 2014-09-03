@@ -247,8 +247,8 @@ should allocate the space for the spectra to avoid all this nonsense.  02feb ksl
   double xbl;
 
   int j, nn;
-  double zz, zzz, zze, ztot;
-  int icheck;
+  double zz, zzz, zze, ztot, zz_adiab;
+  int icheck, nn_adiab;
   FILE *fopen (), *qptr;
 
   int disk_illum;
@@ -259,6 +259,7 @@ should allocate the space for the spectra to avoid all this nonsense.  02feb ksl
 
   int my_rank;		// these two variables are used regardless of parallel mode
   int np_mpi;		// rank and number of processes, 0 and 1 in non-parallel
+  int time_to_quit;
 
 #ifdef MPI_ON
   int mpi_i, mpi_j;
@@ -301,6 +302,8 @@ should allocate the space for the spectra to avoid all this nonsense.  02feb ksl
 
   verbosity = 4;		/* Set the default verbosity to 4.  To get more info raise the verbosity level to a higher number. To
 				   get less set the verbosity to a lower level. */
+
+  time_to_quit = 100000;	// Initialise variable
 
 
   Log_set_verbosity (verbosity);
@@ -355,6 +358,17 @@ should allocate the space for the spectra to avoid all this nonsense.  02feb ksl
 		  exit (0);
 		}
 	      Log_set_verbosity (verbosity);
+	      i++;
+
+	    }
+	  else if (strcmp (argv[i], "-e") == 0)
+	    {
+	      if (sscanf (argv[i + 1], "%d", &time_to_quit) != 1)
+		{
+		  Error ("python: Expected max errors after -e switch\n");
+		  exit (0);
+		}
+	      Log_quit_after_n_errors (time_to_quit);
 	      i++;
 
 	    }
@@ -700,7 +714,7 @@ should allocate the space for the spectra to avoid all this nonsense.  02feb ksl
     ("Wind_ionization(0=on.the.spot,1=LTE,2=fixed,3=recalc_bb,6=pairwise_bb,7=pairwise_pow)",
      &geo.ioniz_mode);
 
-  if (geo.ioniz_mode == 2)
+  if (geo.ioniz_mode == IONMODE_FIXED)
     {
       rdstr ("Fixed.concentrations.filename", &geo.fixed_con_file[0]);
     }
@@ -723,7 +737,12 @@ on levels and their multiplicities is taken into account.   */
      &geo.line_mode);
 
 /* ?? ksl Next section seems rather a kluge.  Why don't we specifty the underlying variables explicitly 
-It also seems likely that we have mixed usage of some things, e.g ge.rt_mode and geo.macro_simple */
+It also seems likely that we have mixed usage of some things, e.g geo.rt_mode and geo.macro_simple */
+
+/* JM 1406 -- geo.rt_mode and geo.macro_simple control different things. geo.rt_mode controls the radiative
+   transfer and whether or not you are going to use the indivisible packet constraint, so you can have all simple 
+   ions, all macro-atoms or a mix of the two. geo.macro_simple just means one can turn off the full macro atom 
+   treatment and treat everything as 2-level simple ions inside the macro atom formalism */ 
 
   /* For now handle scattering as part of a hidden line transfermode ?? */
   if (geo.line_mode == 4)
@@ -756,9 +775,16 @@ It also seems likely that we have mixed usage of some things, e.g ge.rt_mode and
     {
       geo.scatter_mode = 0;	// isotropic
       geo.line_mode = 3;	// Single scattering
-      geo.rt_mode = 2;
+      geo.rt_mode = 2;		// Identify macro atom treatment i.e. indivisible packets
       geo.macro_simple = 1;	// This is for test runs with all simple ions (SS)
     }
+  else if (geo.line_mode == 9)	// JM 1406 -- new mode, as mode 7, but scatter mode is 1
+    {
+      geo.scatter_mode = 1;	// anisotropic scatter mode 1
+      geo.line_mode = 3;	// Single scattering
+      geo.rt_mode = 2;		// Identify macro atom treatment 
+      geo.macro_simple = 0;	// We don't want the all simple case 
+    }  
   else
     {
       geo.scatter_mode = 0;	// isotropic
@@ -1709,17 +1735,6 @@ run -- 07jul -- ksl
 		     top_bot_select, select_extract, rho_select, z_select,
 		     az_select, r_select);
 
-      /* Zero the arrays that store the heating of the disk */
-
-/* 080520 - ksl - There is a conundrum here.  One should really zero out the 
- * quantities below each time the wind structure is updated.  But relatively
- * few photons hit the disk under normal situations, and therefore the statistcs
- * are not very good.  
- */
-      for (n = 0; n < NRINGS; n++)
-	{
-	  qdisk.heat[n] = qdisk.nphot[n] = qdisk.w[n] = qdisk.ave_freq[n] = 0;
-	}
 
       wind_rad_init ();		/*Zero the parameters pertaining to the radiation field */
 
@@ -1765,6 +1780,23 @@ run -- 07jul -- ksl
 
 	  define_phot (p, freqmin, freqmax, nphot_to_define, 0, iwind, 1);
 
+      /* Zero the arrays that store the heating of the disk */
+
+      /* 080520 - ksl - There is a conundrum here.  One should really zero out the 
+       * quantities below each time the wind structure is updated.  But relatively
+       * few photons hit the disk under normal situations, and therefore the statistcs
+       * are not very good.  
+       */
+
+      /* 130213 JM -- previously this was done before define_phot, which meant that
+         the ionization state was never computed with the heated disk */
+
+      for (n = 0; n < NRINGS; n++)
+	{
+	  qdisk.heat[n] = qdisk.nphot[n] = qdisk.w[n] = qdisk.ave_freq[n] = 0;
+	}
+
+
 
 	  photon_checks (p, freqmin, freqmax, "Check before transport");
 
@@ -1799,16 +1831,25 @@ run -- 07jul -- ksl
 	  trans_phot (w, p, 0);
 
 	  /*Determine how much energy was absorbed in the wind */
-	  zze = zzz = 0.0;
+	  zze = zzz = zz_adiab = 0.0;
+	  nn_adiab = 0;
 	  for (nn = 0; nn < NPHOT; nn++)
 	    {
 	      zzz += p[nn].w;
 	      if (p[nn].istat == P_ESCAPE)
 		zze += p[nn].w;
+	      if (p[nn].istat == P_ADIABATIC)
+	      {
+		    zz_adiab += p[nn].w;
+		    nn_adiab++;
+		  }
 	    }
+
 	  Log
-	    ("!!python: Total photon luminosity after transphot %18.12e (diff %18.12e). Radiated luminosity %18.12e \n",
+	    ("!!python: Total photon luminosity after transphot %18.12e (diff %18.12e). Radiated luminosity %18.12e\n",
 	     zzz, zzz - zz, zze);
+      if (geo.rt_mode == 2)
+	  Log("Luminosity taken up by adiabatic kpkt destruction %18.12e number of packets %d\n", zz_adiab, nn_adiab);
 
 #if DEBUG
 	  wind_rad_summary (w, windradfile, "a");
@@ -2072,14 +2113,24 @@ run -- 07jul -- ksl
          JM1304: moved geo.wcycle++ after xsignal to record cycles correctly. First cycle is cycle 0. */
       /* NSH1306 - moved geo.wcycle++ back, but moved the log and xsignal statements */
 
-      Log_silent ("Saved wind structure in %s after cycle %d\n", windsavefile,
-	   geo.wcycle);
 
       xsignal (root, "%-20s Finished %d of %d ionization cycle \n", "OK",
 	       geo.wcycle, wcycles);
       geo.wcycle++;		//Increment ionisation cycles
 
+/* NSH 1408 - The wind save command was not inside the ifdef statement, and so many processors tried to access the same file. This is fixed below */
+
+#ifdef MPI_ON
+      if (rank_global == 0)
+      {
+#endif
       wind_save (windsavefile);
+      Log_silent ("Saved wind structure in %s after cycle %d\n", windsavefile,
+	   geo.wcycle);
+#ifdef MPI_ON
+      }
+      MPI_Barrier(MPI_COMM_WORLD);
+#endif
 
 
 
@@ -2271,7 +2322,7 @@ run -- 07jul -- ksl
 
       geo.pcycle++;		// Increment the spectral cycles
 
-#ifdef MPI_ON
+#ifdef MPI_ON    
       if (rank_global == 0)
       {
 #endif
@@ -2304,11 +2355,9 @@ run -- 07jul -- ksl
 #ifdef MPI_ON
   sprintf (dummy,"End of program, Thread %d only",my_rank);   // added so we make clear these are just errors for thread ngit status	
   error_summary (dummy);	// Summarize the errors that were recorded by the program
-  warning_summary (dummy);	// Summarize the warnings that were recorded by the program
   Log ("Run py_error.py for full error report.\n");
 #else
   error_summary ("End of program");	// Summarize the errors that were recorded by the program
-  warning_summary ("End of program");	// Summarize the warnings that were recorded by the program
 #endif
 
 
@@ -2364,6 +2413,8 @@ This program simulates radiative transfer in a (biconical) CV, YSO, quasar or (s
 \n\
 	-h 	to ge this help message \n\
 	-r 	restart a run of the progarm reading the file xxx.windsave \n\
+	-e change the maximum number of errors before quit- don't do this unless you understand\
+	the consequences! \n\
 \n\
 	-t time_max	limit the total time to approximately time_max seconds.  Note that the program checks \n\
 		for this limit somewhat infrequently, usually at the ends of cycles, because it \n\
@@ -2453,7 +2504,7 @@ init_geo ()
   geo.twind = 40000;
   geo.wind_mdot = 1.e-9 * MSOL / YR;
 
-  geo.ioniz_mode = 3;		/* default is on the spot and find the best t */
+  geo.ioniz_mode = IONMODE_ML93;	/* default is on the spot and find the best t */
   geo.line_mode = 3;		/* default is escape probabilites */
 
   geo.star_radiation = 1;	/* 1 implies star will radiate */

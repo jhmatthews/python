@@ -29,14 +29,58 @@ CC = mpicc
 # CC = gcc	can use GCC either from command line or by uncommenting this
 FC = g77
 # FC = gfortran
+# speciify any extra compiler flags here
+EXTRA_FLAGS =
 
 
-#this is so that the -DMPI_ON flag is only used if you are compiling with mpicc
-ifeq (mpicc, $(CC))
+#Check a load of compiler options
+#this is mostly to address issue $100
+ifeq (mpicc, $(CC))		
+	# you're using mpicc, so we'll compile with the DMPI_ON flag
 	MPI_FLAG = -DMPI_ON
-else
+
+	# check what underlying compiler mpi is using, and the version
+	# we'll use this to print to the user and also to do some checks
+	MPI_COMPILER := $(shell mpicc --showme:command)
+	COMPILER_VERSION := $(shell expr `'$(CC)' -dumpversion`)
+	COMPILER_PRINT_STRING = Compiling with mpicc wrapper, for compiler $(MPI_COMPILER) $(COMPILER_VERSION)
+
+	# if it's gcc we want to check if the version is 4.8 or later
+	# if it is then we'll disable aggressive loop optimizations, see #100
+	ifeq (gcc, $(MPI_COMPILER))
+		GCCVERSIONGTEQ4 := $(shell expr `gcc -dumpversion | cut -f1-2 -d.` \>= 4.8)
+		ifeq ("$(GCCVERSIONGTEQ4)", "1")
+			EXTRA_FLAGS = -fno-aggressive-loop-optimizations 	# add the flag to EXTRA_FLAGS
+			COMPILER_PRINT_STRING += with -fno-aggressive-loop-optimizations
+		endif
+	endif	
+
+else ifeq (gcc, $(CC))
+	# no mpicc,
 	MPI_FLAG =
+
+	# check the version
+	# we'll use this to print to the user and also to do some checks
+	COMPILER_VERSION = $(shell expr `gcc -dumpversion`)
+
+	# if it's gcc we want to check if the version is 4.8 or later
+	# if it is then we'll disable aggressive loop optimizations, see #100
+	GCCVERSIONGTEQ4 = $(shell expr `gcc -dumpversion | cut -f1-2 -d.` \>= 4.8)
+	COMPILER_PRINT_STRING = Compiling with $(CC) $(COMPILER_VERSION)
+	ifeq ("$(GCCVERSIONGTEQ4)", "1")
+		EXTRA_FLAGS += -fno-aggressive-loop-optimizations
+		COMPILER_PRINT_STRING += with -fno-aggressive-loop-optimizations
+	endif
+
+else	# you must be using clang or icc
+	MPI_FLAG =
+
+	# check the version we'll use this to print to the user
+	COMPILER_VERSION = $(shell expr `$(CC) -dumpversion`)
+	COMPILER_PRINT_STRING = Compiling with $(CC) $(COMPILER_VERSION)
 endif
+
+
 
 INCLUDE = ../../include
 INCLUDE2 = ../../gsl/include
@@ -49,15 +93,16 @@ ifeq (D,$(firstword $(MAKECMDGOALS)))
 # use pg when you want to use gprof the profiler
 # to use profiler make with arguments "make D python" 
 # this can be altered to whatever is best	
-	CFLAGS = -g -pg -Wall -I$(INCLUDE) -I$(INCLUDE2) $(MPI_FLAG)
+	CFLAGS = -g -pg -Wall $(EXTRA_FLAGS) -I$(INCLUDE) -I$(INCLUDE2) $(MPI_FLAG)
 	FFLAGS = -g -pg   
 	PRINT_VAR = DEBUGGING, -g -pg -Wall flags
 else
 # Use this for large runs
-	CFLAGS = -O3 -Wall -I$(INCLUDE)  -I$(INCLUDE2) $(MPI_FLAG)
-	FFLAGS =     
-        PRINT_VAR = LARGE RUNS, -03 -Wall flags
+	CFLAGS = -O3 -Wall $(EXTRA_FLAGS) -I$(INCLUDE) -I$(INCLUDE2) $(MPI_FLAG)
+	FFLAGS =         
+	PRINT_VAR = LARGE RUNS, -03 -Wall flags
 endif
+
 
 
 # next line for debugging when concerned about memory problems
@@ -67,12 +112,15 @@ endif
 LDFLAGS= -L$(LIB) -L$(LIB2)  -lm -lcfitsio -lgsl -lgslcblas 
 
 #Note that version should be a single string without spaces. 
-VERSION = 77a_dev
+
+VERSION = 78a
+
 CHOICE=1             // Compress plasma as much as possible
 # CHOICE=0           //  Keep relation between plasma and wind identical
 
 startup:
-	@echo 'YOU ARE COMPILING FOR' $(PRINT_VAR)
+	@echo $(COMPILER_PRINT_STRING)			# prints out compiler information
+	@echo 'YOU ARE COMPILING FOR' $(PRINT_VAR)	# tells user if compiling for optimized or debug
 	@echo 'MPI_FLAG=' $(MPI_FLAG)
 	echo "#define VERSION " \"$(VERSION)\" > version.h
 	echo "#define CHOICE"   $(CHOICE) >> version.h
@@ -146,7 +194,7 @@ py_wind_objects = py_wind.o get_atomicdata.o py_wind_sub.o windsave.o py_wind_io
 
 
 py_wind: startup $(py_wind_objects)
-	mpicc $(CFLAGS) $(py_wind_objects) $(LDFLAGS) -o py_wind
+	$(CC) $(CFLAGS) $(py_wind_objects) $(LDFLAGS) -o py_wind
 	cp $@ $(BIN)
 	mv $@ $(BIN)/py_wind$(VERSION)
 

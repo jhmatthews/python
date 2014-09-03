@@ -61,7 +61,7 @@ bf_estimators_increment (one, p, ds)
   double x, ft;
   double y, yy;
   double exponential, heat_contribution;
-  int n, m, llvl, nn, i;
+  int n, m, llvl, nn;
   double sigma_phot_topbase ();
   double density;
   double abs_cont;
@@ -79,54 +79,24 @@ bf_estimators_increment (one, p, ds)
   // the continuum neglect variation of frequency along path and
   // take as a single "average" value.  
 
-  /* JM -- 1310 -- the loop below is if the user requires extra diagnostics and
+  if (p->freq > xplasma->max_freq)  // check if photon frequency exceeds maximum frequency
+    xplasma->max_freq = p->freq;
+
+
+  /* JM -- 1310 -- check if the user requires extra diagnostics and
      has provided a file diag_cells.dat to store photons stats for cells they have specified
    */
   if (diag_on_off == 1 && ncstat > 0)
     {
-      for (i = 0; i < ncstat; i++)
-	{
-	  /* check if the cell is in the specified list */
-	  if (one->nplasma == ncell_stats[i])
-	    {
-	      fprintf (pstatptr,
-		       "PHOTON_DETAILS %3d %8.3e %8.3e %8.3e cell%3d wind cell%3d\n",
-		       geo.wcycle, p->freq, p->w, ds, one->nplasma,
-		       one->nwind);
-	    }
-	}
+      save_photon_stats(one, p, ds);  // save photon statistics (extra diagnostics)
     }
 
-  /*photon weight times distance in the shell is proportional to the mean intensity */
-  xplasma->j += p->w * ds;
 
-  /* frequency weighted by the weights and distance in the shell .  See eqn 2 ML93 */
-  xplasma->mean_ds += ds;
-  xplasma->n_ds++;
-  xplasma->ave_freq += p->freq * p->w * ds;
+  
+  /* JM 1402 -- the banded versions of j, ave_freq etc. are now updated in update_banded_estimators,
+     which also updates the ionization parameters and scattered and direct contributions */
 
-  if (p->freq > xplasma->max_freq)	// check if photon frequency exceeds maximum frequency
-    xplasma->max_freq = p->freq;
-
-  /* 1310 JM -- The next loop updates the banded versions of j and ave_freq, analogously to routine inradiation
-     nxfreq refers to how many frequencies we have defining the bands. So, if we have 5 bands, we have 6 frequencies, 
-     going from xfreq[0] to xfreq[5] Since we are breaking out of the loop when i>=nxfreq, this means the last loop 
-     will be i=nxfreq-1 */
-
-  /* note that here we can use the photon weight and don't need to calculate anm attenuated average weight
-     as energy packets are indisivible in macro atom mode */
-
-  for (i = 0; i < geo.nxfreq; i++)
-    {
-      if (geo.xfreq[i] < p->freq && p->freq <= geo.xfreq[i + 1])
-	{
-	  xplasma->xave_freq[i] += p->freq * p->w * ds;	/* 1310 JM -- frequency weighted by weight and distance */
-	  xplasma->xsd_freq[i] += p->freq * p->freq * p->w * ds;	/* 1310 JM -- input to allow standard deviation to be calculated */
-	  xplasma->xj[i] += p->w * ds;	/* 1310 JM -- photon weight times distance travelled */
-	  xplasma->nxtot[i]++;	/* 1310 JM -- increment the frequency banded photon counter */
-
-	}
-    }
+  update_banded_estimators(xplasma, p, ds, p->w);
 
   /* check that j and ave freq give sensible numbers */
   if (sane_check (xplasma->j) || sane_check (xplasma->ave_freq))
@@ -135,30 +105,6 @@ bf_estimators_increment (one, p, ds)
 	     xplasma->j, xplasma->ave_freq);
     }
 
-
-  /* 1401 JM -- Similarly to the above routines, this is another bit of code added to radiation
-     which therefore did not get called in macro atom mode. Duplicating code is bad practice and
-     we should probably condense these updates of MC estimators into a single subroutine
-     which gets called by both routines -- for the moment I'm leaving as is */
-
-  /* NSH had implemented a scattered and direct contribution to the IP. This doesn't really work 
-     in the same way due to the nature of macro atoms, so should instead be thought of as 
-     'direct from source' and 'reprocessed' radiation */
-  if (HEV * p->freq > 13.6)	// only record if above H ionization edge
-    {
-
-      /* IP needs to be radiation density in the cell. We sum wcontributions from
-         each photon, then it is normalised in wind_update. */
-      xplasma->ip += ((p->w * ds) / (H * p->freq));
-      if (p->nscat == 0)
-	{
-	  xplasma->ip_direct += ((p->w * ds) / (H * p->freq));
-	}
-      else
-	{
-	  xplasma->ip_scatt += ((p->w * ds) / (H * p->freq));
-	}
-    }
 
 
 

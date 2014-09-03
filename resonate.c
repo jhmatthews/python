@@ -614,7 +614,7 @@ kappa_bf (xplasma, freq, macro_all)
   double kap_bf_tot;
   double ft;
   double x;
-  int nconf, nion;
+  int nconf;
   double density;
   int n;
   int nn;
@@ -642,7 +642,6 @@ kappa_bf (xplasma, freq, macro_all)
 	  /*Need the appropriate density at this point. */
 
 	  nconf = phot_top[n].nlev;	//Returning lower level = correct (SS)
-	  nion = config[nconf].nion;
 
 	  density = den_config (xplasma, nconf);	//Need to check what this does (SS)
 
@@ -1081,9 +1080,13 @@ History:
                         directly but via macro_gov which supervises what the k-packets
                         and r-packets do. Hopefully this make the logic easier to follow.
 
-         04Dec   SS      Added nnscat pointer to call so that the anisotropic thermal
-                         scattering model would work as before for "simple" calculations.
-                         Previously nnscat was always just = 1.
+        04Dec  SS     Added nnscat pointer to call so that the anisotropic thermal
+                        scattering model would work as before for "simple" calculations.
+                        Previously nnscat was always just = 1.
+
+        1406 	JM 		Added normalisation of rejection method for anisotropic scattering
+        				'thermal trapping' model.
+        				See Issue #82.
 
 
 
@@ -1106,9 +1109,6 @@ scatter (p, nres, nnscat)
   double prob_kpkt, kpkt_choice;
   double gamma_twiddle, gamma_twiddle_e, stim_fact;
   int m, llvl, ulvl;
-  //new variable for use with thermal trapping model (SS July 04)
-  double z, ztest, dvds, tau;
-  int ishell;
   PlasmaPtr xplasma;
   MacroPtr mplasma;
 
@@ -1358,23 +1358,11 @@ scatter (p, nres, nnscat)
     }
   else
     {				//It was a line photon and we want to use the thermal trapping model to choose the output direction
-      ztest = 1.0;
-      z = 0.0;
-      *nnscat = *nnscat - 1;
-      while (ztest > z)
-	{
-	  *nnscat = *nnscat + 1;
-	  randvec (z_prime, 1.0);	/* Get a new direction for the photon (isotropic */
-	  stuff_v (z_prime, p->lmn);
-	  ztest = (rand () + 0.5) / MAXRAND;
-	  dvds = dvwind_ds (p);
-	  ishell = p->grid;
-	  tau = sobolev (&wmain[ishell], p, -1.0, lin_ptr[p->nres], dvds);
-	  if (tau < 1.0e-5)
-	    z = 1.0;
-	  else
-	    z = (1. - exp (-tau)) / tau;	/* probability to see if it escapes in that direction */
-	}
+
+      /* JM 1906 -- added normalisation of the below rejection method. We normalise
+         to the escape probability of along the direction of dvds_max, with a safety net of 
+         20% in case we missed the maximum */
+      randwind_thermal_trapping(p, nnscat);
     }
 
   /* End of modification for thermal trapping model (SS July 04) */

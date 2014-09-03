@@ -378,11 +378,10 @@ spherical_where_in_grid (x)
      double x[];
 {
   int n;
-  double r, theta;
+  double r;
   double f;
 
   r = length (x);
-  theta = acos ((fabs (x[2] / r))) * RADIAN;
 
   /* Check to see if x is outside the region of the calculation */
   if (r > wind_x[NDIM - 1])

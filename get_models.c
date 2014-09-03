@@ -537,54 +537,74 @@ excluded from furthur consideration -- 07jul ksl */
 	}
     }
 
-/* 081103 ksl -  Next section is new to deal with models with Temperatures less than in grid */
-/* Now make adjustments if we are actually out of the range of
-* the first parameter in the grid 
 
-f_out =  1/(e**hnu/kT_out -1) /  1/(e**hnu/kT_in -1) * f_in = (1/q1)/(1/q2) * f_in= q2/q1 * f_in
+
+/* 081103 ksl -  Next section is new to deal with models with Temperatures less than in grid 
+   140212 jm -- I've now included a fix for higher temperatures as well. See Pull request #67    
+
+if our temperature is higher or lower than that in the grid then we want to scale it by 
+
+scaling factor = B_nu ( T ) / B_nu (Tmax) = (exp(hnu / kTmax) - 1) / (exp(hnu / kT) - 1)
+
+=> f_out =  1/(e**hnu/kT_out -1) /  1/(e**hnu/kT_in -1) * f_in = (1/q1)/(1/q2) * f_in= q2/q1 * f_in
+
 Note that in the algorithm below we have to worry that the exp can become quite large, infinity
-even, and so for those cases we want to make sure to calculate the ratio of qs dirctly
+even, and so for those cases we want to make sure to calculate the ratio of qs directly
 */
 
-  if (par[0] < comp[spectype].min[0])
+  if (par[0] < comp[spectype].min[0] || par[0] > comp[spectype].max[0])   // is temp outside grid range
     {
-      for (j = 0; j < nwaves; j++)
+      for (j = 0; j < nwaves; j++)              // cycle through wavelength bins
 	{
 	  lambda = comp[spectype].xmod.w[j] * 1.e-8;	// Convert lamda to cgs
 
-	  q1 = 1.43883 / (lambda * par[0]);	//  for model desired 
 
-	  tscale = comp[spectype].min[0];
-	  q2 = 1.43883 / (lambda * tscale);	// for model that exists
+    /* tscale is temperature to use in the BB function by which we need to scale the flux. 
+       tscale can be larger or smaller than our actual temperature */
+    if (par[0] < comp[spectype].min[0])
+      tscale = comp[spectype].min[0];            // lowest temperature model
+
+    else if (par[0] > comp[spectype].max[0])
+      tscale = comp[spectype].max[0];            // highest temperature model
 
 
-	  /* q can be large line below is attempt to keep exponents in range in that case */
+    /* calculate h*nu/kT for both temperatures */
+
+	  q1 = H_OVER_K * C / (lambda * par[0]);	   //  h*nu/kT for model desired 
+
+	  q2 = H_OVER_K * C  / (lambda * tscale);	   //  h*nu/kT for model that exists
+
+
+	  /* q can be large- line below is attempt to keep exponents in range in that case */
 	  if (q1 > 50. || q2 > 50.)
 	    {
 	      xxx = exp (q2 - q1);	// q2 - q1 should be negative since q1 is model desired
 	    }
 	  else
 	    {
-
 	      q2 = exp (q2) - 1.0;	// Model that exists has higher temperature
-	      q1 = exp (q1) - 1.0;	// Model desired has lowe T, hence q1 is larger
+	      q1 = exp (q1) - 1.0;	// Model desired has lower T, hence q1 is larger
 	      xxx = q2 / q1;
 	    }
 
-
+    /* multiply flux by scaling factor */
 	  flux[j] *= xxx;
 
-	  if (nmodel_terror < 20 || xxx > 1.0)
+    /* nmodel_terror counts number of models where this is true. */
+	  if ( nmodel_terror < 20 )
 	    {
 	      Error
-		("model: Taking corrective action because %f < min[0] %f -> factor %f \n",
-		 par[0], comp[spectype].min[0], xxx);
+		("model: Taking corrective action because parameter %f outside bound %f -> scaling factor %f \n",
+		 par[0], tscale, xxx);
+
 	      nmodel_terror++;
 	    }
 	}
     }
 
-/* End of section to reweight the spectra. */
+
+
+/* End of section to reweight the spectra. we can now copy fluxes to structure */
 
   for (j = 0; j < nwaves; j++)
     {

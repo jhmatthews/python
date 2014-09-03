@@ -692,3 +692,122 @@ calloc_estimators (nelem)
 
   return (0);
 }
+
+/***********************************************************
+                                       West Lulworth
+
+ Synopsis:
+	This subroutine allocates space for dynamic arrays in the plasma 
+	structure
+
+ Arguments:
+	nelem - the number of plasma cells (actually NPLASMA+1) to allow for empty cell
+
+	
+ Returns:
+
+
+Description:
+	This subroutine allocates space for variable length arrays in the plasma structure.
+	This is to save space over the previous versions of python, which allocated arrays
+	based on guesses as to the lengths. 
+
+Notes:
+	Arrays sized to the number of ions are largest,
+	and dominate the size of nplasma, so these were first to be dynamically allocated.
+
+History:
+	1407	nsh	Started out allocating arrays that have length nion
+
+**************************************************************/
+
+
+int
+calloc_dyn_plasma (nelem)
+     int nelem;
+{
+  int n;
+
+for (n=0;n<nelem+1;n++)  //We loop over all elements in the plasma array, adding one for an empty cell used for extrapolations.
+	{
+  	if ((plasmamain[n].density =calloc (sizeof (double), nions)) == NULL)
+	{
+	  Error
+	    ("calloc_dyn_plasma: Error in allocating memory for density\n");
+	  exit (0);
+	}
+	if ((plasmamain[n].partition =calloc (sizeof (double), nions)) == NULL)
+	{
+	  Error
+	    ("calloc_dyn_plasma: Error in allocating memory for partition\n");
+	  exit (0);
+	}
+	if ((plasmamain[n].PWdenom =calloc (sizeof (double), nions)) == NULL)
+	{
+	  Error
+	    ("calloc_dyn_plasma: Error in allocating memory for PWdenom\n");
+	  exit (0);
+	}
+	if ((plasmamain[n].PWdtemp =calloc (sizeof (double), nions)) == NULL)
+	{
+	  Error
+	    ("calloc_dyn_plasma: Error in allocating memory for PWtemp\n");
+	  exit (0);
+	}
+	if ((plasmamain[n].PWnumer =calloc (sizeof (double), nions)) == NULL)
+	{
+	  Error
+	    ("calloc_dyn_plasma: Error in allocating memory for PWnumer\n");
+	  exit (0);
+	}
+	if ((plasmamain[n].PWntemp =calloc (sizeof (double), nions)) == NULL)
+	{
+	  Error
+	    ("calloc_dyn_plasma: Error in allocating memory for PWntemp\n");
+	  exit (0);
+	}
+	if ((plasmamain[n].ioniz =calloc (sizeof (double), nions)) == NULL)
+	{
+	  Error
+	    ("calloc_dyn_plasma: Error in allocating memory for ioniz\n");
+	  exit (0);
+	}
+	if ((plasmamain[n].recomb =calloc (sizeof (double), nions)) == NULL)
+	{
+	  Error
+	    ("calloc_dyn_plasma: Error in allocating memory for recomb\n");
+	  exit (0);
+	}
+	if ((plasmamain[n].scatters =calloc (sizeof (int), nions)) == NULL)
+	{
+	  Error
+	    ("calloc_dyn_plasma: Error in allocating memory for scatters\n");
+	  exit (0);
+	}
+	if ((plasmamain[n].xscatters =calloc (sizeof (double), nions)) == NULL)
+	{
+	  Error
+	    ("calloc_dyn_plasma: Error in allocating memory for xscatters\n");
+	  exit (0);
+	}
+	if ((plasmamain[n].heat_ion =calloc (sizeof (double), nions)) == NULL)
+	{
+	  Error
+	    ("calloc_dyn_plasma: Error in allocating memory for heat_ion\n");
+	  exit (0);
+	}
+	if ((plasmamain[n].lum_ion =calloc (sizeof (double), nions)) == NULL)
+	{
+	  Error
+	    ("calloc_dyn_plasma: Error in allocating memory for lum_ion\n");
+	  exit (0);	
+	}
+}
+
+     Log
+	("Allocated %10d bytes for each of %5d elements variable length plasma arrays totaling %10.1f Mb \n",
+	 sizeof (double)*nions*12, (nelem+1),
+	 1.e-6 * (nelem+1 ) * sizeof (double)*nions*12);
+
+  return (0);
+}

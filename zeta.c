@@ -11,9 +11,12 @@ The routines in this file are to do with computing the correction to the saha eq
   Description:
 
 Zeta is the term in lucy and mazzali which corrects for the proportion of recombinations
-going directly to the ground state. I'm experimenting with moving it out of saha and stuart_sim
+going directly to the ground state. 
+
+nsh: I'm experimenting with moving it out of saha and stuart_sim
 since the same factor will be used in both, and I'm going to add in some more options to
 incorporate a correction factor for dielectronic recombination.
+
 
                                                                                                    
   Arguments:  
@@ -127,53 +130,65 @@ compute_zeta (temp, nion, mode)
 
   if (mode == 1)
     {
-      //This is the old method of getting zeta - just from the ground state tables computed by Christian
-
-
-
+      /* This is the old method of getting zeta - just from the ground state tables computed by Christian */
 
       zeta =
 	ground_frac[nion].frac[ilow] +
 	interpfrac * (ground_frac[nion].frac[ihi] -
 		      ground_frac[nion].frac[ilow]);
-//      Log ("for t_e=%f, ilow=%i, ihi=%i, interpfrac=%f, zeta=%f\n",temp,ilow,ihi,interpfrac,zeta);
+    //Log ("for t_e=%f, ilow=%i, ihi=%i, interpfrac=%f, zeta=%f\n",temp,ilow,ihi,interpfrac,zeta);
     }
-  else if (mode == 2)		//Best try at full blown zeta including DR, if we have the data, else default to the old way of doing things....
+
+
+
+  /* Best try at full blown zeta including DR, if we have the data, else default to the old way of doing things */
+  else if (mode == 2)		
     {
-      if (ion[nion].istate == ion[nion].z)	//We call this with the lower ion in a pair, so if that ion has only one electron, (ie. Carbon 6) then we cannot have DR into this ion, so there will be no DR rate associated with it.
+      /* We call this with the lower ion in a pair, so if that ion has only one electron, 
+         (ie. Carbon 6) then we cannot have DR into this ion, so there will be no DR rate 
+         associated with it. NSH 140317 We also do this if we dont have DR data at all. */	
+      if (ion[nion].istate == ion[nion].z || ion[nion].drflag == 0)	
 	{
 	  if (ion[nion].total_rrflag == 1)	//We have total RR data
 	    {
+
 	      if (ion[nion].bad_gs_rr_t_flag == 1 && ion[nion].bad_gs_rr_r_flag == 1)	//We have tabulated gs data
 		{
 		  zeta =
 		    badnell_gs_rr (nion, temp) / total_rrate (nion, temp);
-//                              Log ("We have the data, and zeta=%f\n",zeta);
+            //Log ("We have all the data, and zeta=%f gs=%e total=%e\n",zeta,badnell_gs_rr (nion, temp),total_rrate (nion, temp));
 		}
+
 	      else		//We are going to have to integrate
 		{
-		  Log
-		    ("We do not have tabulated GS data for state %i of element %i\n",
-		     ion[nion].istate, ion[nion].z);
+		  //Log
+		  //  ("We do not have tabulated GS data for state %i of element %i\n",
+		  //   ion[nion].istate, ion[nion].z);
 		  zeta = milne_gs_rr (nion, temp) / total_rrate (nion, temp);
 		}
 	    }
+
 	  else
 	    {
 	      zeta =
 		ground_frac[nion].frac[ilow] +
 		interpfrac * (ground_frac[nion].frac[ihi] -
 			      ground_frac[nion].frac[ilow]);
-//                      Log ("We dont have the data and zeta=%f\n",zeta);
+        //Log ("We dont have the data and zeta=%f\n",zeta);
 	    }
+
 	}
+
+
       else
 	{
 	  if (ion[nion].drflag > 0 && ion[nion].total_rrflag == 1)	//We have the two tabulated rates
 	    {
+	    //Log ("We have dr and total_rr/n");
 	      compute_dr_coeffs (temp);
 	      if (ion[nion].bad_gs_rr_t_flag == 1 && ion[nion].bad_gs_rr_r_flag == 1)	//We also have tabulated GS data
 		{
+		//Log("We have gs_rr/n");
 		  zeta =
 		    badnell_gs_rr (nion,
 				   temp) / (total_rrate (nion,
@@ -182,6 +197,7 @@ compute_zeta (temp, nion, mode)
 		}
 	      else		//We are going to have to integrate
 		{
+		//Log ("We are ging to have to integrate");
 		  zeta =
 		    milne_gs_rr (nion,
 				 temp) / (total_rrate (nion,
@@ -190,17 +206,18 @@ compute_zeta (temp, nion, mode)
 		}
 	    }
 	  else
-	    {
+            {
 	      zeta =
 		ground_frac[nion].frac[ilow] +
 		interpfrac * (ground_frac[nion].frac[ihi] -
 			      ground_frac[nion].frac[ilow]);
-//                      Log ("We dont have the data and zeta=%f\n",zeta);
+                      Log ("We dont have the data and zeta=%f\n",zeta);
 	    }
 	}
-
-
     }
+
+
+  /* if we got here then we don't understand the mode and there must be a problem */  
   else
     {
       Error ("Compute zeta: Unkown mode %i \n", mode);

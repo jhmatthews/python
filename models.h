@@ -9,11 +9,13 @@
  * NDIM --> MOD_NDIM  -- 081026
  */
 
-#define NWAVES 	4100
+ /* 1405 JM -- Increased PDF array for use with disk14 models- also removed duplication of ncomps */
+
+#define NWAVES  28000
 #define NDIM	10		// The maximum number of free parameters
 #define NCOMPS	10		//The maximum number of separate components
 #define NPARS	10		//The maximum number of parameters in a component (not all variable)
-#define NMODS   800		//The total number of models read in in all components
+#define NMODS   1000 	//The total number of models read in in all components
 #define LINELEN 132
 
 

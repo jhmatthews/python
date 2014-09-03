@@ -878,6 +878,7 @@ weight_summary (w, rootname, ochoice)
 {
   int n;
   int nplasma;
+  char filename[LINELENGTH];
 
   for (n = 0; n < NDIM2; n++)
     {
@@ -889,6 +890,14 @@ weight_summary (w, rootname, ochoice)
 	}
     }
   display ("Radiative weights");
+
+  if (ochoice)
+    {
+      strcpy (filename, rootname);
+      strcat (filename, ".w");
+      write_array (filename, ochoice);
+
+    }
 
   return (0);
 
@@ -989,6 +998,7 @@ mo_summary (w, rootname, ochoice)
   int n;
   int ichoice;
   char name[LINELENGTH];
+  char filename[LINELENGTH];
   double x;
   PlasmaPtr xplasma;
 
@@ -1033,8 +1043,15 @@ mo_summary (w, rootname, ochoice)
 	  aaa[n] = x;
 	}
       display (name);
+
+  if (ochoice && ichoice == 0)
+    {
+      strcpy (filename, rootname);
+      strcat (filename, ".f_rad");
+      write_array (filename, ochoice);
     }
 
+  }
   return (0);
 
 }
@@ -1228,7 +1245,7 @@ rdint ("Wind.array.element", &n);
   Log ("Spectral model details:\n");
   for (nn = 0; nn < geo.nxfreq; nn++)
     {
-      Log ("numin= %8.2e (%8.2e) numax= %8.2e (%8.2e) Model= %2d PL_log_w= %9.2e PL_alpha= %9.2e Exp_w= %9.2e EXP_temp= %9.2e\n",xplasma->fmin[nn],geo.xfreq[nn],xplasma->fmax[nn],geo.xfreq[nn+1],xplasma->spec_mod_type[nn],xplasma->pl_log_w[nn],xplasma->pl_alpha[nn],xplasma->exp_w[nn],xplasma->exp_temp[nn]);
+      Log ("numin= %8.2e (%8.2e) numax= %8.2e (%8.2e) Model= %2d PL_log_w= %9.2e PL_alpha= %9.2e Exp_w= %9.2e EXP_temp= %9.2e\n",xplasma-> fmin_mod[nn],geo.xfreq[nn],xplasma->fmax_mod[nn],geo.xfreq[nn+1],xplasma->spec_mod_type[nn],xplasma->pl_log_w[nn],xplasma->pl_alpha[nn],xplasma->exp_w[nn],xplasma->exp_temp[nn]);
 }    
 
 
@@ -1398,6 +1415,7 @@ dvds_summary (w, rootname, ochoice)
      char rootname[];
      int ochoice;
 {
+  char filename[LINELENGTH];
   int n;
 
   for (n = 0; n < NDIM2; n++)
@@ -1410,7 +1428,12 @@ dvds_summary (w, rootname, ochoice)
 	}
     }
   display ("Average dvds");
-
+  if (ochoice)
+    {
+      strcpy (filename, rootname);
+      strcat (filename, ".dvds");
+      write_array (filename, ochoice);
+    }
   return (0);
 }
 
@@ -1549,6 +1572,7 @@ IP_summary (w, rootname, ochoice)
 
    1108	ksl	Adapted for new version of banded alpha
    1208 nsh	Changed names - reference to sim removed to make way for exponential estimators
+   1401 nsh	Added more information - this now writes out all the spectral model parameters
  */
 
 int
@@ -1557,31 +1581,184 @@ alpha_summary (w, rootname, ochoice)
      char rootname[];
      int ochoice;
 {
-  int i, n;
+  int n, m;
   char filename[LINELENGTH];
   int nplasma;
+  char word[LINELENGTH];
 
-  i = 1;
-  rdint ("Band number for alpha", &i);
+ 
 
-  for (n = 0; n < NDIM2; n++)
+  for (m = 0; m < geo.nxfreq; m++)
     {
-      aaa[n] = 0;
-      if (w[n].vol > 0.0)
+      for (n = 0; n < NDIM2; n++)
 	{
-	  nplasma = w[n].nplasma;
-	  aaa[n] = (plasmamain[nplasma].pl_alpha[i]);
+	  aaa[n] = 0;
+	  if (w[n].vol > 0.0)
+	    {
+	      nplasma = w[n].nplasma;
+	      aaa[n] = plasmamain[nplasma].pl_alpha[m];
+	    }
+	}
+
+      strcpy (word, "");
+      sprintf (word, ".pl_alpha%03d", m);
+      display (word);
+
+      if (ochoice)
+	{
+	  strcpy (filename, rootname);
+	  strcat (filename, word);
+	  write_array (filename, ochoice);
 	}
     }
-  display ("Sim alpha in cell");
 
-  if (ochoice)
+ for (m = 0; m < geo.nxfreq; m++)
     {
-      strcpy (filename, rootname);
-      strcat (filename, ".alpha");
-      write_array (filename, ochoice);
+      for (n = 0; n < NDIM2; n++)
+	{
+	  aaa[n] = 0;
+	  if (w[n].vol > 0.0)
+	    {
+	      nplasma = w[n].nplasma;
+	      aaa[n] = plasmamain[nplasma].pl_log_w[m];
+	    }
+	}
 
+      strcpy (word, "");
+      sprintf (word, ".pl_log_w%03d", m);
+      display (word);
+
+      if (ochoice)
+	{
+	  strcpy (filename, rootname);
+	  strcat (filename, word);
+	  write_array (filename, ochoice);
+	}
     }
+
+
+ for (m = 0; m < geo.nxfreq; m++)
+    {
+      for (n = 0; n < NDIM2; n++)
+	{
+	  aaa[n] = 0;
+	  if (w[n].vol > 0.0)
+	    {
+	      nplasma = w[n].nplasma;
+	      aaa[n] = plasmamain[nplasma].exp_temp[m];
+	    }
+	}
+
+      strcpy (word, "");
+      sprintf (word, ".exp_temp%03d", m);
+      display (word);
+
+      if (ochoice)
+	{
+	  strcpy (filename, rootname);
+	  strcat (filename, word);
+	  write_array (filename, ochoice);
+	}
+    }
+
+ for (m = 0; m < geo.nxfreq; m++)
+    {
+      for (n = 0; n < NDIM2; n++)
+	{
+	  aaa[n] = 0;
+	  if (w[n].vol > 0.0)
+	    {
+	      nplasma = w[n].nplasma;
+	      aaa[n] = plasmamain[nplasma].exp_w[m];
+	    }
+	}
+
+      strcpy (word, "");
+      sprintf (word, ".exp_w%03d", m);
+      display (word);
+
+      if (ochoice)
+	{
+	  strcpy (filename, rootname);
+	  strcat (filename, word);
+	  write_array (filename, ochoice);
+	}
+    }
+
+ for (m = 0; m < geo.nxfreq; m++)
+    {
+      for (n = 0; n < NDIM2; n++)
+	{
+	  aaa[n] = 0;
+	  if (w[n].vol > 0.0)
+	    {
+	      nplasma = w[n].nplasma;
+	      aaa[n] = plasmamain[nplasma].spec_mod_type[m];
+	    }
+	}
+
+      strcpy (word, "");
+      sprintf (word, ".spec_mod_type%03d", m);
+      display (word);
+
+      if (ochoice)
+	{
+	  strcpy (filename, rootname);
+	  strcat (filename, word);
+	  write_array (filename, ochoice);
+	}
+    }
+
+
+
+ for (m = 0; m < geo.nxfreq; m++)
+    {
+      for (n = 0; n < NDIM2; n++)
+	{
+	  aaa[n] = 0;
+	  if (w[n].vol > 0.0)
+	    {
+	      nplasma = w[n].nplasma;
+	      aaa[n] = plasmamain[nplasma].fmin_mod[m];
+	    }
+	}
+
+      strcpy (word, "");
+      sprintf (word, ".fmin_mod%03d", m);
+      display (word);
+
+      if (ochoice)
+	{
+	  strcpy (filename, rootname);
+	  strcat (filename, word);
+	  write_array (filename, ochoice);
+	}
+    }
+
+for (m = 0; m < geo.nxfreq; m++)
+    {
+      for (n = 0; n < NDIM2; n++)
+	{
+	  aaa[n] = 0;
+	  if (w[n].vol > 0.0)
+	    {
+	      nplasma = w[n].nplasma;
+	      aaa[n] = plasmamain[nplasma].fmax_mod[m];
+	    }
+	}
+
+      strcpy (word, "");
+      sprintf (word, ".fmax_mod%03d", m);
+      display (word);
+
+      if (ochoice)
+	{
+	  strcpy (filename, rootname);
+	  strcat (filename, word);
+	  write_array (filename, ochoice);
+	}
+    }
+
   return (0);
 
 }

@@ -95,11 +95,12 @@ macro_summary (w, rootname, ochoice)
   int icell;
   int choose;
   int version;
-  int nlev;
+  int nlev, nplasma;
 
   choose = 0;
   nlev = 0;
-  rdint ("Detailed cell info (0), specific level info (1) emissivities (2) Balmer escapes (3)", &choose);
+  nplasma=0;
+  rdint ("Detailed cell info (0), specific level info (1) emissivities (2) Balmer escapes (3) Pops (4)", &choose);
 
   if (choose == 0)
     {
@@ -148,6 +149,15 @@ macro_summary (w, rootname, ochoice)
         /* JM 1311 -- new loop added to report level emissivities */
         rdint ("Level emissivity to view (0 - kpkts, -1 - back):", &nlev);
         level_emissoverview (nlev, w, rootname, ochoice);
+      }
+  }
+else if (choose == 4)
+  {
+    while (nplasma >= 0)
+      {
+        /* JM 1311 -- new loop added to report level emissivities */
+        rdint ("Cell to view (-1 to rollup):", &nplasma);
+        level_popsoverview (nplasma, w, rootname, ochoice);
       }
   }
   else
@@ -463,6 +473,81 @@ depcoef_overview_specific (version, nconfig, w, rootname, ochoice)
   return (0);
 
 }
+
+/* new function to print out level populations */
+int 
+level_popsoverview (nplasma, w, rootname, ochoice)
+  int nplasma;
+  WindPtr w;
+  char rootname[];
+  int ochoice;
+{
+  int i;
+  PlasmaPtr xplasma, xdummy;
+  plasma_dummy pdum;
+  char filename[LINELENGTH];
+  char lname[LINELENGTH];
+  double xden, lteden;
+  int copy_plasma ();
+
+  strcpy (filename, rootname);
+  strcpy (filename, rootname);
+  strcat (filename, ".lev_cell");
+
+  sprintf (lname, "%d", nplasma);
+  strcat (filename, lname);
+  strcat(filename,".dat");
+
+  FILE *f = fopen(filename, "w");
+
+  if (f == NULL)
+  {
+      printf("Error opening file!\n");
+      exit(1);
+  }
+
+  xplasma = &plasmamain[nplasma];
+  xdummy = &pdum;
+
+  copy_plasma (xplasma, xdummy);
+  geo.macro_ioniz_mode = 0;
+  
+  Log("# Level, Pops, Dep coefs\n");
+  if (ochoice)
+    fprintf(f, "# Level, Pops, Dep coefs\n");
+
+  Log("# Cell %i Radiation field t_r %8.4e w %8.4e\n",
+        nplasma, xplasma->t_r, xplasma->w);
+  Log("# Cell %i Physical t_e %8.4e ne %8.4e\n",
+      nplasma, xplasma->t_e, xplasma->ne);
+
+  if (ochoice)
+  {
+    fprintf(f, "# Cell %i Radiation field t_r %8.4e w %8.4e\n",
+        nplasma, xplasma->t_r, xplasma->w);
+    fprintf(f, "# Cell %i Physical t_e %8.4e ne %8.4e\n",
+      nplasma, xplasma->t_e, xplasma->ne);
+  }
+
+  for (i=0; i < nlevels_macro; i++)
+  {
+    partition_functions (xdummy, 1);
+    saha (xdummy, xdummy->ne, xdummy->t_e);
+
+    geo.macro_ioniz_mode = 1;
+
+    //p = &config[i];
+    xden = den_config (xplasma, i);
+    lteden = den_config (xdummy, i);
+    Log("%i %8.4e %8.4e\n", i+1, xplasma->levden[i], xden/lteden);
+    if (ochoice)
+      fprintf(f, "%i %8.4e %8.4e\n", i+1, xden, xden/lteden);
+  }
+  fclose(f);
+
+  return (0);
+}
+
 
 
 

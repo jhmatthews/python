@@ -253,21 +253,34 @@ total_emission (one, f1, f2)
 /***********************************************************
                                        Space Telescope Science Institute
 
-Synopsis:  adiabatic_cooling (one, t) determines the amount of 
-adiabatic cooling in a cell.
+Synopsis:  
+	adiabatic_cooling (one, t) determines the amount of 
+	adiabatic cooling in a cell, in units of luminosity.
 
 Arguments:		
-
+	WindPtr one;	pointer to wind cell
+	double t;		electron temperature
 
 Returns:
  
 Description:	
    Adiabatic cooling is clearly the amount of PdV work done by
-   a fluid element.  The only real question is whether dV is given
-   by the volume * div v
+   a fluid element, per unit time dt. Thus it is equal to P dV/dt.  
+   The only real question is whether dV/dt is given by the volume * div v.
+   div v here is the divergence of the velocity field.
 	
-
 Notes:
+  JM 1401 -- I've rederived the expression for dv/dT. It follows
+        directly from the continuity equation and is indeed equal 
+        to volume * div_v. 
+
+        Note also that this function should only be called
+        if geo.adiabatic == 1, in which case it populates
+        xplasma->lum_adiabatic. This is used in heating and cooling
+        balance. We also use it as a potential destruction choice for 
+        kpkts in which case the kpkt is thrown away by setting its istat 
+        to P_ADIABATIC.
+
 
 History:
 	04nov	ksl	Stuart had switched adiabatic cooling off
@@ -298,10 +311,10 @@ adiabatic_cooling (one, t)
   nplasma = one->nplasma;
   xplasma = &plasmamain[nplasma];
 
-  cooling = 1.5 * xplasma->ne * BOLTZMANN * t * one->vol * one->div_v;
+  //JM 1401 -- here was an old factor of 3/2 which KSL and JM believe to be incorrect. 
+  cooling = xplasma->ne * BOLTZMANN * t * one->vol * one->div_v;
 
   return (cooling);
-
 }
 
 
@@ -356,6 +369,7 @@ photo_gen_wind (p, weight, freqmin, freqmax, photstart, nphot)
   double v[3];
   int icell;
   int nplasma;
+  int nnscat;
 
 
   photstop = photstart + nphot;
@@ -437,22 +451,31 @@ photo_gen_wind (p, weight, freqmin, freqmax, photstart, nphot)
 
 
 
-// Determine the direction of the photon
-// ?? Need to allow for anisotropic emission here
+	  // Determine the direction of the photon
+	  // ?? Need to allow for anisotropic emission here
+      // JM 1406 -- I think there's a mistake here. I believe this should be
+      // if (p[n].nres < 0 || p[n].nres > NLINES || geo.scatter_mode == 0)
+      // to allow for isotropic BF continuum emission
+      nnscat = 1;
       if (p[n].nres < 0 || geo.scatter_mode != 1)
 	{
 /*  It was either an electron scatter so the  distribution is isotropic, or it
 was a resonant scatter but we want isotropic scattering anyway.  */
 	  randvec (p[n].lmn, 1.0);	/* The photon is emitted isotropically */
 	}
-      else
-	{			// It was a line photon and we want anisotropic scattering
+      else if (geo.scatter_mode == 1) 
+	{			// It was a line photon and we want anisotropic scattering mode 1
 
 // -1. forces a full reinitialization of the pdf for anisotropic scattering
-
+      
 	  randwind (&p[n], p[n].lmn, wmain[icell].lmn);
 
 	}
+	  else if (geo.scatter_mode == 2) 
+	{			// It was a line photon and we want anisotropic scattering mode 2
+	  randwind_thermal_trapping (&p[n], &nnscat);
+	}
+	p[n].nnscat = nnscat;
 
 
       /* The next two lines correct the frequency to first order, but do not result in

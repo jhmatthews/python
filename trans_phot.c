@@ -87,6 +87,7 @@ trans_phot (w, p, iextract)
   int nnscat;
   int disk_illum;
   int nerr;
+  double p_norm, tau_norm;
 
 
   n = 0;			// To avoid -O3 warning
@@ -110,9 +111,9 @@ trans_phot (w, p, iextract)
   /* 130718 -- jm -for the moment I've changed this back, as we agreed that printing to 
    * stderr was bad practice.
    */
-  
-  
-  Log("\n");
+
+
+  Log ("\n");
 
   for (nphot = 0; nphot < NPHOT; nphot++)
     {
@@ -121,8 +122,8 @@ trans_phot (w, p, iextract)
       //130306 - ksl since we don't really care what the frequencies are any more
       if (nphot % 50000 == 0)
 	//OLD 130718 fprintf (stderr, "\rPhoton %7d of %7d or %6.3f per cent ", nphot, NPHOT,
-        Log ("Photon %7d of %7d or %6.3f per cent \n", nphot, NPHOT,
-		nphot * 100. / NPHOT);
+	Log ("Photon %7d of %7d or %6.3f per cent \n", nphot, NPHOT,
+	     nphot * 100. / NPHOT);
 
       Log_flush ();		/*NSH June 13 Added call to flush logfile */
 
@@ -194,7 +195,50 @@ trans_phot (w, p, iextract)
 
 
 	  stuff_phot (&p[nphot], &pextract);
-	  pextract.w *= p[nphot].nnscat;
+
+
+	  /* We then increase weight to account for number of scatters.
+	     This is done because in extract we multiply by the escape
+	     probability along a given direction, but we also need to divide the weight
+	     by the mean escape probability, which is equal to 1/nnscat */
+	  if (geo.scatter_mode == 2 && pextract.nres <= NLINES
+	      && pextract.nres > 0)
+	    {
+	      /* we normalised our rejection method by the escape 
+	         probability along the vector of maximum velocity gradient.
+	         First find the sobolev optical depth along that vector */
+	      tau_norm = sobolev (&wmain[pextract.grid], &pextract, -1.0,
+				  lin_ptr[pextract.nres],
+				  wmain[pextract.grid].dvds_max);
+
+	      /* then turn into a probability */
+          p_norm = p_escape_from_tau(tau_norm);
+
+	    }
+	  else
+	    {
+	      p_norm = 1.0;
+
+	      /* throw an error if nnscat does not equal 1 */
+	      if (p[nphot].nnscat != 1)
+		Error ("nnscat is %i for photon %i in scatter mode %i!\n",
+		       p[nphot].nnscat, nphot, geo.scatter_mode);
+	    }
+
+
+
+	  /* We then increase weight to account for number of scatters.
+	     This is done because in extract we multiply by the escape
+	     probability along a given direction, but we also need to divide the weight
+	     by the mean escape probability, which is equal to 1/nnscat */
+	  pextract.w *= p[nphot].nnscat / p_norm;
+
+	  if (sane_check (pextract.w))
+		{
+		  Error
+			("trans_phot: sane_check photon %d has weight %e before extract\n",
+			 nphot, pextract.w);
+		}
 	  extract (w, &pextract, pextract.origin);
 
 
@@ -269,6 +313,7 @@ it from translate. ?? 02jan ksl */
 	      stuff_phot (&pp, &p[nphot]);
 	      break;
 	    }
+
 
 	  if (istat == P_HIT_DISK)
 	    {
@@ -355,6 +400,7 @@ a problem that needs fixing */
 		    ("trans_phot: Trying to scatter a photon in a cell with no wind volume\n");
 		  Error ("trans_phot: grid %3d x %8.2e %8.2e %8.2e\n",
 			 pp.grid, pp.x[0], pp.x[1], pp.x[2]);
+		  Log ("istat %d\n", pp.istat);
 		  Error ("trans_phot: This photon is effectively lost!\n");
 		  istat = pp.istat = p[nphot].istat = P_ERROR;
 		  stuff_phot (&pp, &p[nphot]);
@@ -463,9 +509,55 @@ been initialized. 02may ksl.  This seems to be OK at present.*/
 	      if (iextract)
 		{
 		  stuff_phot (&pp, &pextract);
-		  pextract.w *= nnscat;	// Increase weight to account for number of scatters
+
+
+		  /* JM 1407 -- This next loop is required because in anisotropic 
+		     scattering mode 2 we have normalised our rejection method. 
+		     This means that we have to adjust nnscat by this factor,
+		     since nnscat will be lower by a factor of 1/p_norm */
+		  if (geo.scatter_mode == 2 && pextract.nres <= NLINES
+		      && pextract.nres > 0)
+		    {
+		      /* we normalised our rejection method by the escape 
+		         probability along the vector of maximum velocity gradient.
+		         First find the sobolev optical depth along that vector */
+		      tau_norm =
+			sobolev (&wmain[pextract.grid], &pextract, -1.0,
+				 lin_ptr[pextract.nres],
+				 wmain[pextract.grid].dvds_max);
+
+		      /* then turn into a probability */
+              p_norm = p_escape_from_tau(tau_norm);
+
+		    }
+		  else
+		    {
+		      p_norm = 1.0;
+
+		      /* throw an error if nnscat does not equal 1 */
+		      if (p[nphot].nnscat != 1)
+			Error
+			  ("nnscat is %i for photon %i in scatter mode %i!\n",
+			   p[nphot].nnscat, nphot, geo.scatter_mode);
+		    }
+
+		  /* We then increase weight to account for number of scatters.
+		     This is done because in extract we multiply by the escape
+		     probability along a given direction, but we also need to divide the weight
+		     by the mean escape probability, which is equal to 1/nnscat */
+		  pextract.w *= nnscat / p_norm;
+
+		  if (sane_check (pextract.w))
+		{
+		  Error
+			("trans_phot: sane_check photon %d has weight %e before extract\n",
+			 nphot, pextract.w);
+		}
 		  extract (w, &pextract, PTYPE_WIND);	// Treat as wind photon for purpose of extraction
 		}
+
+
+
 
 /* OK we are ready to continue the processing of a photon which has scattered. The next steps
    reinitialize parameters so that the photon can continue throug the wind */
@@ -478,6 +570,8 @@ been initialized. 02may ksl.  This seems to be OK at present.*/
 	      icell = 0;
 	    }
 
+
+
 /* This completes the portion of the code that handles the scattering of a photon
  * What follows is a simple check to see if this particular photon has gotten stuck
  * in the wind  54b-ksl */
@@ -485,6 +579,13 @@ been initialized. 02may ksl.  This seems to be OK at present.*/
 	  if (pp.nscat == MAXSCAT)
 	    {
 	      istat = pp.istat = P_TOO_MANY_SCATTERS;	/* Scattered too many times */
+	      stuff_phot (&pp, &p[nphot]);
+	      break;
+	    }
+
+	  if (pp.istat == P_ADIABATIC)
+	    {
+	      istat = pp.istat = p[nphot].istat = P_ADIABATIC;
 	      stuff_phot (&pp, &p[nphot]);
 	      break;
 	    }
@@ -501,7 +602,7 @@ been initialized. 02may ksl.  This seems to be OK at present.*/
     }
   /* This is the end of the loop over all of the photons; after this the routine returns */
   //130624 ksl Line added to complete watchdog timeer,
-  Log("\n\n");
+  Log ("\n\n");
 
   return (0);
 }

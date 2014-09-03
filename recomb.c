@@ -15,6 +15,7 @@ Calculate the free-bound emissivity of a cell.   This is the emissivity,
 eg ne * ni *enu.  It includes the electron density
 
   Description:
+
 This is the version of the program that used detailed balance to
 calculate the emissivity.  The specific formulation implemented
 is that described most clearly in Hazy, but that comes from
@@ -35,7 +36,7 @@ fb_choice	When an ion recombines there are three possible quantities
 				go into the binding energy of the level
 				to which the electron+ion are recombining)
 			2=the emissivity in photons/unit frequency
-		0 shoulc be used in calculations of the emission spectrum but
+		0 should be used in calculations of the emission spectrum but
 		1 and should be used in energy loss and gain  calculations), while
 	        2 should be used in ion densities and levels
                                                                                                    
@@ -45,7 +46,6 @@ fb_choice	When an ion recombines there are three possible quantities
   Returns:
                                                                                                    
   Notes:
-                                                                                                   
                                                                                                    
 
 For reference here is  the freebound structures that can be used for both the
@@ -76,6 +76,11 @@ in python.h
 			put it into a more readable format.
 	12jul	nsh	73-Subroutine bad_t_rr coded to generate a total
 			recombination rate from badnell type parameters
+	14jan	nsh	77a - Added some checks into the integrals, to ensure
+			we do not attempt to integrate over a range of 
+			frequencies so large that the integrand is zero over
+			an excessive range - hence causing QROMB to return
+			an answer of zero.
                                                                                                    
  ************************************************************************/
 
@@ -170,6 +175,7 @@ fb_verner_partial (freq)
     FBEMISS * gn / (2. * gion) * pow (freq * freq / fbt,
 				      1.5) * exp (H_OVER_K *
 						  (fthresh - freq) / fbt) * x;
+
 // 0=emissivity, 1=heat loss from electrons, 2=photons emissivity
   if (fbfr == 1)
     partial *= (freq - fthresh) / freq;
@@ -236,11 +242,16 @@ fb_topbase_partial (freq)
     FBEMISS * gn / (2. * gion) * pow (freq * freq / fbt,
 				      1.5) * exp (H_OVER_K *
 						  (fthresh - freq) / fbt) * x;
+
+
+
 // 0=emissivity, 1=heat loss from electrons, 2=photons emissivity
   if (fbfr == 1)
     partial *= (freq - fthresh) / freq;
   else if (fbfr == 2)
     partial /= (H * freq);
+
+
 
   return (partial);
 }
@@ -310,6 +321,9 @@ integ_fb (t, f1, f2, nion, fb_choice)
   double fnu;
   double get_fb (), get_nrecomb ();
   int n;
+
+
+
 
   if (fb_choice == 1)
     {
@@ -398,7 +412,8 @@ total_fb (one, t, f1, f2)
     return (0);			/* It's too cold to emit */
 
 // Initialize the free_bound structures if that is necessary
-  init_freebound (1.e3, 1.e6, f1, f2);
+  init_freebound (1.e3, 1.e9, f1, f2); //NSH 140121 increased limit to take account of hot plasmas
+
 
 // Calculate the number of recombinations whenever calculating the fb_luminosities
   num_recomb (xplasma, t);
@@ -857,14 +872,13 @@ init_freebound (t1, t2, f1, f2)
 	}
 
       Log ("init_freebound: Creating recombination coefficients\n");
-
       for (nion = 0; nion < nions; nion++)
 	{
 	  for (j = 0; j < NTEMPS; j++)
 	    {
 	      t = fb_t[j];
-	      xnrecomb[nion][j] = xinteg_fb (t, 0.0, 1.e50, nion, 2);
 
+	      xnrecomb[nion][j] = xinteg_fb (t, 0.0, 1.e50, nion, 2);
 	    }
 	}
     }
@@ -932,7 +946,6 @@ on the assumption that the fb information will be reused.
 	{			//j covers the temps
 	  t = fb_t[j];
 	  freebound[nput].emiss[nion][j] = xinteg_fb (t, f1, f2, nion, 1);
-
 	}
     }
 
@@ -1037,6 +1050,7 @@ xinteg_fb (t, f1, f2, nion, fb_choice)
 {
   int n;
   double fnu;
+  double dnu;  //NSH 140120 - a parameter to allow one to restrict the integration limits.
   double fthresh, fmax;
   double den_config ();
   double sigma_phot (), sigma_phot_topbase ();
@@ -1044,6 +1058,9 @@ xinteg_fb (t, f1, f2, nion, fb_choice)
   int nvmin, nvmax;		// These are the limits on the Verland x-sections
   double qromb ();
   double fb_topbase_partial (), fb_verner_partial ();
+
+  dnu=0.0; //Avoid compilation errors.
+
 
   if (-1 < nion && nion < nions)	//Get emissivity for this specific ion_number
     {
@@ -1090,8 +1107,15 @@ xinteg_fb (t, f1, f2, nion, fb_choice)
 
 	  // Now calculate the emissivity as long as fmax exceeds xthreshold and there are ions to recombine
 	  if (fmax > fthresh)
-	    fnu += qromb (fb_topbase_partial, fthresh, fmax, 1.e-4);
-
+                {
+//NSH 140120 - this is a test to ensure that the exponential will not go to zero in the integrations 
+     		dnu = 100.0 * (fbt / H_OVER_K);
+      		if (fthresh + dnu < fmax)
+			{
+	  		fmax = fthresh + dnu;
+			}
+	    	fnu += qromb (fb_topbase_partial, fthresh, fmax, 1.e-5);
+	    	}
 	}
     }
 
@@ -1110,7 +1134,15 @@ xinteg_fb (t, f1, f2, nion, fb_choice)
 	    fmax = f2;
 	  // Now integrate only if its in allowable range  && there are ions to recombine
 	  if (fmax > fthresh)
-	    fnu += qromb (fb_verner_partial, fthresh, fmax, 1.e-4);
+//NSH 140120 - this is a test to ensure that the exponential will not go to zero in the integrations 
+		{     		
+		dnu = 100.0 * (fbt / H_OVER_K);
+      		if (fthresh + dnu < fmax)
+			{
+	  		fmax = fthresh + dnu;
+			}
+	        fnu += qromb (fb_verner_partial, fthresh, fmax, 1.e-5);
+		}
 	}
     }
 
@@ -1419,6 +1451,7 @@ Notes:
                                                                                                                                       
 History:
         12jul   nsh     73 -- Began coding
+  	14mar	nsh	77a-- Interpolaion now carried out in log space
 
 	
                                                                                                                                       
@@ -1455,15 +1488,23 @@ badnell_gs_rr (nion, T)
       Log_silent
 	("bad_gs_rr: Requested temp %e is below limit of data for ion %i(Tmin= %e)\n",
 	 T, nion, temps[0]);
-      rate = rates[0];
-    }
+//      rate = rates[0];
+     	imax=1;
+	imin=0;  
+  }
 
   else if (T >= temps[BAD_GS_RR_PARAMS - 1])	//we are above the range of GS data
     {
       Log_silent
 	("bad_gs_rr: Requested temp %e is above limit (%e) of data for ion %i\n",
 	 T, nion, bad_gs_rr[ion[nion].nxbadgsrr].temps[BAD_GS_RR_PARAMS - 1]);
-      rate = rates[BAD_GS_RR_PARAMS - 1];
+ //     rate = rates[BAD_GS_RR_PARAMS - 1];
+	imax=BAD_GS_RR_PARAMS - 1;
+	imin=BAD_GS_RR_PARAMS - 2;
+//We will try to extrapolate.
+
+
+
     }
   else				//We must be within the range of tabulated data
     {
@@ -1475,13 +1516,15 @@ badnell_gs_rr (nion, T)
 	      imax = i + 1;
 	    }
 	}
-      drdt = (rates[imax] - rates[imin]) / (temps[imax] - temps[imin]);
-      dt = (T - temps[imin]);
-      rate = rates[imin] + drdt * dt;
-
-
-
+/* NSH 140313 - changed the following lines to interpolate in log space */
     }
+      drdt = (log10(rates[imax]) - log10(rates[imin])) / (log10(temps[imax]) - log10(temps[imin]));
+      dt = (log10(T) - log10(temps[imin]));
+      rate = pow(10,(log10(rates[imin]) + drdt * dt));
+
+
+
+    
 
 
 

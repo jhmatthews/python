@@ -8,6 +8,13 @@
 	modelling the spectrum in a cell. It uses the mean frequency to
 	find a power law model and an exponential model. It then uses
 	the standard deviation to decide which is best.
+
+	The main routine is spectral_estimators and it currently attempts
+	to model the spectrum in each band in the cell an exponetial or
+	a power law.  The routine is called from ionization.c
+
+	The results are stored in parameters in the PlasmaPtr structure 
+	in variables, such as spec_mod_type, pl_alpah, pl_log,exp_temp, etc. 
 	
  Arguments:		
 	WindPtr w;
@@ -127,7 +134,7 @@ for (n1 =xband.nbands-1; n1>-1; n1--)
 			}
 		else
 			{
-			Warning("spectral_estimators: too few photons (1 or 0) in cell %d band %d to produce a model\n",xplasma->nplasma, n);
+			Error("spectral_estimators: too few photons (1 or 0) in cell %d band %d to produce a model\n",xplasma->nplasma, n);
 /* NSH 130709 - changed this to be a warning, there are photons produced here, so the fact that there are none getting into a cell tells us something - it may be perfectly reasonable but nice to know  */
 			}
 //	  	xplasma->pl_w[n] = 0;	//We also want to make sure that the weight will be zero, this way we make sure there is no contribution to the ionization balance from this frequency.
@@ -139,7 +146,7 @@ for (n1 =xband.nbands-1; n1>-1; n1--)
 		}
       else if (xplasma->fmax[n]==xplasma->fmin[n]) /*If all the photons in the cell are concentrated in a tiny range then we will also not expect to make a sensible model - this check could be reviewed later if lots of warning are produced */
 		{
-		Warning("spectral_estimators: multiple photons but only one frequency seen in %d band %d\n",xplasma->nplasma,n); /*Flag as a warning, so one can see if it is an issue */
+		Error("spectral_estimators: multiple photons but only one frequency seen in %d band %d\n",xplasma->nplasma,n); /*Flag as a warning, so one can see if it is an issue */
                 xplasma->pl_log_w[n] = -999; //A very tiny weight
 	  	xplasma->pl_alpha[n] = 999.9;	//Give alpha a value that will show up as an error
 	  	xplasma->exp_w[n] = 0.0;	//Make sure that w is zero, s no chance of mucking up ionization balance
@@ -216,10 +223,10 @@ for (n1 =xband.nbands-1; n1>-1; n1--)
 	    }
 
 
-	  if (finite(pl_alpha_func_log(pl_alpha_min))==0
-	      || finite(pl_alpha_func_log (pl_alpha_max))==0)
+	  if (isfinite(pl_alpha_func_log(pl_alpha_min))==0
+	      || isfinite(pl_alpha_func_log (pl_alpha_max))==0)
 	    {
-	      Warning
+	      Error
 		("spectral_estimators: Alpha cannot be bracketed (%e %e)in band %i cell %i- setting w to zero\n",
 		 pl_alpha_min,pl_alpha_max,n, xplasma->nplasma); //NSH 131108 - now a warning, this should no longer happen
 //	      xplasma->pl_w[n] = 0.0;
@@ -248,9 +255,9 @@ for (n1 =xband.nbands-1; n1>-1; n1--)
 //	      pl_w_temp = pl_w (j, pl_alpha_temp, spec_numin, spec_numax);
               pl_w_temp = pl_log_w (j, pl_alpha_temp, lspec_numin, lspec_numax);
 
-	      if ((finite(pl_w_temp))==0)
+	      if ((isfinite(pl_w_temp))==0)
 		{
-		  Warning
+		  Error
 		    ("spectral_estimators: New PL parameters (%e) unreasonable, using existing parameters. Check number of photons in this cell\n",pl_w_temp); //NSH 131108 - now a warning, this should no longer happen
 		  plflag = -1;	// Dont use this model
 //		  xplasma->pl_w[n] = 0.0;
@@ -279,10 +286,10 @@ for (n1 =xband.nbands-1; n1>-1; n1--)
 		}
 	      	exp_temp_max = exp_temp_max * 1.1; //The maximum temperature can go up forever with no fear of numerical problems
 	    }
-	  if (finite(exp_temp_func (exp_temp_min))==0
-	      || finite(exp_temp_func (exp_temp_max))==0)
+	  if (isfinite(exp_temp_func (exp_temp_min))==0
+	      || isfinite(exp_temp_func (exp_temp_max))==0)
 	    {
-	      Warning
+	      Error
 		("spectral_estimators: Exponential temperature cannot be bracketed (%e %e) in band %i - setting w to zero\n",
 		 exp_temp_min,exp_temp_max,n);//NSH 131108 - now a warning, this should no longer happen
 	      xplasma->exp_w[n] = 0.0;
@@ -307,9 +314,9 @@ for (n1 =xband.nbands-1; n1>-1; n1--)
 	      exp_w_temp = exp_w (j, exp_temp_temp, spec_numin, spec_numax);	/* Calculate the weight */
 
 
-	      if ((finite (exp_w_temp))==0)
+	      if ((isfinite (exp_w_temp))==0)
 		{
-		  Warning
+		  Error
 		    ("spectral_estimators: New exponential parameters (%e) unreasonable, using existing parameters. Check number of photons in this cell\n",exp_w_temp); //NSH 131108 - now a warning, this should no longer happen
 		  expflag = -1;	//discount an exponential model
 		  xplasma->exp_w[n] = 0.0;
@@ -355,7 +362,7 @@ for (n1 =xband.nbands-1; n1>-1; n1--)
 	  else
 	    {
 	      xplasma->spec_mod_type[n] = -1;	//Oh dear, there is no suitable model - this should be an error
-	      Warning ("No suitable model in band %i cell %i (nphot=%i fmin=%e fmax=%e)\n", n,
+	      Error ("No suitable model in band %i cell %i (nphot=%i fmin=%e fmax=%e)\n", n,
 		     xplasma->nplasma,xplasma->nxtot[n],xplasma->fmin[n],xplasma->fmax[n]);
 	  xplasma->fmin_mod[n]=spec_numax; //We will set the applicable frequency bands for the model to values that will cause errors if the model is used
 	  xplasma->fmax_mod[n]=spec_numin; 

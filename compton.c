@@ -61,6 +61,9 @@ kappa_comp (xplasma, freq)
 
 /*	alpha=1/(1+freq*HRYD*(1.1792e-4+(7.084e-10*freq*HRYD))); NSH 130214 This is the approximate way of doing it.*/
 
+ //	sigma=THOMPSON/(1+freq*HRYD*(1.1792e-4+(7.084e-10*freq*HRYD)));
+
+
   sigma = klein_nishina (freq);	//NSH 130214 - full KN formula
 
   x = (sigma * H) / (MELEC * C * C);	//Calculate the constant
@@ -101,8 +104,8 @@ kappa_ind_comp (xplasma, freq)
 {
   double x;			// The opacity of the cell by the time we return it.
   double sigma;			/*The cross section, thompson, or KN if hnu/mec2 > 0.01 */
-  double J, expo;		//The estimated intensity in the cell
-  int i;
+  double J;		//The estimated intensity in the cell
+//  int i;
 
   /* Previously, NSH had used the following formula whixch required ds and w to work  
      J=(4*PI*w*ds)/(C*xplasma->vol); //Calcuate the intensity NSH This works for a thin shell... Why? Dont know.
@@ -110,62 +113,13 @@ kappa_ind_comp (xplasma, freq)
 
   J = 0.0;			/* NSH 130605 to remove o3 compile error */
 
-  if (geo.ioniz_mode == 5 || geo.ioniz_mode == 7)	/*If we are using power law ionization, use PL estimators */
-    {
-      if (geo.wcycle > 0) /* there is only any point in worrying if we have had at least one cycle otherwise there is no model */
-      {
-      for (i = 0; i < geo.nxfreq; i++)
-	{
-	  if (geo.xfreq[i] < freq && freq <= geo.xfreq[i + 1])	//We have found the correct model band
-	    {
-	      if (xplasma->spec_mod_type[i] > 0)	//Only bother if we have a model in this band
-		{
-	        if (freq > xplasma->fmin_mod[i] && freq < xplasma->fmax_mod[i]) //The spectral model is defined for the frequency in question
-			{
-			if (xplasma->spec_mod_type[i] == SPEC_MOD_PL)	//Power law model
-				{				
-				J = pow(10,(xplasma->pl_log_w[i]+log10(freq)*xplasma->pl_alpha[i]));
-				}
-			else if (xplasma->spec_mod_type[i] == SPEC_MOD_EXP)	//Exponential model
-				{
-		  		J = xplasma->exp_w[i] * exp ((-1 * H * freq) / (BOLTZMANN * xplasma->exp_temp[i]));
-				}
-			else
-				{
-		  		Error("kappa_ind_comp - unknown spectral model (%i) in band %i\n",xplasma->spec_mod_type[i], i);
-		  		J = 0.0;	//Something has gone wrong
-				}
-			}
-		else /*We have a spectral model, but it doesnt apply to the frequency in question. clearly this is a slightly odd situation, where last time we didnt get a photon of this frequency, but this time we did. Still this should only happen in very sparse cells, so induced compton is unlikely to be important in such cells. We generate a warning, just so we can see if this is happening a lot*/
-			{
-			Warning ("kappa_ind_comp: frequency of photon (%e) is outside frequency range (%e - %e) of spectral model in cell %i band %i\n",freq,xplasma->fmin_mod[i],xplasma->fmax_mod[i],xplasma->nplasma,i); //This is unlikely to happen very often, but if it does, we should probably know about it
-			J = 0.0; //We 
-			}
-		}
-	     else /* There is no model in this band - this should not happen very often  */
-		{	
-		J = 0.0;	//THere is no modelin this band, so the best we can do is assume zero J
-		Warning ("kappa_ind_comp: no model exists in cell %i band %i\n",xplasma->nplasma,i); //This is unlikely to happen very often, but if it does, we should probably know about it
-		}
+  /* Obtain a model for the mean intensity - we call this with mode=2, which means 
+     that if we have not yet completed a cycle, dont return a dilute blackbody 
+     estimate if we are in PL mode. */
+  J = mean_intensity (xplasma, freq, 2); 
 
-
-
-	    }
-	}
-    }
-	else //We have not completed an ionization cycle, so no chance of a model
-	{
-	J=0.0;
-	}
-}
-
-  else				/*Else, use BB estimator of J */
-    {
-      expo = (H * freq) / (BOLTZMANN * xplasma->t_r);
-      J = (2 * H * freq * freq * freq) / (C * C);
-      J *= 1 / (exp (expo) - 1);
-      J *= xplasma->w;
-    }
+  /* 1407 -- JM -- There was a lot of commented out code here which I've deleted-
+     NSH moved it into the mean_intensity subroutine. See Pull Request #88 */
 
 
   sigma = klein_nishina (freq);	//NSH 130214 - full KN formula

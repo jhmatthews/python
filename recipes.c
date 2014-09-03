@@ -42,6 +42,7 @@ qromb (func, a, b, eps)
   int j;
   void polint ();
 
+  ss = 0.0;
   if (a >= b)
     {
       Error ("Error qromb: a %e>=b %e\n", a, b);

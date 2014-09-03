@@ -38,6 +38,7 @@ double DFUDGE;
 
 
 
+
 /* 57h -- Changed several defined variables to numbers to allow one to vary them 
 in the process of running the code */
 double SMAX_FRAC;		/* In translate_in_wind, a limit is placed on the maximum distance a
@@ -72,7 +73,7 @@ double DENSITY_PHOT_MIN;	/* This constant is a minimum density for the purpose o
 #define BETA  				1.0
 #define KAPPA_CONT 			4.
 #define EPSILON  			1.e-6	/* A general purpose fairly small number */
-#define NSTAT 				9
+#define NSTAT 				10    // JM increased this to ten to allow for adiabatic
 #define VMAX                		1.e9
 #define TAU_MAX				20.	/* Sets an upper limit in extract on when
 						   a photon can be assumed to be completely absorbed */
@@ -516,13 +517,9 @@ plasma in regions of the geometry that are actually included n the wind
 /* ksl - It would probably make more sense to define these in the same ways that bands are done for the generation of photons, or to
  * do both the same way at least.  Choosing to do this in two different ways makes the program confusing. The structure that has
  * the photon generation is called xband */
+/* 78 - 1407 - NSH - changed several elements (initially those of size nions) in the plasma array to by dynamically allocated.
+They are now pointers in the array. */
 
-//71 - 111229 - Moved into the geo structure so that it would be possible to get this information into py_wind more easily
-//OLD71 #define  NXBANDS 10             /* the maximum number of bands that can be defined */
-//OLD71 int nxfreq;                     /* the number of bands actually used */
-//OLD71 double xfreq[NXBANDS+1];        /* the band limits  */
-
-//OLD - ksl - this shold not be an external variable int nx4power;  //The band to use for the power law ionization calculations
 
 typedef struct plasma
 {
@@ -532,21 +529,21 @@ typedef struct plasma
   double rho;			/*density at the center of the cell */
   double vol;			/* valid volume of this cell (more specifically the volume of one of the
 				   two annular regions that this cell represents). */
-  double density[NIONS];	/*The number density of a specific ion.  This needs to correspond
-				   to the ion order obtained by get_atomic_data */
-  double partition[NIONS];	/*The partition function for each  ion */
+  double *density;	/*The number density of a specific ion.  This needs to correspond
+				   to the ion order obtained by get_atomic_data. 78 - changed to dynamic allocation*/
+  double *partition;	/*The partition function for each  ion. 78 - changed to dynamic allocation */
   double levden[NLTE_LEVELS];	/*The number density (occupation number?) of a specific level */
 
-  double PWdenom[NIONS];	/*The denominator in the pairwise ionization solver. Sicne this is computed at a temperature 
+  double *PWdenom;	/*The denominator in the pairwise ionization solver. Sicne this is computed at a temperature 
 				   chosen from basic ioinzation proerties to be good for this ion, it should not change
 				   very much from cycle to cycle - hence we shold be able to speed up the code by storing 
-				   it and refering to it if the temperature has not changed much */
-  double PWdtemp[NIONS];	/*The temperature at which the pairwise denominator was calculated last */
-  double PWnumer[NIONS];	/* The numberator in the pairwise approach. When we are chasing the true density
+				   it and refering to it if the temperature has not changed much. 78 - changed to dynamic allocation */
+  double *PWdtemp;	/*The temperature at which the pairwise denominator was calculated last. 78 - changed to dynamic allocation */
+  double *PWnumer;	/* The numberator in the pairwise approach. When we are chasing the true density
 				   by carying n_e - this value will not change, so we canspeed things up a lot
-				   by not recomputing it! */
-  double PWntemp[NIONS];	/* The temperature at which the stored pairwise numerator was last computed at. This
-				   is used in the BB version of the pairwise correction factor */
+				   by not recomputing it!. 78 - changed to dynamic allocation */
+  double *PWntemp;	/* The temperature at which the stored pairwise numerator was last computed at. This
+				   is used in the BB version of the pairwise correction factor. 78 - changed to dynamic allocation */
 
   double kappa_ff_factor;	/* Multiplicative factor for calculating the FF heating for                                      a photon. */
 
@@ -610,15 +607,15 @@ typedef struct plasma
   int n_ds;			/* NSH 6/9/12 Added to allow the mean dsto be computed */
   int nrad;			/* Total number of photons radiated within the cell */
   int nioniz;			/* Total number of photons capable of ionizing H */
-  double ioniz[NIONS], recomb[NIONS];	/* Number of ionizations and recombinations for each ion.
+  double *ioniz, *recomb;	/* Number of ionizations and recombinations for each ion.
 					   The sense is ionization from ion[n], and recombinations 
-					   to each ion[n] */
-  int scatters[NIONS];		/* 68b - The number of scatters in this cell for each ion. */
-  double xscatters[NIONS];	/* 68b - Diagnostic measure of energy scattered out of beam on extract */
-  double heat_ion[NIONS];	/* The amount of energy being transferred to the electron pool
-				   sby this ion via photoionization */
-  double lum_ion[NIONS];	/* The amount of energy being released from the electron pool
-				   by this ion via recombination */
+					   to each ion[n] . 78 - changed to dynamic allocation*/
+  int *scatters;		/* 68b - The number of scatters in this cell for each ion. 78 - changed to dynamic allocation*/
+  double *xscatters;	/* 68b - Diagnostic measure of energy scattered out of beam on extract. 78 - changed to dynamic allocation */
+  double *heat_ion;	/* The amount of energy being transferred to the electron pool
+				   sby this ion via photoionization. 78 - changed to dynamic allocation */
+  double *lum_ion;	/* The amount of energy being released from the electron pool
+				   by this ion via recombination. 78 - changed to dynamic allocation */
   double j, ave_freq, lum;	/*Respectively mean intensity, intensity_averaged frequency, 
 				   luminosity and absorbed luminosity of shell */
   double xj[NXBANDS], xave_freq[NXBANDS];	/* 1108 NSH frequency limited versions of j and ave_freq */
@@ -680,7 +677,6 @@ NSH 130725 - this number is now also used to say if the cell is over temperature
 
   double exp_temp[NXBANDS];	/*NSH 120817 - The effective temperature of an exponential representation of the radiation field in a cell */
   double exp_w[NXBANDS];	/*NSH 120817 - The prefector of an exponential representation of the radiation field in a cell */
-//OLD  double sim_e1,sim_e2; /*Sim estimators used to compute alpha and w for a power law spectrum for the cell */
   double sim_ip;		/*Ionisation parameter for the cell as defined in Sim etal 2010 */
   double ferland_ip;		/* IP calculaterd from equation 5.4 in hazy1 - assuming allphotons come from 0,0,0 and the wind is transparent */
   double ip;			/*NSH 111004 Ionization parameter calculated as number of photons over the lyman limit entering a cell, divided by the number density of hydrogen for the cell */
@@ -728,66 +724,62 @@ jbar are allcoated in calloc_esimators.
 typedef struct macro
 {
   double *jbar;
-  //[NLEVELS_MACRO][NBBJUMPS]; 
   /* This will store the Sobolev mean intensity in transitions which is needed 
      for Macro Atom jumping probabilities. The indexing is by configuration (the 
      NLTE_LEVELS) and then by the upward bound-bound jumps from that level 
      (the NBBJUMPS) (SS) */
+
   double *jbar_old;
-  //[NLEVELS_MACRO][NBBJUMPS];
 
   double *gamma;
-  //[NLEVELS_MACRO][NBFJUMPS]; 
   /* This is similar to the jbar but for bound-free transitions. It records the 
      appropriate photoionisation rate co-efficient. (SS) */
+
   double *gamma_old;
-  //[NLEVELS_MACRO][NBFJUMPS];
+
   double *gamma_e;
-  //[NLEVELS_MACRO][NBFJUMPS]; 
   /* This is Leon's gamma_e: very similar to gamma but energy weighted. Needed
      for division of photoionisation energy into excitation and k-packets. (SS) */
+
   double *gamma_e_old;
-  //[NLEVELS_MACRO][NBFJUMPS];
 
   double *alpha_st;
-  //[NLEVELS_MACRO][NBFJUMPS]; /* Same as gamma but for stimulated recombination rather than photoionisation. (SS)*/
+  /* Same as gamma but for stimulated recombination rather than photoionisation. (SS)*/
+
   double *alpha_st_old;
-  //[NLEVELS_MACRO][NBFJUMPS];
+
   double *alpha_st_e;
-  //[NLEVELS_MACRO][NBFJUMPS]; 
   /* Same as gamma_e but for stimulated recombination rather than photoionisation. (SS) */
+
   double *alpha_st_e_old;
-  //[NLEVELS_MACRO][NBFJUMPS];
 
   double *recomb_sp;
-  //[NLEVELS_MACRO][NBFJUMPS]; 
   /* Spontaneous recombination. (SS) */
+
   double *recomb_sp_e;
-  //[NLEVELS_MACRO][NBFJUMPS]; 
   /* "e" version of the spontaneous recombination coefficient. (SS) */
 
   double *matom_emiss;
-  //[NLEVELS_MACRO]; 
   /* This is the specific emissivity due to the de-activation of macro atoms in the cell
      in the frequency range that is required for the final spectral synthesis. (SS) */
-  double *matom_abs;
-  //[NLEVELS_MACRO];  
+
+  double *matom_abs;  
   /* This is the energy absorbed by the macro atom levels - recorded during the ionization 
      cycles and used to get matom_emiss (SS) */
 
-// The portion of the macroy structure  is not written out by windsave
+  /* This portion of the macro structure  is not written out by windsave */
   int kpkt_rates_known;
-  // COOLSTR kpkt_rates;
 
   double *cooling_bf;
-//  double cooling_bf[NTOP_PHOT];
   double *cooling_bf_col;
-// double cooling_bf_col[NTOP_PHOT];
   double *cooling_bb;
-// double cooling_bb[NLINES];
+
+  /* set of cooling rate stores, which are calculated for each macro atom each cycle,
+     and used to select destruction rates for kpkts */
   double cooling_normalisation;
   double cooling_bbtot, cooling_bftot, cooling_bf_coltot;
   double cooling_ff;
+  double cooling_adiabatic;     // this is just lum_adiabatic / vol / ne
 
 } macro_dummy, *MacroPtr;
 
@@ -816,6 +808,7 @@ phot.istat below */
 #define P_TOO_MANY_SCATTERS 4	//in wind after MAXSCAT scatters
 #define P_ERROR             5	//Too many calls to translate without something happening
 #define P_SEC               8	//Photon hit secondary
+#define P_ADIABATIC         9 //records that a photon created a kpkt which was destroyed by adiabatic cooling
 
 #define TMAX_FACTOR			1.5	/*Factor by which t_e can exceed
 						   t_r in order for absorbed to 
@@ -833,10 +826,29 @@ phot.istat below */
 #define MAXITERATIONS	200	//The number of loops to do to try to converge in ne
 #define FRACTIONAL_ERROR 0.03	//The change in n_e which causes a break out of the loop for ne
 #define THETAMAX	 1e4	//Used in initial calculation of n_e
-#define MIN_TEMP	100.	//  ??? this is another minimum temperature - it is used as the minimum tempersture in
+#define MIN_TEMP	100.	//  ??? this is another minimum temperature - it is used as the minimum tempersture in (JM -- in what??)
+
+// these definitions are for various ionization modes
+#define IONMODE_ML93_FIXTE 0                  // Lucy Mazzali using existing t_e (no HC balance)
+#define IONMODE_LTE 1                          // LTE using t_r
+#define IONMODE_FIXED 2                       // Hardwired concentrations
+#define IONMODE_ML93 3                        // Lucy Mazzali
+#define IONMODE_PAIRWISE_ML93 6               // pairwise version of Lucy Mazzali 
+#define IONMODE_PAIRWISE_SPECTRALMODEL 7      // pariwise modeled J_nu approach
+
+// and the corresponding modes in nebular_concentrations
+#define NEBULARMODE_TR 0                       // LTE using t_r
+#define NEBULARMODE_TE 1                       // LTE using t_e
+#define NEBULARMODE_ML93 2                     // ML93 using correction
+#define NEBULARMODE_PAIRWISE_ML93 6            // pairwise ML93
+#define NEBULARMODE_PAIRWISE_SPECTRALMODEL 7   // pairwise spectral models
 
 
-#define NDIM_MAX 500
+
+
+
+
+#define NDIM_MAX 500                // maximum size of the grid in each dimension
 double wind_x[NDIM_MAX], wind_z[NDIM_MAX];	/* These define the edges of the cells in the x and z directions */
 double wind_midx[NDIM_MAX], wind_midz[NDIM_MAX];	/* These define the midpoints of the cells in the x and z directions */
 
@@ -876,6 +888,10 @@ typedef struct photon
 }
 p_dummy, *PhotPtr;
 
+
+/* minimum value for tau for p_escape_from_tau function- below this we 
+   set to p_escape_ to 1 */
+#define TAU_MIN 1e-6
 
 
 /* 68b - ksl - This is a structure in which the history of a single photon bundle can be recorded
@@ -1043,7 +1059,9 @@ xband;
  * assuming the array has been initialized, which can take a few minutes
 */
 
-#define NTEMPS	30		// The number of temperatures which are stored in each fbstruct
+#define NTEMPS	60		// The number of temperatures which are stored in each fbstruct
+				/* NSH this was increased from 30 to 60 to take account of 3 extra OOM 
+				intemperature we wanted to have in fb */ 
 #define NFB	10		// The maximum number of frequency intervals for which the fb emission is calculated
 
 struct fbstruc
@@ -1085,3 +1103,8 @@ int cell_phot_stats;		//1=do  it, 0=dont do it
 #define  NCSTAT 10		//The maximum number of cells we are going to log
 int ncstat;			// the actual number we are going to log
 int ncell_stats[NCSTAT];	//the numbers of the cells we are going to log
+
+
+/* Added variables which count number of times two situations occur (See #91) */
+int nerr_no_Jmodel;
+int nerr_Jmodel_wrong_freq;

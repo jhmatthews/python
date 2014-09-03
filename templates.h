@@ -130,6 +130,9 @@ double sigma_phot_topbase(struct topbase_phot *x_ptr, double freq);
 double sigma_phot_verner(struct innershell *x_ptr, double freq);
 double den_config(PlasmaPtr xplasma, int nconf);
 double pop_kappa_ff_array(void);
+int update_banded_estimators(PlasmaPtr xplasma, PhotPtr p, double ds, double w_ave);
+int save_photon_stats(WindPtr one, PhotPtr p, double ds);
+double mean_intensity(PlasmaPtr xplasma, double freq, int mode);
 /* wind_updates2d.c */
 int wind_update(WindPtr (w));
 int wind_rad_init(void);
@@ -218,6 +221,7 @@ double two_level_atom(struct lines *line_ptr, PlasmaPtr xplasma, double *d1, dou
 double line_nsigma(struct lines *line_ptr, PlasmaPtr xplasma);
 double scattering_fraction(struct lines *line_ptr, PlasmaPtr xplasma);
 double p_escape(struct lines *line_ptr, PlasmaPtr xplasma);
+double p_escape_from_tau(double tau);
 int line_heat(PlasmaPtr xplasma, PhotPtr pp, int nres);
 double get_he_forbidden_omega(LinePtr line_ptr, double t);
 /* continuum.c */
@@ -284,6 +288,7 @@ int randwind(PhotPtr p, double lmn[3], double north[3]);
 double vrandwind(double x);
 double reweightwind(PhotPtr p);
 int make_pdf_randwind(double tau);
+int randwind_thermal_trapping(PhotPtr p, int *nnscat);
 /* util.c */
 int fraction(double value, double array[], int npts, int *ival, double *f, int mode);
 int linterp(double x, double xarray[], double yarray[], int xdim, double *y, int mode);
@@ -400,6 +405,7 @@ int calloc_plasma(int nelem);
 int check_plasma(PlasmaPtr xplasma, char message[]);
 int calloc_macro(int nelem);
 int calloc_estimators(int nelem);
+int calloc_dyn_plasma(int nelem);
 /* partition.c */
 int partition_functions(PlasmaPtr xplasma, int mode);
 int partition_functions_2(PlasmaPtr xplasma, int xnion, double temp, double weight);
@@ -507,6 +513,7 @@ int config_overview(int n, int icell);
 int depcoef_overview(int icell);
 int copy_plasma(PlasmaPtr x1, PlasmaPtr x2);
 int depcoef_overview_specific(int version, int nconfig, WindPtr w, char rootname[], int ochoice);
+int level_popsoverview(int nplasma, WindPtr w, char rootname[], int ochoice);
 int level_emissoverview(int nlev, WindPtr w, char rootname[], int ochoice);
 int level_escapeoverview(int nlev, WindPtr w, char rootname[], int ochoice);
 /* py_wind.c */

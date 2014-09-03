@@ -123,7 +123,7 @@ nebular_concentrations (xplasma, mode)
   int lucy_mazzali1 ();
   int m;
 
-  if (mode == 0)
+  if (mode == NEBULARMODE_TR)
     {				// LTE all the way -- uses tr
 
       partition_functions (xplasma, mode);
@@ -131,7 +131,7 @@ nebular_concentrations (xplasma, mode)
       m = concentrations (xplasma, mode);
 
     }
-  else if (mode == 1)
+  else if (mode == NEBULARMODE_TE)
     {				//LTE but uses temperature te
 
       partition_functions (xplasma, mode);
@@ -139,7 +139,7 @@ nebular_concentrations (xplasma, mode)
       m = concentrations (xplasma, mode);
 
     }
-  else if (mode == 2)		// This is the standard LM method
+  else if (mode == NEBULARMODE_ML93)		// This is the standard LM method
     {
 
 
@@ -150,7 +150,7 @@ nebular_concentrations (xplasma, mode)
 	 the escape probabilities are calculated with saha ion densities each time,
 	 because saha() repopulates xplasma in each cycle. */
 
-      m = concentrations (xplasma, 0);	// Saha equation using t_r
+      m = concentrations (xplasma, NEBULARMODE_TR);	// Saha equation using t_r
 
       /* JM 1308 -- lucy then applies the lucy mazzali correction factors to the saha abundances. 
 	 in macro atom mode it also call macro_pops which is done correctly in this case, as lucy_mazzali, 
@@ -175,13 +175,13 @@ nebular_concentrations (xplasma, mode)
  //     m = sim_driver (xplasma);
  //   }
 
-  /* Two new modes, they could proably be combined into one if statement, but having 
+  /* Two new modes, they could probably be combined into one if statement, but having 
      two adds little complexity and allows for other   modifications if required. No 
      call to partition functions is required, since this is done on a pairwise basis 
      in the routine. Similarly there is no call to concentrations, since this is also 
      done pairwise inside the routine. */
 
-  else if (mode == 6)		/* Pairwise calculation of abundances, using a 
+  else if (mode == NEBULARMODE_PAIRWISE_ML93)		/* Pairwise calculation of abundances, using a 
 				   temperature computed to ensure a reasonable
 				   ratio between the two, and then corrected for
 				   a dilute blackbody radiation field. */
@@ -189,7 +189,7 @@ nebular_concentrations (xplasma, mode)
       m = variable_temperature (xplasma, mode);
     }
 
-  else if (mode == 7)		/* Pairwise calculation of abundances, using a 
+  else if (mode == NEBULARMODE_PAIRWISE_SPECTRALMODEL)		/* Pairwise calculation of abundances, using a 
 				   temperature computed to ensure a reasonable
 				   ratio between the two, and then corrected for
 				   a radiation field modelled by a power law */
@@ -225,7 +225,7 @@ concentrations (xplasma, mode)
   
  Arguments:		
 
-     WindPtr ww;
+     PlasmaPtr xplasma;
      int mode;			//   0=saha using tr, 1=saha using te
 
  Returns:
@@ -308,23 +308,18 @@ concentrations (xplasma, mode)
   // This needs to be moved up into nebular_concentrations given that we
   // do not want these routines to do mode shifting.
   //
-  if (mode == 0)
+  if (mode == NEBULARMODE_TR)
     {
       t = xplasma->t_r;
     }
-  else if (mode == 1)
+  else if (mode == NEBULARMODE_TE)
     {
       t = xplasma->t_e;
     }
-  else if (mode == 2)
+  else if (mode == NEBULARMODE_ML93)
     {
       t = sqrt (xplasma->t_e * xplasma->t_r);
     }
-//ksl I removed the next lines.  It is bad practice to needlessly complicate something unless you know one needs to do so
-//OLD ksl  else if (mode == 3)   //same as mode 1, put in to allow identical control when using Sim modifications to concentrations
-//OLD ksl    {
-//OLD ksl      t = xplasma->t_e;
-//OLD ksl    }
   else
     {
       Error ("Concentrations: Unknown mode %d\n", mode);
@@ -433,7 +428,7 @@ concentrations (xplasma, mode)
   Synopsis:   
 
    	Calculate the saha densities for all of the ions in a single
-   	cell. 
+   	cell (given ne). 
   
   Arguments:
 	xplasma, ne, t
@@ -453,6 +448,9 @@ concentrations (xplasma, mode)
 	
 	Note that this routine populates the actual xplasma structure
    	with saha abundances.
+
+	This routine assumes ne is known.  Iteration to calculate ne
+	takes place in concentrations.
 
 
   History:
@@ -653,19 +651,18 @@ lucy (xplasma)
 
 	  lucy_mazzali1 (nh, t_r, t_e, www, nelem, xplasma->ne,
 			 xplasma->density, xne, newden);
+  }
 
-	  /* Re solve for the macro atom populations with the current guess for ne */
-          /* JM1308 -- note that unlike lucy mazzali above, here we actually modify the xplasma
-	     structure for those ions which are being treated as macro ions. This means that the
-	     the newden array will contain wrong values for these particular macro ions, but due
-             to the if loop at the end of this subroutine they are never passed to xplasma */
-
+    /* Re solve for the macro atom populations with the current guess for ne */
+    /* JM1308 -- note that unlike lucy mazzali above, here we actually modify the xplasma
+       structure for those ions which are being treated as macro ions. This means that the
+       the newden array will contain wrong values for these particular macro ions, but due
+       to the if loop at the end of this subroutine they are never passed to xplasma */
 	  if (geo.macro_ioniz_mode == 1)
 	    {
 	      macro_pops (xplasma, xne);
 	    }
 
-	}
 
       for (nion = 0; nion < nions; nion++)
 	{

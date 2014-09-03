@@ -76,19 +76,19 @@ partition_functions (xplasma, mode)
   double z, kt;
 
 
-  if (mode == 0)
+  if (mode == NEBULARMODE_TR)
     {
       //LTE using t_r
       t = xplasma->t_r;
       weight = 1;
     }
-  else if (mode == 1)
+  else if (mode == NEBULARMODE_TE)
     {
       //LTE using t_e
       t = xplasma->t_e;
       weight = 1;
     }
-  else if (mode == 2)
+  else if (mode == NEBULARMODE_ML93)
     {
       //Non LTE calculation with radiative weights
       t = xplasma->t_r;

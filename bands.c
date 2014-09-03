@@ -290,22 +290,63 @@ bands_init (imode, band)
       Log ("Highest photon energy is ev (freq) is %f (%.2e)\n", f2 * HEV, f2);
 
 
-      band->nbands = 5;
+      band->nbands = 12;
+
+
+
+
+
 
       band->f1[0] = (geo.agn_cltab_low / HEV) / 1000.0;
       band->f2[0] = band->f1[1] = (geo.agn_cltab_low / HEV) / 100.0;
       band->f2[1] = band->f1[2] = (geo.agn_cltab_low / HEV) / 10.0;
-      band->f2[2] = band->f1[3] = (geo.agn_cltab_low / HEV);
-      band->f2[3] = band->f1[4] = geo.agn_cltab_hi / HEV;
-      band->f2[4] = f2;
+      band->f2[2] 	        = (geo.agn_cltab_low / HEV);
+
+
+/* Now set up a set of log spaced bands in the range over the central range */
+      f1_log = log10 (geo.agn_cltab_low/HEV);
+      f2_log = log10 (geo.agn_cltab_hi/HEV);
+      df = (f2_log - f1_log) / (6);
+
+      ii = 3;
+      while (ii < 9)
+	{
+	  band->f1[ii] = pow (10., f1_log + (ii-3) * df);
+	  band->f2[ii] = pow (10., f1_log + ((ii-3) + 1) * df);
+	  ii++;
+	}
+
+      f1_log = log10 (geo.agn_cltab_hi/HEV);
+      f2_log = log10 (f2);
+      df = (f2_log - f1_log) / (3);
+
+      ii = 9;
+      while (ii < 12)
+	{
+	  band->f1[ii] = pow (10., f1_log + (ii-9) * df);
+	  band->f2[ii] = pow (10., f1_log + ((ii-9) + 1) * df);
+	  ii++;
+	}
+
+ //     band->f1[9] = geo.agn_cltab_hi / HEV;
+ //     band->f2[9] = f2;
 
       //Set number of photons in each band
 
-      band->min_fraction[0] = 0.1;
-      band->min_fraction[1] = 0.1;
-      band->min_fraction[2] = 0.1;
-      band->min_fraction[3] = 0.6;
+      band->min_fraction[0] = 0.0666;
+      band->min_fraction[1] = 0.0666;
+      band->min_fraction[2] = 0.0666;
+
+      band->min_fraction[3] = 0.1;
       band->min_fraction[4] = 0.1;
+      band->min_fraction[5] = 0.1;
+      band->min_fraction[6] = 0.1;
+      band->min_fraction[7] = 0.1;
+      band->min_fraction[8] = 0.1;
+
+      band->min_fraction[9] =  0.0666;
+      band->min_fraction[10] = 0.0666;
+      band->min_fraction[11] = 0.0666;
 
       //Set alpha for each band
 
@@ -313,7 +354,17 @@ bands_init (imode, band)
       band->alpha[1] = geo.agn_cltab_low_alpha;
       band->alpha[2] = geo.agn_cltab_low_alpha;
       band->alpha[3] = geo.alpha_agn;
-      band->alpha[4] = geo.agn_cltab_hi_alpha;
+      band->alpha[4] = geo.alpha_agn;
+      band->alpha[5] = geo.alpha_agn;
+      band->alpha[6] = geo.alpha_agn;
+      band->alpha[7] = geo.alpha_agn;
+      band->alpha[8] = geo.alpha_agn;
+      band->alpha[9] = geo.agn_cltab_hi_alpha;
+      band->alpha[10] = geo.agn_cltab_hi_alpha;
+      band->alpha[11] = geo.agn_cltab_hi_alpha;
+
+
+
 
       //Set the constant for each band to ensure continuous distribution
 
@@ -330,10 +381,26 @@ bands_init (imode, band)
 			     geo.alpha_agn) / pow ((band->f2[2]),
 						   band->alpha[0]);
       band->pl_const[3] = geo.const_agn;
-      band->pl_const[4] =
-	geo.const_agn * pow ((band->f2[3]),
-			     geo.alpha_agn) / pow ((band->f2[3]),
-						   band->alpha[4]);
+      band->pl_const[4] = geo.const_agn;
+      band->pl_const[5] = geo.const_agn;
+      band->pl_const[6] = geo.const_agn;
+      band->pl_const[7] = geo.const_agn;
+      band->pl_const[8] = geo.const_agn;
+
+      band->pl_const[9] =
+	geo.const_agn * pow ((band->f2[8]),
+			     geo.alpha_agn) / pow ((band->f2[8]),
+						   band->alpha[9]);
+
+      band->pl_const[10] =
+	geo.const_agn * pow ((band->f2[8]),
+			     geo.alpha_agn) / pow ((band->f2[8]),
+						   band->alpha[9]);
+
+      band->pl_const[11] =
+	geo.const_agn * pow ((band->f2[8]),
+			     geo.alpha_agn) / pow ((band->f2[8]),
+						   band->alpha[9]);
 
 
       for (nband = 0; nband < band->nbands; nband++)
@@ -548,16 +615,20 @@ xfreq[2] = 54.42 / HEV;
 
 /* bands to match the cloudy table spectrum - needed to cover all frequencies to let induced compton work OK */
 
-/*nxfreq = 3;
-xfreq[0]=0.0001/HEV;
-xfreq[1]=0.136/HEV;
-xfreq[2]=20000/HEV;
-xfreq[3]=100000000/HEV;*/
-
+if (geo.agn_ion_spectype == SPECTYPE_CL_TAB)
+	{
+	nxfreq = 3;
+	xfreq[0]=0.0001/HEV;
+	xfreq[1]=geo.agn_cltab_low/HEV;
+	xfreq[2]=geo.agn_cltab_hi/HEV;
+	xfreq[3]=100000000/HEV;
+	}
+	
 /* bands try to deal with a blackbody spectrum */
 /*nupeak=WIEN*geo.tstar;
 printf ("Tstar=%e, Nupeak=%e\n",geo.tstar,nupeak);*/
-
+else
+	{
   nxfreq = 10;
   xfreq[0] = freqmin;		//We need the whole range to be modelled for induced compton heating to work
   xfreq[1] = 1e15;		//This should be below the lowest threshold frequency of any element in our model
@@ -570,7 +641,7 @@ printf ("Tstar=%e, Nupeak=%e\n",geo.tstar,nupeak);*/
   xfreq[8] = 3.162e18;
   xfreq[9] = 1.2e19;		//This is the highest frequency defined in our ionization data
   xfreq[10] = freqmax;
-
+	}
 
 
 

@@ -400,5 +400,21 @@ int gsl_linalg_bidiag_unpack_B (const gsl_matrix * A,
 int gsl_linalg_balance_columns (gsl_matrix * A, gsl_vector * D);
 
 
+/* JM 140414 -- I've had to include a few definitions from gsl/gsl_cblas.h and gsl/gsl_blas_types.h here
+   instead of including the files, as some of the variables conflicted with python */
+
+typedef  enum CBLAS_TRANSPOSE   CBLAS_TRANSPOSE_t;
+enum CBLAS_TRANSPOSE {CblasNoTrans=111, CblasTrans=112, CblasConjTrans=113};
+
+/* we use this function to multiply matrices together and check if our populations matrix
+   is a solution to the rate equations */
+int  gsl_blas_dgemv (CBLAS_TRANSPOSE_t TransA,
+                     double alpha,
+                     const gsl_matrix * A,
+                     const gsl_vector * X,
+                     double beta,
+                     gsl_vector * Y);
+
+
 __END_DECLS
 #endif /* __GSL_LINALG_H__ */
