@@ -323,8 +323,7 @@ matom (p, nres, escape)
 					    n] * xplasma->ne *
 		      den_config (xplasma,
 				  cont_ptr->uplev) / den_config (xplasma,
-								 cont_ptr->
-								 nlev)));
+								 cont_ptr->nlev)));
 		  jprbs_known[uplvl][m] = jprbs[m] = 0.0;
 
 		}
@@ -886,9 +885,7 @@ kpkt (p, nres, escape)
          volume.  Recall however that vol is part of the windPtr */
       if (one->vol > 0)
 	{
-	  cooling_ff = mplasma->cooling_ff =
-	    total_free (one, xplasma->t_e, 0.0,
-			VERY_BIG) / xplasma->vol / xplasma->ne;		// JM 1411 - changed to use filled volume
+	  cooling_ff = mplasma->cooling_ff = total_free (one, xplasma->t_e, 0.0, VERY_BIG) / xplasma->vol / xplasma->ne;	// JM 1411 - changed to use filled volume
 	}
       else
 	{
@@ -928,30 +925,33 @@ kpkt (p, nres, escape)
 
       /* note the units here- we divide the total luminosity of the cell by volume and ne to give cooling rate */
 
-      cooling_adiabatic = xplasma->lum_adiabatic / xplasma->vol / xplasma->ne; // JM 1411 - changed to use filled volume
+      cooling_adiabatic = xplasma->lum_adiabatic / xplasma->vol / xplasma->ne;	// JM 1411 - changed to use filled volume
 
       if (geo.adiabatic == 0 && cooling_adiabatic > 0.0)
-        {
-      	  Error("Adiabatic cooling turned off, but non zero in cell %d", xplasma->nplasma);
-        }
+	{
+	  Error ("Adiabatic cooling turned off, but non zero in cell %d",
+		 xplasma->nplasma);
+	}
 
 
       /* JM 1302 -- Negative adiabatic coooling- this used to happen due to issue #70, where we incorrectly calculated dvdy, 
          but this is now resolved. Now it should only happen for cellspartly in wind, because we don't treat these very well.
          Now, if cooling_adiabatic < 0 then set it to zero to avoid runs exiting for part in wind cells. */
       if (cooling_adiabatic < 0)
-        {
-          Error("kpkt: Adiabatic cooling negative! Major problem if inwind (%d) == 0\n",
-          	     one->inwind);
-	      Log ("kpkt: Setting adiabatic kpkt destruction probability to zero for this matom.\n");
-	      cooling_adiabatic = 0.0;
-        }
+	{
+	  Error
+	    ("kpkt: Adiabatic cooling negative! Major problem if inwind (%d) == 0\n",
+	     one->inwind);
+	  Log
+	    ("kpkt: Setting adiabatic kpkt destruction probability to zero for this matom.\n");
+	  cooling_adiabatic = 0.0;
+	}
 
 
       cooling_normalisation += cooling_adiabatic;
 
 
- 
+
       mplasma->cooling_bbtot = cooling_bbtot;
       mplasma->cooling_bftot = cooling_bftot;
       mplasma->cooling_bf_coltot = cooling_bf_coltot;
@@ -1074,18 +1074,20 @@ kpkt (p, nres, escape)
   /* JM 1310 -- added loop to check if destruction occurs via adiabatic cooling */
   else if (destruction_choice <
 	   (mplasma->cooling_bftot +
-	    mplasma->cooling_bbtot + mplasma->cooling_ff + mplasma->cooling_adiabatic))
+	    mplasma->cooling_bbtot + mplasma->cooling_ff +
+	    mplasma->cooling_adiabatic))
     {
 
       if (geo.adiabatic == 0)
-      {
-      	Error("Destroying kpkt by adiabatic cooling even though it is turned off.");
-      }
+	{
+	  Error
+	    ("Destroying kpkt by adiabatic cooling even though it is turned off.");
+	}
       *escape = 1;		// we want to escape but set photon weight to zero
-      *nres = -2;		
-      //p->w = 0.0;		// JM131030 set photon weight to zero as energy is taken up in adiabatic expansion
+      *nres = -2;
+      //p->w = 0.0;             // JM131030 set photon weight to zero as energy is taken up in adiabatic expansion
 
-      p->istat = P_ADIABATIC; 	// record that this photon went into a kpkt destruction from adiabatic cooling
+      p->istat = P_ADIABATIC;	// record that this photon went into a kpkt destruction from adiabatic cooling
 
       return (0);
     }
@@ -1096,7 +1098,8 @@ kpkt (p, nres, escape)
       /* We want destruction by collisional ionization in a macro atom. */
       destruction_choice =
 	destruction_choice - mplasma->cooling_bftot -
-	mplasma->cooling_bbtot - mplasma->cooling_ff - mplasma->cooling_adiabatic;
+	mplasma->cooling_bbtot - mplasma->cooling_ff -
+	mplasma->cooling_adiabatic;
 
       for (i = 0; i < ntop_phot; i++)
 	{
@@ -1135,7 +1138,8 @@ kpkt (p, nres, escape)
   Error
     ("matom.c: cooling_bftot %g, cooling_bbtot %g, cooling_ff %g, cooling_bf_coltot %g cooling_adiabatic %g\n",
      mplasma->cooling_bftot, mplasma->cooling_bbtot,
-     mplasma->cooling_ff, mplasma->cooling_bf_coltot, mplasma->cooling_adiabatic);
+     mplasma->cooling_ff, mplasma->cooling_bf_coltot,
+     mplasma->cooling_adiabatic);
 
   exit (0);
 
@@ -1429,7 +1433,7 @@ macro_pops (xplasma, xne)
 
 	      /* 140423 JM -- new int array to flag if  two levels are radiatively linked
 	         initialize to 0 */
-	      radiative_flag[mm][nn] = 0; 
+	      radiative_flag[mm][nn] = 0;
 	    }
 	}
 
@@ -1559,10 +1563,12 @@ macro_pops (xplasma, xne)
 		         for popualtion inversions. Flag this jump */
 		      radiative_flag[index_lvl][line_ptr->nconfigu] = 1;
 
-		      if (rate < 0.0 || sane_check(rate))
-		      {
-		      	Error("macro_pops: bbu rate is %8.4e in cell/matom %i\n", rate, xplasma->nplasma);
-		      }
+		      if (rate < 0.0 || sane_check (rate))
+			{
+			  Error
+			    ("macro_pops: bbu rate is %8.4e in cell/matom %i\n",
+			     rate, xplasma->nplasma);
+			}
 		    }
 
 		  for (index_bbd = 0;
@@ -1594,10 +1600,12 @@ macro_pops (xplasma, xne)
 		         for popualtion inversions. Flag this jump */
 		      radiative_flag[line_ptr->nconfigl][index_lvl] = 1;
 
-		      if (rate < 0.0 || sane_check(rate))
-		      {
-		      	Error("macro_pops: bbd rate is %8.4e in cell/matom %i\n", rate, xplasma->nplasma);
-		      }
+		      if (rate < 0.0 || sane_check (rate))
+			{
+			  Error
+			    ("macro_pops: bbd rate is %8.4e in cell/matom %i\n",
+			     rate, xplasma->nplasma);
+			}
 		    }
 
 
@@ -1628,27 +1636,31 @@ macro_pops (xplasma, xne)
 		      rate_matrix[lower][lower] += -1. * rate;
 		      rate_matrix[upper][lower] += rate;
 
-		      if (rate < 0.0 || sane_check(rate))
-		      {
-		      	Error("macro_pops: bfu rate is %8.4e in cell/matom %i\n", rate, xplasma->nplasma);
-		      }
+		      if (rate < 0.0 || sane_check (rate))
+			{
+			  Error
+			    ("macro_pops: bfu rate is %8.4e in cell/matom %i\n",
+			     rate, xplasma->nplasma);
+			}
 
 		      /* Now deal with the stimulated emission. */
 		      /* Lower and upper are the same, but now it contributes in the
 		         other direction. */
 
 		      rate =
-			mplasma->
-			alpha_st_old[config[index_lvl].bfu_indx_first +
-				     index_bfu] * xne;
+			mplasma->alpha_st_old[config[index_lvl].
+					      bfu_indx_first +
+					      index_bfu] * xne;
 
 		      rate_matrix[upper][upper] += -1. * rate;
 		      rate_matrix[lower][upper] += rate;
 
-		      if (rate < 0.0 || sane_check(rate))
-		      {
-		      	Error("macro_pops: st. recomb rate is %8.4e in cell/matom %i\n", rate, xplasma->nplasma);
-		      }
+		      if (rate < 0.0 || sane_check (rate))
+			{
+			  Error
+			    ("macro_pops: st. recomb rate is %8.4e in cell/matom %i\n",
+			     rate, xplasma->nplasma);
+			}
 
 		    }
 
@@ -1687,10 +1699,12 @@ macro_pops (xplasma, xne)
 		      rate_matrix[upper][upper] += -1. * rate;
 		      rate_matrix[lower][upper] += rate;
 
-		      if (rate < 0.0 || sane_check(rate))
-		      {
-		      	Error("macro_pops: bfd rate is %8.4e in cell/matom %i\n", rate, xplasma->nplasma);
-		      }
+		      if (rate < 0.0 || sane_check (rate))
+			{
+			  Error
+			    ("macro_pops: bfd rate is %8.4e in cell/matom %i\n",
+			     rate, xplasma->nplasma);
+			}
 		    }
 		}
 	    }
@@ -1736,14 +1750,14 @@ macro_pops (xplasma, xne)
 	  /* replace the first entry with 1.0- this is part of the normalisation constraint */
 	  b_data[0] = 1.0;
 
-      /* create gsl matrix/vector views of the arrays of rates */
+	  /* create gsl matrix/vector views of the arrays of rates */
 	  m = gsl_matrix_view_array (a_data, n_macro_lvl, n_macro_lvl);	//KSLNEW
 
 	  /* these are used for testing the solution below */
-	  test_matrix = gsl_matrix_alloc(n_macro_lvl, n_macro_lvl);
+	  test_matrix = gsl_matrix_alloc (n_macro_lvl, n_macro_lvl);
 	  test_vector = gsl_vector_alloc (n_macro_lvl);
 
-	  gsl_matrix_memcpy(test_matrix, &m.matrix); 	// create copy for testing 
+	  gsl_matrix_memcpy (test_matrix, &m.matrix);	// create copy for testing 
 
 	  b = gsl_vector_view_array (b_data, n_macro_lvl);	//KSLNEW
 
@@ -1762,46 +1776,99 @@ macro_pops (xplasma, xne)
 
 	  /**********************************************************/
 
-      /* JM 140414 -- before we clean, we should check that the populations vector we 
-         have just created really is a solution to the matrix equation */
-      
-      /* declaration contained in my_linalg.h, taken from gsl library */
-      ierr = gsl_blas_dgemv(CblasNoTrans, 1.0, test_matrix, populations, 0.0, test_vector);
+	  /* JM 140414 -- before we clean, we should check that the populations vector we 
+	     have just created really is a solution to the matrix equation */
 
-      if (ierr != 0)
-        {
-      	  Error("macro_pops: bad return when testing matrix solution to rate equations.\n");
-        }
+	  /* declaration contained in my_linalg.h, taken from gsl library */
+	  ierr =
+	    gsl_blas_dgemv (CblasNoTrans, 1.0, test_matrix, populations, 0.0,
+			    test_vector);
 
-      /* now cycle through and check the solution to y = m * populations really is
-         (1, 0, 0 ... 0) */
+	  if (ierr != 0)
+	    {
+	      Error
+		("macro_pops: bad return when testing matrix solution to rate equations.\n");
+	    }
 
-      for (mm = 0; mm < n_macro_lvl; mm++)
-        {
+	  /* now cycle through and check the solution to y = m * populations really is
+	     (1, 0, 0 ... 0) */
 
-          /* get the element of the vector we want to check */
-          test_val = gsl_vector_get (test_vector, mm);
-          
-          if (mm == 0)		// 0th element should be 1
-          {
-      	    if ( (fabs(test_val - 1.0)) > EPSILON)
-      	      Error("macro_pops: test vector has first element = %8.4e, should be 1.0\n",
-      	      	     test_val);    
-          }     
+	  for (mm = 0; mm < n_macro_lvl; mm++)
+	    {
 
-          else 				// all other elements should be zero
-          {
-          	if ( fabs(test_val)  > EPSILON)
-      	      Error("macro_pops: test vector has element %i = %8.4e, should be 0.0\n",
-      	      	     mm, test_val);    
-          }
-        }
+	      /* get the element of the vector we want to check */
+	      test_val = gsl_vector_get (test_vector, mm);
 
-        /* free memory */
-        free (a_data);	
-	    free (b_data);	
-	    free (test_vector);
-	    free (test_matrix);
+	      if (mm == 0)	// 0th element should be 1
+		{
+		  if ((fabs (test_val - 1.0)) > EPSILON)
+		    Error
+		      ("macro_pops: test vector has first element = %8.4e, should be 1.0\n",
+		       test_val);
+		}
+
+	      else		// all other elements should be zero
+		{
+		  if (fabs (test_val) > EPSILON)
+		    Error
+		      ("macro_pops: test vector has element %i = %8.4e, should be 0.0\n",
+		       mm, test_val);
+		}
+	    }
+
+	  /* free memory */
+	  free (a_data);
+	  free (b_data);
+	  free (test_vector);
+	  free (test_matrix);
+
+	  /* test loop in which we save the levden array pre cleaning */
+
+	  nn = 0;
+	  mm = 0;
+	  for (index_ion = ele[index_element].firstion;
+	       index_ion <
+	       (ele[index_element].firstion + ele[index_element].nions);
+	       index_ion++)
+	    {
+	      this_ion_density = 0.0;
+	      for (index_lvl = ion[index_ion].first_nlte_level;
+		   index_lvl <
+		   ion[index_ion].first_nlte_level + ion[index_ion].nlte;
+		   index_lvl++)
+		{
+		  level_population =
+		    gsl_vector_get (populations, conf_to_matrix[index_lvl]);
+		  this_ion_density += level_population;
+
+		  /* JM 140409 -- add error check for negative populations */
+		  if (level_population < 0.0 || sane_check (level_population))
+		    Error
+		      ("macro_pops: level %i has frac. pop. %8.4e in cell %i\n",
+		       index_lvl, level_population, xplasma->nplasma);
+
+		  nn++;
+		}
+
+	      /* Write the level populations to the 
+	         levden array. These are fractional level populations within an ion. */
+
+	      for (index_lvl = ion[index_ion].first_nlte_level;
+		   index_lvl <
+		   ion[index_ion].first_nlte_level + ion[index_ion].nlte;
+		   index_lvl++)
+		{
+
+		  xplasma->levden_pre_clean[config[index_lvl].nden] =
+		    gsl_vector_get (populations,
+				    conf_to_matrix[index_lvl]) /
+		    this_ion_density;
+
+		  mm++;
+
+		}
+	    }
+
 
 
 
@@ -1829,17 +1896,17 @@ macro_pops (xplasma, xne)
 			ion[index_ion].nlte); nn++)
 		    {
 
-              /* this if statement means we only clean if there's a radiative jump between the levels */
-              if (radiative_flag[index_lvl][nn])
-              {
-		        inversion_test = gsl_vector_get (populations, conf_to_matrix[index_lvl]) * config[nn].g / config[index_lvl].g * 0.999999;	//include a correction factor 
-		        if (gsl_vector_get (populations, conf_to_matrix[nn]) >
-			    inversion_test)
-			  {
-			    gsl_vector_set (populations, conf_to_matrix[nn],
-					  inversion_test);
-			  }
-		      }
+		      /* this if statement means we only clean if there's a radiative jump between the levels */
+		      if (radiative_flag[index_lvl][nn])
+			{
+			  inversion_test = gsl_vector_get (populations, conf_to_matrix[index_lvl]) * config[nn].g / config[index_lvl].g * 0.999999;	//include a correction factor 
+			  if (gsl_vector_get (populations, conf_to_matrix[nn])
+			      > inversion_test)
+			    {
+			      gsl_vector_set (populations, conf_to_matrix[nn],
+					      inversion_test);
+			    }
+			}
 		    }
 		}
 	    }
@@ -1864,13 +1931,15 @@ macro_pops (xplasma, xne)
 		   ion[index_ion].first_nlte_level + ion[index_ion].nlte;
 		   index_lvl++)
 		{
-		  level_population = gsl_vector_get (populations, conf_to_matrix[index_lvl]);	
+		  level_population =
+		    gsl_vector_get (populations, conf_to_matrix[index_lvl]);
 		  this_ion_density += level_population;
 
 		  /* JM 140409 -- add error check for negative populations */
-		  if (level_population < 0.0 || sane_check(level_population))
-		    Error("macro_pops: level %i has frac. pop. %8.4e in cell %i\n", 
-		    	   index_lvl, level_population, xplasma->nplasma);
+		  if (level_population < 0.0 || sane_check (level_population))
+		    Error
+		      ("macro_pops: level %i has frac. pop. %8.4e in cell %i\n",
+		       index_lvl, level_population, xplasma->nplasma);
 
 		  nn++;
 		}
@@ -2195,7 +2264,7 @@ History:
 
 double
 get_matom_f (mode)
-    int mode;
+     int mode;
 {
   int n, m;
   int mm, ss;
@@ -2208,182 +2277,175 @@ get_matom_f (mode)
   int my_nmin, my_nmax;		//These variables are used even if not in parallel mode
 
 
-  if (mode == USE_STORED_MATOM_EMISSIVITIES) 
+  if (mode == USE_STORED_MATOM_EMISSIVITIES)
     {
-  	  Log("geo.pcycle (%i) > 0, so using saved level emissivities for macro atoms\n", 
-  		   geo.pcycle);
+      Log
+	("geo.pcycle (%i) > 0, so using saved level emissivities for macro atoms\n",
+	 geo.pcycle);
     }
 
-  else   // we need to compute the emissivities
+  else				// we need to compute the emissivities
     {
 #ifdef MPI_ON
-  int num_mpi_cells, num_mpi_extra, position, ndo, n_mpi, num_comm, n_mpi2;
-  int size_of_commbuffer;
-  char *commbuffer;
+      int num_mpi_cells, num_mpi_extra, position, ndo, n_mpi, num_comm,
+	n_mpi2;
+      int size_of_commbuffer;
+      char *commbuffer;
 
-  /* the commbuffer needs to communicate 2 variables and the number of macor levels, 
-     plus the variable for how many cells each thread is doing */
-  size_of_commbuffer =
-    8 * (3 + nlevels_macro) * (floor (NPLASMA / np_mpi_global) + 1);
+      /* the commbuffer needs to communicate 2 variables and the number of macor levels, 
+         plus the variable for how many cells each thread is doing */
+      size_of_commbuffer =
+	8 * (3 + nlevels_macro) * (floor (NPLASMA / np_mpi_global) + 1);
 
-  commbuffer = (char *) malloc (size_of_commbuffer * sizeof (char));
+      commbuffer = (char *) malloc (size_of_commbuffer * sizeof (char));
 #endif
 
 
 
-  which_out = 0;
-  n_tries = 5000000;
-  geo.matom_radiation = 0;
-  n_tries_local = 0;
+      which_out = 0;
+      n_tries = 5000000;
+      geo.matom_radiation = 0;
+      n_tries_local = 0;
 
 
 
-  norm = 0;
-  for (n = 0; n < NPLASMA; n++)
-    {
-      for (m = 0; m < nlevels_macro; m++)
+      norm = 0;
+      for (n = 0; n < NPLASMA; n++)
 	{
-	  norm += macromain[n].matom_abs[m];
-	}
-      norm += plasmamain[n].kpkt_abs;
-    }
-
-
-
-  Log ("Calculating macro atom emissivities- this might take a while...\n");
-
-  /* For MPI parallelisation, the following loop will be distributed over multiple tasks. 
-     Note that the mynmim and mynmax variables are still used even without MPI on */
-  my_nmin = 0;
-  my_nmax = NPLASMA;
-
-#ifdef MPI_ON
-
-  num_mpi_cells = floor(NPLASMA/np_mpi_global);  // divide the cells between the threads
-  num_mpi_extra = NPLASMA - (np_mpi_global*num_mpi_cells);  // the remainder from the above division
-  
-  /* this next loop splits the cells up between the threads. All threads with 
-     rank_global<num_mpi_extra deal with one extra cell to account for the remainder */
-  if (rank_global < num_mpi_extra)
-    {
-      my_nmin = rank_global*(num_mpi_cells+1);
-      my_nmax = (rank_global+1)*(num_mpi_cells+1);     
-    }
-  else
-    {
-      my_nmin = num_mpi_extra*(num_mpi_cells+1) + (rank_global-num_mpi_extra)*(num_mpi_cells);
-      my_nmax = num_mpi_extra*(num_mpi_cells+1) + (rank_global-num_mpi_extra+1)*(num_mpi_cells);
-    }
-  ndo = my_nmax-my_nmin;
-
-  Log_parallel
-    ("Thread %d is calculating macro atom emissivities for macro atoms %d to %d\n",
-     rank_global, my_nmin, my_nmax);
-
-#endif
-
-
-
-
-  for (n = my_nmin; n < my_nmax; n++)
-    {
-
-      /* JM 1309 -- these lines are just log statements which track progress, as this section
-         can take a long time */
-#ifdef MPI_ON
-      if (n % 50 == 0)
-	Log
-	  ("Thread %d is calculating  macro atom emissivity for macro atom %7d of %7d or %6.3f per cent\n",
-	   rank_global, n, my_nmax, n * 100. / my_nmax);
-#else
-      if (n % 50 == 0)
-	Log
-	  ("Calculating macro atom emissivity for macro atom %7d of %7d or %6.3f per cent\n",
-	   n, my_nmax, n * 100. / my_nmax);
-#endif
-
-      for (m = 0; m < nlevels_macro + 1; m++)
-	{
-	  if ((m == nlevels_macro && plasmamain[n].kpkt_abs > 0)
-	      || (m < nlevels_macro && macromain[n].matom_abs[m] > 0))
+	  for (m = 0; m < nlevels_macro; m++)
 	    {
-	      if (m < nlevels_macro)
-		{
-		  if (macromain[n].matom_abs[m] > 0)
-		    {
-		      n_tries_local =
-			(n_tries * macromain[n].matom_abs[m] / norm) + 10;
-		    }
-		  else
-		    {
-		      n_tries_local = 0;
-		    }
-		}
-	      else if (m == nlevels_macro)
-		{
-		  if (plasmamain[n].kpkt_abs > 0)
-		    {
-		      n_tries_local =
-			(n_tries * plasmamain[n].kpkt_abs / norm) + 10;
-		    }
-		  else
-		    {
-		      n_tries_local = 0;
-		    }
-		}
-	      /* We know "matom_abs" is the amount of energy absobed by
-	         each macro atom level in each cell. We now want to determine what fraction of
-	         that energy re-appears in the frequency range we want and from which macro atom
-	         level it is re-emitted (or if it appears via a k-packet). */
+	      norm += macromain[n].matom_abs[m];
+	    }
+	  norm += plasmamain[n].kpkt_abs;
+	}
 
-	      for (mm = 0; mm < NLEVELS_MACRO; mm++)
+
+
+      Log
+	("Calculating macro atom emissivities- this might take a while...\n");
+
+      /* For MPI parallelisation, the following loop will be distributed over multiple tasks. 
+         Note that the mynmim and mynmax variables are still used even without MPI on */
+      my_nmin = 0;
+      my_nmax = NPLASMA;
+
+#ifdef MPI_ON
+
+      num_mpi_cells = floor (NPLASMA / np_mpi_global);	// divide the cells between the threads
+      num_mpi_extra = NPLASMA - (np_mpi_global * num_mpi_cells);	// the remainder from the above division
+
+      /* this next loop splits the cells up between the threads. All threads with 
+         rank_global<num_mpi_extra deal with one extra cell to account for the remainder */
+      if (rank_global < num_mpi_extra)
+	{
+	  my_nmin = rank_global * (num_mpi_cells + 1);
+	  my_nmax = (rank_global + 1) * (num_mpi_cells + 1);
+	}
+      else
+	{
+	  my_nmin =
+	    num_mpi_extra * (num_mpi_cells + 1) + (rank_global -
+						   num_mpi_extra) *
+	    (num_mpi_cells);
+	  my_nmax =
+	    num_mpi_extra * (num_mpi_cells + 1) + (rank_global -
+						   num_mpi_extra +
+						   1) * (num_mpi_cells);
+	}
+      ndo = my_nmax - my_nmin;
+
+      Log_parallel
+	("Thread %d is calculating macro atom emissivities for macro atoms %d to %d\n",
+	 rank_global, my_nmin, my_nmax);
+
+#endif
+
+
+
+
+      for (n = my_nmin; n < my_nmax; n++)
+	{
+
+	  /* JM 1309 -- these lines are just log statements which track progress, as this section
+	     can take a long time */
+#ifdef MPI_ON
+	  if (n % 50 == 0)
+	    Log
+	      ("Thread %d is calculating  macro atom emissivity for macro atom %7d of %7d or %6.3f per cent\n",
+	       rank_global, n, my_nmax, n * 100. / my_nmax);
+#else
+	  if (n % 50 == 0)
+	    Log
+	      ("Calculating macro atom emissivity for macro atom %7d of %7d or %6.3f per cent\n",
+	       n, my_nmax, n * 100. / my_nmax);
+#endif
+
+	  for (m = 0; m < nlevels_macro + 1; m++)
+	    {
+	      if ((m == nlevels_macro && plasmamain[n].kpkt_abs > 0)
+		  || (m < nlevels_macro && macromain[n].matom_abs[m] > 0))
 		{
-		  level_emit[mm] = 0;
-		}
-	      kpkt_emit = 0;
-	      if (n_tries_local > 0)
-		{
-		  for (ss = 0; ss < n_tries_local; ss++)
+		  if (m < nlevels_macro)
 		    {
-		      if (m < nlevels_macro)
+		      if (macromain[n].matom_abs[m] > 0)
 			{
-			  /* Dealing with excitation of a macro atom level. */
-			  /* First find a suitable transition in which to excite the macro atom (to get it
-			     in the correct starting level. */
+			  n_tries_local =
+			    (n_tries * macromain[n].matom_abs[m] / norm) + 10;
+			}
+		      else
+			{
+			  n_tries_local = 0;
+			}
+		    }
+		  else if (m == nlevels_macro)
+		    {
+		      if (plasmamain[n].kpkt_abs > 0)
+			{
+			  n_tries_local =
+			    (n_tries * plasmamain[n].kpkt_abs / norm) + 10;
+			}
+		      else
+			{
+			  n_tries_local = 0;
+			}
+		    }
+		  /* We know "matom_abs" is the amount of energy absobed by
+		     each macro atom level in each cell. We now want to determine what fraction of
+		     that energy re-appears in the frequency range we want and from which macro atom
+		     level it is re-emitted (or if it appears via a k-packet). */
 
-			  /* As Knox pointed out in an earlier comment
-			     here, the next loop isn't the best way to
-			     do this - however I'm not sure we can
-			     just replace nlines->nlines_macro since
-			     we don't know for sure that the
-			     macro_lines are the first lines in the
-			     array. If this is really a bottle neck we
-			     should set up a quicker way to identify
-			     the level - the purpose is just to set
-			     the macro atom state to the appropriate
-			     upper level so all we need is some way to
-			     tell it which state it should be. */
-
-			  nres = 0;
-			  while ((nres < nlines))
+		  for (mm = 0; mm < NLEVELS_MACRO; mm++)
+		    {
+		      level_emit[mm] = 0;
+		    }
+		  kpkt_emit = 0;
+		  if (n_tries_local > 0)
+		    {
+		      for (ss = 0; ss < n_tries_local; ss++)
+			{
+			  if (m < nlevels_macro)
 			    {
-			      if (lin_ptr[nres]->nconfigu != m)
-				{
-				  nres += 1;
-				}
-			      else
-				{
-				  break;
-				}
-			    }
+			      /* Dealing with excitation of a macro atom level. */
+			      /* First find a suitable transition in which to excite the macro atom (to get it
+			         in the correct starting level. */
 
+			      /* As Knox pointed out in an earlier comment
+			         here, the next loop isn't the best way to
+			         do this - however I'm not sure we can
+			         just replace nlines->nlines_macro since
+			         we don't know for sure that the
+			         macro_lines are the first lines in the
+			         array. If this is really a bottle neck we
+			         should set up a quicker way to identify
+			         the level - the purpose is just to set
+			         the macro atom state to the appropriate
+			         upper level so all we need is some way to
+			         tell it which state it should be. */
 
-			  if (nres > (nlines - 1))
-			    {
-			      nres = NLINES + 1;
-			      while (nres < (NLINES + 1 + ntop_phot))
+			      nres = 0;
+			      while ((nres < nlines))
 				{
-				  if (phot_top[nres - NLINES - 1].uplev != m)
+				  if (lin_ptr[nres]->nconfigu != m)
 				    {
 				      nres += 1;
 				    }
@@ -2392,194 +2454,217 @@ get_matom_f (mode)
 				      break;
 				    }
 				}
-			    }
-
-			  if (nres > NLINES + ntop_phot)
-			    {
-			      Error ("Problem in get_matom_f (1). Abort. \n");
-			      exit (0);
-			    }
-
-			  ppp.nres = nres;
-			  ppp.grid = plasmamain[n].nwind;
-			  ppp.w = 0;
-
-			  macro_gov (&ppp, &nres, 1, &which_out);
 
 
-			  /* Now a macro atom has been excited and followed until an r-packet is made. Now, if that 
-			     r-packet is in the correct frequency range we record it. If not, we throw it away. */
-			}
-		      else if (m == nlevels_macro)
-			{
-			  /* kpkt case. */
+			      if (nres > (nlines - 1))
+				{
+				  nres = NLINES + 1;
+				  while (nres < (NLINES + 1 + ntop_phot))
+				    {
+				      if (phot_top[nres - NLINES - 1].uplev !=
+					  m)
+					{
+					  nres += 1;
+					}
+				      else
+					{
+					  break;
+					}
+				    }
+				}
 
-			  nres = -2;	//will do - just need
-			  //something that will tigger kpkt
-
-			  ppp.nres = nres;
-			  ppp.grid = plasmamain[n].nwind;
-			  ppp.w = 0;
-
-			  macro_gov (&ppp, &nres, 2, &which_out);
-
-			  /* We have an r-packet back again. */
-			}
-
-
-		      if (ppp.freq > em_rnge.fmin && ppp.freq < em_rnge.fmax)
-			{
-			  if (which_out == 1)
-			    {
-			      if (nres < 0)
+			      if (nres > NLINES + ntop_phot)
 				{
 				  Error
-				    ("Negative out from matom?? Abort.\n");
+				    ("Problem in get_matom_f (1). Abort. \n");
 				  exit (0);
 				}
 
-			      /* It was a macro atom de-activation. */
-			      if (nres < nlines)
-				{	/* It was a line. */
-				  level_emit[lin_ptr[nres]->nconfigu] += 1;
+			      ppp.nres = nres;
+			      ppp.grid = plasmamain[n].nwind;
+			      ppp.w = 0;
+
+			      macro_gov (&ppp, &nres, 1, &which_out);
+
+
+			      /* Now a macro atom has been excited and followed until an r-packet is made. Now, if that 
+			         r-packet is in the correct frequency range we record it. If not, we throw it away. */
+			    }
+			  else if (m == nlevels_macro)
+			    {
+			      /* kpkt case. */
+
+			      nres = -2;	//will do - just need
+			      //something that will tigger kpkt
+
+			      ppp.nres = nres;
+			      ppp.grid = plasmamain[n].nwind;
+			      ppp.w = 0;
+
+			      macro_gov (&ppp, &nres, 2, &which_out);
+
+			      /* We have an r-packet back again. */
+			    }
+
+
+			  if (ppp.freq > em_rnge.fmin
+			      && ppp.freq < em_rnge.fmax)
+			    {
+			      if (which_out == 1)
+				{
+				  if (nres < 0)
+				    {
+				      Error
+					("Negative out from matom?? Abort.\n");
+				      exit (0);
+				    }
+
+				  /* It was a macro atom de-activation. */
+				  if (nres < nlines)
+				    {	/* It was a line. */
+				      level_emit[lin_ptr[nres]->nconfigu] +=
+					1;
+				    }
+				  else
+				    {
+				      level_emit[phot_top
+						 [nres - NLINES - 1].uplev] +=
+					1;
+				    }
+				}
+			      else if (which_out == 2)
+				{
+				  /* It was a k-packet de-activation. */
+				  kpkt_emit += 1;
 				}
 			      else
 				{
-				  level_emit[phot_top
-					     [nres - NLINES - 1].uplev] += 1;
+				  Error
+				    ("Packet didn't emerge from matom or kpkt??? Abort. \n");
+				  exit (0);
 				}
 			    }
-			  else if (which_out == 2)
+			}
+
+
+		      /* Now we've done all the runs for this level de-activating so we can add the contributions
+		         to the level emissivities, the k-packet emissivity and the total luminosity. */
+
+		      for (mm = 0; mm < nlevels_macro; mm++)
+			{
+			  contribution = 0;
+			  if (m < nlevels_macro)
 			    {
-			      /* It was a k-packet de-activation. */
-			      kpkt_emit += 1;
+			      macromain[n].matom_emiss[mm] += contribution =
+				level_emit[mm] * macromain[n].matom_abs[m] /
+				n_tries_local;
 			    }
-			  else
+			  else if (m == nlevels_macro)
 			    {
-			      Error
-				("Packet didn't emerge from matom or kpkt??? Abort. \n");
-			      exit (0);
+			      macromain[n].matom_emiss[mm] += contribution =
+				level_emit[mm] * plasmamain[n].kpkt_abs /
+				n_tries_local;
 			    }
 			}
-		    }
 
-
-		  /* Now we've done all the runs for this level de-activating so we can add the contributions
-		     to the level emissivities, the k-packet emissivity and the total luminosity. */
-
-		  for (mm = 0; mm < nlevels_macro; mm++)
-		    {
-		      contribution = 0;
 		      if (m < nlevels_macro)
 			{
-			  macromain[n].matom_emiss[mm] += contribution =
-			    level_emit[mm] * macromain[n].matom_abs[m] /
+			  plasmamain[n].kpkt_emiss +=
+			    kpkt_emit * macromain[n].matom_abs[m] /
 			    n_tries_local;
 			}
 		      else if (m == nlevels_macro)
 			{
-			  macromain[n].matom_emiss[mm] += contribution =
-			    level_emit[mm] * plasmamain[n].kpkt_abs /
+			  plasmamain[n].kpkt_emiss +=
+			    kpkt_emit * plasmamain[n].kpkt_abs /
 			    n_tries_local;
-			}      
-		    }
-
-		  if (m < nlevels_macro)
-		    {
-		      plasmamain[n].kpkt_emiss +=
-			kpkt_emit * macromain[n].matom_abs[m] / n_tries_local;
-		    }
-		  else if (m == nlevels_macro)
-		    {
-		      plasmamain[n].kpkt_emiss +=
-			kpkt_emit * plasmamain[n].kpkt_abs / n_tries_local;
+			}
 		    }
 		}
 	    }
 	}
-    }
 
 
-  /*This is the end of the update loop that is parallelised. We now need to exchange data between the tasks.
-    This is done much the same way as in wind_update */
+      /*This is the end of the update loop that is parallelised. We now need to exchange data between the tasks.
+         This is done much the same way as in wind_update */
 #ifdef MPI_ON
-  for (n_mpi = 0; n_mpi < np_mpi_global; n_mpi++)
-    {
-      /* here we loop over the number of threads. If the thread is this thread then we pack the macromain information
-         into memory and then broadcast it to ther other threads */
-      position = 0;
-
-      if (rank_global == n_mpi)
+      for (n_mpi = 0; n_mpi < np_mpi_global; n_mpi++)
 	{
+	  /* here we loop over the number of threads. If the thread is this thread then we pack the macromain information
+	     into memory and then broadcast it to ther other threads */
+	  position = 0;
 
-	  Log
-	    ("MPI task %d is working on matoms %d to max %d (total size %d).\n",
-	     rank_global, my_nmin, my_nmax, NPLASMA);
-
-	  MPI_Pack (&ndo, 1, MPI_INT, commbuffer,
-		    size_of_commbuffer, &position, MPI_COMM_WORLD);
-	  for (n = my_nmin; n < my_nmax; n++)
+	  if (rank_global == n_mpi)
 	    {
 
-	      /* pack the number of the cell, and the kpkt and macro atom emissivites for that cell // */
-	      MPI_Pack (&n, 1, MPI_INT, commbuffer,
+	      Log
+		("MPI task %d is working on matoms %d to max %d (total size %d).\n",
+		 rank_global, my_nmin, my_nmax, NPLASMA);
+
+	      MPI_Pack (&ndo, 1, MPI_INT, commbuffer,
 			size_of_commbuffer, &position, MPI_COMM_WORLD);
-	      MPI_Pack (&plasmamain[n].kpkt_emiss, 1, MPI_DOUBLE,
-			commbuffer, size_of_commbuffer, &position,
-			MPI_COMM_WORLD);
-	      MPI_Pack (macromain[n].matom_emiss, nlevels_macro, MPI_DOUBLE,
-			commbuffer, size_of_commbuffer, &position,
-			MPI_COMM_WORLD);
+	      for (n = my_nmin; n < my_nmax; n++)
+		{
 
+		  /* pack the number of the cell, and the kpkt and macro atom emissivites for that cell // */
+		  MPI_Pack (&n, 1, MPI_INT, commbuffer,
+			    size_of_commbuffer, &position, MPI_COMM_WORLD);
+		  MPI_Pack (&plasmamain[n].kpkt_emiss, 1, MPI_DOUBLE,
+			    commbuffer, size_of_commbuffer, &position,
+			    MPI_COMM_WORLD);
+		  MPI_Pack (macromain[n].matom_emiss, nlevels_macro,
+			    MPI_DOUBLE, commbuffer, size_of_commbuffer,
+			    &position, MPI_COMM_WORLD);
+
+		}
+
+	      Log_parallel
+		("MPI task %d broadcasting matom emissivity information.\n",
+		 rank_global);
 	    }
 
+
+	  /* Set MPI_Barriers and broadcast information to other threads */
+	  MPI_Barrier (MPI_COMM_WORLD);
+	  MPI_Bcast (commbuffer, size_of_commbuffer, MPI_PACKED,
+		     n_mpi, MPI_COMM_WORLD);
+	  MPI_Barrier (MPI_COMM_WORLD);
 	  Log_parallel
-	    ("MPI task %d broadcasting matom emissivity information.\n",
+	    ("MPI task %d survived broadcasting matom emissivity information.\n",
 	     rank_global);
-	}
-
-
-      /* Set MPI_Barriers and broadcast information to other threads */
-      MPI_Barrier (MPI_COMM_WORLD);
-      MPI_Bcast (commbuffer, size_of_commbuffer, MPI_PACKED,
-		 n_mpi, MPI_COMM_WORLD);
-      MPI_Barrier (MPI_COMM_WORLD);
-      Log_parallel
-	("MPI task %d survived broadcasting matom emissivity information.\n",
-	 rank_global);
 
 
 
-      position = 0;
+	  position = 0;
 
-      /* If not this thread then we unpack the macromain information from the other threads */
+	  /* If not this thread then we unpack the macromain information from the other threads */
 
-      if (rank_global != n_mpi)
-	{
-	  MPI_Unpack (commbuffer, size_of_commbuffer, &position,
-		      &num_comm, 1, MPI_INT, MPI_COMM_WORLD);
-	  for (n_mpi2 = 0; n_mpi2 < num_comm; n_mpi2++)
+	  if (rank_global != n_mpi)
 	    {
+	      MPI_Unpack (commbuffer, size_of_commbuffer, &position,
+			  &num_comm, 1, MPI_INT, MPI_COMM_WORLD);
+	      for (n_mpi2 = 0; n_mpi2 < num_comm; n_mpi2++)
+		{
 
-	      /* unpack the number of the cell, and the kpkt and macro atom emissivites for that cell */
-	      MPI_Unpack (commbuffer, size_of_commbuffer,
-			  &position, &n, 1, MPI_INT, MPI_COMM_WORLD);
-	      MPI_Unpack (commbuffer, size_of_commbuffer, &position,
-			  &plasmamain[n].kpkt_emiss, 1, MPI_DOUBLE,
-			  MPI_COMM_WORLD);
-	      MPI_Unpack (commbuffer, size_of_commbuffer, &position,
-			  macromain[n].matom_emiss, nlevels_macro, MPI_DOUBLE,
-			  MPI_COMM_WORLD);
+		  /* unpack the number of the cell, and the kpkt and macro atom emissivites for that cell */
+		  MPI_Unpack (commbuffer, size_of_commbuffer,
+			      &position, &n, 1, MPI_INT, MPI_COMM_WORLD);
+		  MPI_Unpack (commbuffer, size_of_commbuffer, &position,
+			      &plasmamain[n].kpkt_emiss, 1, MPI_DOUBLE,
+			      MPI_COMM_WORLD);
+		  MPI_Unpack (commbuffer, size_of_commbuffer, &position,
+			      macromain[n].matom_emiss, nlevels_macro,
+			      MPI_DOUBLE, MPI_COMM_WORLD);
+		}
 	    }
-	}
-    }  // end of parallelised section
-  #endif	
+	}			// end of parallelised section
+#endif
 
-  } // end of if loop which controls whether to compute the emissivities or not 
+    }				// end of if loop which controls whether to compute the emissivities or not 
 
   /* this next loop just calculates lum to be the correct summed value in parallel mode */
   /* if mode == USE_STORED_MATOM_EMISSIVITIES this is all this routine does */
-  lum = 0.0;   // need to rezero, fixes segfault bug #59 
+  lum = 0.0;			// need to rezero, fixes segfault bug #59 
 
   for (n = 0; n < NPLASMA; n++)
     {
@@ -2742,7 +2827,7 @@ photo_gen_kpkt (p, weight, photstart, nphot)
       else if (geo.scatter_mode == 2)
 	{			//It was a line photon and we want the thermal trapping anisotropic model
 
-	  randwind_thermal_trapping(&p[n], &nnscat);
+	  randwind_thermal_trapping (&p[n], &nnscat);
 	}
 
       p[n].nnscat = nnscat;
@@ -2939,7 +3024,7 @@ photo_gen_matom (p, weight, photstart, nphot)
       else if (geo.scatter_mode == 2)
 	{			//It was a line photon and we want the thermal trapping anisotropic model
 
-      randwind_thermal_trapping(&p[n], &nnscat);
+	  randwind_thermal_trapping (&p[n], &nnscat);
 	}
       p[n].nnscat = nnscat;
 
@@ -3194,12 +3279,10 @@ q_recomb (cont_ptr, electron_temperature)
 
   gaunt = 0.1;			//for now - from Mihalas for hydrogen
 
-  coeff = 3.2085e-3  / electron_temperature * gaunt * cont_ptr->x[0];	// normal constants * 1/T times gaunt * cross section
+  coeff = 3.2085e-3 / electron_temperature * gaunt * cont_ptr->x[0];	// normal constants * 1/T times gaunt * cross section
 
-  coeff /= cont_ptr->freq[0] * H_OVER_K;			// divide by h nu / k
+  coeff /= cont_ptr->freq[0] * H_OVER_K;	// divide by h nu / k
   coeff *= config[cont_ptr->nlev].g / config[cont_ptr->uplev].g;
 
   return (coeff);
 }
-
-

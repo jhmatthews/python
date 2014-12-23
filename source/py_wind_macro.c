@@ -1053,3 +1053,94 @@ int level_tauoverview (nlev, w, rootname, ochoice)
 
   return (0);
 }
+
+
+
+/**************************************************************************
+
+  Synopsis:  
+
+  Routine to print level absorptions in each cell.
+  The emissivity is the quantity
+  A21 * n2 * beta_sobolev * nu_21 * H * volume
+  And thus has units of ergs/s
+  
+  Description:  
+
+  Arguments:  
+
+  Returns:
+
+  Notes:
+
+  History:
+      1312  JM  Coded to track 
+                e.g. H-alpha emission through wind
+ ************************************************************************/
+
+
+int 
+level_emissoverview (nlev, w, rootname, ochoice)
+  int nlev;
+  WindPtr w;
+  char rootname[];
+  int ochoice;
+{
+  int n, nplasma;
+  char name[LINELENGTH], lname[LINELENGTH];
+  char filename[LINELENGTH];
+
+  strcpy (name, "");
+
+  if (nlev != 0)
+    {
+      sprintf (name, "Level emissivities for Level %i", nlev);
+    }
+  else
+    {
+      sprintf (name, "Kpkt emissivities");
+    }
+
+
+  for (n = 0; n < NDIM2; n++)
+    {
+      aaa[n] = 0;
+      nplasma = w[n].nplasma;
+
+      if (w[n].vol > 0.0 && plasmamain[nplasma].ne > 1.0)
+        {
+          if (nlev != 0)
+            {
+              aaa[n] = macromain[nplasma].matom_emiss[nlev - 1];
+            }
+          else
+            {
+              aaa[n] = plasmamain[nplasma].kpkt_emiss;
+            }
+        }
+    }
+
+  display(name);
+
+  if (ochoice)
+    {
+      strcpy (filename, rootname);
+      strcat (filename, ".lev");
+
+      if (nlev != 0)
+        {
+          sprintf (lname, "%d", nlev);
+          strcat (filename, lname);
+        }
+      else
+        {
+          strcat (filename, "k");
+        }
+
+      strcat (filename, "_emiss");
+      write_array (filename, ochoice);
+
+    }
+
+  return (0);
+}

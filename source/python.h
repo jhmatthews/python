@@ -540,7 +540,7 @@ typedef struct plasma
 				   to the ion order obtained by get_atomic_data. 78 - changed to dynamic allocation*/
   double *partition;	/*The partition function for each  ion. 78 - changed to dynamic allocation */
   double levden[NLTE_LEVELS];	/*The number density (occupation number?) of a specific level */
-
+  double levden_pre_clean[NLTE_LEVELS];
   double *PWdenom;	/*The denominator in the pairwise ionization solver. Sicne this is computed at a temperature 
 				   chosen from basic ioinzation proerties to be good for this ion, it should not change
 				   very much from cycle to cycle - hence we shold be able to speed up the code by storing 
