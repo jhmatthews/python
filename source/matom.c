@@ -1878,38 +1878,38 @@ macro_pops (xplasma, xne)
 
 
 
-	  for (index_ion = ele[index_element].firstion;
-	       index_ion <
-	       (ele[index_element].firstion + ele[index_element].nions);
-	       index_ion++)
-	    {
-	      for (index_lvl = ion[index_ion].first_nlte_level;
-		   index_lvl <
-		   ion[index_ion].first_nlte_level + ion[index_ion].nlte;
-		   index_lvl++)
-		{		/* Start loop with lowest level of the ion. For each level in turn check to see if there's a population 
-				   inversion i.e. is  upper_pop > lower_pop * g_upper / g_lower. If it is then replace upper_pop with
-				   lower_pop * g_upper / g_lower. We loop over all levels higher than the currently chosen lower level. */
-		  for (nn = index_lvl + 1;
-		       nn <
-		       (ion[index_ion].first_nlte_level +
-			ion[index_ion].nlte); nn++)
-		    {
+	 //  for (index_ion = ele[index_element].firstion;
+	 //       index_ion <
+	 //       (ele[index_element].firstion + ele[index_element].nions);
+	 //       index_ion++)
+	 //    {
+	 //      for (index_lvl = ion[index_ion].first_nlte_level;
+		//    index_lvl <
+		//    ion[index_ion].first_nlte_level + ion[index_ion].nlte;
+		//    index_lvl++)
+		// {		/* Start loop with lowest level of the ion. For each level in turn check to see if there's a population 
+		// 		   inversion i.e. is  upper_pop > lower_pop * g_upper / g_lower. If it is then replace upper_pop with
+		// 		   lower_pop * g_upper / g_lower. We loop over all levels higher than the currently chosen lower level. */
+		//   for (nn = index_lvl + 1;
+		//        nn <
+		//        (ion[index_ion].first_nlte_level +
+		// 	ion[index_ion].nlte); nn++)
+		//     {
 
-		      /* this if statement means we only clean if there's a radiative jump between the levels */
-		      if (radiative_flag[index_lvl][nn])
-			{
-			  inversion_test = gsl_vector_get (populations, conf_to_matrix[index_lvl]) * config[nn].g / config[index_lvl].g * 0.999999;	//include a correction factor 
-			  if (gsl_vector_get (populations, conf_to_matrix[nn])
-			      > inversion_test)
-			    {
-			      gsl_vector_set (populations, conf_to_matrix[nn],
-					      inversion_test);
-			    }
-			}
-		    }
-		}
-	    }
+		//       /* this if statement means we only clean if there's a radiative jump between the levels */
+		//       if (radiative_flag[index_lvl][nn])
+		// 	{
+		// 	  inversion_test = gsl_vector_get (populations, conf_to_matrix[index_lvl]) * config[nn].g / config[index_lvl].g * 0.999999;	//include a correction factor 
+		// 	  if (gsl_vector_get (populations, conf_to_matrix[nn])
+		// 	      > inversion_test)
+		// 	    {
+		// 	      gsl_vector_set (populations, conf_to_matrix[nn],
+		// 			      inversion_test);
+		// 	    }
+		// 	}
+		//     }
+		// }
+	 //    }
 
 
 	  /* The populations are now known. The populations need to be stored
