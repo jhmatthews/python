@@ -1484,7 +1484,15 @@ macro_pops (xplasma, xne)
 	    {
 	      index_lvl = ion[index_ion].first_nlte_level;
 
-	      /* The next loop judges whether or not a level is to be fixed in population relative to ground
+	    
+
+
+	      for (index_lvl = ion[index_ion].first_nlte_level;
+		   index_lvl <
+		   ion[index_ion].first_nlte_level + ion[index_ion].nlte;
+		   index_lvl++)
+		{
+		  /* The next loop judges whether or not a level is to be fixed in population relative to ground
 	         star. The input radiative lifetime is used to judge this at the moment. If the lifetime was set
 	         to be long (essentially infite) then a very fast collisional transition is put in to dominate
 	         all other rates into and out of this level. 
@@ -1492,40 +1500,40 @@ macro_pops (xplasma, xne)
 	         Whether this is really the best thing to do I don't know, but it's an improvement over ignoring 
 	         this issue altogether! SS Aug 05 */
 
-	      for (index_fast_col = index_lvl;
-		   index_fast_col <
-		   ion[index_ion].first_nlte_level + ion[index_ion].nlte - 1;
-		   index_fast_col++)
-		{
-		  {
-		    if (config[index_fast_col + 1].rad_rate > 1.e15)
-		      {
-			fast_line.gl = config[index_lvl].g;
-			fast_line.gu = config[index_fast_col + 1].g;
-			fast_line.freq =
-			  (config[index_fast_col + 1].ex -
-			   config[index_lvl].ex) / H;
-			fast_line.f = 1e4;
-			rate = q12 (&fast_line, xplasma->t_e) * xne;
-			lower = conf_to_matrix[index_lvl];
-			upper = conf_to_matrix[index_fast_col + 1];
-			rate_matrix[lower][lower] += -1. * rate;
-			rate_matrix[upper][lower] += rate;
-			rate = q21 (&fast_line, xplasma->t_e) * xne;
-			rate_matrix[upper][upper] += -1. * rate;
-			rate_matrix[lower][upper] += rate;
-		      }
-		  }
-		}
+		  // is this He 1? is the level a 2s or 2p shell?
+		  if (ion[index_ion].z == 2 && ion[index_ion].istate == 1 && config[index_lvl].ilv > 1 && config[index_lvl].ilv < 6)
+		    {
+		      for (index_fast_col = index_lvl + 1; 
+		      	   index_fast_col < ion[index_ion].first_nlte_level + ion[index_ion].nlte - 1; 
+		      	   index_fast_col++)
+		      {	
+		      	 if (config[index_fast_col].ilv > 1 && config[index_fast_col].ilv < 6)
+		      	 {
+			   	   fast_line.gl = config[index_lvl].g;
+				   fast_line.gu = config[index_fast_col].g;
+				   fast_line.freq = (config[index_fast_col].ex - config[index_lvl].ex) / H;
 
-	      for (index_lvl = ion[index_ion].first_nlte_level;
-		   index_lvl <
-		   ion[index_ion].first_nlte_level + ion[index_ion].nlte;
-		   index_lvl++)
-		{
+	               lower = conf_to_matrix[index_lvl];
+				   upper = conf_to_matrix[index_fast_col];
+
+				   rate = q12 (&fast_line, xplasma->t_e) * xne;
+				   rate_matrix[lower][lower] += -1. * rate;
+				   rate_matrix[upper][lower] += rate;
+
+				   rate = q21 (&fast_line, xplasma->t_e) * xne;
+				   rate_matrix[upper][upper] += -1. * rate;
+				   rate_matrix[lower][upper] += rate;	
+
+				   //Log("adding a fast line!! delta E = %8.4e\n", HEV * fast_line.freq);
+		      	 }
+		      }
+		    }
+
+
 		  /* Now add contribution for all the bb and bf processes between the levels. This is
 		     done by looping over the numbers "bbu, bbd, bfu, bfd" which tell us how many
 		     processes there are. */
+
 
 
 		  for (index_bbu = 0;
