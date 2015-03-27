@@ -1,0 +1,59 @@
+#####################################################################################
+#
+#       James Matthews, University of Southampton
+#                   6 Feb 2014
+#
+# This is the travis yml file which controls the test builds 
+# for Python, the radiative transfer code hosted at https://github.com/agnwinds/python
+#
+# Procedure:
+#       - travis automatically clones the main dev branch of the repository
+#       - we clone the rest the atomic data from the data repository
+#       - we then run some simple test models to check we are reading in data and so on
+#   
+#####################################################################################
+
+language: c
+
+compiler:
+    - gcc
+
+# only want to run this test when we commit to dev
+branches:
+  only:
+      dev
+
+install:
+    # first configure
+    - export PYTHON=$TRAVIS_BUILD_DIR
+    - export PATH=$PATH:$PYTHON/bin 
+    - ./configure
+
+    # do installation
+    - make install
+
+
+    #Then clone data
+    - mkdir data
+    - git clone --depth=50 git://github.com/agnwinds/data.git data
+
+
+script:
+    - echo $PWD
+    - cd source/
+    - make clean
+    - make CC=gcc py_wind
+    - make clean
+    - cd ../examples/travis 
+    - Setup_Py_Dir
+    - py test1 > test1.out
+    - py balmer_test > balmer_test.out
+    - python check_travis_test.py 
+    - cd ..
+    - Setup_Py_Dir
+    - py -i cv_macro_benchmark
+    - py -i cv_standard
+    - py -i -d sv_detailedmode
+    - py -i fiducial_agn
+    - py -i 1d_sn
+    - py -i agn_ss_2010_modela.pf

@@ -1,0 +1,9 @@
+find . -name *.sig -print  > tmpCheck
+rm tmpCheck1
+awk '{print "grep COMPLETE "$1" >> tmpCheck1.out"}'<tmpCheck >>tmpCheck1
+rm tmpCheck1.out
+source tmpCheck1
+echo 'Total sig files'
+wc tmpCheck
+echo 'Total completed'
+wc tmpCheck1.out

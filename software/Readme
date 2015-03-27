@@ -1,0 +1,8 @@
+This directory contains libraries that are used in Python or
+related packages that I did not write, e.g Bill Pence's cfitsio
+software
+
+
+The Makefile for cfitsio does not automatically move 
+the library to the location ksl expects it to be, e.g.
+../lib in the Makefiles contained in progs

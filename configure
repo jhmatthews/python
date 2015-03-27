@@ -1,0 +1,47 @@
+#!/bin/sh
+# Shell script for configuring Python radiative transfer code compilation
+# James Matthews, University of Southampton
+# Questions: jm8g08@soton.ac.uk
+# Usage: ./configure 
+
+MPICC="True"
+
+printf "Configuring Makefile for Python radiative transfer code\n"
+
+printf "Checking for mpicc..."
+if hash mpicc 2>/dev/null; then
+	printf "yes\n"
+	MPICC_IN=1
+else
+	printf "no\n"
+	MPICC_IN=0
+fi
+
+
+printf "Checking for gcc..."
+if hash gcc 2>/dev/null; then
+	printf "yes\n"
+	GCC_IN=1
+else
+	printf "no\n"
+	GCC_IN=0
+fi
+
+printf "Preparing Makefile..."
+
+if [ "$MPICC_IN" -eq 0 ]
+then
+	if [ "$GCC_IN" -eq 1 ]
+	then
+		cp Makefile.in Makefile
+ 		sed -i -e 's/mpicc/gcc/' Makefile
+ 		printf "Done.\n"
+	else
+		printf "failed.\nNo gcc or mpicc installed. You need a C compiler!\n"
+	fi
+else 
+	cp Makefile.in Makefile
+	printf "Done.\n"
+fi
+
+

@@ -1,0 +1,49 @@
+# This is the git ignore for python
+# ignore binaries in bin/ such as e.g. py78a
+bin/py*
+
+# Object files
+*.o
+*.ko
+*.obj
+*.elf
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+
+
+#things from gsl
+
+
+
+
+# python and system files
+*.pyc
+*~
+*.DS_Store
+
+
+# some gsl files
+*.Plo
+*.Po
