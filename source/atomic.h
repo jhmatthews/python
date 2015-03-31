@@ -165,6 +165,7 @@ typedef struct ions
   int dere_di_flag;              /* Flag to say if we have DERE direct ionization data for this ion */
   int nxderedi;		/* index into the dere direct ionization structure to give the location of the data for this ion */
 
+  int has_superlevel;     /* is this ion allowed to posses superlevels? 1=yes, 0=no */
 }
 ion_dummy, *IonPtr;
 
@@ -209,6 +210,8 @@ typedef struct configurations
 config_dummy, *ConfigPtr;
 
 ConfigPtr config;
+
+
 
 /* So what is the energy of the first level CIV 
    ex[ion[6][0].index]

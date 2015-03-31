@@ -410,10 +410,13 @@ be optional which variables beyond here are moved to structures othere than Wind
 	     plasmamain[n].w);
 	}
 
+  //Log("About to setup\n");
+  //setup_superlevels();
+
       /* 68b - Initialize the scatters array 73d - and the pariwise ionization denominator and temperature
        */
 
-      for (j = 0; j < nions; j++) /* NSH 1107 - changed this loop to loop over nions rather than NIONS. Dynamic
+      for (j = 0; j < nions; j++) /* NSH 1107 - changed this loop to longerop over nions rather than NIONS. Dynamic
 	allocation means that these arrays are no longer of length NIONS */
 	{
 	  plasmamain[n].PWdenom[j] = 0.0;

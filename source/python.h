@@ -797,12 +797,17 @@ typedef struct macro
   double cooling_ff;
   double cooling_adiabatic;     // this is just lum_adiabatic / vol / ne
 
-  double lte_pops[NLEVELS_MACRO]; /* a store of LTE level populations for the macro atom. */ 
-  double lte_pops_norm;
+  double superlevel_lte_pops[NLEVELS]; /* a store of LTE level populations for the macro atom. */ 
+  double superlevel_norm[NIONS];            /* the normalisation for each ion */
+  int superlevel_threshold[NIONS];           /* the threshold for each ion */
 
 } macro_dummy, *MacroPtr;
 
 MacroPtr macromain;
+
+
+#define LOWEST_SUPERLEVEL_THRESHOLD 10
+
 
 int xxxpdfwind;			// When 1, line luminosity calculates pdf
 

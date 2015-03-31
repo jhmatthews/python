@@ -215,6 +215,7 @@ get_atomic_data (masterfile)
   char gsflag, drflag;		//Flags to say what part of data is being read in for DR and RR
   double gstmin, gstmax;	//The range of temperatures for which all ions have GS RR rates
   double gsqrdtemp, gfftemp, s1temp, s2temp, s3temp;	//Temporary storage for gaunt factors
+  int has_superlevel;
 
   /* define which files to read as data files */
 
@@ -659,10 +660,15 @@ ksl 04Apr  ??
 		case 'i':
 
 		  if ((nwords = sscanf
-		       (aline, "%*s %*s %d %d %le %le %d %d", &z, &istate,
-			&gg, &p, &nmax, &nlte)) == 6)
+		       (aline, "%*s %*s %d %d %le %le %d %d %d", &z, &istate,
+			&gg, &p, &nmax, &nlte, &has_superlevel)) == 7)
 		    {
 		    }		// It's a new style ion line specifying levels to treat in nlte
+      else if (nwords == 6)
+        {
+          // then there are no "has superlevel" variables
+          has_superlevel = 0;
+        }   // It's a new style ion line specifying levels to treat in nlte
 		  else if (nwords == 4)
 		    {		//It's an old style ion line
 		      nlte = 0;
@@ -711,15 +717,17 @@ ksl 04Apr  ??
 		  ion[nions].g = gg;
 		  ion[nions].ip = p * EV2ERGS;
 		  ion[nions].nmax = nmax;
-/* Use the keyword IonM to classify the ion as a macro-ion (IonM) or not (simply Ion) */
+      /* Use the keyword IonM to classify the ion as a macro-ion (IonM) or not (simply Ion) */
 		  if (strncmp (word, "IonM", 4) == 0)
 		    {
 		      ion[nions].macro_info = 1;
+          ion[nions].has_superlevel = has_superlevel;
 		      nions_macro++;
 		    }
 		  else
 		    {
 		      ion[nions].macro_info = 0;
+          ion[nions].has_superlevel = 0;  // non matoms can't have superlevels
 		      nions_simple++;
 		    }
 		  nions++;

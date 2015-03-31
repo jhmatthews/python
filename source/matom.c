@@ -123,6 +123,7 @@ matom (p, nres, escape)
     eprbs_known[NLEVELS_MACRO][2 * (NBBJUMPS + NBFJUMPS)];
   double pjnorm_known[NLEVELS_MACRO], penorm_known[NLEVELS_MACRO];
   int prbs_known[NLEVELS_MACRO];
+  int in_superlevel;
 
 
   for (n = 0; n < NLEVELS_MACRO; n++)
@@ -160,12 +161,23 @@ matom (p, nres, escape)
       exit (0);
     }
 
+
+
+
   /* Now follows the main loop to govern the macro atom jumps. Keeps jumping until
      an emission occurs (at which point it breaks). */
 
-
   for (njumps = 0; njumps < MAXJUMPS; njumps++)
     {
+      /* If the upper level is in the superlevel for this macro-atom then choose
+         a new upper level according to Boltzmann populations */
+	  in_superlevel = 0;
+	  if (uplvl >= mplasma->superlevel_threshold[config[uplvl].nion] && ion[config[uplvl].nion].has_superlevel == 1)
+	  {
+	  	uplvl = choose_superlevel_deactivation (xplasma, uplvl);
+	  	in_superlevel = 1;
+	  }
+
       /*  The excited configuration is now known. Now compute all the probabilities of deactivation
          /jumping from this configuration. Then choose one. */
 
@@ -174,8 +186,13 @@ matom (p, nres, escape)
       nbfd = config[uplvl].n_bfd_jump;	// number of bf downward jumps from this transition
       nbfu = config[uplvl].n_bfu_jump;	// number of bf upward jumps from this transiion
 
+
+
+
+
       if (prbs_known[uplvl] != 1)
 	{
+
 	  /* Start by setting everything to 0  */
 
 	  m = 0;		//m counts the total number of possible ways to leave the level
@@ -206,13 +223,24 @@ matom (p, nres, escape)
 	    {
 	      line_ptr = &line[config[uplvl].bbd_jump[n]];
 
-	      rad_rate = (a21 (line_ptr) * p_escape (line_ptr, xplasma));
-	      coll_rate = q21 (line_ptr, t_e);	// this is multiplied by ne below
+          /* we can only jump down to the lower level if the lower level is 
+             not in the superlevel */
+          if (line_ptr->nconfigl < mplasma->superlevel_threshold[config[uplvl].nion])
+          {
+          	rad_rate = 0.0;
+          	coll_rate = 0.0;
+          }
+          else
+          {
 
-	      if (coll_rate < 0)
-		{
-		  coll_rate = 0;
-		}
+	        rad_rate = (a21 (line_ptr) * p_escape (line_ptr, xplasma));
+	        coll_rate = q21 (line_ptr, t_e);	// this is multiplied by ne below
+
+	        if (coll_rate < 0)
+		    {
+		      coll_rate = 0;
+		    }
+          }
 
 	      bb_cont = rad_rate + (coll_rate * ne);
 	      jprbs_known[uplvl][m] = jprbs[m] = bb_cont * config[line_ptr->nconfigl].ex;	//energy of lower state
@@ -280,6 +308,15 @@ matom (p, nres, escape)
 
 	  for (n = 0; n < nbbu; n++)
 	    {
+
+	    if (in_superlevel)		// don't want to go up if in the superlevel 
+	    {
+          rad_rate = 0.0;
+          coll_rate = 0.0;
+        }
+	    else
+	    {
+
 	      line_ptr = &line[config[uplvl].bbu_jump[n]];
 	      rad_rate =
 		(b12 (line_ptr) *
@@ -291,6 +328,7 @@ matom (p, nres, escape)
 		{
 		  coll_rate = 0;
 		}
+	    }
 
 	      jprbs_known[uplvl][m] = jprbs[m] = ((rad_rate) + (coll_rate * ne)) * config[uplvl].ex;	//energy of lower state
 
@@ -398,11 +436,12 @@ matom (p, nres, escape)
 	}
       else
 	{
-	  Error ("Trying to jump but nowhere to go! Matom. Abort");
+	  Error ("Trying to jump but nowhere to go! Matom. Abort %i %i %8.4e %8.4e\n",
+	  	      n, nbbd + nbfd + nbbu + nbfu, threshold, run_tot);
 	  exit (0);
 	}
 
-/* ksl: Check added to verify that the level actually changed */
+      /* ksl: Check added to verify that the level actually changed */
       if (uplvl_old == uplvl)
 	{
 	  Error ("matom: uplvl did not change with jump: %d %d\n", uplvl, n);
@@ -1500,7 +1539,6 @@ macro_pops (xplasma, xne)
 		   ion[index_ion].first_nlte_level + ion[index_ion].nlte - 1;
 		   index_fast_col++)
 		{
-		  {
 		    if (config[index_fast_col + 1].rad_rate > 1.e15)
 		      {
 			fast_line.gl = config[index_lvl].g;
@@ -1518,7 +1556,6 @@ macro_pops (xplasma, xne)
 			rate_matrix[upper][upper] += -1. * rate;
 			rate_matrix[lower][upper] += rate;
 		      }
-		  }
 		}
 
 	      for (index_lvl = ion[index_ion].first_nlte_level;

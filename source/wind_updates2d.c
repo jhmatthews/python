@@ -312,6 +312,8 @@ WindPtr (w);
 
       ion_abundances (&plasmamain[n], geo.ioniz_mode);
 
+ 
+
 
 
       /* Perform checks to see how much temperatures have changed in this iteration */
@@ -1053,6 +1055,9 @@ wind_rad_init ()
       /* End of added material. */
     }
 
+
+  if (geo.rt_mode == 2)
+    setup_superlevels();		// reinitialise the superlevels
 
   return (0);
 }

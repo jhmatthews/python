@@ -482,6 +482,10 @@ double setup_dfudge(void);
 int setup_windcone(void);
 int setup_created_files(void);
 int get_standard_care_factors(void);
+/* superlevel.c */
+int choose_superlevel_deactivation(PlasmaPtr xplasma, int uplvl);
+int setup_superlevels(void);
+int get_superlevel_threshold(PlasmaPtr xplasma, int nion);
 /* py_wind_sub.c */
 int zoom(int direction);
 int overview(WindPtr w, char rootname[]);
@@ -541,7 +545,6 @@ int macro_summary(WindPtr w, char rootname[], int ochoice);
 int ion_overview(int icell);
 int config_overview(int n, int icell);
 int depcoef_overview(int icell);
-int copy_plasma(PlasmaPtr x1, PlasmaPtr x2);
 int depcoef_overview_specific(int version, int nconfig, WindPtr w, char rootname[], int ochoice);
 int level_popsoverview(int nplasma, WindPtr w, char rootname[], int ochoice);
 int level_emissoverview(int nlev, WindPtr w, char rootname[], int ochoice);
