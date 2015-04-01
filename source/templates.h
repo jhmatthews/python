@@ -545,6 +545,7 @@ int macro_summary(WindPtr w, char rootname[], int ochoice);
 int ion_overview(int icell);
 int config_overview(int n, int icell);
 int depcoef_overview(int icell);
+int copy_plasma(PlasmaPtr x1, PlasmaPtr x2);
 int depcoef_overview_specific(int version, int nconfig, WindPtr w, char rootname[], int ochoice);
 int level_popsoverview(int nplasma, WindPtr w, char rootname[], int ochoice);
 int level_emissoverview(int nlev, WindPtr w, char rootname[], int ochoice);

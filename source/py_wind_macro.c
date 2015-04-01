@@ -506,6 +506,51 @@ depcoef_overview (icell)
 }
 
 
+/**************************************************************************
+
+  Synopsis:  
+
+  Routine to copy the necessary parts of a plasma structure for computing 
+  a set of level populations. x1 points to the cell from which data is copied 
+  and x2 points to the cell to which data is copied.
+  
+  Description:  
+
+  Arguments:  
+
+  Returns:
+
+  Notes:
+
+  History:
+ ************************************************************************/
+
+
+int
+copy_plasma (x1, x2)
+     PlasmaPtr x1, x2;
+{
+  x2->nwind = x1->nwind;
+  x2->nplasma = x1->nplasma;
+  x2->ne = x1->ne;
+  x2->rho = x1->rho;
+  x2->vol = x1->vol;
+  x2->t_r = x1->t_r;
+  x2->t_e = x1->t_e;
+  x2->w = x1->w;
+
+  /* JM 1409 -- added this for depcoef_overview_specific */
+  x2->partition = x1->partition;
+  x2->density = x1->density;
+
+  /* Note this isn't everything in the cell! 
+     Only the things needed for these routines */
+
+  return (0);
+}
+
+
+
 
 /**************************************************************************
 
