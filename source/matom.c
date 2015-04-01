@@ -172,11 +172,11 @@ matom (p, nres, escape)
       /* If the upper level is in the superlevel for this macro-atom then choose
          a new upper level according to Boltzmann populations */
 	  in_superlevel = 0;
-	  // if (uplvl >= mplasma->superlevel_threshold[config[uplvl].nion] && ion[config[uplvl].nion].has_superlevel == 1)
-	  // {
-	  // 	uplvl = choose_superlevel_deactivation (xplasma, uplvl);
-	  // 	in_superlevel = 1;
-	  // }
+	  if (uplvl >= mplasma->superlevel_threshold[config[uplvl].nion] && ion[config[uplvl].nion].has_superlevel == 1)
+	  {
+	  	uplvl = choose_superlevel_deactivation (xplasma, uplvl);
+	  	in_superlevel = 1;
+	  }
 
       /*  The excited configuration is now known. Now compute all the probabilities of deactivation
          /jumping from this configuration. Then choose one. */
