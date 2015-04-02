@@ -232,6 +232,7 @@ q21 (line_ptr, t)
 {
   double gaunt;
   double omega;
+  double f;
 
 
   if (q21_line_ptr != line_ptr || t != q21_t_old)
@@ -248,11 +249,19 @@ q21 (line_ptr, t)
          gaunt = 0.2;
          } */
 
+     f = line_ptr->f;
+     if (line_ptr->z == 2 && line_ptr->istate == 1)
+     {
+       if (config[line_ptr->nconfigl].ilv > 1 && config[line_ptr->nconfigu].ilv < 6)
+        {
+          f = 1e3;
+        }
+     }
 
 
       gaunt = 1;
       omega =
-	ECS_CONSTANT * line_ptr->gl * gaunt * line_ptr->f / line_ptr->freq;
+	ECS_CONSTANT * line_ptr->gl * gaunt * f / line_ptr->freq;
       q21_a = 8.629e-6 / (sqrt (t) * line_ptr->gu) * omega;
       q21_t_old = t;
     }
