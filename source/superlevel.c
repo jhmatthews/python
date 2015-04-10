@@ -48,7 +48,7 @@ int choose_superlevel_deactivation (xplasma, uplvl)
      then we need to calculate the sum of downwards probabilities out of the 
      levels in the superlevel */
   if (mplasma->jprobs_down_known[nion] == 0)
-    calculate_downwards_jumps(mplasma, nion);
+    calculate_downwards_jumps(xplasma, nion);
 
   /* generate random numbers and loop over all superlevel levels */
   run_tot = 0.0;
@@ -61,7 +61,7 @@ int choose_superlevel_deactivation (xplasma, uplvl)
   while (run_tot < threshold && n < ground + ion[nion].nlte)
 	{ 
 	  /* keep looping til we hit the random number. note division by g */
-	  run_tot += mplasma->superlevel_lte_pops[n] / config[n].g;
+	  run_tot += mplasma->jprobs_down[n] * mplasma->superlevel_lte_pops[n] / config[n].g;
 	  n++;
 	}
   
@@ -259,7 +259,7 @@ int calculate_downwards_jumps(xplasma, nion)
   MacroPtr mplasma;
   LinePtr line_ptr;
   int ground, threshold, lastden, n, nbbd, uplvl;
-  double rad_rate, coll_rate, bb_cont, t_e, ne;
+  double rad_rate, coll_rate, bb_cont, t_e, ne, E_upper, sum_probs;
   //double jprbs_sums[NLEVELS_MACRO], eprbs_sums[NLEVELS_MACRO];
 
   mplasma = &macromain[xplasma->nplasma];
@@ -271,10 +271,14 @@ int calculate_downwards_jumps(xplasma, nion)
   threshold = ion[nion].nlte + ground - 1;
 
   threshold = mplasma->superlevel_threshold[nion];
+  sum_probs = 0.0;
+
   for (uplvl = threshold + 1; uplvl < ion[nion].nlte + ground; uplvl++)
   {
 
     nbbd = config[uplvl].n_bbd_jump;
+
+    E_upper = config[uplvl].ex;
 
     for (n = 0; n < nbbd; n++)
     {
@@ -284,12 +288,20 @@ int calculate_downwards_jumps(xplasma, nion)
       coll_rate = q21 (line_ptr, t_e);  // this is multiplied by ne below
 
       bb_cont = rad_rate + (coll_rate * ne);
-      mplasma->jprobs_down[uplvl] += bb_cont * config[line_ptr->nconfigl].ex;  //energy of lower state
 
-      /* what do we do about emisson? */
+      /* we now multiply by the energy of the *upper* state. The reason for this is that
+         what we care about is the sum of the jumping and emission probabilities. 
+         emission ~ E_u - E_l, and jumping ~ E_l, so this means jumping + emission ~ E_u. */
+      mplasma->jprobs_down[uplvl] += bb_cont * config[line_ptr->nconfigu].ex;  
+
+      /* JM: what do we do about emisson in higher levels? unlikely, but should be improved */
       //eprbs_sums[uplvl] += bb_cont * (config[uplvl].ex - config[line[config[uplvl].bbd_jump[n]].nconfigl].ex);
     }
+
+    sum_probs += mplasma->jprobs_down[uplvl];
   }
+
+  mplasma->superlevel_norm[nion] *= sum_probs;    // multiply the normalisation by the sum 
 
   return 0;
 }
