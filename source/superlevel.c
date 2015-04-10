@@ -44,6 +44,12 @@ int choose_superlevel_deactivation (xplasma, uplvl)
   mplasma = &macromain[xplasma->nplasma];
   nion = config[uplvl].nion;
 
+  /* if this is the first time we've entered this routine for this macro-atom
+     then we need to calculate the sum of downwards probabilities out of the 
+     levels in the superlevel */
+  if (mplasma->jprobs_down_known[nion] == 0)
+    calculate_downwards_jumps(mplasma, nion);
+
   /* generate random numbers and loop over all superlevel levels */
   run_tot = 0.0;
   z = ((rand () + 0.5) / MAXRAND);
@@ -126,10 +132,13 @@ int setup_superlevels()
         ground = ion[nion].first_nlte_level;
         mplasma->superlevel_lte_pops[ground] = 1.0;
 
+        mplasma->jprobs_down_known[nion] = 0; // we calculate the jump probabilities later so not known
+
         /* now calculate the LTE ratios to ground for the other elements */
         for (n = ground + 1; n < ground + ion[nion].nlte; n++)
   	      {
             mplasma->superlevel_lte_pops[n] = (config[n].g / config[ground].g) * exp ((-config[n].ex + config[ground].ex) / kt);
+            mplasma->jprobs_down[n] = 0.0;  // we calculate the jump probabilities later so zero
   	      }
         
         /* get the threshold */
@@ -219,4 +228,68 @@ int get_superlevel_threshold(xplasma, nion)
   threshold++;
 
   return threshold;
+}
+
+
+
+
+/*****************************************************************************
+
+                        University of Southampton
+Synopsis:
+  calculate_downwards_jumps 
+
+Arguments:
+
+Returns:
+
+Description:
+
+Notes: 
+
+History:
+  1503 JM Coded
+
+************************************************************/
+
+int calculate_downwards_jumps(xplasma, nion)
+  PlasmaPtr xplasma;
+  int nion;
+{
+  MacroPtr mplasma;
+  LinePtr line_ptr;
+  int ground, threshold, lastden, n, nbbd, uplvl;
+  double rad_rate, coll_rate, bb_cont, t_e, ne;
+  //double jprbs_sums[NLEVELS_MACRO], eprbs_sums[NLEVELS_MACRO];
+
+  mplasma = &macromain[xplasma->nplasma];
+  t_e = xplasma->t_e;
+  ne = xplasma->ne;
+
+  ground = ion[nion].first_nlte_level;
+  lastden = ion[nion].first_levden + ion[nion].nlte - 1;
+  threshold = ion[nion].nlte + ground - 1;
+
+  threshold = mplasma->superlevel_threshold[nion];
+  for (uplvl = threshold + 1; uplvl < ion[nion].nlte + ground; uplvl++)
+  {
+
+    nbbd = config[uplvl].n_bbd_jump;
+
+    for (n = 0; n < nbbd; n++)
+    {
+      line_ptr = &line[config[uplvl].bbd_jump[n]];
+
+      rad_rate = (a21 (line_ptr) * p_escape (line_ptr, xplasma));
+      coll_rate = q21 (line_ptr, t_e);  // this is multiplied by ne below
+
+      bb_cont = rad_rate + (coll_rate * ne);
+      mplasma->jprobs_down[uplvl] += bb_cont * config[line_ptr->nconfigl].ex;  //energy of lower state
+
+      /* what do we do about emisson? */
+      //eprbs_sums[uplvl] += bb_cont * (config[uplvl].ex - config[line[config[uplvl].bbd_jump[n]].nconfigl].ex);
+    }
+  }
+
+  return 0;
 }

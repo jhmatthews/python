@@ -486,6 +486,7 @@ int get_standard_care_factors(void);
 int choose_superlevel_deactivation(PlasmaPtr xplasma, int uplvl);
 int setup_superlevels(void);
 int get_superlevel_threshold(PlasmaPtr xplasma, int nion);
+int calculate_downwards_jumps(PlasmaPtr xplasma, int nion);
 /* py_wind_sub.c */
 int zoom(int direction);
 int overview(WindPtr w, char rootname[]);
