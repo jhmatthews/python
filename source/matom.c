@@ -174,167 +174,19 @@ matom (p, nres, escape)
       nbfd = config[uplvl].n_bfd_jump;	// number of bf downward jumps from this transition
       nbfu = config[uplvl].n_bfu_jump;	// number of bf upward jumps from this transiion
 
-      if (prbs_known[uplvl] != 1)
+      if (mplasma->prbs_known[uplvl] != 1)
 	{
-	  /* Start by setting everything to 0  */
+	  /* If we haven't yet, calculate the jumping probabilities in this macro-atom */
+	  get_je_probs(xplasma, uplvl);
 
-	  m = 0;		//m counts the total number of possible ways to leave the level
-	  pjnorm = 0.0;		//stores the total jump probability
-	  penorm = 0.0;		//stores the total emission probability
-
-	  for (n = 0; n < nbbd + nbfd; n++)
-	    {
-	      eprbs_known[uplvl][n] = eprbs[n] = 0;	//stores the individual emission probabilities SS
-	      jprbs_known[uplvl][n] = jprbs[n] = 0;	//stores the individual jump probabilities SS
-	    }
-	  for (n = nbbd + nbfd; n < nbbd + nbfd + nbbu + nbfu; n++)
-	    {
-	      jprbs_known[uplvl][n] = jprbs[n] = 0;	/*slots for upward jumps */
-	    }
-	  /* Finished zeroing. */
-
-
-	  /* bb */
-
-	  /* First downward jumps. (I.e. those that have emission probabilities. */
-
-	  /* For bound-bound decays the jump probability is A-coeff * escape-probability * energy */
-	  /* At present the escape probability is only approximated (p_escape). This should be improved. */
-	  /* The collisional contribution to both the jumping and deactivation probabilities are now added (SS, Apr04) */
-
-	  for (n = 0; n < nbbd; n++)
-	    {
-	      line_ptr = &line[config[uplvl].bbd_jump[n]];
-
-	      rad_rate = (a21 (line_ptr) * p_escape (line_ptr, xplasma));
-	      coll_rate = q21 (line_ptr, t_e);	// this is multiplied by ne below
-
-	      if (coll_rate < 0)
-		{
-		  coll_rate = 0;
-		}
-
-	      bb_cont = rad_rate + (coll_rate * ne);
-	      jprbs_known[uplvl][m] = jprbs[m] = bb_cont * config[line_ptr->nconfigl].ex;	//energy of lower state
-
-	      eprbs_known[uplvl][m] = eprbs[m] = bb_cont * (config[uplvl].ex - config[line[config[uplvl].bbd_jump[n]].nconfigl].ex);	//energy difference
-
-	      if (jprbs[m] < 0.)	//test (can be deleted eventually SS)
-		{
-		  Error ("Negative probability (matom, 1). Abort.");
-		  exit (0);
-		}
-	      if (eprbs[m] < 0.)	//test (can be deleted eventually SS)
-		{
-		  Error ("Negative probability (matom, 2). Abort.");
-		  exit (0);
-		}
-
-	      pjnorm += jprbs[m];
-	      penorm += eprbs[m];
-	      m++;
-	    }
-
-	  /* bf */
-	  for (n = 0; n < nbfd; n++)
-	    {
-
-	      cont_ptr = &phot_top[config[uplvl].bfd_jump[n]];	//pointer to continuum
-	      if (n < 25)
-		{
-		  sp_rec_rate = mplasma->recomb_sp[config[uplvl].bfd_indx_first + n];	//need this twice so store it
-		  bf_cont =
-		    (sp_rec_rate + q_recomb (cont_ptr, t_e) * ne) * ne;
-		}
-	      else
-		{
-		  bf_cont = 0.0;
-		}
-
-	      jprbs_known[uplvl][m] = jprbs[m] = bf_cont * config[phot_top[config[uplvl].bfd_jump[n]].nlev].ex;	//energy of lower state
-	      eprbs_known[uplvl][m] = eprbs[m] = bf_cont * (config[uplvl].ex - config[phot_top[config[uplvl].bfd_jump[n]].nlev].ex);	//energy difference
-	      if (jprbs[m] < 0.)	//test (can be deleted eventually SS)
-		{
-		  Error ("Negative probability (matom, 3). Abort.");
-		  exit (0);
-		}
-	      if (eprbs[m] < 0.)	//test (can be deleted eventually SS)
-		{
-		  Error ("Negative probability (matom, 4). Abort.");
-		  exit (0);
-		}
-	      pjnorm += jprbs[m];
-	      penorm += eprbs[m];
-	      m++;
-	    }
-
-	  /* Now upwards jumps. */
-
-	  /* bb */
-	  /* For bound-bound excitation the jump probability is B-coeff times Jbar with a correction 
-	     for stimulated emission. To avoid the need for recalculation all the time, the code will
-	     be designed to include the stimulated correction in Jbar - i.e. the stimulated correction
-	     factor will NOT be included here. (SS) */
-	  /* There is no emission probability for upwards transitions. */
-	  /* Collisional contribution to jumping probability added. (SS,Apr04) */
-
-	  for (n = 0; n < nbbu; n++)
-	    {
-	      line_ptr = &line[config[uplvl].bbu_jump[n]];
-	      rad_rate =
-		(b12 (line_ptr) *
-		 mplasma->jbar_old[config[uplvl].bbu_indx_first + n]);
-
-	      coll_rate = q12 (line_ptr, t_e);	// this is multiplied by ne below
-
-	      if (coll_rate < 0)
-		{
-		  coll_rate = 0;
-		}
-
-	      jprbs_known[uplvl][m] = jprbs[m] = ((rad_rate) + (coll_rate * ne)) * config[uplvl].ex;	//energy of lower state
-
-
-
-	      if (jprbs[m] < 0.)	//test (can be deleted eventually SS)
-		{
-		  Error ("Negative probability (matom, 5). Abort.");
-		  exit (0);
-		}
-	      pjnorm += jprbs[m];
-	      m++;
-	    }
-
-	  /* bf */
-	  for (n = 0; n < nbfu; n++)
-	    {
-	      /* For bf ionization the jump probability is just gamma * energy
-	         gamma is the photoionisation rate. Stimulated recombination also included. */
-	      cont_ptr = &phot_top[config[uplvl].bfu_jump[n]];	//pointer to continuum
-
-	      jprbs_known[uplvl][m] = jprbs[m] = (mplasma->gamma_old[config[uplvl].bfu_indx_first + n] - (mplasma->alpha_st_old[config[uplvl].bfu_indx_first + n] * xplasma->ne * den_config (xplasma, cont_ptr->uplev) / den_config (xplasma, cont_ptr->nlev)) + (q_ioniz (cont_ptr, t_e) * ne)) * config[uplvl].ex;	//energy of lower state
-	      if (jprbs[m] < 0.)	//test (can be deleted eventually SS)
-		{
-		  Error ("Negative probability (matom, 6). Abort?\n");
-		  Log
-		    ("mplasma->gamma_old[uplvl][n] %g, (mplasma->alpha_st_old[uplvl][n] * xplasma->ne * den_config (xplasma, cont_ptr->uplev) / den_config (xplasma, cont_ptr->nlev)) %g\n",
-		     mplasma->gamma_old[config[uplvl].bfu_indx_first + n],
-		     (mplasma->alpha_st_old[config[uplvl].bfu_indx_first +
-					    n] * xplasma->ne *
-		      den_config (xplasma,
-				  cont_ptr->uplev) / den_config (xplasma,
-								 cont_ptr->
-								 nlev)));
-		  jprbs_known[uplvl][m] = jprbs[m] = 0.0;
-
-		}
-	      pjnorm += jprbs[m];
-	      m++;
-	    }
+	  /* work out the *net* rates- i.e. if two large rates go in either direction then
+	     subtract them */
+	  //make_net_probs(mplasma, uplvl);
+    }
 
 	  pjnorm_known[uplvl] = pjnorm;
 	  penorm_known[uplvl] = penorm;
-	  prbs_known[uplvl] = 1;
+	  mplasma->prbs_known[uplvl] = 1;
 
 	}
 
@@ -510,6 +362,251 @@ matom (p, nres, escape)
 
   return (0);
 }
+
+
+
+/************************************************************
+                                    Imperial College London
+Synopsis:
+
+Arguments:
+
+       WindPtr w                   the ptr to the structure defining the wind
+       PhotPtr p                   the packet at the point of activation
+       int nres                    the process which activates the Macro Atom
+
+Returns:
+       int nres                    the process by which deactivation occurs
+       PhotPtr p                   the packet following deactivation
+       int escape                  indicated whether removal of k-packet was by creating
+                                   an r-packet (escape = 1) or by exciting a macro atom
+                                   (escape = 0)
+
+Description:
+
+
+Notes: 
+
+
+History:
+          Mar 04  SS   Coding began.
+          Apr 04  SS   Various improvements including the addition of ff and collisions.
+          May 04  SS   Minor changes made to collisional cooling rates (bug fixed)
+                       and fb cooling for simple continua.
+          May 04  SS   Modified to work for case with all "simple" ions.
+          May 04  SS   Modified to use "scattering probability" formalism for 
+                       simple ion cooling rates.
+          Jun 04  SS   Modified to include the "escape" variable to identify excitation of
+                       macro atoms. This removes the need to call matom from within this routine.
+          Jun 04  SS   Modified to include collisional ionization as a cooling term.
+          July04  SS   Modified to use recomb_sp(_e) rather than alpha_sp(_e) to speed up.
+	06may	ksl	57+ -- Modified to use new plasma array.  Eliminated passing
+			entire w array
+	131030	JM 		-- Added adiabatic cooling as possible kpkt destruction choice
+          
+************************************************************/
+
+int get_je_probs(xplasma, uplvl, jprbs_known, eprbs_known);
+    PlasmaPtr xplasma;
+    int uplvl;
+{
+  int m, n, nbbd, nbbu, nbfd, nbfu;
+  double rad_rate, ne, t_e, coll_rate, bb_cont;
+  double pjnorm, penorm;
+  double jprbs[2 * (NBBJUMPS + NBFJUMPS)];
+  double eprbs[NBBJUMPS + NBFJUMPS];
+  double jprbs_known[NLEVELS_MACRO][2 * (NBBJUMPS + NBFJUMPS)],
+    eprbs_known[NLEVELS_MACRO][2 * (NBBJUMPS + NBFJUMPS)];
+
+  nbbd = config[uplvl].n_bbd_jump;	//store these for easy access -- number of bb downward jumps
+  nbbu = config[uplvl].n_bbu_jump;	// number of bb upward jump from this configuration
+  nbfd = config[uplvl].n_bfd_jump;	// number of bf downward jumps from this transition
+  nbfu = config[uplvl].n_bfu_jump;	// number of bf upward jumps from this transiion
+
+  /* Start by setting everything to 0  */
+  m = 0;		//m counts the total number of possible ways to leave the level
+  pjnorm = 0.0;		//stores the total jump probability
+  penorm = 0.0;		//stores the total emission probability
+
+  for (n = 0; n < nbbd + nbfd; n++)
+    {
+      eprbs_known[uplvl][n] = eprbs[n] = 0;	//stores the individual emission probabilities SS
+      jprbs_known[uplvl][n] = jprbs[n] = 0;	//stores the individual jump probabilities SS
+    }
+  for (n = nbbd + nbfd; n < nbbd + nbfd + nbbu + nbfu; n++)
+    {
+      jprbs_known[uplvl][n] = jprbs[n] = 0;	/*slots for upward jumps */
+    }
+  /* Finished zeroing. */
+
+
+  /* bb */
+
+  /* First downward jumps. (I.e. those that have emission probabilities. */
+
+  /* For bound-bound decays the jump probability is A-coeff * escape-probability * energy */
+  /* At present the escape probability is only approximated (p_escape). This should be improved. */
+  /* The collisional contribution to both the jumping and deactivation probabilities are now added (SS, Apr04) */
+
+  for (n = 0; n < nbbd; n++)
+    {
+      line_ptr = &line[config[uplvl].bbd_jump[n]];
+
+      rad_rate = (a21 (line_ptr) * p_escape (line_ptr, xplasma));
+      coll_rate = q21 (line_ptr, t_e);	// this is multiplied by ne below
+
+      if (coll_rate < 0)
+	{
+	  coll_rate = 0;
+	}
+
+      bb_cont = rad_rate + (coll_rate * ne);
+      jprbs_known[uplvl][m] = jprbs[m] = bb_cont * config[line_ptr->nconfigl].ex;	//energy of lower state
+
+      eprbs_known[uplvl][m] = eprbs[m] = bb_cont * (config[uplvl].ex - config[line[config[uplvl].bbd_jump[n]].nconfigl].ex);	//energy difference
+
+      if (jprbs[m] < 0.)	//test (can be deleted eventually SS)
+	{
+	  Error ("Negative probability (matom, 1). Abort.");
+	  exit (0);
+	}
+      if (eprbs[m] < 0.)	//test (can be deleted eventually SS)
+	{
+	  Error ("Negative probability (matom, 2). Abort.");
+	  exit (0);
+	}
+
+      pjnorm += jprbs[m];
+      penorm += eprbs[m];
+      m++;
+    }
+
+  /* bf */
+  for (n = 0; n < nbfd; n++)
+    {
+
+      cont_ptr = &phot_top[config[uplvl].bfd_jump[n]];	//pointer to continuum
+      if (n < 25)
+	{
+	  sp_rec_rate = mplasma->recomb_sp[config[uplvl].bfd_indx_first + n];	//need this twice so store it
+	  bf_cont =
+	    (sp_rec_rate + q_recomb (cont_ptr, t_e) * ne) * ne;
+	}
+      else
+	{
+	  bf_cont = 0.0;
+	}
+
+      jprbs_known[uplvl][m] = jprbs[m] = bf_cont * config[phot_top[config[uplvl].bfd_jump[n]].nlev].ex;	//energy of lower state
+      eprbs_known[uplvl][m] = eprbs[m] = bf_cont * (config[uplvl].ex - config[phot_top[config[uplvl].bfd_jump[n]].nlev].ex);	//energy difference
+      if (jprbs[m] < 0.)	//test (can be deleted eventually SS)
+	{
+	  Error ("Negative probability (matom, 3). Abort.");
+	  exit (0);
+	}
+      if (eprbs[m] < 0.)	//test (can be deleted eventually SS)
+	{
+	  Error ("Negative probability (matom, 4). Abort.");
+	  exit (0);
+	}
+      pjnorm += jprbs[m];
+      penorm += eprbs[m];
+      m++;
+    }
+
+  /* Now upwards jumps. */
+
+  /* bb */
+  /* For bound-bound excitation the jump probability is B-coeff times Jbar with a correction 
+     for stimulated emission. To avoid the need for recalculation all the time, the code will
+     be designed to include the stimulated correction in Jbar - i.e. the stimulated correction
+     factor will NOT be included here. (SS) */
+  /* There is no emission probability for upwards transitions. */
+  /* Collisional contribution to jumping probability added. (SS,Apr04) */
+
+  for (n = 0; n < nbbu; n++)
+    {
+      line_ptr = &line[config[uplvl].bbu_jump[n]];
+      rad_rate =
+	(b12 (line_ptr) *
+	 mplasma->jbar_old[config[uplvl].bbu_indx_first + n]);
+
+      coll_rate = q12 (line_ptr, t_e);	// this is multiplied by ne below
+
+      if (coll_rate < 0)
+	{
+	  coll_rate = 0;
+	}
+
+      jprbs_known[uplvl][m] = jprbs[m] = ((rad_rate) + (coll_rate * ne)) * config[uplvl].ex;	//energy of lower state
+
+
+
+      if (jprbs[m] < 0.)	//test (can be deleted eventually SS)
+	{
+	  Error ("Negative probability (matom, 5). Abort.");
+	  exit (0);
+	}
+      pjnorm += jprbs[m];
+      m++;
+    }
+
+  /* bf */
+  for (n = 0; n < nbfu; n++)
+    {
+      /* For bf ionization the jump probability is just gamma * energy
+         gamma is the photoionisation rate. Stimulated recombination also included. */
+      cont_ptr = &phot_top[config[uplvl].bfu_jump[n]];	//pointer to continuum
+
+      jprbs_known[uplvl][m] = jprbs[m] = (mplasma->gamma_old[config[uplvl].bfu_indx_first + n] - (mplasma->alpha_st_old[config[uplvl].bfu_indx_first + n] * xplasma->ne * den_config (xplasma, cont_ptr->uplev) / den_config (xplasma, cont_ptr->nlev)) + (q_ioniz (cont_ptr, t_e) * ne)) * config[uplvl].ex;	//energy of lower state
+      if (jprbs[m] < 0.)	//test (can be deleted eventually SS)
+	{
+	  Error ("Negative probability (matom, 6). Abort?\n");
+	  Log
+	    ("mplasma->gamma_old[uplvl][n] %g, (mplasma->alpha_st_old[uplvl][n] * xplasma->ne * den_config (xplasma, cont_ptr->uplev) / den_config (xplasma, cont_ptr->nlev)) %g\n",
+	     mplasma->gamma_old[config[uplvl].bfu_indx_first + n],
+	     (mplasma->alpha_st_old[config[uplvl].bfu_indx_first +
+				    n] * xplasma->ne *
+	      den_config (xplasma,
+			  cont_ptr->uplev) / den_config (xplasma,
+							 cont_ptr->
+							 nlev)));
+	  jprbs_known[uplvl][m] = jprbs[m] = 0.0;
+
+	}
+      pjnorm += jprbs[m];
+      m++;
+    }
+
+  return 0;
+}
+
+
+
+// int make_net_probs(xplasma, uplvl, jprbs, eprbs)
+//     PlasmaPtr xplasma;
+//     int uplvl;
+// {
+//   /* first do bound bound */
+//   nbbd = config[uplvl].n_bbd_jump;	//store these for easy access -- number of bb downward jumps
+//   nbbu = config[uplvl].n_bbu_jump;	// number of bb upward jump from this configuration
+//   nbfd = config[uplvl].n_bfd_jump;	// number of bf downward jumps from this transition
+//   nbfu = config[uplvl].n_bfu_jump;	// number of bf upward jumps from this transiton
+
+//   m = 0;
+
+//   for (n = 0; n < nbbd; n++)
+//   {
+//   	line_ptr = &line[config[uplvl].bbd_jump[n]];
+
+
+
+//   }
+  
+
+
+// }
+
 
 /********************************************************************************/
 

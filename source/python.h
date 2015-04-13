@@ -797,9 +797,11 @@ typedef struct macro
   double cooling_ff;
   double cooling_adiabatic;     // this is just lum_adiabatic / vol / ne
 
-  double lte_pops[NLEVELS_MACRO]; /* a store of LTE level populations for the macro atom. */ 
-  double lte_pops_norm;
-
+  double *jprbs_known;
+  double *eprbs_known;
+  double *pjnorm;
+  double *penorm;
+  double *prbs_known;
 } macro_dummy, *MacroPtr;
 
 MacroPtr macromain;
