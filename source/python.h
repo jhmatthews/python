@@ -797,11 +797,20 @@ typedef struct macro
   double cooling_ff;
   double cooling_adiabatic;     // this is just lum_adiabatic / vol / ne
 
-  double *jprbs_known;
-  double *eprbs_known;
-  double *pjnorm;
-  double *penorm;
-  double *prbs_known;
+  // double *jprbs_known;
+  // double *eprbs_known;
+  // double *pjnorm;
+  // double *penorm;
+  // double *prbs_known;
+
+  double pjnorm[NLEVELS_MACRO];
+  double pjnorm_net[NLEVELS_MACRO];
+  double penorm[NLEVELS_MACRO];
+  double jprbs_known[NLEVELS_MACRO][2 * (NBBJUMPS + NBFJUMPS)];
+  double eprbs_known[NLEVELS_MACRO][NBBJUMPS + NBFJUMPS];
+  int prbs_known[NLEVELS_MACRO];
+  int use_net_rates;
+
 } macro_dummy, *MacroPtr;
 
 MacroPtr macromain;

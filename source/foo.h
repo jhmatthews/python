@@ -308,6 +308,7 @@ double timer(void);
 int get_time(char curtime[]);
 /* matom.c */
 int matom(PhotPtr p, int *nres, int *escape);
+int get_je_probs(PlasmaPtr xplasma, int uplvl);
 double b12(struct lines *line_ptr);
 double alpha_sp(struct topbase_phot *cont_ptr, PlasmaPtr xplasma, int ichoice);
 double alpha_sp_integrand(double freq);
