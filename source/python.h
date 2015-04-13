@@ -803,6 +803,8 @@ typedef struct macro
   // double *penorm;
   // double *prbs_known;
 
+  /* these are the arrays and so on for storing macro atom jumping probabilities */
+  /* as these can take up a lot of memory we should try and only do it where necessary */
   double pjnorm[NLEVELS_MACRO];
   double pjnorm_net[NLEVELS_MACRO];
   double penorm[NLEVELS_MACRO];

@@ -121,6 +121,7 @@ matom (p, nres, escape)
   //int prbs_known[NLEVELS_MACRO];
 
 
+
   // for (n = 0; n < NLEVELS_MACRO; n++)
   //   {
   //     prbs_known[n] = -1;	//flag all as unknown
@@ -132,6 +133,7 @@ matom (p, nres, escape)
   check_plasma (xplasma, "matom");
 
   mplasma = &macromain[xplasma->nplasma];
+
 
 
   t_e = xplasma->t_e;		//electron temperature 

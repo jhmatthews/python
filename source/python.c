@@ -556,7 +556,7 @@ main (argc, argv)
       exit (0);
     }
 
-
+  Log("size %10d\n", sizeof (macromain[0].jprbs_known));
   /* 57h -- Next line prevents bf calculation of macro_estimaters when no macro atoms are present.   */
 
   if (nlevels_macro == 0)
