@@ -983,6 +983,7 @@ wind_rad_init ()
 
       for (i = 0; i < nlevels_macro; i++)	//57h
 	{
+	  macromain[n].prbs_known[i] = 0.0;
 	  for (njump = 0; njump < config[i].n_bbu_jump; njump++)
 	    {
 	      macromain[n].jbar[config[i].bbu_indx_first + njump] = 0.0;	// mean intensity

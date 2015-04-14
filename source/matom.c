@@ -194,7 +194,7 @@ matom (p, nres, escape)
 
       threshold = ((rand () + 0.5) / MAXRAND);
 
-      if ((mplasma->pjnorm[uplvl] + mplasma->penorm[uplvl]) <= 0.0)
+      if ((mplasma->pjnorm_net[uplvl] + mplasma->penorm[uplvl]) <= 0.0)
 	{
 	  Error ("matom: macro atom level has no way out %d %g %g\n", uplvl,
 		 mplasma->pjnorm[uplvl], mplasma->penorm[uplvl]);
@@ -202,9 +202,9 @@ matom (p, nres, escape)
 	}
 
       /* for the threshold we are concerned about the total rates, so use the right normalisation */
-      if (((mplasma->pjnorm[uplvl] /
-	    (mplasma->pjnorm[uplvl] + mplasma->penorm[uplvl])) < threshold)
-	  || (mplasma->pjnorm[uplvl] == 0))
+      if (((mplasma->pjnorm_net[uplvl] /
+	    (mplasma->pjnorm_net[uplvl] + mplasma->penorm[uplvl])) < threshold)
+	  || (mplasma->pjnorm_net[uplvl] == 0))
 	break;			// An emission occurs and so we leave the for loop.
 
       uplvl_old = uplvl;
@@ -488,6 +488,7 @@ int get_je_probs(xplasma, uplvl)
 	  exit (0);
 	}
 	  
+	rate_in = 0.0;
 	if (mplasma->use_net_rates == 1) // then we are worried about *net* rates
 	{
 	  /* identify the lower level */
@@ -504,9 +505,9 @@ int get_je_probs(xplasma, uplvl)
   	  {
   	  	rad_rate_in = b12 (line_ptr) * mplasma->jbar_old[config[lower].bbu_indx_first + nn];
   	  	coll_rate_in = ne * q12 (line_ptr, t_e);
-  	  	rate_in = rad_rate_in + coll_rate_in;
-
-  	  	if (rate_in > mplasma->jprbs_known[uplvl][m])
+  	  	rate_in = (rad_rate_in + coll_rate_in) * config[line_ptr->nconfigl].ex;
+        
+  	  	if (rate_in >= mplasma->jprbs_known[uplvl][m])
   	  	{
           mplasma->jprbs_known[uplvl][m] = 0.0;
           //jprbs_known[lower][nn] = rate_up - jprbs_known[uplvl][m];
@@ -519,6 +520,7 @@ int get_je_probs(xplasma, uplvl)
   	  }
   	}
     }
+      //Log("JMRATE u %i l %i rate %8.4e net_rate %8.4e old %8.4e\n", uplvl, lower, rate_in, mplasma->jprbs_known[uplvl][m], bb_cont*config[line_ptr->nconfigl].ex);
       
       mplasma->pjnorm[uplvl] += jprbs[m];
       mplasma->pjnorm_net[uplvl] += mplasma->jprbs_known[uplvl][m];
@@ -594,12 +596,13 @@ int get_je_probs(xplasma, uplvl)
 	  exit (0);
 	}
 
+      rate_in = 0.0;
       if (mplasma->use_net_rates == 1) // then we are worried about *net* rates
 	{
 	  /* identify the upper level */
 	  upper = line_ptr->nconfigu;
 
-      /* cycle through all the bbu jumps from the lower level
+      /* cycle through all the bbd jumps from the lower level
          and if there is one in the opposite direction then 
          worry about the net rate */
 	  for (nn = 0; nn < config[upper].n_bbd_jump; nn++)
@@ -610,9 +613,9 @@ int get_je_probs(xplasma, uplvl)
   	  {
   	  	rad_rate_in = a21 (line_ptr) * p_escape (line_ptr, xplasma);
   	  	coll_rate_in = ne * q21 (line_ptr, t_e);
-  	  	rate_in = rad_rate_in + coll_rate_in;
+  	  	rate_in = (rad_rate_in + coll_rate_in) * config[uplvl].ex; //energy of lower state
 
-  	  	if (rate_in > mplasma->jprbs_known[uplvl][m])
+  	  	if (rate_in >= mplasma->jprbs_known[uplvl][m])
   	  	{
           mplasma->jprbs_known[uplvl][m] = 0.0;
           //jprbs_known[lower][nn] = rate_up - jprbs_known[uplvl][m];
@@ -625,6 +628,7 @@ int get_je_probs(xplasma, uplvl)
   	  }
   	}
     }
+      //Log("JMRATE l %i u %i rate %8.4e net_rate %8.4e old %8.4e\n", uplvl, upper, rate_in, mplasma->jprbs_known[uplvl][m], ((rad_rate) + (coll_rate * ne)) * config[uplvl].ex);
 
       mplasma->pjnorm[uplvl] += jprbs[m];
       mplasma->pjnorm_net[uplvl] += mplasma->jprbs_known[uplvl][m];
