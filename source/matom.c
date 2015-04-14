@@ -435,7 +435,7 @@ int get_je_probs(xplasma, uplvl)
   mplasma->penorm[uplvl]  = 0.0;		//stores the total emission probability
   mplasma->pjnorm_net[uplvl] = 0.0;
 
-  if (xplasma->ne > 1e8)
+  if (xplasma->ne > 1)
     mplasma->use_net_rates = 1;
   else
   	mplasma->use_net_rates = 0;
@@ -489,10 +489,11 @@ int get_je_probs(xplasma, uplvl)
 	}
 	  
 	rate_in = 0.0;
+	lower = line_ptr->nconfigl;
 	if (mplasma->use_net_rates == 1) // then we are worried about *net* rates
 	{
 	  /* identify the lower level */
-	  lower = line_ptr->nconfigl;
+
 
       /* cycle through all the bbu jumps from the lower level
          and if there is one in the opposite direction then 
@@ -520,7 +521,7 @@ int get_je_probs(xplasma, uplvl)
   	  }
   	}
     }
-      //Log("JMRATE u %i l %i rate %8.4e net_rate %8.4e old %8.4e\n", uplvl, lower, rate_in, mplasma->jprbs_known[uplvl][m], bb_cont*config[line_ptr->nconfigl].ex);
+      Log("JMRATE bbd from %i to %i net_rate %8.4e rate %8.4e e_rate %8.4e\n", uplvl, line_ptr->nconfigl, mplasma->jprbs_known[uplvl][m], bb_cont * config[uplvl].ex, mplasma->eprbs_known[uplvl][m]);
       
       mplasma->pjnorm[uplvl] += jprbs[m];
       mplasma->pjnorm_net[uplvl] += mplasma->jprbs_known[uplvl][m];
@@ -556,10 +557,13 @@ int get_je_probs(xplasma, uplvl)
 	  Error ("Negative probability (matom, 4). Abort.");
 	  exit (0);
 	}
+	  Log("JMRATE bfd from %i to %i net_rate %8.4e rate %8.4e e_rate %8.4e\n", uplvl, cont_ptr->nlev, mplasma->jprbs_known[uplvl][m], mplasma->jprbs_known[uplvl][m], mplasma->eprbs_known[uplvl][m]);
+
       mplasma->pjnorm[uplvl] += jprbs[m];
       mplasma->pjnorm_net[uplvl] += mplasma->jprbs_known[uplvl][m];
       mplasma->penorm[uplvl] += eprbs[m];
       m++;
+
     }
 
   /* Now upwards jumps. */
@@ -628,8 +632,7 @@ int get_je_probs(xplasma, uplvl)
   	  }
   	}
     }
-      //Log("JMRATE l %i u %i rate %8.4e net_rate %8.4e old %8.4e\n", uplvl, upper, rate_in, mplasma->jprbs_known[uplvl][m], ((rad_rate) + (coll_rate * ne)) * config[uplvl].ex);
-
+      Log("JMRATE bbu from %i to %i net_rate %8.4e rate %8.4e e_rate %8.4e\n", uplvl, line_ptr->nconfigu, mplasma->jprbs_known[uplvl][m], ((rad_rate) + (coll_rate * ne)) * config[uplvl].ex, mplasma->eprbs_known[uplvl][m]);
       mplasma->pjnorm[uplvl] += jprbs[m];
       mplasma->pjnorm_net[uplvl] += mplasma->jprbs_known[uplvl][m];
       m++;
@@ -645,6 +648,7 @@ int get_je_probs(xplasma, uplvl)
       cont_ptr = &phot_top[config[uplvl].bfu_jump[n]];	//pointer to continuum
 
       mplasma->jprbs_known[uplvl][m] = jprbs[m] = (mplasma->gamma_old[config[uplvl].bfu_indx_first + n] - (mplasma->alpha_st_old[config[uplvl].bfu_indx_first + n] * xplasma->ne * den_config (xplasma, cont_ptr->uplev) / den_config (xplasma, cont_ptr->nlev)) + (q_ioniz (cont_ptr, t_e) * ne)) * config[uplvl].ex;	//energy of lower state
+      Log("JMRATE bfu from %i to %i net_rate %8.4e rate %8.4e e_rate %8.4e\n", uplvl, cont_ptr->uplev, mplasma->jprbs_known[uplvl][m], mplasma->jprbs_known[uplvl][m], 0.0);
       if (jprbs[m] < 0.)	//test (can be deleted eventually SS)
 	{
 	  Error ("Negative probability (matom, 6). Abort?\n");
@@ -664,6 +668,8 @@ int get_je_probs(xplasma, uplvl)
       mplasma->pjnorm_net[uplvl] += mplasma->jprbs_known[uplvl][m];
       m++;
     }
+
+  Log_flush();
 
   return 0;
 }
