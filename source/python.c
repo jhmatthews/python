@@ -333,7 +333,7 @@ main (argc, argv)
     }
 
   xsignal (files.root, "%-20s Initializing variables for %s\n", "NOK", files.root);
-  Debug ("TIMER %8.1f Initialising variables START", timer());
+  Debug ("TIMER %8.1f Initialising variables START\n", timer());
   
   opar_stat = setup_created_files();
 
@@ -1034,7 +1034,7 @@ main (argc, argv)
 
   xsignal (files.root, "%-20s Finished initialization for %s\n", "NOK", files.root);
   check_time (files.root);
-  Debug ("TIMER %8.1f Initialising variables END", timer());
+  Debug ("TIMER %8.1f Initialising variables END\n", timer());
 
 #ifdef MPI_ON
   /* Since the wind is now set up can work out the length big arrays to help with the MPI reductions of the spectra
@@ -1121,12 +1121,12 @@ main (argc, argv)
 	   */
 	  /* JM 1409 photons_per_cycle has been removed in favour of NPHOT */
 
-      Debug ("TIMER %8.1f define_phot cycle%i START", geo.wcycle, timer());
+      Debug ("TIMER %8.1f define_phot cycle%i START\n", geo.wcycle, timer());
 	  nphot_to_define = (long) NPHOT;
 
 	  define_phot (p, freqmin, freqmax, nphot_to_define, 0, iwind, 1);
 
-	  Debug ("TIMER %8.1f define_phot cycle%i END", geo.wcycle, timer());
+	  Debug ("TIMER %8.1f define_phot cycle%i END\n", geo.wcycle, timer());
 
       /* Zero the arrays that store the heating of the disk */
 
@@ -1175,12 +1175,12 @@ main (argc, argv)
 	  if (gaunt_n_gsqrd > 0)
 	    pop_kappa_ff_array ();
 
-      Debug ("TIMER %8.1f trans_phot START", timer());
+      Debug ("TIMER %8.1f trans_phot START\n", timer());
 
 	  /* Transport the photons through the wind */
 	  trans_phot (w, p, 0);
 
-	  Debug ("TIMER %8.1f trans_phot END", timer());
+	  Debug ("TIMER %8.1f trans_phot END\n", timer());
 
 	  /*Determine how much energy was absorbed in the wind */
 	  zze = zzz = zz_adiab = 0.0;
@@ -1220,13 +1220,13 @@ main (argc, argv)
 
 #ifdef MPI_ON
 
-	Debug ("TIMER %8.1f communicate_estimators_para cycle%i START", geo.wcycle, timer());
+	Debug ("TIMER %8.1f communicate_estimators_para cycle%i START\n", geo.wcycle, timer());
 
     communicate_estimators_para ();
 
     communicate_matom_estimators_para (); // this will return 0 if nlevels_macro == 0
 
-    Debug ("TIMER %8.1f communicate_estimators_para cycle%i END", geo.wcycle, timer());
+    Debug ("TIMER %8.1f communicate_estimators_para cycle%i END\n", geo.wcycle, timer());
 #endif
 
 
@@ -1247,11 +1247,11 @@ main (argc, argv)
 
 /* This step shoudl be MPI_parallelised too */
 
-	  Debug ("TIMER %8.1f wind_update cycle%i START", geo.wcycle, timer());
+	  Debug ("TIMER %8.1f wind_update cycle%i START\n", geo.wcycle, timer());
 
       wind_update (w);
 
-      Debug ("TIMER %8.1f wind_update cycle%i END", geo.wcycle, timer());
+      Debug ("TIMER %8.1f wind_update cycle%i END\n", geo.wcycle, timer());
 
 /* In a diagnostic mode save the wind file for each cycle (from thread 0) */
 
@@ -1280,8 +1280,11 @@ main (argc, argv)
       /* Do an MPI reduce to get the spectra all gathered to the master thread */
 
 #ifdef MPI_ON
+    Debug ("TIMER %8.1f gather_spectra_para cycle%i START\n", geo.wcycle, timer());
 
     gather_spectra_para (ioniz_spec_helpers, MSPEC);
+
+    Debug ("TIMER %8.1f gather_spectra_para cycle%i END\n", geo.wcycle, timer());
 
 #endif
 
@@ -1448,11 +1451,11 @@ main (argc, argv)
        */
 
 
-      Debug ("TIMER %8.1f define_phot scycle%i START", geo.pcycle, timer());
+      Debug ("TIMER %8.1f define_phot scycle%i START\n", geo.pcycle, timer());
       nphot_to_define = (long) NPHOT * (long) geo.pcycles;
       define_phot (p, freqmin, freqmax, nphot_to_define, 1, iwind, 0);
 
-      Debug ("TIMER %8.1f define_phot scycle%i END", geo.pcycle, timer());
+      Debug ("TIMER %8.1f define_phot scycle%i END\n", geo.pcycle, timer());
 
       for (icheck = 0; icheck < NPHOT; icheck++)
 	{
@@ -1480,9 +1483,9 @@ main (argc, argv)
 
       /* Do an MPI reduce to get the spectra all gathered to the master thread */
 #ifdef MPI_ON
-      Debug ("TIMER %8.1f gather_spectra_para scycle%i START", geo.pcycle, timer());
+      Debug ("TIMER %8.1f gather_spectra_para scycle%i START\n", geo.pcycle, timer());
       gather_spectra_para(spec_spec_helpers, nspectra);
-      Debug ("TIMER %8.1f gather_spectra_para scycle%i START", geo.pcycle, timer());
+      Debug ("TIMER %8.1f gather_spectra_para scycle%i END\n", geo.pcycle, timer());
 #endif
 
 
