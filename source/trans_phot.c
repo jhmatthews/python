@@ -66,12 +66,13 @@ History:
 FILE *pltptr;
 int plinit = 0;
 
-int
-trans_phot (w, p, iextract)
-     WindPtr w;
-     PhotPtr p;
-     int iextract;		/*  0 means do not extract along specific angles; 
+int 
+trans_phot (
+    WindPtr w,
+    PhotPtr p,
+    int iextract		/*  0 means do not extract along specific angles; 
 				   nonzero implies to extract */
+)
 
 {
   double tau_scat, tau;

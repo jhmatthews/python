@@ -62,10 +62,8 @@ History:
 
 
 
-int
-partition_functions (xplasma, mode)
-     PlasmaPtr xplasma;
-     int mode;
+int 
+partition_functions (PlasmaPtr xplasma, int mode)
 {
   int nion;
   double partition ();
@@ -216,12 +214,8 @@ History:
 
 
 
-int
-partition_functions_2 (xplasma, xnion, temp, weight)
-     PlasmaPtr xplasma;
-     int xnion;
-     double temp;
-     double weight;
+int 
+partition_functions_2 (PlasmaPtr xplasma, int xnion, double temp, double weight)
 {
   int nion;
   double partition ();

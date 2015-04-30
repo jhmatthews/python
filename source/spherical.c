@@ -45,9 +45,8 @@ History:
  
 **************************************************************/
 
-double
-spherical_ds_in_cell (p)
-     PhotPtr p;
+double 
+spherical_ds_in_cell (PhotPtr p)
 
 {
 
@@ -108,9 +107,8 @@ History:
 **************************************************************/
 
 
-int
-spherical_make_grid (w)
-     WindPtr w;
+int 
+spherical_make_grid (WindPtr w)
 {
   double dr, dlogr;
   int n;
@@ -190,9 +188,8 @@ spherical_make_grid (w)
 **************************************************************/
 
 
-int
-spherical_wind_complete (w)
-     WindPtr w;
+int 
+spherical_wind_complete (WindPtr w)
 {
   int i;
 
@@ -253,10 +250,8 @@ spherical_wind_complete (w)
 #define RESOLUTION   100
 
 
-int
-spherical_volumes (w, icomp)
-     WindPtr w;
-     int icomp;
+int 
+spherical_volumes (WindPtr w, int icomp)
 {
   int i, n;
   double fraction;
@@ -373,9 +368,8 @@ spherical_volumes (w, icomp)
 
 
 
-int
-spherical_where_in_grid (x)
-     double x[];
+int 
+spherical_where_in_grid (double x[])
 {
   int n;
   double r;
@@ -422,11 +416,8 @@ spherical_where_in_grid (x)
  
 **************************************************************/
 
-int
-spherical_get_random_location (n, icomp, x)
-     int n;			// Cell in which to create position
-     int icomp;			// Component in which to create position
-     double x[];		// Returned position
+int 
+spherical_get_random_location (int n, int icomp, double x[])		// Returned position
 {
   int i, j;
   int inwind;
@@ -500,9 +491,8 @@ spherical_get_random_location (n, icomp, x)
 **************************************************************/
 
 
-int
-spherical_extend_density (w)
-     WindPtr w;
+int 
+spherical_extend_density (WindPtr w)
 {
 
   int j, n, m;
@@ -568,9 +558,8 @@ History:
 **************************************************************/
 
 
-int
-shell_make_grid (w)
-     WindPtr w;
+int 
+shell_make_grid (WindPtr w)
 {
   int n;
 

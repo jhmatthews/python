@@ -35,9 +35,8 @@
 #include "python.h"
 
 
-double
-torus_rho (x)
-     double x[];
+double 
+torus_rho (double x[])
 {
   double z;
   double rho;
@@ -63,10 +62,8 @@ ds_to_cylinder is modeled on ds_to_sphere
 110930	ksl	Began coding
 */
 
-double
-ds_to_cylinder (rho, p)
-     double rho;
-     struct photon *p;
+double 
+ds_to_cylinder (double rho, struct photon *p)
 {
   double a, b, c, root[2];
   int i;
@@ -87,9 +84,8 @@ both roots were imaginary */
 }
 
 
-double
-ds_to_torus (pp)
-     PhotPtr pp;
+double 
+ds_to_torus (PhotPtr pp)
 {
   struct photon ptest;
   double ds, ds_best, x;

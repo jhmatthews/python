@@ -78,14 +78,8 @@ double f1_old = 0;
 double f2_old = 0;
 int iwind_old = 0;
 
-int
-define_phot (p, f1, f2, nphot_tot, ioniz_or_final, iwind, freq_sampling)
-     PhotPtr p;
-     double f1, f2;
-     long nphot_tot;
-     int ioniz_or_final;
-     int iwind;
-     int freq_sampling;		// 0 --> old uniform approach, 1 --> mininimum fractions ins various bins
+int 
+define_phot (PhotPtr p, double f1, double f2, long nphot_tot, int ioniz_or_final, int iwind, int freq_sampling)		// 0 --> old uniform approach, 1 --> mininimum fractions ins various bins
 
 {
   double natural_weight, weight;
@@ -171,12 +165,8 @@ History:
 **************************************************************/
 
 
-double
-populate_bands (f1, f2, ioniz_or_final, iwind, band)
-     double f1, f2;
-     int ioniz_or_final;
-     int iwind;
-     struct xbands *band;
+double 
+populate_bands (double f1, double f2, int ioniz_or_final, int iwind, struct xbands *band)
 
 {
   double ftot, frac_used, z;
@@ -274,11 +264,8 @@ History:
 
 
 
-int
-xdefine_phot (f1, f2, ioniz_or_final, iwind)
-     double f1, f2;
-     int ioniz_or_final;
-     int iwind;
+int 
+xdefine_phot (double f1, double f2, int ioniz_or_final, int iwind)
 
 {
 
@@ -416,15 +403,8 @@ History:
 **************************************************************/
 
 
-int
-xmake_phot (p, f1, f2, ioniz_or_final, iwind, weight, iphot_start, nphotons)
-     PhotPtr p;
-     double f1, f2;
-     int ioniz_or_final;
-     int iwind;
-     double weight;
-     int iphot_start;		//The place to begin putting photons in the photon structure in this call
-     int nphotons;		//The total number of photons to generate in this call
+int 
+xmake_phot (PhotPtr p, double f1, double f2, int ioniz_or_final, int iwind, double weight, int iphot_start, int nphotons)		//The total number of photons to generate in this call
 {
 
   int nphot, nn;
@@ -660,10 +640,8 @@ History:
 
 
 
-double
-star_init (r, tstar, freqmin, freqmax, ioniz_or_final, f)
-     double r, tstar, freqmin, freqmax, *f;
-     int ioniz_or_final;
+double 
+star_init (double r, double tstar, double freqmin, double freqmax, int ioniz_or_final, double *f)
 {
   double lumstar;
   double log_g;
@@ -722,14 +700,19 @@ History:
 
 **************************************************************/
 
-int
-photo_gen_star (p, r, t, weight, f1, f2, spectype, istart, nphot)
-     PhotPtr p;
-     double r, t, weight;
-     double f1, f2;		/* The freqency mininimum and maximum if a uniform distribution is selected */
-     int spectype;		/*The spectrum type to generate: 0 is bb, 1 (or in fact anything but 0)
+int 
+photo_gen_star (
+    PhotPtr p,
+    double r,
+    double t,
+    double weight,
+    double f1,
+    double f2,		/* The freqency mininimum and maximum if a uniform distribution is selected */
+    int spectype,		/*The spectrum type to generate: 0 is bb, 1 (or in fact anything but 0)
 				   is uniform in frequency space */
-     int istart, nphot;		/* Respecitively the starting point in p and the number of photons to generate */
+    int istart,
+    int nphot		/* Respecitively the starting point in p and the number of photons to generate */
+)
 {
   double freqmin, freqmax, dfreq;
   int i, iend;
@@ -876,10 +859,8 @@ History:
 #define STEPS 100000
 
 
-double
-disk_init (rmin, rmax, m, mdot, freqmin, freqmax, ioniz_or_final, ftot)
-     double rmin, rmax, m, mdot, freqmin, freqmax, *ftot;
-     int ioniz_or_final;
+double 
+disk_init (double rmin, double rmax, double m, double mdot, double freqmin, double freqmax, int ioniz_or_final, double *ftot)
 {
   double t, tref, teff (), tdisk ();
   double log_g, gref, geff (), gdisk ();
@@ -1068,13 +1049,8 @@ History:
 
 **************************************************************/
 
-int
-photo_gen_disk (p, weight, f1, f2, spectype, istart, nphot)
-     PhotPtr p;
-     double weight;
-     double f1, f2;
-     int spectype;
-     int istart, nphot;
+int 
+photo_gen_disk (PhotPtr p, double weight, double f1, double f2, int spectype, int istart, int nphot)
 {
 
   double freqmin, freqmax, dfreq;
@@ -1241,9 +1217,8 @@ History:
 
 **************************************************************/
 
-int
-phot_gen_sum (filename, mode)
-     char filename[], mode[];
+int 
+phot_gen_sum (char filename[], char mode[])
 {
   FILE *fopen (), *ptr;
   int n;
@@ -1301,10 +1276,8 @@ History:
 **************************************************************/
 
 
-double
-bl_init (lum_bl, t_bl, freqmin, freqmax, ioniz_or_final, f)
-     double lum_bl, t_bl, freqmin, freqmax, *f;
-     int ioniz_or_final;
+double 
+bl_init (double lum_bl, double t_bl, double freqmin, double freqmax, int ioniz_or_final, double *f)
 {
   double q1;
   double integ_planck_d ();

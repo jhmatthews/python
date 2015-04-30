@@ -68,11 +68,8 @@ History:
 **************************************************************/
 
 
-int
-extract (w, p, itype)
-     WindPtr w;
-     PhotPtr p;
-     int itype;
+int 
+extract (WindPtr w, PhotPtr p, int itype)
 {
   int n, mscat, mtopbot;
   struct photon pp;
@@ -238,11 +235,8 @@ History:
 
 
 
-int
-extract_one (w, pp, itype, nspec)
-     WindPtr w;
-     PhotPtr pp;
-     int itype, nspec;
+int 
+extract_one (WindPtr w, PhotPtr pp, int itype, int nspec)
 
 {
   int istat, nres;

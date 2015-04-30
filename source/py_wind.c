@@ -141,10 +141,8 @@ char *choice_options = "\n\
    z=Zoom,u=unZoom,Z=switch to/from raw and yz projected modes, F=Create files, A=Change file write defaults\n\
    N=new.windfile q=quit (preferred over EOF)\n";
 
-int
-main (argc, argv)
-     int argc;
-     char *argv[];
+int 
+main (int argc, char *argv[])
 {
 
 
@@ -359,11 +357,8 @@ History:
 
 **************************************************************/
 
-int
-one_choice (choice, root, ochoice)
-     char choice;
-     char *root;
-     int ochoice;
+int 
+one_choice (int choice, char *root, int ochoice)
 {
   double lambda, freq;
   int n, istate, iswitch;
@@ -643,8 +638,8 @@ History:
 **************************************************************/
 
 
-int
-py_wind_help ()
+int 
+py_wind_help (void)
 {
 
   char *some_help;

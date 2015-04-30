@@ -30,8 +30,8 @@
  */
 
 int
-randvec (a, r)
-     double a[], r;
+int 
+randvec (double a[], double r)
 {
 
   double costheta, sintheta, phi, sinphi, cosphi;
@@ -66,9 +66,8 @@ double zzz[] = { 0.0, 0.0, 1.0 };
 struct Pdf pdf_vcos;
 int init_vcos = 0;
 
-int
-randvcos (lmn, north)
-     double lmn[], north[];
+int 
+randvcos (double lmn[], double north[])
 {
   double x[3];			/* the photon direction in the rotated frame */
   double l, m, n;		/* the individual direction cosines in the rotated frame */
@@ -147,9 +146,8 @@ this is simple. Otherwise one must do a coordinate rotation. */
 
 /* This is the appropriate distribution for Eddington limb darkining I believe ksl 97july06 */
 
-double
-vcos (x)
-     double x;
+double 
+vcos (double x)
 {
   double a, b;
   double z;

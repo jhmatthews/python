@@ -26,11 +26,8 @@ History:
         06may   ksl     57+--Modified to use new plasma structuref level populations.  
 **************************************************************/
 
-int
-detailed_balance (xplasma, nelem, newden)
-     PlasmaPtr xplasma;
-     int nelem;
-     double newden[];
+int 
+detailed_balance (PlasmaPtr xplasma, int nelem, double newden[])
 {
   double rates_up[NIONS], rates_down[NIONS], fraction[NIONS];
   int n;
@@ -87,12 +84,8 @@ detailed_balance (xplasma, nelem, newden)
  * and all recombinations are from the state above
 */
 
-int
-rebalance (rates_up, rates_down, fraction, ntot)
-     double rates_up[];
-     double rates_down[];
-     double fraction[];
-     int ntot;
+int 
+rebalance (double rates_up[], double rates_down[], double fraction[], int ntot)
 {
   int n;
   double sum;
@@ -132,11 +125,8 @@ History:
 	06may	ksl	57+ -- Converted to use plasma structure
  */
 
-int
-wind_update_after_detailed_balance (xplasma, nelem, newden)
-     PlasmaPtr xplasma;
-     int nelem;
-     double newden[];
+int 
+wind_update_after_detailed_balance (PlasmaPtr xplasma, int nelem, double newden[])
 {
   int nion;
   int first, last;

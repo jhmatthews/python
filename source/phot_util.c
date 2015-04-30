@@ -43,9 +43,8 @@ size_t sizeofphot;
   History:
 
  ************************************************************************/
-int
-stuff_phot (pin, pout)
-     PhotPtr pin, pout;
+int 
+stuff_phot (PhotPtr pin, PhotPtr pout)
 {
   pout->x[0] = pin->x[0];
   pout->x[1] = pin->x[1];
@@ -95,10 +94,8 @@ stuff_phot (pin, pout)
 
  ************************************************************************/
 
-int
-move_phot (pp, ds)
-     PhotPtr pp;
-     double ds;
+int 
+move_phot (PhotPtr pp, double ds)
 {
 
   pp->x[0] += pp->lmn[0] * ds;
@@ -130,9 +127,8 @@ move_phot (pp, ds)
 
  ************************************************************************/
 
-int
-comp_phot (p1, p2)
-     PhotPtr p1, p2;
+int 
+comp_phot (PhotPtr p1, PhotPtr p2)
 {
   if (p1->x[0] != p2->x[0] || p1->lmn[0] != p2->lmn[0])
     return (1);
@@ -171,10 +167,8 @@ comp_phot (p1, p2)
 			being absorbed or losing energy in the grid
 
  ************************************************************************/
-int
-phot_hist (p, iswitch)
-     PhotPtr p;
-     int iswitch;
+int 
+phot_hist (PhotPtr p, int iswitch)
 {
   if (phot_hist_on == 0)
     return (0);
@@ -225,8 +219,8 @@ phot_hist (p, iswitch)
 
  ************************************************************************/
 
-int
-phot_history_summarize ()
+int 
+phot_history_summarize (void)
 {
   int n;
   PlasmaPtr xplasma;
@@ -333,10 +327,8 @@ History:
 */
 
 
-double
-ds_to_cone (cc, p)
-     ConePtr cc;
-     struct photon *p;
+double 
+ds_to_cone (ConePtr cc, struct photon *p)
 {
   double dz, dzdr2;
   double a, b, c, root[2];
@@ -408,10 +400,8 @@ ds_to_cone (cc, p)
   History:
 
  ************************************************************************/
-double
-ds_to_sphere (r, p)
-     double r;
-     struct photon *p;
+double 
+ds_to_sphere (double r, struct photon *p)
 {
   double a, b, c, root[2];
   int i;
@@ -456,10 +446,8 @@ both roots were imaginary */
 
  ************************************************************************/
 
-double
-ds_to_sphere2 (x, r, p)
-     double x[], r;
-     struct photon *p;
+double 
+ds_to_sphere2 (double x[], double r, struct photon *p)
 {
   double a, b, c, root[2], delta[3];
   int i;
@@ -515,9 +503,8 @@ ds_to_sphere2 (x, r, p)
 			sure root was defined in all cases.
 
  ************************************************************************/
-int
-quadratic (a, b, c, r)
-     double a, b, c, r[];
+int 
+quadratic (double a, double b, double c, double r[])
 {
   double q, z;
 
@@ -598,10 +585,8 @@ quadratic (a, b, c, r)
 
  ************************************************************************/
 
-double
-ds_to_plane (pl, p)
-     struct plane *pl;
-     struct photon *p;
+double 
+ds_to_plane (struct plane *pl, struct photon *p)
 {
   double denom, diff[3], numer;
   double dot ();
@@ -644,11 +629,12 @@ ds_to_plane (pl, p)
 
  ************************************************************************/
 
-double
-ds_to_closest_approach (x, p, impact_parameter)
-     double x[];		/* point for which impact parameter is calculated */
-     struct photon *p;		/* Photon ptr of interest */
-     double *impact_parameter;	/* distance of ray to point a closest approach */
+double 
+ds_to_closest_approach (
+    double x[],		/* point for which impact parameter is calculated */
+    struct photon *p,		/* Photon ptr of interest */
+    double *impact_parameter	/* distance of ray to point a closest approach */
+)
 {
   double diff[3], s, result[3];
   double length (), dot ();

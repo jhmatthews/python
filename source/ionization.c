@@ -57,10 +57,8 @@ History:
 
 
 
-int
-ion_abundances (xplasma, mode)
-     PlasmaPtr xplasma;
-     int mode;
+int 
+ion_abundances (PlasmaPtr xplasma, int mode)
 {
   int ireturn;
 
@@ -235,9 +233,8 @@ History:
         11sep  nsh     70f: Added lines to track which of the convergence criteria
 			in each cell was being met
 **************************************************************/
-int
-convergence (xplasma)
-     PlasmaPtr xplasma;
+int 
+convergence (PlasmaPtr xplasma)
 {
   int trcheck, techeck, hccheck, whole_check, converging;
   double epsilon;
@@ -342,8 +339,8 @@ History:
         06may	ksl	57+ -- Now using plasma structure
         11sep   nsh     70e added in lines to write out the split of temperature and luminosity convergence
 **************************************************************/
-int
-check_convergence ()
+int 
+check_convergence (void)
 {
   int n;
   int nconverge, nconverging, ntot;
@@ -418,10 +415,8 @@ History:
 
 
 
-int
-one_shot (xplasma, mode)
-     PlasmaPtr xplasma;
-     int mode;
+int 
+one_shot (PlasmaPtr xplasma, int mode)
 
 {
   double te_old, te_new, dte;
@@ -527,10 +522,8 @@ meaning in nebular concentrations.
 
 PlasmaPtr xxxplasma;
 
-double
-calc_te (xplasma, tmin, tmax)
-     PlasmaPtr xplasma;
-     double tmin, tmax;
+double 
+calc_te (PlasmaPtr xplasma, double tmin, double tmax)
 {
   double heat_tot;
   double z1, z2;
@@ -595,9 +588,8 @@ calc_te (xplasma, tmin, tmax)
 
 /* This is just a function which has a zero when total energy loss is equal to total energy gain */
 
-double
-zero_emit (t)
-     double t;
+double 
+zero_emit (double t)
 {
   double difference;
   double total_emission ();

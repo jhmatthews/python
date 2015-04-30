@@ -39,8 +39,8 @@ History:
 **************************************************************/
 
 
-int
-get_shell_wind_params ()
+int 
+get_shell_wind_params (void)
 {
   double vtemp[3];
   double rhotemp[200];

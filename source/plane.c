@@ -31,9 +31,8 @@ History:
  
 **************************************************************/
 
-int
-pl_wind_define (w)
-     WindPtr w;			// This is the entire grid
+int 
+pl_wind_define (WindPtr w)			// This is the entire grid
 {
   double x[3], vmid[3], vbot[3], diff[3];
   double xmin, xmax, zmin, zmax;
@@ -126,9 +125,8 @@ pl_wind_define (w)
 }
 
 
-double
-pl_rho (x)
-     double x[];
+double 
+pl_rho (double x[])
 {
   if (geo.pl_nh <= 0)
     {
@@ -137,9 +135,8 @@ pl_rho (x)
   return (geo.pl_nh / rho2nh);
 }
 
-double
-pl_velocity (x, v)
-     double x[], v[];
+double 
+pl_velocity (double x[], double v[])
 {
   v[0] = 0.0;
   v[1] = 0.0;
@@ -177,10 +174,8 @@ History:
  				and all of wind_complete
  
 **************************************************************/
-int
-define_wind_grid (w, xmin, xmax, zmin, zmax)
-     WindPtr w;
-     double xmin, xmax, zmin, zmax;
+int 
+define_wind_grid (WindPtr w, double xmin, double xmax, double zmin, double zmax)
 {
   double dr, dz;
   double logr, logz, dlogr, zscale, dlogz;
@@ -274,9 +269,8 @@ define_wind_grid (w, xmin, xmax, zmin, zmax)
  */
 
 
-int
-pl_copy_conditions (win, wout)
-     PlasmaPtr win, wout;
+int 
+pl_copy_conditions (PlasmaPtr win, PlasmaPtr wout)
 {
   int n;
   wout->rho = win->rho;

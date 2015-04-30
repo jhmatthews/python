@@ -73,10 +73,8 @@ typedef struct sss
 s_dummy, *SpPtr;
 
 
-int
-main (argc, argv)
-     int argc;
-     char *argv[];
+int 
+main (int argc, char *argv[])
 
 {
   FILE *fp, *fout, *fopen ();
@@ -370,9 +368,8 @@ main (argc, argv)
 #define		ISTEPS	20
 #define		LIMIT	4
 
-float
-gauss (xmin, xmax, x, sigma)
-     float xmin, xmax, x, sigma;
+float 
+gauss (double xmin, double xmax, double x, double sigma)
 
 {
   double exp ();

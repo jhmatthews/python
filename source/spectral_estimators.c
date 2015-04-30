@@ -77,9 +77,8 @@ double spec_numin, spec_numax, spec_numean;
 double lspec_numin, lspec_numax; //Log versions of numin and numax
 
 
-int
-spectral_estimators (xplasma)
-     PlasmaPtr xplasma;
+int 
+spectral_estimators (PlasmaPtr xplasma)
 {
   double pl_alpha_min, pl_alpha_max, pl_alpha_temp, pl_w_temp, j;
   double exp_temp_min, exp_temp_max;	/*120817 the 'temperature' range we are going to search for an effective temperature for the exponential model */
@@ -411,9 +410,8 @@ History:  	NSH 120817 - 	Tidied up to make it a bit more clear what is going on 
 
 **************************************************************/
 
-double
-pl_alpha_func_log (alpha)
-     double alpha;
+double 
+pl_alpha_func_log (double alpha)
 {
   double answer;
 
@@ -452,10 +450,8 @@ pl_mean (alpha, numin, numax)
 
 /*NSH 131108 - changed the formulation to work in log space - also changed name */   
 
-double
-pl_logmean (alpha, lnumin, lnumax)
-	double alpha;
-	double lnumin,lnumax;
+double 
+pl_logmean (double alpha, double lnumin, double lnumax)
 {
   double k, answer, numerator, denominator, a,b,c,d;
 
@@ -536,11 +532,8 @@ d=pow (10.0,(k+(lnumin*(alpha+1.0))));
 //  return (w);
 //}
 
-double
-pl_log_w (j, alpha, lnumin, lnumax)
-     double j;			//the band limited spectral density
-     double alpha;		//Computed spectral index for the cell
-     double lnumin, lnumax;	//Range of frequencies we are considering
+double 
+pl_log_w (double j, double alpha, double lnumin, double lnumax)	//Range of frequencies we are considering
 {
   double logw;			//the answer
   double logk; //scaling prefactor to permit huge numbers to be dealt with
@@ -607,10 +600,8 @@ pl_log_w (j, alpha, lnumin, lnumax)
 //}
 
 
-double
-pl_log_stddev (alpha, lnumin, lnumax)
-     double alpha;		//Computed spectral index for the cell
-     double lnumin, lnumax;	//Range of frequencies we are considering
+double 
+pl_log_stddev (double alpha, double lnumin, double lnumax)	//Range of frequencies we are considering
 {
   double answer;		//the answer
 
@@ -675,9 +666,8 @@ History:  NSH 120817 - Tidied up to make it a bit more clear what is going on he
 
 **************************************************************/
 
-double
-exp_temp_func (exp_temp)
-     double exp_temp;
+double 
+exp_temp_func (double exp_temp)
 {
   double answer;
 
@@ -685,10 +675,8 @@ exp_temp_func (exp_temp)
   return (answer);
 }
 
-double
-exp_mean (exp_temp, numin, numax)
-     double exp_temp;
-     double numin, numax;
+double 
+exp_mean (double exp_temp, double numin, double numax)
 {
   double answer, numerator, denominator;
   double exp1;			/* We supply a temperature, but actually we expect the correct function to be of the form e^-hnu/kt, so this will hold -1*h/kt */
@@ -744,11 +732,8 @@ exp_mean (exp_temp, numin, numax)
  ************************************************************************/
 
 
-double
-exp_w (j, exp_temp, numin, numax)
-     double j;			//the band limited spectral density
-     double exp_temp;		//Computed effective temperature for the cell
-     double numin, numax;	//Range of frequencies we are considering
+double 
+exp_w (double j, double exp_temp, double numin, double numax)	//Range of frequencies we are considering
 {
   double w;			//the answer
 
@@ -799,10 +784,8 @@ exp_w (j, exp_temp, numin, numax)
  ************************************************************************/
 
 
-double
-exp_stddev (exp_temp, numin, numax)
-     double exp_temp;		//Computed spectral index for the cell
-     double numin, numax;	//Range of frequencies we are considering
+double 
+exp_stddev (double exp_temp, double numin, double numax)	//Range of frequencies we are considering
 {
   double answer;		//the answer
   double exp1;			/* We supply a temperature, but actually we expect the correct function to be of the form e^-hnu/kt, so this will hold -1*h/kt */

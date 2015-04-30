@@ -69,9 +69,11 @@ History:
  
 **************************************************************/
 
-double
-wind_luminosity (f1, f2)
-     double f1, f2;		/* freqmin and freqmax */
+double 
+wind_luminosity (
+    double f1,
+    double f2		/* freqmin and freqmax */
+)
 {
   double lum, lum_lines, lum_fb, lum_ff, lum_comp, lum_dr, lum_di, lum_adiab, heat_adiab;	//1108 NSH Added a new variable for compton cooling 1408 NSH and for DI cooling
   //1109 NSH Added a new variable for dielectronic cooling
@@ -190,11 +192,13 @@ History:
 **************************************************************/
 
 
-double
-total_emission (one, f1, f2)
-     WindPtr one;		/* WindPtr to a specific cell in the wind */
-     double f1, f2;		/* The minimum and maximum frequency over which the emission is
+double 
+total_emission (
+    WindPtr one,		/* WindPtr to a specific cell in the wind */
+    double f1,
+    double f2		/* The minimum and maximum frequency over which the emission is
 				   integrated */
+)
 {
   double total_line_emission (), total_free (), total_fb ();
   double total_fb_matoms (), total_bb_cooling ();
@@ -309,10 +313,8 @@ History:
 **************************************************************/
 
 
-double
-adiabatic_cooling (one, t)
-     WindPtr one;
-     double t;
+double 
+adiabatic_cooling (WindPtr one, double t)
 {
   double cooling;
   int nplasma;
@@ -366,12 +368,8 @@ History:
  
 **************************************************************/
 
-int
-photo_gen_wind (p, weight, freqmin, freqmax, photstart, nphot)
-     PhotPtr p;
-     double weight;
-     double freqmin, freqmax;
-     int photstart, nphot;
+int 
+photo_gen_wind (PhotPtr p, double weight, double freqmin, double freqmax, int photstart, int nphot)
 {
   int n;
   int photstop;
@@ -531,11 +529,8 @@ History:
 **************************************************************/
 
 
-double
-one_line (one, freqmin, freqmax, nres)
-     WindPtr one;
-     double freqmin, freqmax;
-     int *nres;
+double 
+one_line (WindPtr one, double freqmin, double freqmax, int *nres)
 {
   double xlum, xlumsum;
   int m, n;
@@ -621,11 +616,8 @@ Note: program uses an integral formula rather than integrating on
         13jul	nsh	76  - fixed major bugs in this code relating to bug number 29!
 */
 
-double
-total_free (one, t_e, f1, f2)
-     WindPtr one;
-     double t_e;
-     double f1, f2;
+double 
+total_free (WindPtr one, double t_e, double f1, double f2)
 {
   double g_ff_h, g_ff_he;
   double gaunt;
@@ -724,10 +716,8 @@ SS Apr 04: added an "if" statement to deal with case where there's only H.
 	
 */
 
-double
-ff (one, t_e, freq)
-     WindPtr one;
-     double t_e, freq;
+double 
+ff (WindPtr one, double t_e, double freq)
 {
   double g_ff_h, g_ff_he;
   double fnu;
@@ -816,10 +806,12 @@ struct Pdf pdf_ff;
 double ff_x[200], ff_y[200];
 double one_ff_f1, one_ff_f2, one_ff_te;	/* Old values */
 
-double
-one_ff (one, f1, f2)
-     WindPtr one;		/* a single cell */
-     double f1, f2;		/* freqmin and freqmax */
+double 
+one_ff (
+    WindPtr one,		/* a single cell */
+    double f1,
+    double f2		/* freqmin and freqmax */
+)
 {
   double dummy, freq, dfreq;
   int n;
@@ -894,9 +886,10 @@ History:
 **************************************************************/
 
 
-double
-gaunt_ff (gsquared)
-     double gsquared;		/* the gamma squared varaiable */
+double 
+gaunt_ff (
+    double gsquared		/* the gamma squared varaiable */
+)
 {
   int i, index;
   double gaunt;

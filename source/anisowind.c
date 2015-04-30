@@ -64,10 +64,8 @@ and
 double tau_randwind = -1000.;
 //struct Pdf pdf_randwind;    // Moved into python.h for python_43.2
 
-int
-randwind (p, lmn, north)
-     PhotPtr p;
-     double lmn[3], north[3];
+int 
+randwind (PhotPtr p, double lmn[3], double north[3])
 {
 
   double xyz[3];
@@ -179,9 +177,8 @@ double vrandwind (x)
 #define VRANDWIND_FLOOR 1e-5
 #define VRANDWIND_TAU 11.51
 
-double
-vrandwind (x)
-     double x;
+double 
+vrandwind (double x)
 {
 //  double a, b;
   double abscos, z;
@@ -261,9 +258,8 @@ and the reweighting is returned.
 int reweightwind_init = 1;	//TRUE to start
 double reweightwind_zmax;
 
-double
-reweightwind (p)
-     PhotPtr p;
+double 
+reweightwind (PhotPtr p)
 {
   double ctheta, x, z;
   double north_xyz[3];
@@ -339,9 +335,8 @@ double make_pdf_randwind_jumps[180];
 #define LOGTAUMAX 1.
 double pdf_randwind_dlogtau;
 
-int
-make_pdf_randwind (tau)
-     double tau;
+int 
+make_pdf_randwind (double tau)
 {
   int jj;
   int echeck;
@@ -433,9 +428,7 @@ History:
 
 
 int 
-randwind_thermal_trapping(p, nnscat)
-  PhotPtr p;
-  int *nnscat;
+randwind_thermal_trapping (PhotPtr p, int *nnscat)
 {
   double tau_norm, p_norm;
   double tau, dvds, z, ztest;

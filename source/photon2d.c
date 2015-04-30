@@ -40,13 +40,8 @@ History:
  
 **************************************************************/
 
-int
-translate (w, pp, tau_scat, tau, nres)
-     WindPtr w;			//w here refers to entire wind, not a single element
-     PhotPtr pp;
-     double tau_scat;
-     double *tau;
-     int *nres;
+int 
+translate (WindPtr w, PhotPtr pp, double tau_scat, double *tau, int *nres)
 {
   int istat;
 
@@ -99,9 +94,8 @@ History:
 **************************************************************/
 
 
-int
-translate_in_space (pp)
-     PhotPtr pp;
+int 
+translate_in_space (PhotPtr pp)
 {
   double ds, x;
   double ds_to_wind (), ds_to_sphere ();
@@ -215,9 +209,8 @@ History:
 
 
 
-double
-ds_to_wind (pp)
-     PhotPtr pp;
+double 
+ds_to_wind (PhotPtr pp)
 {
   struct photon ptest;
   double ds, x;
@@ -293,12 +286,8 @@ History:
 
 int neglible_vol_count = 0;
 
-int
-translate_in_wind (w, p, tau_scat, tau, nres)
-     WindPtr w;			//w here refers to entire wind, not a single element
-     PhotPtr p;
-     double tau_scat, *tau;
-     int *nres;
+int 
+translate_in_wind (WindPtr w, PhotPtr p, double tau_scat, double *tau, int *nres)
 
 
 {
@@ -534,9 +523,8 @@ History:
 
 **************************************************************/
 
-int
-walls (p, pold)
-     PhotPtr p, pold;
+int 
+walls (PhotPtr p, PhotPtr pold)
 {
   double dot (), r, rho, rho_sq;
   double xxx[3];

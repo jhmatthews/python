@@ -17,9 +17,8 @@ calculations
 
 
 
-int
-summary (one)
-     PlasmaPtr one;
+int 
+summary (PlasmaPtr one)
 {
   int n, first, last, nn, m;
   int nmax, n_tenth, n_hundredth;
@@ -142,11 +141,8 @@ line is described by a square profile
 ksl 01 aug
 */
 
-double
-line_heating (w, p, ds)
-     PlasmaPtr w;
-     PhotPtr p;
-     double ds;
+double 
+line_heating (PlasmaPtr w, PhotPtr p, double ds)
 {
   double f1, f2, phi, tau, dvds;
   double dd, heating;
@@ -188,11 +184,8 @@ photon is absorbed.
 ksl 01sep
 
 */
-double
-sobolev_line_heating (w, p, ds)
-     PlasmaPtr w;
-     PhotPtr p;
-     double ds;
+double 
+sobolev_line_heating (PlasmaPtr w, PhotPtr p, double ds)
 {
   double f1, f2, tau, dvds;
   double dd, heating;

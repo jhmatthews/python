@@ -162,9 +162,8 @@ int log_verbosity=5;   // A parameter which can be used to suppress what would n
 //1411 JM debug statements are controlled by verbosity now, so no need for Log_Debug
 //int log_debug=0;	//A parameter which is set to cause Debug commands to be logged
 
-int
-Log_init (filename)
-     char *filename;
+int 
+Log_init (char *filename)
 {
   FILE *fopen ();
 
@@ -189,9 +188,8 @@ Log_init (filename)
 }
 
 
-int
-Log_append (filename)
-     char *filename;
+int 
+Log_append (char *filename)
 {
   FILE *fopen ();
 
@@ -215,8 +213,8 @@ Log_append (filename)
   return (0);
 }
 
-int
-Log_close ()
+int 
+Log_close (void)
 {
   fclose (diagptr);
   init_log = 0;
@@ -228,8 +226,8 @@ Log_close ()
  * carried out through the logging subroutines
  */
 
-int Log_set_verbosity(vlevel)
-	int vlevel;
+int 
+Log_set_verbosity (int vlevel)
 {
 	log_verbosity=vlevel;
   rdpar_set_verbose(vlevel);
@@ -241,8 +239,8 @@ int Log_set_verbosity(vlevel)
  * carried out through the logging subroutines
  */
 
-int Log_print_max(print_max)
-	int print_max;
+int 
+Log_print_max (int print_max)
 {
 	log_print_max=print_max;
 	return(0);
@@ -253,8 +251,8 @@ int Log_print_max(print_max)
  * carried out through the logging subroutines
  */
 
-int Log_quit_after_n_errors(n)
-	int n;
+int 
+Log_quit_after_n_errors (int n)
 {
 	time_to_quit=n;
 	return(0);
@@ -366,9 +364,8 @@ Shout (char *format, ...)
   return (result);
 }
 
-int
-sane_check (x)
-     double x;
+int 
+sane_check (double x)
 {
   int i;
   if ((i = isfinite (x)) == 0)
@@ -382,8 +379,8 @@ sane_check (x)
 
 /* JM 1410- mytrap is a function that was previously use for debugging. 
    It is now deprecated in python but you may want to use for tests */
-int
-mytrap ()
+int 
+mytrap (void)
 {
   int x;
   x = 0;
@@ -435,9 +432,8 @@ error_count (char *format)
 
 
 
-int
-error_summary (message)
-     char *message;
+int 
+error_summary (char *message)
 {
   int n;
   Log ("\nError summary: %s\n", message);
@@ -453,8 +449,8 @@ error_summary (message)
 
 /*NSH 121107 added a routine to flush the diagfile*/
 
-int
-Log_flush()
+int 
+Log_flush (void)
 {
   if (init_log == 0)
     Log_init ("logfile");
@@ -472,8 +468,8 @@ return(0);
  * if not in parallel mode then we set my_rank to zero
  */
 
-int Log_set_mpi_rank(rank, n_mpi)
-	int rank, n_mpi;
+int 
+Log_set_mpi_rank (int rank, int n_mpi)
 {
 	my_rank=rank;
 	rdpar_set_mpi_rank(rank);	//this just communicates the rank to rdpar	

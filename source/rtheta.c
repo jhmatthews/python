@@ -36,9 +36,8 @@ History:
 
 
 
-double
-rtheta_ds_in_cell (p)
-     PhotPtr p;
+double 
+rtheta_ds_in_cell (PhotPtr p)
 
 
 {
@@ -133,9 +132,8 @@ History:
 **************************************************************/
 
 
-int
-rtheta_make_grid (w)
-     WindPtr w;
+int 
+rtheta_make_grid (WindPtr w)
 {
   double dr, theta, thetacen, dtheta, dlogr;
   int i, j, n;
@@ -237,9 +235,8 @@ History:
 
   /* Now set up the wind cones that are needed for calclating ds in a cell */
 
-int
-rtheta_make_cones (w)
-     WindPtr w;
+int 
+rtheta_make_cones (WindPtr w)
 {
   int  n;
 
@@ -283,9 +280,8 @@ rtheta_make_cones (w)
  * 04aug	ksl	Routine was removed from windsave,  wind_complete is now just a driver.
  */
 
-int
-rtheta_wind_complete (w)
-     WindPtr w;
+int 
+rtheta_wind_complete (WindPtr w)
 {
   int i, j;
 
@@ -356,10 +352,8 @@ rtheta_wind_complete (w)
 
 
 
-int
-rtheta_volumes (w, icomp)
-     WindPtr w;
-     int icomp;
+int 
+rtheta_volumes (WindPtr w, int icomp)
 {
   int i, j, n;
   int jj, kk;
@@ -490,9 +484,8 @@ rtheta_volumes (w, icomp)
 
 
 
-int
-rtheta_where_in_grid (x)
-     double x[];
+int 
+rtheta_where_in_grid (double x[])
 {
   int i, j, n;
   double r, theta;
@@ -546,11 +539,8 @@ rtheta_where_in_grid (x)
  
 **************************************************************/
 
-int
-rtheta_get_random_location (n, icomp, x)
-     int n;			// Cell in which to create position
-     int icomp;			// The component in which to create position
-     double x[];		// Returned position
+int 
+rtheta_get_random_location (int n, int icomp, double x[])		// Returned position
 {
   int i, j;
   int inwind;
@@ -630,9 +620,8 @@ rtheta_get_random_location (n, icomp, x)
 **************************************************************/
 
 
-int
-rtheta_extend_density (w)
-     WindPtr w;
+int 
+rtheta_extend_density (WindPtr w)
 {
 
   int i, j, n, m;
@@ -686,10 +675,8 @@ of these are in the wind
 			see python.h
 */
 
-int
-rtheta_is_cell_in_wind (n, icomp)
-     int n;
-     int icomp;
+int 
+rtheta_is_cell_in_wind (int n, int icomp)
 {
   int i, j;
   double r, theta;

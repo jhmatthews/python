@@ -111,8 +111,8 @@ History:
 **************************************************************/
 
 
-int
-get_proga_wind_params ()
+int 
+get_proga_wind_params (void)
 {
   int get_proga ();
 
@@ -170,8 +170,8 @@ Log ("geo.wind_rhomax=%e\n",geo.wind_rho_min);
 
 
 
-int
-get_proga ()
+int 
+get_proga (void)
 {
 
   FILE *fopen (), *fptr;
@@ -391,10 +391,8 @@ History:
 **************************************************************/
 
 
-double
-proga_velocity (x, v)
-     double x[];
-     double v[];
+double 
+proga_velocity (double x[], double v[])
 {
   double length ();
   int ii, jj;
@@ -562,9 +560,8 @@ proga_velocity (x, v)
 }
 
 
-double
-proga_rho (x)
-     double x[];
+double 
+proga_rho (double x[])
 {
   double length ();
   int ii, jj;
@@ -656,9 +653,8 @@ History:
 **************************************************************/
 
 
-double
-proga_temp (x)
-     double x[];
+double 
+proga_temp (double x[])
 {
   double length ();
   int ii, jj;
@@ -755,9 +751,8 @@ History:
 **************************************************************/
 
 
-int
-rtheta_make_zeus_grid (w)
-     WindPtr w;
+int 
+rtheta_make_zeus_grid (WindPtr w)
 {
   double theta, thetacen;
   int i, j, n;
@@ -889,9 +884,8 @@ History:
 **************************************************************/
 
 
-int
-rtheta_zeus_volumes (w)
-     WindPtr w;
+int 
+rtheta_zeus_volumes (WindPtr w)
 {
   int i, j, n;
 

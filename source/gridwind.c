@@ -60,9 +60,8 @@ History:
 **************************************************************/
 
 
-int
-create_maps (ichoice)
-     int ichoice;
+int 
+create_maps (int ichoice)
 {
   int i, j;
   j = 0;
@@ -136,9 +135,8 @@ create_maps (ichoice)
 **************************************************************/
 
 
-int
-calloc_wind (nelem)
-     int nelem;
+int 
+calloc_wind (int nelem)
 {
 
   if (wmain != NULL)
@@ -191,9 +189,8 @@ History:
 **************************************************************/
 
 
-int
-calloc_plasma (nelem)
-     int nelem;
+int 
+calloc_plasma (int nelem)
 {
 
   if (plasmamain != NULL)
@@ -246,10 +243,8 @@ calloc_plasma (nelem)
 }
 
 
-int
-check_plasma (xplasma, message)
-     PlasmaPtr xplasma;
-     char message[];
+int 
+check_plasma (PlasmaPtr xplasma, char message[])
 {
   if (xplasma->nplasma == NPLASMA)
     {
@@ -359,9 +354,8 @@ History:
 **************************************************************/
 
 
-int
-calloc_macro (nelem)
-     int nelem;
+int 
+calloc_macro (int nelem)
 {
 
   /* JM 1502 -- commented out this if loop because we want 
@@ -425,9 +419,8 @@ the number of elements
  */
 
 
-int
-calloc_estimators (nelem)
-     int nelem;
+int 
+calloc_estimators (int nelem)
 {
   int n;
 
@@ -723,9 +716,8 @@ History:
 **************************************************************/
 
 
-int
-calloc_dyn_plasma (nelem)
-     int nelem;
+int 
+calloc_dyn_plasma (int nelem)
 {
   int n;
 

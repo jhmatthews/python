@@ -38,10 +38,8 @@ History:
 
 
 
-double
-get_ion_density (x, nion)
-     double x[];
-     int nion;
+double 
+get_ion_density (double x[], int nion)
 {
   double dd;
   int nn, nnn[4], nelem;

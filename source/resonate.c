@@ -92,14 +92,8 @@ double cds_v2_old, cds_dvds2_old;
 
 
 
-double
-calculate_ds (w, p, tau_scat, tau, nres, smax, istat)
-     WindPtr w;			//w here refers to entire wind, not a single element
-     PhotPtr p;
-     double tau_scat, *tau;
-     int *nres;
-     double smax;
-     int *istat;
+double 
+calculate_ds (WindPtr w, PhotPtr p, double tau_scat, double *tau, int *nres, double smax, int *istat)
 {
   int kkk;
   double kap_es;
@@ -526,10 +520,8 @@ History:
                         vary from cell to cell.
 
 **************************************************************/
-int
-select_continuum_scattering_process (kap_cont, kap_es, kap_ff, xplasma)
-     double kap_cont, kap_es, kap_ff;
-     PlasmaPtr xplasma;
+int 
+select_continuum_scattering_process (double kap_cont, double kap_es, double kap_ff, PlasmaPtr xplasma)
 {
   int nres;
   double threshold;
@@ -615,11 +607,8 @@ History:
                         make more sense.
 
 **************************************************************/
-double
-kappa_bf (xplasma, freq, macro_all)
-     PlasmaPtr xplasma;
-     double freq;
-     int macro_all;
+double 
+kappa_bf (PlasmaPtr xplasma, double freq, int macro_all)
 
 
 {
@@ -722,9 +711,8 @@ History:
                    
 
 **************************************************************/
-int
-kbf_need (fmin, fmax)
-     double fmin, fmax;
+int 
+kbf_need (double fmin, double fmax)
 
 
 {
@@ -836,13 +824,8 @@ History:
 
 **************************************************************/
 
-double
-sobolev (one, x, den_ion, lptr, dvds)
-     WindPtr one;		// This is a single cell in the wind
-     double x[];
-     double den_ion;
-     struct lines *lptr;
-     double dvds;
+double 
+sobolev (WindPtr one, double x[], double den_ion, struct lines *lptr, double dvds)
 {
   double tau, xden_ion, tau_x_dvds;
   double two_level_atom (), d1, d2;
@@ -992,11 +975,8 @@ History:
 ***********************************************************/
 
 
-int
-doppler (pin, pout, v, nres)
-     PhotPtr pin, pout;
-     double v[];
-     int nres;
+int 
+doppler (PhotPtr pin, PhotPtr pout, double v[], int nres)
 
 {
   double dot ();
@@ -1124,11 +1104,8 @@ History:
 
 ***********************************************************/
 
-int
-scatter (p, nres, nnscat)
-     PhotPtr p;
-     int *nres;
-     int *nnscat;
+int 
+scatter (PhotPtr p, int *nres, int *nnscat)
 {
   double v[3];
   double z_prime[3];

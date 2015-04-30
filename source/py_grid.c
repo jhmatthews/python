@@ -31,8 +31,8 @@ History:
 #include "atomic.h"
 #include "python.h"
 #define LINELENGTH 132
-int
-main ()
+int 
+main (void)
 {
   WindPtr w;
   struct photon p;

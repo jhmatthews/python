@@ -49,11 +49,8 @@ History:
 			but it may be that this should be done
 ************************************************************/
 
-int
-bf_estimators_increment (one, p, ds)
-     WindPtr one;
-     PhotPtr p;
-     double ds;
+int 
+bf_estimators_increment (WindPtr one, PhotPtr p, double ds)
 
 {
   double freq_av;
@@ -336,13 +333,8 @@ History:
 
 
 
-int
-bb_estimators_increment (one, p, tau_sobolev, dvds, nn)
-     WindPtr one;
-     PhotPtr p;
-     double tau_sobolev;
-     double dvds;
-     int nn;
+int 
+bb_estimators_increment (WindPtr one, PhotPtr p, double tau_sobolev, double dvds, int nn)
 
 {
   int llvl;
@@ -470,9 +462,8 @@ History:
           
 ************************************************************/
 
-int
-mc_estimator_normalise (n)
-     int n;
+int 
+mc_estimator_normalise (int n)
 
 {
   double volume, filled_volume;
@@ -688,11 +679,8 @@ History:
           
 ************************************************************/
 
-double
-total_fb_matoms (xplasma, t_e, f1, f2)
-     PlasmaPtr xplasma;
-     double t_e;
-     double f1, f2;
+double 
+total_fb_matoms (PlasmaPtr xplasma, double t_e, double f1, double f2)
 {
   double cool_contribution;
   double t_e_store;
@@ -783,10 +771,8 @@ History:
           
 ************************************************************/
 
-double
-total_bb_cooling (xplasma, t_e)
-     PlasmaPtr xplasma;
-     double t_e;
+double 
+total_bb_cooling (PlasmaPtr xplasma, double t_e)
 {
   double cool_contribution;
   struct lines *line_ptr;
@@ -876,10 +862,8 @@ History:
           
 ************************************************************/
 
-double
-macro_bb_heating (xplasma, t_e)
-     PlasmaPtr xplasma;
-     double t_e;
+double 
+macro_bb_heating (PlasmaPtr xplasma, double t_e)
 {
   double heat_contribution;
   struct lines *line_ptr;
@@ -944,10 +928,8 @@ History:
           
 ************************************************************/
 
-double
-macro_bf_heating (xplasma, t_e)
-     PlasmaPtr xplasma;
-     double t_e;
+double 
+macro_bf_heating (PlasmaPtr xplasma, double t_e)
 {
   double heat_contribution;
   double total, upper_density, lower_density;
@@ -1032,13 +1014,8 @@ History:
 
 
 
-int
-bb_simple_heat (xplasma, p, tau_sobolev, dvds, nn)
-     PlasmaPtr xplasma;
-     PhotPtr p;
-     double tau_sobolev;
-     double dvds;
-     int nn;
+int 
+bb_simple_heat (PlasmaPtr xplasma, PhotPtr p, double tau_sobolev, double dvds, int nn)
 
 {
   double heat_contribution;
@@ -1095,10 +1072,8 @@ bb_simple_heat (xplasma, p, tau_sobolev, dvds, nn)
 			since volume is not involved.
 *****************************************************/
 
-double
-get_gamma (cont_ptr, xplasma)
-     struct topbase_phot *cont_ptr;
-     PlasmaPtr xplasma;
+double 
+get_gamma (struct topbase_phot *cont_ptr, PlasmaPtr xplasma)
 {
   double gamma_value;
   double fthresh, flast;
@@ -1122,9 +1097,8 @@ get_gamma (cont_ptr, xplasma)
  Function to give the integrand for gamma at frequency freq
 **************************************************/
 
-double
-gamma_integrand (freq)
-     double freq;
+double 
+gamma_integrand (double freq)
 {
   double fthresh;
   double x;
@@ -1153,10 +1127,8 @@ gamma_integrand (freq)
 			No need for volume so eleminated Wind altogther
 *****************************************************/
 
-double
-get_gamma_e (cont_ptr, xplasma)
-     struct topbase_phot *cont_ptr;
-     PlasmaPtr xplasma;
+double 
+get_gamma_e (struct topbase_phot *cont_ptr, PlasmaPtr xplasma)
 {
   double gamma_e_value;
   double fthresh, flast;
@@ -1180,9 +1152,8 @@ get_gamma_e (cont_ptr, xplasma)
  Function to give the integrand for gamma_e at frequency freq
 **************************************************/
 
-double
-gamma_e_integrand (freq)
-     double freq;
+double 
+gamma_e_integrand (double freq)
 {
   double fthresh;
   double x;
@@ -1212,10 +1183,8 @@ get_alpha_st - to get the stimulated recombination estimator
 *********************************************/
 #define ALPHA_SP_CONSTANT 5.79618e-36
 
-double
-get_alpha_st (cont_ptr, xplasma)
-     struct topbase_phot *cont_ptr;
-     PlasmaPtr xplasma;
+double 
+get_alpha_st (struct topbase_phot *cont_ptr, PlasmaPtr xplasma)
 {
   double alpha_st_value;
   double fthresh, flast;
@@ -1253,9 +1222,8 @@ get_alpha_st (cont_ptr, xplasma)
 /* alpha_st_integrand. This returns the integrand for alpha_st at a chosen
    frequency*/
 
-double
-alpha_st_integrand (freq)
-     double freq;		//frequency 
+double 
+alpha_st_integrand (double freq)		//frequency 
 {
   double fthresh;
   double x;
@@ -1288,10 +1256,8 @@ get_alpha_st_e - to get the stimulated recombination estimator
 *********************************************/
 #define ALPHA_SP_CONSTANT 5.79618e-36
 
-double
-get_alpha_st_e (cont_ptr, xplasma)
-     struct topbase_phot *cont_ptr;
-     PlasmaPtr xplasma;
+double 
+get_alpha_st_e (struct topbase_phot *cont_ptr, PlasmaPtr xplasma)
 {
   double alpha_st_e_value;
   double fthresh, flast;
@@ -1329,9 +1295,8 @@ get_alpha_st_e (cont_ptr, xplasma)
 /* alpha_st_e_integrand. This returns the integrand for alpha_st at a chosen
    frequency*/
 
-double
-alpha_st_e_integrand (freq)
-     double freq;		//frequency 
+double 
+alpha_st_e_integrand (double freq)		//frequency 
 {
   double fthresh;
   double x;

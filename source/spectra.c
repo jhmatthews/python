@@ -85,15 +85,8 @@ History:
 
 int i_spec_start = 0;
 
-int
-spectrum_init (f1, f2, nangle, angle, phase, scat_select, top_bot_select,
-	       select_extract, rho_select, z_select, az_select, r_select)
-     double f1, f2;
-     int nangle;
-     double angle[], phase[];
-     int scat_select[], top_bot_select[];
-     int select_extract;
-     double rho_select[], z_select[], az_select[], r_select[];
+int 
+spectrum_init (double f1, double f2, int nangle, double angle[], double phase[], int scat_select[], int top_bot_select[], int select_extract, double rho_select[], double z_select[], double az_select[], double r_select[])
 {
   int i, n;
   int nspec;
@@ -335,12 +328,8 @@ History:
 			not recorded.
 **************************************************************/
 
-int
-spectrum_create (p, f1, f2, nangle, select_extract)
-     PhotPtr p;
-     double f1, f2;
-     int nangle;
-     int select_extract;
+int 
+spectrum_create (PhotPtr p, double f1, double f2, int nangle, int select_extract)
 
 {
   int nphot, i, j, k, k1, n;
@@ -643,14 +632,8 @@ History:
 
 
 
-int
-spectrum_summary (filename, mode, nspecmin, nspecmax, select_spectype, renorm,
-		  loglin)
-     char filename[], mode[];
-     int loglin;		// switch to tell the code if we are outputting a log or a lin
-     int nspecmin, nspecmax;
-     int select_spectype;
-     double renorm;		// parameter used to rescale spectrum as it is building up 
+int 
+spectrum_summary (char filename[], char mode[], int nspecmin, int nspecmax, int select_spectype, double renorm, int loglin)		// parameter used to rescale spectrum as it is building up 
 
 {
   FILE *fopen (), *fptr;
@@ -803,8 +786,8 @@ History:
 
 **************************************************************/
 
-int spectrum_restart_renormalise(nangle)
-    int nangle;
+int 
+spectrum_restart_renormalise (int nangle)
 {
   double renorm_factor;
   int n, m, nspec;

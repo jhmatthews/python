@@ -14,8 +14,8 @@ Return the time in seconds since the timer was initiated
 
 double t_init = 0.0;
 
-double
-timer ()
+double 
+timer (void)
 {
   struct timeval tv;
   struct timezone tz;
@@ -50,9 +50,8 @@ of the string.
 
  */
 
-int
-get_time (curtime)
-     char curtime[];
+int 
+get_time (char curtime[])
 {
   time_t tloc;
   time (&tloc);

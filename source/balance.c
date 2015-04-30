@@ -56,10 +56,8 @@ History:
 
 
 
-int
-main (argc, argv)
-     int argc;
-     char *argv[];
+int 
+main (int argc, char *argv[])
 
 {
   FILE *fopen (), *fptr;
@@ -707,13 +705,8 @@ History:
  
 **************************************************************/
 
-int
-multicycle (www, p, mode, freq_sampling, radmode)
-     PlasmaPtr www;
-     PhotPtr p;
-     int mode;
-     int freq_sampling;
-     int radmode;
+int 
+multicycle (PlasmaPtr www, PhotPtr p, int mode, int freq_sampling, int radmode)
 
 {
   FILE *fopen (), *fptr, *fudgefile, *numfile, *denomfile, *heatcoolfile;
@@ -960,9 +953,8 @@ multicycle (www, p, mode, freq_sampling, radmode)
     }
 }
 
-int
-print_levels (w)
-     PlasmaPtr w;
+int 
+print_levels (PlasmaPtr w)
 {
   int n, m;
   for (n = 0; n < nions; n++)
@@ -982,9 +974,8 @@ print_levels (w)
   return (0);
 }
 
-int
-multi_concen (www)
-     PlasmaPtr www;
+int 
+multi_concen (PlasmaPtr www)
 
 {
   FILE *fopen (), *fptr;
@@ -1064,9 +1055,8 @@ multi_concen (www)
   return (0);
 }
 
-int
-check_field (one)
-     PlasmaPtr one;
+int 
+check_field (PlasmaPtr one)
 {
 
   double trad;
@@ -1084,9 +1074,8 @@ check_field (one)
   return (0);
 }
 
-int
-do_detail (one)
-     PlasmaPtr one;
+int 
+do_detail (PlasmaPtr one)
 {
   double newden[NIONS];
   int n, nelem;

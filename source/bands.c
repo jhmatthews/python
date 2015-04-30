@@ -103,10 +103,8 @@ xband;
 
 
 
-int
-bands_init (imode, band)
-     int imode;			// A switch used for determining how the bands are to be populated
-     struct xbands *band;
+int 
+bands_init (int imode, struct xbands *band)
 
 {
   int mode;
@@ -592,9 +590,8 @@ History:
 			regions where photons are being generated
 **************************************************************/
 
-int
-freqs_init (freqmin, freqmax)
-     double freqmin, freqmax;
+int 
+freqs_init (double freqmin, double freqmax)
 {
   int i, n, ngood, good[NXBANDS];
   double xfreq[NXBANDS];

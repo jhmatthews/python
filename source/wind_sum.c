@@ -41,9 +41,8 @@ History:
 
 **************************************************************/
 
-int
-xtemp_rad (w)
-     WindPtr w;
+int 
+xtemp_rad (WindPtr w)
 {
   int i, j, n;
   double x;

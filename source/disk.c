@@ -10,9 +10,8 @@
 /* The reference temperature for the disk in degrees.  The maximum temperature
    actuallly seen in the disk is 0.488 tdisk
  */
-double
-tdisk (m, mdot, r)
-     double m, mdot, r;
+double 
+tdisk (double m, double mdot, double r)
 {
   double t;
   t = 3. * G / (8. * PI * STEFAN_BOLTZMANN) * m * mdot / (r * r * r);
@@ -40,9 +39,8 @@ tdisk (m, mdot, r)
    06Jan	ksl	Fixed problem with absorbing disk
 */
 
-double
-teff (t, x)
-     double t, x;
+double 
+teff (double t, double x)
 {
   double q, theat, r;
   double pow ();
@@ -121,9 +119,8 @@ teff (t, x)
   return (q);
 }
 
-double
-gdisk (mass, mdot, rmin)
-     double mass, rmin, mdot;
+double 
+gdisk (double mass, double mdot, double rmin)
 {
   double g0;
   g0 =
@@ -133,14 +130,16 @@ gdisk (mass, mdot, rmin)
   return (g0);
 }
 
-double
-geff (g0, x)
+double 
+geff (
 /* effective gravity of standard accretion disk as a function of r
 	inputs:         g 	reference gravity in cm s**-2
 			x	distance from center in units of r/rmin
 
 */
-     double g0, x;
+    double g0,
+    double x
+)
 {
   double q;
   q = (1.0e0 - pow (x, -0.5e0));
@@ -180,10 +179,8 @@ History:
  */
 double north[] = { 0.0, 0.0, 1.0 };
 
-double
-vdisk (x, v)
-     double x[];
-     double v[];
+double 
+vdisk (double x[], double v[])
 {
   double xhold[3];
   double r, speed;
@@ -222,9 +219,8 @@ History:
                                                                                          
 **************************************************************/
 
-double
-zdisk (r)
-     double r;
+double 
+zdisk (double r)
 {
   double z;
   z = geo.disk_z0 * pow (r / geo.diskrad, geo.disk_z1) * geo.diskrad;
@@ -277,10 +273,8 @@ int ds_to_disk_init = 0;
 struct photon ds_to_disk_photon;
 struct plane diskplane, disktop, diskbottom;
 
-double
-ds_to_disk (p, miss_return)
-     struct photon *p;
-     int miss_return;
+double 
+ds_to_disk (struct photon *p, int miss_return)
 {
   double x1, x2;
   double s_plane, s_top, s_bottom, s_sphere, s_disk;
@@ -461,9 +455,8 @@ ds_to_disk (p, miss_return)
 
 */
 
-void
-disk_deriv (s, value, derivative)
-     double s, *value, *derivative;
+void 
+disk_deriv (double s, double *value, double *derivative)
 {
   struct photon phit;
   double z1, z2, r1, r2;

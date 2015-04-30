@@ -32,8 +32,8 @@ History:
 #include "python.h"
 
     
-int
-communicate_estimators_para ()
+int 
+communicate_estimators_para (void)
 {
 #ifdef MPI_ON   // these routines should only be called anyway in parallel but we need these to compile
 
@@ -226,10 +226,8 @@ History:
 **************************************************************/
 
 
-int
-gather_spectra_para (nspec_helper, nspecs)
-     int nspec_helper;
-     int nspecs;
+int 
+gather_spectra_para (int nspec_helper, int nspecs)
 {
 #ifdef MPI_ON   // these routines should only be called anyway in parallel but we need these to compile
 
@@ -301,8 +299,8 @@ History:
 **************************************************************/
 
 
-int
-communicate_matom_estimators_para ()
+int 
+communicate_matom_estimators_para (void)
 {
 #ifdef MPI_ON   // these routines should only be called anyway in parallel but we need these to compile
 

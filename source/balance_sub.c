@@ -20,16 +20,8 @@
 	06nov	ksl	58b - Began work to get this to work again
  */
 
-int
-xsaha (one, p, nh, t_r, t_e, weight, ioniz_mode, freq_sampling)
-     WindPtr one;
-     PhotPtr p;
-     double nh;
-     double t_r;
-     double t_e;
-     double weight;
-     int ioniz_mode;
-     int freq_sampling;
+int 
+xsaha (WindPtr one, PhotPtr p, double nh, double t_r, double t_e, double weight, int ioniz_mode, int freq_sampling)
 {
   double total_fb ();
   double total_free ();
@@ -224,17 +216,8 @@ History:
 double cy_tr = 0.0;
 double cy_nh = 0.0;
 
-int
-cycle (xplasma, p, nh, t_r, t_e, weight, mode, freq_sampling, radmode)
-     PlasmaPtr xplasma;
-     PhotPtr p;
-     double nh;
-     double t_r;
-     double t_e;
-     double weight;
-     int mode;
-     int freq_sampling;
-     int radmode;
+int 
+cycle (PlasmaPtr xplasma, PhotPtr p, double nh, double t_r, double t_e, double weight, int mode, int freq_sampling, int radmode)
 {
   double total_fb ();
   double total_free ();
@@ -537,10 +520,8 @@ recalculate the heating at any point.   The resulting te is incorporated into th
 			seemed to work following these changes.
 */
 
-int
-dumb_step (one, te)
-     WindPtr one;
-     double *te;
+int 
+dumb_step (WindPtr one, double *te)
 {
   double lum_current, lum_hotter, lum_cooler;
   double tstep, hardness;
@@ -649,9 +630,8 @@ dumb_step (one, te)
   return (0);
 }
 
-int
-find_te (one)
-     WindPtr one;
+int 
+find_te (WindPtr one)
 {
   double calc_te ();
   double luminosity, total_emission ();

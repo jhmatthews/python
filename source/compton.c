@@ -51,10 +51,8 @@ feb 2013 - nsh - approximate KN cross section replaced by correct value
  ************************************************************************/
 
 
-double
-kappa_comp (xplasma, freq)
-     PlasmaPtr xplasma;		// Pointer to current plasma cell
-     double freq;		// Frequency of the current photon being tracked
+double 
+kappa_comp (PlasmaPtr xplasma, double freq)		// Frequency of the current photon being tracked
 {
   double x;			// The opacity of the cell by the time we return it.
   double sigma;			/*The cross section, thompson, or KN if hnu/mec2 > 0.01 */
@@ -97,10 +95,8 @@ feb 2013 - nsh - approximate KN cross section replaced by correct value
  ************************************************************************/
 
 
-double
-kappa_ind_comp (xplasma, freq)
-     PlasmaPtr xplasma;		// Pointer to current plasma cell
-     double freq;		// Frequency of the current photon being tracked
+double 
+kappa_ind_comp (PlasmaPtr xplasma, double freq)		// Frequency of the current photon being tracked
      //double w;			// The weight of the photon packet
      //double ds;			//The distance the photon travels
 {
@@ -163,10 +159,8 @@ kappa_ind_comp (xplasma, freq)
 
  ************************************************************************/
 
-double
-total_comp (one, t_e)
-     WindPtr one;		// Pointer to the current wind cell - we need the cell volume, this is not in the plasma structure
-     double t_e;		//Current electron temperature of the cell
+double 
+total_comp (WindPtr one, double t_e)		//Current electron temperature of the cell
 {
   double x;			//The returned variable
   int nplasma;			//The cell number in the plasma array
@@ -205,9 +199,8 @@ total_comp (one, t_e)
 
  ************************************************************************/
 
-double
-klein_nishina (nu)
-     double nu;			//The frequency of the photon packet
+double 
+klein_nishina (double nu)			//The frequency of the photon packet
 {
   double x;			//h nu / kt
   double x1, x2, x3, x4;	//variables to store intermediate results.

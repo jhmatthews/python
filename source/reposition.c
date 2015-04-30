@@ -33,10 +33,8 @@ History:
 
 
 
-int
-reposition (w, p)
-     WindPtr w;			//w here refers to entire wind, not a single element
-     PhotPtr p;
+int 
+reposition (WindPtr w, PhotPtr p)
 
 {
 

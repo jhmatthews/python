@@ -63,10 +63,12 @@ History:
 	06may	ksl	57+ -- Mods for change to  plasma.  Downsream programs need volume
  */
 
-double
-total_line_emission (one, f1, f2)
-     WindPtr one;		/* WindPtr to a specific cell in the wind */
-     double f1, f2;		/* Minimum and maximum frequency */
+double 
+total_line_emission (
+    WindPtr one,		/* WindPtr to a specific cell in the wind */
+    double f1,
+    double f2		/* Minimum and maximum frequency */
+)
 {
 
   double lum;
@@ -93,10 +95,12 @@ total_line_emission (one, f1, f2)
 
 }
 
-double
-lum_lines (one, nmin, nmax)
-     WindPtr one;		/* WindPtr to a specific cell in the wind */
-     int nmin, nmax;		/* The min and max index in lptr array for which the power is to be calculated */
+double 
+lum_lines (
+    WindPtr one,		/* WindPtr to a specific cell in the wind */
+    int nmin,
+    int nmax		/* The min and max index in lptr array for which the power is to be calculated */
+)
 {
   int n;
   double lum, x, z;
@@ -164,10 +168,8 @@ lum_lines (one, nmin, nmax)
 }
 
 /* This routine creates a luminosty pdf */
-int
-lum_pdf (xplasma, lumlines)
-     PlasmaPtr xplasma;
-     double lumlines;
+int 
+lum_pdf (PlasmaPtr xplasma, double lumlines)
 {
   int n, m;
   double xsum, vsum;
@@ -225,10 +227,8 @@ pdf_x[m]-1
 struct lines *q21_line_ptr;
 double q21_a, q21_t_old;
 
-double
-q21 (line_ptr, t)
-     struct lines *line_ptr;
-     double t;
+double 
+q21 (struct lines *line_ptr, double t)
 {
   double gaunt;
   double omega;
@@ -260,10 +260,8 @@ q21 (line_ptr, t)
   return (q21_a);
 }
 
-double
-q12 (line_ptr, t)
-     struct lines *line_ptr;
-     double t;
+double 
+q12 (struct lines *line_ptr, double t)
 {
   double x;
   double q21 ();
@@ -290,9 +288,8 @@ q12 (line_ptr, t)
 struct lines *a21_line_ptr;
 double a21_a;
 
-double
-a21 (line_ptr)
-     struct lines *line_ptr;
+double 
+a21 (struct lines *line_ptr)
 {
   double freq;
 
@@ -351,11 +348,8 @@ struct lines *old_line_ptr;
 double old_ne, old_te, old_w, old_tr, old_dd;
 double old_d1, old_d2, old_n2_over_n1;
 
-double
-two_level_atom (line_ptr, xplasma, d1, d2)
-     struct lines *line_ptr;
-     PlasmaPtr xplasma;
-     double *d1, *d2;
+double 
+two_level_atom (struct lines *line_ptr, PlasmaPtr xplasma, double *d1, double *d2)
 {
   double a, a21 ();
   double q, q21 (), c12, c21;
@@ -509,10 +503,8 @@ ERROR -- or conceptually
 /* Calculate the total line absorption crossection for a specific transition
    allowing for stimulated emission */
 
-double
-line_nsigma (line_ptr, xplasma)
-     struct lines *line_ptr;
-     PlasmaPtr xplasma;
+double 
+line_nsigma (struct lines *line_ptr, PlasmaPtr xplasma)
 {
   double d1, d2, x;
 
@@ -566,10 +558,8 @@ History:
 */
 
 
-double
-scattering_fraction (line_ptr, xplasma)
-     struct lines *line_ptr;
-     PlasmaPtr xplasma;
+double 
+scattering_fraction (struct lines *line_ptr, PlasmaPtr xplasma)
 {
   double q, escape;
   double a, c, z;
@@ -639,10 +629,8 @@ struct lines *pe_line_ptr;
 double pe_ne, pe_te, pe_dd, pe_dvds, pe_w, pe_tr;
 double pe_escape;
 
-double
-p_escape (line_ptr, xplasma)
-     struct lines *line_ptr;
-     PlasmaPtr xplasma;
+double 
+p_escape (struct lines *line_ptr, PlasmaPtr xplasma)
 {
   double tau, two_level_atom ();
   double escape;
@@ -712,9 +700,8 @@ p_escape (line_ptr, xplasma)
  */
 
 
-double
-p_escape_from_tau(tau)
-double tau;
+double 
+p_escape_from_tau (double tau)
 {
   double escape;
 
@@ -742,11 +729,8 @@ double tau;
 	06my	ksl	57+ Updated for new structure approach
  */
 
-int
-line_heat (xplasma, pp, nres)
-     PlasmaPtr xplasma;
-     PhotPtr pp;
-     int nres;
+int 
+line_heat (PlasmaPtr xplasma, PhotPtr pp, int nres)
 {
   double x, sf;
 

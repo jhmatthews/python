@@ -37,10 +37,8 @@ History:
 
 #include "python.h"
 
-int
-main (argc, argv)
-     int argc;
-     char *argv[];
+int 
+main (int argc, char *argv[])
 {
 
   int pcycles;
@@ -383,8 +381,8 @@ History:
  				python
 **************************************************************/
 
-int
-init_geo ()
+int 
+init_geo (void)
 {
   geo.wind_type = 0;		// Schlossman and Vitello
 

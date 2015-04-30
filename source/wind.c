@@ -68,9 +68,8 @@ History:
 			
 **************************************************************/
 
-int
-where_in_wind (x)
-     double x[];
+int 
+where_in_wind (double x[])
 {
   double rho, rho_min, rho_max, z;
   int ireturn;
@@ -191,10 +190,8 @@ History:
 			quit when a sane_check error found
 **************************************************************/
 
-int
-wind_check (www, n)
-     WindPtr www;
-     int n;
+int 
+wind_check (WindPtr www, int n)
 {
   Log ("Got to wind_check\n");
   int i, j, k, istart, istop;
@@ -259,9 +256,8 @@ wind_check (www, n)
  * 			handle multiple coordinate systems
  */
 
-double
-model_velocity (x, v)
-     double x[], v[];
+double 
+model_velocity (double x[], double v[])
 {
   double speed;
 
@@ -324,9 +320,8 @@ model_velocity (x, v)
  * 04aug	ksl	52 adapted form define_wind in wind2d.c
  */
 
-int
-model_vgrad (x, v_grad)
-     double x[], v_grad[][3];
+int 
+model_vgrad (double x[], double v_grad[][3])
 {
 
   double v0[3], v1[3];
@@ -375,9 +370,8 @@ History
 11aug	ksl	70b- added call to calculate density in the torus
  */
 
-double
-model_rho (x)
-     double x[];
+double 
+model_rho (double x[])
 {
   double rho;
   if (geo.wind_type == 0)

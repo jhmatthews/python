@@ -26,8 +26,8 @@ History:
 **************************************************************/
 
 
-int
-get_corona_params ()
+int 
+get_corona_params (void)
 {
   Log ("Creating a corona above a disk\n");
 
@@ -115,9 +115,8 @@ History:
  
 **************************************************************/
 
-double
-corona_velocity (x, v)
-     double x[], v[];
+double 
+corona_velocity (double x[], double v[])
 {
   double rho, speed;
   double xtest[3];
@@ -171,9 +170,8 @@ History:
  
 **************************************************************/
 
-double
-corona_rho (x)
-     double x[];
+double 
+corona_rho (double x[])
 {
   double rho;
   double tref, t;

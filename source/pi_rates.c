@@ -62,10 +62,7 @@ calc_pi_rate (nion,xplasma,mode)  calculates the photoionization rarte coefficie
 
 
 double 
-calc_pi_rate (nion,xplasma,mode)
-	PlasmaPtr xplasma;
-	int nion;
-	int mode;
+calc_pi_rate (int nion, PlasmaPtr xplasma, int mode)
 {
   int  n, j;
   double pi_rate;
@@ -243,9 +240,8 @@ This is almost identical to code written to compute the sim power law correction
  ************************************************************************/
 
 
-double
-tb_planck1 (freq)
-     double freq;
+double 
+tb_planck1 (double freq)
 {
   double answer, bbe;
   bbe = exp ((H * freq) / (BOLTZMANN * qromb_temp));
@@ -264,9 +260,8 @@ tb_planck1 (freq)
 
 
 
-double
-tb_logpow1 (freq)
-     double freq;
+double 
+tb_logpow1 (double freq)
 {
   double answer;
 
@@ -312,9 +307,8 @@ This is almost identical to code written to compute the sim power law correction
 
 
 
-double
-tb_exp1 (freq)
-     double freq;
+double 
+tb_exp1 (double freq)
 {
   double answer;
 

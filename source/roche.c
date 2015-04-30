@@ -81,8 +81,8 @@
 
 struct photon p_roche;
 
-int
-binary_basics ()
+int 
+binary_basics (void)
 {
   double x;
 
@@ -171,9 +171,8 @@ binary_basics ()
 
  */
 
-double
-ds_to_roche_2 (p)
-     PhotPtr p;
+double 
+ds_to_roche_2 (PhotPtr p)
 {
 
 
@@ -231,9 +230,8 @@ ds_to_roche_2 (p)
 /* Find out whether a photon will hit the secondary, but don't actually calculate the
    point where it hits */
 
-int
-hit_secondary (p)
-     PhotPtr p;
+int 
+hit_secondary (PhotPtr p)
 {
   double smin, smax, s;
   double golden (), phi ();
@@ -280,10 +278,8 @@ History:
 			to be counted as hitting the pillbox.  See note above
 */
 
-double
-pillbox (p, smin, smax)
-     PhotPtr p;
-     double *smin, *smax;
+double 
+pillbox (PhotPtr p, double *smin, double *smax)
 {
   double x1, x2;
   double a, b, c;
@@ -400,9 +396,8 @@ then the photon did not hit the pillbox ksl 02jan */
 int phi_init = 0;
 double phi_gm1, phi_gm2, phi_3, phi_4;
 
-double
-phi (s)
-     double s;
+double 
+phi (double s)
 {
   struct photon pp;
   double x1, x2, z, z1, z2, z3;
@@ -448,9 +443,8 @@ phi (s)
 
 #define EPS 10000.
 
-double
-dphi_ds (s)
-     double s;
+double 
+dphi_ds (double s)
 {
   double phi (), x1, x2;
   double dx, z;
@@ -465,9 +459,8 @@ dphi_ds (s)
 }
 
 
-double
-d2phi_ds2 (s)
-     double s;
+double 
+d2phi_ds2 (double s)
 {
   double phi (), x1, x2, x3;
   double dx;
@@ -486,9 +479,8 @@ d2phi_ds2 (s)
    x axis in the plane of the orbit.  There is no real guarantee that this would
    work if you were outside L2 or L3. */
 
-double
-roche_width (x)
-     double x;
+double 
+roche_width (double x)
 {
   double rho, smax;
   void roche ();
@@ -518,8 +510,8 @@ roche_width (x)
 /* Find the maximum half width of the Roche lobe of the secondary.   This routine
    uses the NR routine golden to find the point in x where the Roche lobe is maximized.  */
 
-double
-roche2_width_max ()
+double 
+roche2_width_max (void)
 {
   double xmin, xmax, xmid, xbest;
   double rmin;
@@ -550,9 +542,8 @@ roche2_width_max ()
    phi has to be set in advance through geo.phi and would normally be that of
    the Roche lobe */
 
-void
-roche (s, value, derivative)
-     double s, *value, *derivative;
+void 
+roche (double s, double *value, double *derivative)
 {
   *value = phi (s);
   *derivative = dphi_ds (s);
@@ -564,9 +555,8 @@ roche (s, value, derivative)
    *value is the derivative of phi at s along the vector defined by p_roche, and 
    *derivative is the second derivative */
 
-void
-roche_deriv (s, value, derivative)
-     double s, *value, *derivative;
+void 
+roche_deriv (double s, double *value, double *derivative)
 {
   *value = dphi_ds (s);
   *derivative = d2phi_ds2 (s);

@@ -43,10 +43,8 @@ int ispy_cell[] = { 91, 92, 93, 121, 122, 123 };
 
 int ispy_ncells = 6;
 
-int
-ispy_init (filename, icycle)
-     char filename[];
-     int icycle;
+int 
+ispy_init (char filename[], int icycle)
 {
   FILE *fopen ();
   char wholename[30];
@@ -64,8 +62,8 @@ ispy_init (filename, icycle)
   return (0);
 }
 
-int
-ispy_close ()
+int 
+ispy_close (void)
 {
   if (ispy_start == 0)
     {
@@ -83,11 +81,8 @@ int ispy_grid_old = -1;		// The grid cell in which a photon was laast
 
 int ispy_phot_old = -1;		// The photon number of the last photon
 
-int
-ispy (p, n)
-     PhotPtr p;			//The photon
-
-     int n;			//The photon number
+int 
+ispy (PhotPtr p, int n)			//The photon number
 
 {
   int i, m;

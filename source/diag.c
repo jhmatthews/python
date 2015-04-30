@@ -43,8 +43,8 @@ History:
 int eplinit = 0;
 int pstatinit = 0;		/*To say if we have checked to see if we need to log photons */
 
-int
-open_diagfile ()
+int 
+open_diagfile (void)
 {
   FILE *cellfile;		/*File that may or may not exist, pointing to cells we want to write out photon stats for */
   int cell;			/*Temporary storage of cell to use */
@@ -123,7 +123,8 @@ History:
     1410 -- JM -- Coded
 **************************************************************/
 
-int get_extra_diagnostics()
+int 
+get_extra_diagnostics (void)
 {
   int wordlength;
   char firstword[LINELENGTH];
@@ -249,11 +250,8 @@ History:
 
 
 
-int
-save_photon_stats (one, p, ds)
-     WindPtr one;
-     PhotPtr p;
-     double ds;
+int 
+save_photon_stats (WindPtr one, PhotPtr p, double ds)
 {
   int i;
 

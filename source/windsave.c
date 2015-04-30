@@ -55,9 +55,8 @@ History:
 #include "python.h"
 
 
-int
-wind_save (filename)
-     char filename[];
+int 
+wind_save (char filename[])
 {
   FILE *fptr, *fopen ();
   char line[LINELENGTH];
@@ -168,9 +167,8 @@ in the plasma structure */
 		different cases
 14jul	nsh	Code added to read in variable length arrays in plasma structure
 */
-int
-wind_read (filename)
-     char filename[];
+int 
+wind_read (char filename[])
 {
   FILE *fptr, *fopen ();
   int n, m;
@@ -319,9 +317,8 @@ wind_read (filename)
  * 	04aug	ksl	Routine rewritten just to be a driver 
  */
 
-int
-wind_complete (w)
-     WindPtr w;
+int 
+wind_complete (WindPtr w)
 {
 
   if (geo.coord_type == SPHERICAL)
@@ -350,9 +347,8 @@ wind_complete (w)
   return (0);
 }
 
-int
-spec_save (filename)
-     char filename[];
+int 
+spec_save (char filename[])
 {
 
   FILE *fptr, *fopen ();
@@ -374,9 +370,8 @@ spec_save (filename)
 }
 
 
-int
-spec_read (filename)
-     char filename[];
+int 
+spec_read (char filename[])
 {
   FILE *fptr, *fopen ();
   int n;

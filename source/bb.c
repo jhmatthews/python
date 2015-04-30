@@ -192,9 +192,8 @@ double bb_set[] = {
 int error_bb_hi = 0;
 int error_bb_lo = 0;
 
-double
-planck (t, freqmin, freqmax)
-     double t, freqmin, freqmax;
+double 
+planck (double t, double freqmin, double freqmax)
 {
   FILE *fopen ();
   double freq, alpha, y;
@@ -333,9 +332,8 @@ Notes:
 History:
 	06sep	ksl	Coded       
 **************************************************************/
-double
-get_rand_pow (x1, x2, alpha)
-     double x1, x2, alpha;
+double 
+get_rand_pow (double x1, double x2, double alpha)
 {
   double r;
   double a;
@@ -404,9 +402,8 @@ History:
 			the difference between alpha_min and the
 			value we want
 **************************************************************/
-double
-get_rand_exp (alpha_min, alpha_max)
-     double alpha_min, alpha_max;
+double 
+get_rand_exp (double alpha_min, double alpha_max)
 {
   double r;
   //Old ksl 12nov double x1, x2;
@@ -466,9 +463,8 @@ History:
 
 double integ_planck[NMAX + 1];
 int i_integ_planck_d = 0;
-double
-integ_planck_d (alphamin, alphamax)
-     double alphamin, alphamax;
+double 
+integ_planck_d (double alphamin, double alphamax)
 {
   double x, z1, z2;
   int n;
@@ -539,8 +535,8 @@ History:
 
 **************************************************************/
 
-int
-init_integ_planck_d ()
+int 
+init_integ_planck_d (void)
 {
   double x;
   double planck_d (), qromb ();
@@ -579,9 +575,8 @@ History:
 
 #define EPSILON	1.e-6
 
-double
-planck_d (alpha)
-     double alpha;
+double 
+planck_d (double alpha)
 {
   double x;
   if (alpha < EPSILON || alpha > ALPHABIG)
@@ -592,9 +587,8 @@ planck_d (alpha)
 
 // Calculate the emittance of a bb between freqmin and freqmax
 // Should integrate to sigma 
-double
-emittance_bb (freqmin, freqmax, t)
-     double freqmin, freqmax, t;
+double 
+emittance_bb (double freqmin, double freqmax, double t)
 {
   double alphamin, alphamax, q1;
   double integ_planck_d ();
@@ -647,9 +641,8 @@ History:
 **************************************************************/
 
 
-double
-check_fmax (fmin, fmax, temp)
-     double fmin, fmax, temp;
+double 
+check_fmax (double fmin, double fmax, double temp)
 {
   double bblim;
 

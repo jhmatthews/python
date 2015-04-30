@@ -32,13 +32,8 @@ History:
  
 **************************************************************/
 
-int
-translate (w, pp, tau_scat, tau, nres)
-     WindPtr w;
-     PhotPtr pp;
-     double tau_scat;
-     double *tau;
-     int *nres;
+int 
+translate (WindPtr w, PhotPtr pp, double tau_scat, double *tau, int *nres)
 {
   int istat;
 
@@ -84,9 +79,8 @@ History:
 **************************************************************/
 
 
-int
-translate_in_space (pp)
-     PhotPtr pp;
+int 
+translate_in_space (PhotPtr pp)
 {
   double ds, x;
 
@@ -130,9 +124,8 @@ History:
 **************************************************************/
 
 
-double
-ds_to_wind (pp)
-     PhotPtr pp;
+double 
+ds_to_wind (PhotPtr pp)
 {
   double ds, ds_to_cone (), x;
 
@@ -173,12 +166,8 @@ History:
 
 
 
-int
-translate_in_wind (w, p, tau_scat, tau, nres)
-     WindPtr w;
-     PhotPtr p;
-     double tau_scat, *tau;
-     int *nres;
+int 
+translate_in_wind (WindPtr w, PhotPtr p, double tau_scat, double *tau, int *nres)
 
 
 {
@@ -264,9 +253,8 @@ History:
 
 **************************************************************/
 
-int
-walls (p, pold)
-     PhotPtr p, pold;
+int 
+walls (PhotPtr p, PhotPtr pold)
 {
   double dot ();
 

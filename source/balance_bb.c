@@ -43,13 +43,8 @@ History
 //02jul int nbands, mbands;             // Actual number of bands
 
 
-int
-xbb (p, t, weight, f1, f2, freq_sampling)
-     PhotPtr p;
-     double t;
-     double weight;
-     double f1, f2;
-     int freq_sampling;
+int 
+xbb (PhotPtr p, double t, double weight, double f1, double f2, int freq_sampling)
 {
 
   int n, most;
@@ -185,13 +180,8 @@ one photon for each band.*/
 }
 
 // This is a stripped down routine. It doesn't think. It just makes photons
-int
-xmake_bb (p, t_r, freqmin, freqmax, weight, iphot_start, nphot)
-     PhotPtr p;
-     double t_r;
-     double freqmin, freqmax;
-     double weight;
-     int iphot_start, nphot;	// Parallels photon gen
+int 
+xmake_bb (PhotPtr p, double t_r, double freqmin, double freqmax, double weight, int iphot_start, int nphot)	// Parallels photon gen
 {
   int n;
   int iphot_stop;

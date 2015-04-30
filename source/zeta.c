@@ -101,10 +101,8 @@ incorporate a correction factor for dielectronic recombination.
                                                                                                    
  ************************************************************************/
 
-double
-compute_zeta (temp, nion, mode)
-     double temp;
-     int mode, nion;
+double 
+compute_zeta (double temp, int nion, int mode)
 {
   double zeta, interpfrac, dummy;
   int ihi, ilow;

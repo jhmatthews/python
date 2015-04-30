@@ -57,10 +57,8 @@
 #include "atomic.h"
 #include "python.h"
 
-int
-levels (xplasma, mode)
-     PlasmaPtr xplasma;
-     int mode;
+int 
+levels (PlasmaPtr xplasma, int mode)
 {
   double t, weight;
   int n, m;

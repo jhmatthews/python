@@ -150,9 +150,8 @@ described in terms of Topbase photoionization x-sections.
  ************************************************************************/
 
 
-double
-fb_topbase_partial (freq)
-     double freq;
+double 
+fb_topbase_partial (double freq)
 {
   int nion;
   double partial;
@@ -243,12 +242,8 @@ recombinations per second of a particular ion.
  ************************************************************************/
 
 
-double
-integ_fb (t, f1, f2, nion, fb_choice)
-     double t;			// The temperature at which to calculate the emissivity
-     double f1, f2;		// The frequencies overwhich to integrate the emissivity
-     int nion;			// The ion for which the "specific emissivity is calculateed
-     int fb_choice;		// 0=full, otherwise reduced
+double 
+integ_fb (double t, double f1, double f2, int nion, int fb_choice)		// 0=full, otherwise reduced
 {
   double xinteg_fb ();
   double fnu;
@@ -327,10 +322,8 @@ integ_fb (t, f1, f2, nion, fb_choice)
  ************************************************************************/
 
 
-double
-total_fb (one, t, f1, f2)
-     WindPtr one;
-     double t, f1, f2;
+double 
+total_fb (WindPtr one, double t, double f1, double f2)
 {
   double total;
   int nion;
@@ -435,10 +428,12 @@ WindPtr ww_fb;
 struct Pdf pdf_fb;
 double one_fb_f1, one_fb_f2, one_fb_te;	/* Old values */
 
-double
-one_fb (one, f1, f2)
-     WindPtr one;		/* a single cell */
-     double f1, f2;		/* freqmin and freqmax */
+double 
+one_fb (
+    WindPtr one,		/* a single cell */
+    double f1,
+    double f2		/* freqmin and freqmax */
+)
 {
   double freq, tt, delta;
   int n;
@@ -592,10 +587,8 @@ generate photons */
                                                                                                    
  ************************************************************************/
 
-int
-num_recomb (xplasma, t_e)
-     PlasmaPtr xplasma;
-     double t_e;
+int 
+num_recomb (PlasmaPtr xplasma, double t_e)
 {
   int nelem;
   int i, imin, imax;
@@ -650,13 +643,8 @@ num_recomb (xplasma, t_e)
  ************************************************************************/
 
 
-double
-fb (xplasma, t, freq, ion_choice, fb_choice)
-     PlasmaPtr xplasma;		// A cell with all its associated density data
-     double t;			// The temperature at which to calculate the emissivity
-     double freq;		// The frequency at which to calculate the emissivity
-     int ion_choice;		// Selects which ions the emissivity is to be calculated for (see above)
-     int fb_choice;		// 0=full, otherwise reduced
+double 
+fb (PlasmaPtr xplasma, double t, double freq, int ion_choice, int fb_choice)		// 0=full, otherwise reduced
 {
   int n;
   double fnu, x;
@@ -782,9 +770,8 @@ recombination rates and band-limited luminosities.
 int init_freebound_nfb;		/*Indicates the total number of freebound sets that
 				   could be used */
 
-int
-init_freebound (t1, t2, f1, f2)
-     double t1, t2, f1, f2;
+int 
+init_freebound (double t1, double t2, double f1, double f2)
 {
   double t;
   int i, j, nion;
@@ -929,10 +916,8 @@ on the assumption that the fb information will be reused.
  ************************************************************************/
 
 
-double
-get_nrecomb (t, nion)
-     double t;
-     int nion;
+double 
+get_nrecomb (double t, int nion)
 {
   int linterp ();
   double x;
@@ -944,11 +929,8 @@ get_nrecomb (t, nion)
 
 /* Return the specific emissivity due to recombination emission in an interval */
 
-double
-get_fb (t, nion, narray)
-     double t;
-     int nion;
-     int narray;
+double 
+get_fb (double t, int nion, int narray)
 {
   int linterp ();
   double x;
@@ -991,12 +973,8 @@ a frequency range
  ************************************************************************/
 
 
-double
-xinteg_fb (t, f1, f2, nion, fb_choice)
-     double t;			// The temperature at which to calculate the emissivity
-     double f1, f2;		// The frequencies overwhich to integrate the emissivity
-     int nion;			// The ion for which the "specific emissivity is calculateed
-     int fb_choice;		// 0=full, otherwise reduced
+double 
+xinteg_fb (double t, double f1, double f2, int nion, int fb_choice)		// 0=full, otherwise reduced
 {
   int n;
   double fnu;
@@ -1121,9 +1099,8 @@ History:
                                                                                                                                       
 **************************************************************/
 
-int
-fb_save (filename)
-     char filename[];
+int 
+fb_save (char filename[])
 {
   FILE *fptr, *fopen ();
 
@@ -1161,9 +1138,8 @@ fb_save (filename)
 }
 
 
-int
-fb_read (filename)
-     char filename[];
+int 
+fb_read (char filename[])
 {
   FILE *fptr, *fopen ();
   int n;
@@ -1302,10 +1278,8 @@ History:
                                                                                                                                       
 **************************************************************/
 
-double
-total_rrate (nion, T)
-     int nion;
-     double T;
+double 
+total_rrate (int nion, double T)
 {
 
 
@@ -1416,10 +1390,8 @@ History:
                                                                                                                                       
 **************************************************************/
 
-double
-gs_rrate (nion, T)
-     int nion;
-     double T;
+double 
+gs_rrate (int nion, double T)
 {
   double rate, drdt, dt;
   int i, imin, imax;

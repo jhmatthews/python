@@ -50,9 +50,8 @@ History:
 
 **************************************************************/
 
-double
-dvwind_ds (p)
-     PhotPtr p;
+double 
+dvwind_ds (PhotPtr p)
 {
   double v_grad[3][3];
   double lmn[3], dvel_ds[3], dvds;
@@ -199,8 +198,8 @@ dvwind_ds (p)
  */
 
 #define N_DVDS_AVE	10000
-int
-dvds_ave ()
+int 
+dvds_ave (void)
 {
   struct photon p, pp;
   double v_zero[3], delta[3], vdelta[3], diff[3];

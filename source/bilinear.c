@@ -110,10 +110,8 @@
 			coordiantes within python
 
  ************************************************************************/
-int
-bilin (x, x00, x01, x10, x11, f, g)
-     double x[], x00[], x01[], x10[], x11[];
-     double *f, *g;
+int 
+bilin (double x[], double x00[], double x01[], double x10[], double x11[], double *f, double *g)
 
 {
   double z;
@@ -233,9 +231,8 @@ History
 
 */
 
-int
-xquadratic (a, b, c, r)
-     double a, b, c, r[];
+int 
+xquadratic (double a, double b, double c, double r[])
 {
   double q, z;
   double qq;

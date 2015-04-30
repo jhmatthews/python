@@ -53,10 +53,8 @@ History:
  * much
  */
 
-double
-agn_init (r, lum, alpha, freqmin, freqmax, ioniz_or_final, f)
-     double r, lum, alpha, freqmin, freqmax, *f;
-     int ioniz_or_final;
+double 
+agn_init (double r, double lum, double alpha, double freqmin, double freqmax, int ioniz_or_final, double *f)
 {
 
   double t;
@@ -102,9 +100,8 @@ agn_init (r, lum, alpha, freqmin, freqmax, ioniz_or_final, f)
 
 
 /* This routine returns the specific luminosity, that is the luminosity within the frequency interval */
-double
-emittance_pow (freqmin, freqmax, lum, alpha)
-     double freqmin, freqmax, lum, alpha;
+double 
+emittance_pow (double freqmin, double freqmax, double lum, double alpha)
 {
   double constant, emit;
   /* these are the frequencies over which the power law is defined - currently set to the
@@ -153,9 +150,8 @@ emittance_pow (freqmin, freqmax, lum, alpha)
 
  ************************************************************************/
 
-double
-emittance_bpow (freqmin, freqmax, lum, alpha)
-     double freqmin, freqmax, lum, alpha;
+double 
+emittance_bpow (double freqmin, double freqmax, double lum, double alpha)
 {
   double constant, constant_low, constant_hi, emit;
   double e1, e2, e3;
@@ -304,14 +300,19 @@ emittance_bpow (freqmin, freqmax, lum, alpha)
 
 
 
-int
-photo_gen_agn (p, r, alpha, weight, f1, f2, spectype, istart, nphot)
-     PhotPtr p;
-     double r, alpha, weight;
-     double f1, f2;		/* The freqency mininimum and maximum if a uniform distribution is selected */
-     int spectype;		/*The spectrum type to generate: 0 is bb, 1 (or in fact anything but 0)
+int 
+photo_gen_agn (
+    PhotPtr p,
+    double r,
+    double alpha,
+    double weight,
+    double f1,
+    double f2,		/* The freqency mininimum and maximum if a uniform distribution is selected */
+    int spectype,		/*The spectrum type to generate: 0 is bb, 1 (or in fact anything but 0)
 				   is uniform in frequency space */
-     int istart, nphot;		/* Respecitively the starting point in p and the number of photons to generate */
+    int istart,
+    int nphot		/* Respecitively the starting point in p and the number of photons to generate */
+)
 {
   double freqmin, freqmax, dfreq, t;
   int i, iend;

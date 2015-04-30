@@ -18,15 +18,8 @@
 #define NP    10000
 
 
-int
-absolute_saha (www, p, nh, t_r, t_e, weight, freq_sampling)
-     PlasmaPtr www;
-     PhotPtr p;
-     double nh;
-     double t_r;
-     double t_e;
-     double weight;
-     int freq_sampling;
+int 
+absolute_saha (PlasmaPtr www, PhotPtr p, double nh, double t_r, double t_e, double weight, int freq_sampling)
 {
   double total_fb ();
   double total_free ();
@@ -128,13 +121,15 @@ absolute_saha (www, p, nh, t_r, t_e, weight, freq_sampling)
 }
 
 //??? I have changed the calls to total_emission but not absolute_total_emission ksl 
-double
-absolute_total_emission (one, t_e, f1, f2)
-     WindPtr one;		/* WindPtr to a specific cell in the wind */
-     double t_e;		/* The electron temperature of the gas, which can be different from
+double 
+absolute_total_emission (
+    WindPtr one,		/* WindPtr to a specific cell in the wind */
+    double t_e,		/* The electron temperature of the gas, which can be different from
 				   the value stored in ww */
-     double f1, f2;		/* The minimum and maximum frequency over which the emission is
+    double f1,
+    double f2		/* The minimum and maximum frequency over which the emission is
 				   integrated */
+)
 {
   double absolute_total_line_emission (), total_free (), total_fb ();
   double ffmax;
@@ -172,12 +167,14 @@ absolute_total_emission (one, t_e, f1, f2)
 
 }
 
-double
-absolute_total_line_emission (ww, t_e, f1, f2)
-     PlasmaPtr ww;		/* WindPtr to a specific cell in the wind */
-     double t_e;		/* The electron temperature of the gas, which can be different from
+double 
+absolute_total_line_emission (
+    PlasmaPtr ww,		/* WindPtr to a specific cell in the wind */
+    double t_e,		/* The electron temperature of the gas, which can be different from
 				   the value stored in ww */
-     double f1, f2;		/* Minimum and maximum frequency */
+    double f1,
+    double f2		/* Minimum and maximum frequency */
+)
 {
 
   int n;
@@ -258,11 +255,8 @@ absolute_total_line_emission (ww, t_e, f1, f2)
 int ialh = 0;
 
 /* Calculate line heating in the cell for one photon */
-double
-absolute_line_heating (w, p, ds)
-     PlasmaPtr w;
-     PhotPtr p;
-     double ds;
+double 
+absolute_line_heating (PlasmaPtr w, PhotPtr p, double ds)
 {
   double f1, f2, phi, tau;
   double dd;
@@ -316,10 +310,8 @@ absolute_line_heating (w, p, ds)
 /* Calculate the total line absorption crossection for a specific transition
    allowing for stimulated emission */
 
-double
-absolute_line_nsigma (line_ptr, w)
-     struct lines *line_ptr;
-     PlasmaPtr w;
+double 
+absolute_line_nsigma (struct lines *line_ptr, PlasmaPtr w)
 {
   double d1, d2, x;
   int ion;
@@ -340,11 +332,8 @@ absolute_line_nsigma (line_ptr, w)
 /* Calculate the ratio of populations of a two level atom
    in lte */
 
-double
-absolute_two_level_atom (line_ptr, www, d1, d2)
-     struct lines *line_ptr;
-     PlasmaPtr www;
-     double *d1, *d2;
+double 
+absolute_two_level_atom (struct lines *line_ptr, PlasmaPtr www, double *d1, double *d2)
 {
   double freq, te;
   int gu, gl;
@@ -398,10 +387,8 @@ History:
 double fb_alpha;
 struct photoionization *fb_xptr;
 
-double
-fb_cooling (t_e, f1, f2, fb_h, fb_he1, fb_he2)
-     double t_e, f1, f2;
-     double *fb_h, *fb_he1, *fb_he2;
+double 
+fb_cooling (double t_e, double f1, double f2, double *fb_h, double *fb_he1, double *fb_he2)
 {
   int n;
   double h, he1, he2;
@@ -458,9 +445,8 @@ fb_cooling (t_e, f1, f2, fb_h, fb_he1, fb_he2)
 }
 
 
-double
-fb_cooling_d (f)
-     double f;
+double 
+fb_cooling_d (double f)
 {
   double ft, x;
   double sigma_phot ();

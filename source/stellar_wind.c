@@ -57,8 +57,8 @@ History:
 **************************************************************/
 
 
-int
-get_stellar_wind_params ()
+int 
+get_stellar_wind_params (void)
 {
   Log ("Creating a wind model for a Star\n");
 
@@ -152,9 +152,8 @@ History:
  
 **************************************************************/
 
-double
-stellar_velocity (x, v)
-     double x[], v[];
+double 
+stellar_velocity (double x[], double v[])
 {
   double r, speed, zzz;
   double length ();
@@ -204,9 +203,8 @@ History:
  
 **************************************************************/
 
-double
-stellar_rho (x)
-     double x[];
+double 
+stellar_rho (double x[])
 {
   double r, rho, v[3];
   double length (), stellar_velocity ();
@@ -242,9 +240,8 @@ NB: Making ds too small can cause roundoff and/or precision errors.
         01dec   ksl     Added for python_40
 
 */
-int
-stellar_vel_grad (x, velgrad)
-     double x[], velgrad[][3];
+int 
+stellar_vel_grad (double x[], double velgrad[][3])
 {
   double v0[3], v1[3];
   double dx[3], dv[3];

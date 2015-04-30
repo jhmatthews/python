@@ -51,13 +51,8 @@ History:
 #include "python.h"
 
 
-int
-ion_summary (w, element, istate, iswitch, rootname, ochoice)
-     WindPtr w;
-     int element, istate;
-     int iswitch;
-     char rootname[];
-     int ochoice;
+int 
+ion_summary (WindPtr w, int element, int istate, int iswitch, char rootname[], int ochoice)
 {
   int nion, nelem;
   int n;
@@ -198,13 +193,8 @@ ion_summary (w, element, istate, iswitch, rootname, ochoice)
   return (0);
 }
 
-int
-tau_ave_summary (w, element, istate, freq, rootname, ochoice)
-     WindPtr w;
-     int element, istate;
-     double freq;
-     char rootname[];
-     int ochoice;
+int 
+tau_ave_summary (WindPtr w, int element, int istate, double freq, char rootname[], int ochoice)
 {
   int nion, nelem;
   int n;
@@ -280,12 +270,8 @@ tau_ave_summary (w, element, istate, freq, rootname, ochoice)
   return (0);
 }
 
-int
-line_summary (w, element, istate, rootname, ochoice)
-     WindPtr w;
-     int element, istate;
-     char rootname[];
-     int ochoice;
+int 
+line_summary (WindPtr w, int element, int istate, char rootname[], int ochoice)
 {
   int nion, nelem;
   int n;
@@ -413,10 +399,8 @@ line_summary (w, element, istate, rootname, ochoice)
   return (0);
 }
 
-int
-total_emission_summary (w, rootname, ochoice)
-     WindPtr w;
-     char rootname[];
+int 
+total_emission_summary (WindPtr w, char rootname[], int ochoice)
 {
   double tot;
   int n;
@@ -451,10 +435,8 @@ total_emission_summary (w, rootname, ochoice)
   return (0);
 }
 
-int
-modify_te (w, rootname, ochoice)
-     WindPtr w;
-     char rootname[];
+int 
+modify_te (WindPtr w, char rootname[], int ochoice)
 {
   int n;
   double x;
@@ -489,12 +471,8 @@ modify_te (w, rootname, ochoice)
 
 
 
-int
-partial_measure_summary (w, element, istate, rootname, ochoice)
-     WindPtr w;
-     int element, istate;
-     char rootname[];
-     int ochoice;
+int 
+partial_measure_summary (WindPtr w, int element, int istate, char rootname[], int ochoice)
 {
   int nion, nelem;
   int n;

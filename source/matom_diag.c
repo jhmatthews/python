@@ -27,8 +27,8 @@ History:
 
 **************************************************************/
 
-int
-matom_emiss_report ()
+int 
+matom_emiss_report (void)
 {
 
   int n, m;

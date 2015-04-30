@@ -55,9 +55,8 @@ History:
 
 
 
-double
-cylvar_ds_in_cell (p)
-     PhotPtr p;
+double 
+cylvar_ds_in_cell (PhotPtr p)
 
 
 {
@@ -151,9 +150,8 @@ History:
 **************************************************************/
 
 
-int
-cylvar_make_grid (w)
-     WindPtr w;
+int 
+cylvar_make_grid (WindPtr w)
 {
   double dr, dz, dlogr, dlogz;
   double r, z_offset;
@@ -286,9 +284,8 @@ History:
 **************************************************************/
 
 
-int
-cylvar_wind_complete (w)
-     WindPtr w;
+int 
+cylvar_wind_complete (WindPtr w)
 {
   int i, j, n;
   double drho, dz;
@@ -377,10 +374,8 @@ cylvar_wind_complete (w)
 #define RESOLUTION   1000
 
 
-int
-cylvar_volumes (w, icomp)
-     WindPtr w;
-     int icomp;			// The component for which we want the volume
+int 
+cylvar_volumes (WindPtr w, int icomp)			// The component for which we want the volume
 {
   int i, j, n;
   int jj, kk;
@@ -542,11 +537,8 @@ cylvar_volumes (w, icomp)
 int cylvar_n_approx;
 int ierr_cylvar_where_in_grid = 0;
 
-int
-cylvar_where_in_grid (x, ichoice, fx, fz)
-     double x[];
-     int ichoice;
-     double *fx, *fz;
+int 
+cylvar_where_in_grid (double x[], int ichoice, double *fx, double *fz)
 {
   int i, j, n, ii;
   double z[3];
@@ -708,11 +700,8 @@ cylvar_where_in_grid (x, ichoice, fx, fz)
  
 **************************************************************/
 
-int
-cylvar_get_random_location (n, icomp, x)
-     int n;			// Cell in which to create position
-     int icomp;			// Component in which to create position
-     double x[];		// Returned position
+int 
+cylvar_get_random_location (int n, int icomp, double x[])		// Returned position
 {
   int i, j;
   int inwind, incell;
@@ -824,9 +813,8 @@ cylvar_get_random_location (n, icomp, x)
 **************************************************************/
 
 
-int
-cylvar_extend_density (w)
-     WindPtr w;
+int 
+cylvar_extend_density (WindPtr w)
 {
 
   int i, j, n, m;
@@ -940,13 +928,8 @@ History:
 
 
 
-int
-cylvar_coord_fraction (ichoice, x, ii, frac, nelem)
-     int ichoice;
-     double x[];
-     int ii[];
-     double frac[];
-     int *nelem;
+int 
+cylvar_coord_fraction (int ichoice, double x[], int ii[], double frac[], int *nelem)
 {
   double dr, dz;
   int n;

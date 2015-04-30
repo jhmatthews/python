@@ -114,10 +114,8 @@ nebular_concentrations (xplasama, mode)  modifies the densities of ions, levels,
 
 **************************************************************/
 
-int
-nebular_concentrations (xplasma, mode)
-     PlasmaPtr xplasma;
-     int mode;			// 0=saha using tr, 1=saha using te, 2= Lucy & Mazzali
+int 
+nebular_concentrations (PlasmaPtr xplasma, int mode)			// 0=saha using tr, 1=saha using te, 2= Lucy & Mazzali
 {
   double get_ne ();
   int lucy_mazzali1 ();
@@ -290,10 +288,8 @@ concentrations (xplasma, mode)
 //#define MIN_TEMP         100. NSH 0712 - moved into python.h because this is used in severalpaces
 
 
-int
-concentrations (xplasma, mode)
-     PlasmaPtr xplasma;
-     int mode;			//   0=saha using tr, 1=saha using te
+int 
+concentrations (PlasmaPtr xplasma, int mode)			//   0=saha using tr, 1=saha using te
 {
   int nion, niterate;
   double xne, xxne, xnew, xsaha;
@@ -461,10 +457,8 @@ concentrations (xplasma, mode)
 
 **************************************************************/
 
-int
-saha (xplasma, ne, t)
-     PlasmaPtr xplasma;
-     double ne, t;
+int 
+saha (PlasmaPtr xplasma, double ne, double t)
 
 {
   double nh;
@@ -609,9 +603,8 @@ saha (xplasma, ne, t)
 #define MIN_FUDGE  1.e-10
 #define MAX_FUDGE  10.
 
-int
-lucy (xplasma)
-     PlasmaPtr xplasma;
+int 
+lucy (PlasmaPtr xplasma)
 {
   int nelem, nion, niterate;
   double xne, xnew;
@@ -764,11 +757,8 @@ lucy (xplasma)
 **************************************************************/
 
 
-int
-lucy_mazzali1 (nh, t_r, t_e, www, nelem, ne, density, xne, newden)
-     double nh, t_r, t_e, www;
-     int nelem;
-     double ne, density[], xne, newden[];
+int 
+lucy_mazzali1 (double nh, double t_r, double t_e, double www, int nelem, double ne, double density[], double xne, double newden[])
 {
   double fudge;			
   double fudge2, q;
@@ -941,10 +931,8 @@ struct force_con
 con_force[10];
 int nforce;
 
-int
-fix_concentrations (xplasma, mode)
-     PlasmaPtr xplasma;
-     int mode;			// 0=saha using tr, 1=saha using te, 2= Lucy & Mazzali
+int 
+fix_concentrations (PlasmaPtr xplasma, int mode)			// 0=saha using tr, 1=saha using te, 2= Lucy & Mazzali
 
 {
   int nelem, nion;
@@ -1050,9 +1038,8 @@ fix_concentrations (xplasma, mode)
 
 **************************************************************/
 
-double
-get_ne (density)
-     double density[];
+double 
+get_ne (double density[])
 {
   int n;
   double ne;

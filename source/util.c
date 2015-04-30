@@ -93,13 +93,8 @@ History:
 
 
 
-int
-fraction (value, array, npts, ival, f, mode)
-     double array[];		// The array in we want to search
-     int npts, *ival;		// ival is the lower point
-     double value;		// The value we want to index
-     double *f;			// The fractional "distance" to the next point in the array
-     int mode;        // 0 = compute in lin space, 1=compute in log space
+int 
+fraction (double value, double array[], int npts, int *ival, double *f, int mode)        // 0 = compute in lin space, 1=compute in log space
 {
   int imin, imax, ihalf;
 
@@ -172,13 +167,8 @@ circumstances
 	02jul	ksl	Modified again so now it returns nelem.
 */
 
-int
-linterp (x, xarray, yarray, xdim, y, mode)
-     double x;			// The value that we wish to index i
-     double xarray[], yarray[];
-     int xdim;
-     double *y;
-     int mode;      //0 = linear, 1 = log
+int 
+linterp (double x, double xarray[], double yarray[], int xdim, double *y, int mode)      //0 = linear, 1 = log
 {
   int nelem;
   double frac;
@@ -279,13 +269,8 @@ History:
 
 int ierr_coord_fraction = 0;
 
-int
-coord_fraction (ichoice, x, ii, frac, nelem)
-     int ichoice;
-     double x[];
-     int ii[];
-     double frac[];
-     int *nelem;
+int 
+coord_fraction (int ichoice, double x[], int ii[], double frac[], int *nelem)
 {
   double r, z;
   double *xx, *zz;
@@ -447,12 +432,8 @@ History:
 
 int ierr_where_in_2dcell = 0;
 
-int
-where_in_2dcell (ichoice, x, n, fx, fz)
-     int ichoice;
-     double x[];
-     int n;
-     double *fx, *fz;
+int 
+where_in_2dcell (int ichoice, double x[], int n, double *fx, double *fz)
 {
   double *x00, *x01, *x10, *x11;
   double z[3];
@@ -537,9 +518,8 @@ History:
 **************************************************************/
 
 
-int
-wind_n_to_ij (n, i, j)
-     int n, *i, *j;
+int 
+wind_n_to_ij (int n, int *i, int *j)
 {
   if (geo.coord_type == SPHERICAL)
     {
@@ -558,9 +538,8 @@ wind_n_to_ij (n, i, j)
   return (0);
 }
 
-int
-wind_ij_to_n (i, j, n)
-     int *n, i, j;
+int 
+wind_ij_to_n (int i, int j, int *n)
 {
   if (geo.coord_type == SPHERICAL)
     {

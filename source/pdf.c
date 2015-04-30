@@ -227,13 +227,8 @@ This routine stores values of the function in  pdf_array
 			adequately sample the CDF.
 
 */
-int
-pdf_gen_from_func (pdf, func, xmin, xmax, njumps, jump)
-     PdfPtr pdf;
-     double (*func) (double);
-     double xmin, xmax;
-     double jump[];
-     int njumps;
+int 
+pdf_gen_from_func (PdfPtr pdf, double (*func)(double), double xmin, double xmax, int njumps, double jump[])
 {
   double xstep;
   double y;
@@ -389,11 +384,8 @@ History
 
 */
 
-double
-gen_array_from_func (func, xmin, xmax, pdfsteps)
-     double (*func) (double);
-     double xmin, xmax;
-     int pdfsteps;
+double 
+gen_array_from_func (double (*func)(double), double xmin, double xmax, int pdfsteps)
 {
 
   double x, z, xstep;
@@ -530,14 +522,8 @@ History:
 double pdf_x[PDF_ARRAY], pdf_y[PDF_ARRAY], pdf_z[PDF_ARRAY];
 int pdf_n;
 
-int
-pdf_gen_from_array (pdf, x, y, n_xy, xmin, xmax, njumps, jump)
-     PdfPtr pdf;
-     double x[], y[];
-     int n_xy;
-     double xmin, xmax;
-     int njumps;
-     double jump[];
+int 
+pdf_gen_from_array (PdfPtr pdf, double x[], double y[], int n_xy, double xmin, double xmax, int njumps, double jump[])
 {
   int allzero;
   int m, n, nn, j;
@@ -776,9 +762,8 @@ History:
 			uniform between intervals.
 */
 
-double
-pdf_get_rand (pdf)
-     PdfPtr pdf;
+double 
+pdf_get_rand (PdfPtr pdf)
 {
   double x, r;
   int i, j;
@@ -846,10 +831,8 @@ the CDF but we need x too
 	06sep	ksl	57i -- Added the xlimits to the pd
 */
 
-int
-pdf_limit (pdf, xmin, xmax)
-     PdfPtr pdf;
-     double xmin, xmax;
+int 
+pdf_limit (PdfPtr pdf, double xmin, double xmax)
 {
   int i;
   double q;
@@ -919,9 +902,8 @@ History
 			uniform between intervals.
 
 */
-double
-pdf_get_rand_limit (pdf)
-     PdfPtr pdf;
+double 
+pdf_get_rand_limit (PdfPtr pdf)
 {
   double x, r;
   int i, j;
@@ -980,10 +962,8 @@ a file
 		anisowind
 */
 
-int
-pdf_to_file (pdf, filename)
-     PdfPtr pdf;
-     char filename[];
+int 
+pdf_to_file (PdfPtr pdf, char filename[])
 {
   FILE *fopen (), *fptr;
   int n;
@@ -1022,9 +1002,8 @@ pdf_to_file (pdf, filename)
    in principle.
  */
 
-int
-pdf_check (pdf)
-     PdfPtr pdf;
+int 
+pdf_check (PdfPtr pdf)
 {
   int n;
   double x, y;
@@ -1147,9 +1126,8 @@ History:
                                                                                              
 **************************************************************/
 
-int
-recalc_pdf_from_cdf (pdf)
-     PdfPtr pdf;
+int 
+recalc_pdf_from_cdf (PdfPtr pdf)
 {
   int n;
   double dx1, dx2, dy1, dy2;

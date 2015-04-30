@@ -43,10 +43,8 @@
 
 FILE *get_line_ptr;
 
-int
-get_line (fptr, line)
-     FILE *fptr;
-     char line[];
+int 
+get_line (FILE *fptr, char line[])
 {
 
   char dummy[LINELEN];

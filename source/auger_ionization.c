@@ -5,9 +5,8 @@
 #include "atomic.h"
 #include "python.h"
 
-int
-auger_ionization (xplasma)
-     PlasmaPtr xplasma;
+int 
+auger_ionization (PlasmaPtr xplasma)
 {
 
   int n;

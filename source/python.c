@@ -217,10 +217,8 @@ History:
 #include "python.h"
 #define NSPEC	20
 
-int
-main (argc, argv)
-     int argc;
-     char *argv[];
+int 
+main (int argc, char *argv[])
 {
   WindPtr w;
   PhotPtr p;
@@ -1567,8 +1565,8 @@ History:
 
 **************************************************************/
 
-int
-help ()
+int 
+help (void)
 {
   char *some_help;
 
@@ -1644,8 +1642,8 @@ History:
 
 **************************************************************/
 
-int
-init_geo ()
+int 
+init_geo (void)
 {
   geo.coord_type = 1;
   geo.ndim = 30;
@@ -1716,11 +1714,8 @@ History:
 			is OK and if not debugging
 
 */
-int
-photon_checks (p, freqmin, freqmax, comment)
-     char *comment;
-     PhotPtr p;
-     double freqmin, freqmax;
+int 
+photon_checks (PhotPtr p, double freqmin, double freqmax, char *comment)
 {
   int nnn, nn;
 //  double lum_ioniz;  //NSH 16/2/2011 These are now declared externally to allow python to see them
@@ -1843,11 +1838,8 @@ History:
 
 char get_spectype_oldname[LINELENGTH] = "data/kurucz91.ls";	/*This is to assure that we read model lists in the same order everytime */
 int get_spectype_count = 0;
-int
-get_spectype (yesno, question, spectype)
-     int yesno;
-     char *question;
-     int *spectype;
+int 
+get_spectype (int yesno, char *question, int *spectype)
 {
   char model_list[LINELENGTH];
   int stype;
@@ -1935,8 +1927,8 @@ History:
 **************************************************************/
 
 
-int
-qdisk_init ()
+int 
+qdisk_init (void)
 {
   int n;
   for (n = 0; n < NRINGS; n++)
@@ -1955,10 +1947,8 @@ qdisk_init ()
   return (0);
 }
 
-int
-qdisk_save (diskfile, ztot)
-     char *diskfile;
-     double ztot;
+int 
+qdisk_save (char *diskfile, double ztot)
 {
   FILE *qptr;
   int n;
@@ -2022,9 +2012,8 @@ History:
 
 **************************************************************/
 
-int
-read_non_standard_disk_profile (tprofile)
-     char *tprofile;
+int 
+read_non_standard_disk_profile (char *tprofile)
 {
 
   FILE *fopen (), *fptr;
@@ -2077,7 +2066,8 @@ History:
 **************************************************************/
 
 
-int init_advanced_modes()
+int 
+init_advanced_modes (void)
 { 
   modes.iadvanced = 0;                // this is controlled by the -d flag, global mode control.
   modes.save_cell_stats = 0;          // want to save photons statistics by cell

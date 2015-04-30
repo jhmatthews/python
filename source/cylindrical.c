@@ -39,9 +39,8 @@ History:
 
 
 
-double
-cylind_ds_in_cell (p)
-     PhotPtr p;
+double 
+cylind_ds_in_cell (PhotPtr p)
 
 
 {
@@ -134,9 +133,8 @@ History:
 **************************************************************/
 
 
-int
-cylind_make_grid (w)
-     WindPtr w;
+int 
+cylind_make_grid (WindPtr w)
 {
   double dr, dz, dlogr, dlogz;
   int i, j, n;
@@ -216,9 +214,8 @@ cylind_make_grid (w)
  * 04aug	ksl	Routine was removed from windsave,  wind_complete is now just a driver.
  */
 
-int
-cylind_wind_complete (w)
-     WindPtr w;
+int 
+cylind_wind_complete (WindPtr w)
 {
   int i, j;
 
@@ -287,10 +284,8 @@ cylind_wind_complete (w)
 #define RESOLUTION   1000
 
 
-int
-cylind_volumes (w, icomp)
-     WindPtr w;
-     int icomp;			// component number
+int 
+cylind_volumes (WindPtr w, int icomp)			// component number
 {
   int i, j, n;
   int jj, kk;
@@ -423,9 +418,8 @@ cylind_volumes (w, icomp)
 
 
 
-int
-cylind_where_in_grid (x)
-     double x[];
+int 
+cylind_where_in_grid (double x[])
 {
   int i, j, n;
   double z;
@@ -484,11 +478,8 @@ cylind_where_in_grid (x)
  
 **************************************************************/
 
-int
-cylind_get_random_location (n, icomp, x)
-     int n;			// Cell in which to create postion
-     double x[];		// Returned position
-     int icomp;
+int 
+cylind_get_random_location (int n, int icomp, double x[])
 {
   int i, j;
   int inwind;
@@ -557,9 +548,8 @@ cylind_get_random_location (n, icomp, x)
 **************************************************************/
 
 
-int
-cylind_extend_density (w)
-     WindPtr w;
+int 
+cylind_extend_density (WindPtr w)
 {
 
   int i, j, n, m;
@@ -630,10 +620,8 @@ History:
 
 */
 
-int
-cylind_is_cell_in_wind (n, icomp)
-     int n;			// cell number
-     int icomp;			// component number
+int 
+cylind_is_cell_in_wind (int n, int icomp)			// component number
 {
   int i, j;
   double r, z, dr, dz;

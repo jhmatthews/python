@@ -46,10 +46,8 @@ History:
 
 **************************************************************/
 
-double
-sigma_phot (x_ptr, freq)
-     struct photoionization *x_ptr;
-     double freq;
+double 
+sigma_phot (struct photoionization *x_ptr, double freq)
 {
   double ft;
   double x, y;
@@ -90,9 +88,8 @@ sigma_phot (x_ptr, freq)
 struct lines *a21_line_ptr;
 double a21_a;
 
-double
-a21 (line_ptr)
-     struct lines *line_ptr;
+double 
+a21 (struct lines *line_ptr)
 {
   double freq;
 

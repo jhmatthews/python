@@ -13,9 +13,8 @@
 
 
 
-int
-compute_di_coeffs (T)
-     double T;
+int 
+compute_di_coeffs (double T)
 {
   int i,n,nrec;
   double rate, drdt, t, dt, scaled_t;
@@ -119,10 +118,8 @@ di_coeffs[n]*=exp_int;
 return(0);
 }	 
 
-double
-total_di (one, t_e)
-     WindPtr one;		// Pointer to the current wind cell - we need the cell volume, this is not in the plasma structure
-     double t_e;		//Current electron temperature of the cell
+double 
+total_di (WindPtr one, double t_e)		//Current electron temperature of the cell
 
 {
   double x;			//The returned variable

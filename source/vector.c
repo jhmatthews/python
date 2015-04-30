@@ -107,9 +107,8 @@ History:
 //
 //};
 
-double
-dot (a, b)
-     double a[], b[];
+double 
+dot (double a[], double b[])
 {
   double x;
 
@@ -125,9 +124,8 @@ dot (a, b)
 
 /* Return the length of a 3 vector */
 
-double
-length (a)
-     double a[];
+double 
+length (double a[])
 {
   double x, y;
   double sqrt ();
@@ -143,9 +141,8 @@ length (a)
 
 /* Renormalize a vector so that it has length "scalar" */
 
-int
-renorm (a, scalar)
-     double a[], scalar;
+int 
+renorm (double a[], double scalar)
 {
   double x;
   double dot ();
@@ -164,9 +161,8 @@ renorm (a, scalar)
   return (0);
 }
 
-int
-cross (a, b, c)
-     double a[], b[], c[];
+int 
+cross (double a[], double b[], double c[])
 {
   c[0] = a[1] * b[2] - a[2] * b[1];
   c[1] = a[2] * b[0] - a[0] * b[2];
@@ -178,9 +174,8 @@ cross (a, b, c)
 /* translate a vector in the direction lmn (must already be normalized) by a distance
    s and report the answer in result */
 
-int
-vmove (u, lmn, s, result)
-     double u[], lmn[], s, result[];
+int 
+vmove (double u[], double lmn[], double s, double result[])
 {
   result[0] = lmn[0] * s + u[0];
   result[1] = lmn[1] * s + u[1];
@@ -188,9 +183,8 @@ vmove (u, lmn, s, result)
   return (0);
 }
 
-int
-vsub (u, v, result)
-     double u[], v[], result[];
+int 
+vsub (double u[], double v[], double result[])
 {
   result[0] = u[0] - v[0];
   result[1] = u[1] - v[1];
@@ -199,9 +193,8 @@ vsub (u, v, result)
 
 }
 
-int
-vadd (u, v, result)
-     double u[], v[], result[];
+int 
+vadd (double u[], double v[], double result[])
 {
   result[0] = u[0] + v[0];
   result[1] = u[1] + v[1];
@@ -210,9 +203,8 @@ vadd (u, v, result)
 
 }
 
-int
-stuff_v (vin, vout)
-     double vin[], vout[];
+int 
+stuff_v (double vin[], double vout[])
 {
   vout[0] = vin[0];
   vout[1] = vin[1];
@@ -234,9 +226,8 @@ the direction of vin.
 
 */
 
-double
-dot_tensor_vec (tensor, vin, vout)
-     double tensor[3][3], vin[3], vout[3];
+double 
+dot_tensor_vec (double tensor[3][3], double vin[3], double vout[3])
 {
   double dot ();
   vout[0] = dot (tensor[0], vin);
@@ -248,9 +239,8 @@ dot_tensor_vec (tensor, vin, vout)
 /* Project a vector b in xyz coords from position a in xyz coords
 into cylindrical coordinates */
 
-int
-project_from_xyz_cyl (a, b, result)
-     double a[], b[], result[];
+int 
+project_from_xyz_cyl (double a[], double b[], double result[])
 {
 
   double n_rho[3], n_phi[3], n_z[3];
@@ -281,9 +271,8 @@ project_from_xyz_cyl (a, b, result)
 cartesion (xyz) coords into cartesion xyz coordinates.  Note this is clearly different
 from the situation where both a and b are in cylindrical coordinates. */
 
-int
-project_from_cyl_xyz (a, b, result)
-     double a[], b[], result[];
+int 
+project_from_cyl_xyz (double a[], double b[], double result[])
 {
   double x, ctheta, stheta;
 
@@ -310,10 +299,8 @@ project_from_cyl_xyz (a, b, result)
    y axis in the uv plane, and the the third axis in the perpendicular direction.  The
    system is right-handed */
 
-int
-create_basis (u, v, basis_new)
-     double u[], v[];
-     struct basis *basis_new;
+int 
+create_basis (double u[], double v[], struct basis *basis_new)
 {
   int i;
   double x[3], y[3], z[3];
@@ -360,10 +347,12 @@ create_basis (u, v, basis_new)
 
 /* This routine projects a vector in the locally rotated frame onto the unrotated frame */
 
-int
-project_from (basis_from, v_in, v_out)
-     struct basis *basis_from;	/* direction cosines to go from rotated to unrotated frame */
-     double v_in[], v_out[];	/*v_in here is in rotated frame, v_out in unrotated frame */
+int 
+project_from (
+    struct basis *basis_from,	/* direction cosines to go from rotated to unrotated frame */
+    double v_in[],
+    double v_out[]	/*v_in here is in rotated frame, v_out in unrotated frame */
+)
 
 {
   int i, j;
@@ -379,10 +368,12 @@ project_from (basis_from, v_in, v_out)
 }
 
 /* This routine projects a vector in the unrotated frame onto the rotated frame */
-int
-project_to (basis_from, v_in, v_out)
-     struct basis *basis_from;	/* direction cosines to go from rotated to unrotated frame */
-     double v_in[], v_out[];	/*v_in here is in unrotated frame, v_out in rotated frame */
+int 
+project_to (
+    struct basis *basis_from,	/* direction cosines to go from rotated to unrotated frame */
+    double v_in[],
+    double v_out[]	/*v_in here is in unrotated frame, v_out in rotated frame */
+)
 
 {
   int i, j;
@@ -402,10 +393,8 @@ project_to (basis_from, v_in, v_out)
    a[i][j] is always the project from a rotated frame to the unrotated (Master) frame.  The projection
    in the other direction is just the transpose of this */
 
-int
-reorient (basis_from, basis_to, v_from, v_to)
-     struct basis *basis_from, *basis_to;
-     double v_from[], v_to[];
+int 
+reorient (struct basis *basis_from, struct basis *basis_to, double v_from[], double v_to[])
 {
   double a[3][3];
   int i, j, k;

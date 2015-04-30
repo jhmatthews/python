@@ -3,9 +3,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-int
-DebugStr (string)
-     char *string;
+int 
+DebugStr (char *string)
 {
   printf ("Debug string: %s\n", string);
   exit (0);

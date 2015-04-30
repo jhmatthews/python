@@ -31,11 +31,8 @@
 */
 
 
-double
-qromb (func, a, b, eps)
-     double a, b;
-     double (*func) (double);
-     double eps;
+double 
+qromb (double (*func)(double), double a, double b, double eps)
 {
   double ss, dss, trapzd ();
   double s[JMAXP + 1], h[JMAXP + 1];
@@ -77,11 +74,13 @@ qromb (func, a, b, eps)
 
 #define FUNC(x) ((*func)(x))
 
-double
-trapzd (func, a, b, n)
-     double a, b;
-     double (*func) (double);	/* ANSI: double (*func)(double); */
-     int n;
+double 
+trapzd (
+    double (*func)(double),	/* ANSI: double (*func)(double); */
+    double a,
+    double b,
+    int n
+)
 {
   double x, tnm, sum, del;
   static double s;
@@ -114,10 +113,8 @@ trapzd (func, a, b, n)
    that polint will return a value outside the specified range without 
    bothering to warn you */
 
-void
-polint (xa, ya, n, x, y, dy)
-     double xa[], ya[], x, *y, *dy;
-     int n;
+void 
+polint (double xa[], double ya[], int n, double x, double *y, double *dy)
 {
   int i, m, ns = 1;
   double den, dif, dift, ho, hp, w;
@@ -161,10 +158,13 @@ polint (xa, ya, n, x, y, dy)
 #define ITMAX 100
 #define EPS 3.0e-8
 
-double
-zbrent (func, x1, x2, tol)
-     double x1, x2, tol;
-     double (*func) (double);	/* ANSI: double (*func)(double); */
+double 
+zbrent (
+    double (*func)(double),	/* ANSI: double (*func)(double); */
+    double x1,
+    double x2,
+    double tol
+)
 {
   int iter;
   double a = x1, b = x2, c, d, e, min1, min2;
@@ -252,10 +252,8 @@ zbrent (func, x1, x2, tol)
 #undef EPS
 
 
-void
-spline (x, y, n, yp1, ypn, y2)
-     double x[], y[], yp1, ypn, y2[];
-     int n;
+void 
+spline (double x[], double y[], int n, double yp1, double ypn, double y2[])
 {
   int i, k;
   double p, qn, sig, un, *u, *vector ();
@@ -295,10 +293,8 @@ spline (x, y, n, yp1, ypn, y2)
   free_vector (u, 1, n - 1);
 }
 
-void
-splint (xa, ya, y2a, n, x, y)
-     double xa[], ya[], y2a[], x, *y;
-     int n;
+void 
+splint (double xa[], double ya[], double y2a[], int n, double x, double *y)
 {
   int klo, khi, k;
   double h, b, a;
@@ -416,18 +412,15 @@ expint (int n, double x)
    the recipes programs which I had but I think they are what was intended */
 
 double *
-vector (i, j)
-     int i, j;
+vector (int i, int j)
 {
   double dummy, *d;
   d = calloc (sizeof (dummy), (j - i + 1) + 1);
   return (d);
 }
 
-void
-free_vector (a, i, j)
-     double *a;
-     int i, j;
+void 
+free_vector (double *a, int i, int j)
 {
   free (a);
 }
@@ -605,10 +598,15 @@ of the function, and the value xmin where the minimum occurs */
 #define CC (1.0-R)
 #define SHFT(a,b,c,d) (a)=(b);(b)=(c);(c)=(d);
 
-double
-golden (ax, bx, cx, f, tol, xmin)
-     double ax, bx, cx, tol, *xmin;
-     double (*f) (double);	/* ANSI: double (*f)(double); */
+double 
+golden (
+    double ax,
+    double bx,
+    double cx,
+    double (*f)(double),	/* ANSI: double (*f)(double); */
+    double tol,
+    double *xmin
+)
 {
   double f0, f1, f2, f3, x0, x1, x2, x3;
 

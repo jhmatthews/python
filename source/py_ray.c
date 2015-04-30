@@ -55,8 +55,8 @@ int nc4 = 0;
 
 #define LINELENGTH 132
 
-int
-main ()
+int 
+main (void)
 {
   WindPtr w;
   PhotPtr p;
@@ -267,12 +267,8 @@ main ()
 }
 
 
-int
-gen_one_phot (p, weight, freq, x, theta, phi)
-     PhotPtr p;
-     double weight, freq;
-     double x[3];
-     double theta, phi;		// relative to a cartesian system
+int 
+gen_one_phot (PhotPtr p, double weight, double freq, double x[3], double theta, double phi)		// relative to a cartesian system
 {
   double lmn[3];
 
@@ -295,12 +291,8 @@ gen_one_phot (p, weight, freq, x, theta, phi)
   return (0);
 }
 
-int
-process_one_phot (optr, w, p, ds, smax)
-     FILE *optr;
-     WindPtr w;			// These is the whole wind structure
-     PhotPtr p;
-     double ds, smax;
+int 
+process_one_phot (FILE *optr, WindPtr w, PhotPtr p, double ds, double smax)
 {
   struct photon tphot, zphot;
   double s, v[3], vs[3], zvs[3], lmn[3];

@@ -77,10 +77,8 @@
 int init_write_array = 1;
 float aout[ODIM][ODIM];
 
-int
-write_array (filename, choice)
-     char filename[];
-     int choice;
+int 
+write_array (char filename[], int choice)
 {
   //Dynamical allocation is allowed, although I generally avoid it -- 05apr ksl
   float rin[NDIM], zin[MDIM];
@@ -278,9 +276,8 @@ are linear, and x otherwise.  This is not particularly transparent ?? ksl */
 
 
 
-int
-display (name)
-     char name[];
+int 
+display (char name[])
 {
   int i, j, n;
   Log ("\n %s \n", name);

@@ -114,11 +114,8 @@
 /* Get all the models of one type and regrid them onto the wavelength grid of the data */
 int get_models_init = 0;	// needed so can initialize nmods_tot the first time this routine is called
 
-int
-get_models (modellist, npars, spectype)
-     char modellist[];		// filename containing location and associated parameters of models
-     int npars;			// Number of parameters which vary for these models
-     int *spectype;		//  The returned spectrum type 
+int 
+get_models (char modellist[], int npars, int *spectype)		//  The returned spectrum type 
 
 
 {
@@ -272,10 +269,8 @@ get_models (modellist, npars, spectype)
 080915  ksl     Added error to catch the case where the model being read in has more
                 wavelengths than allowed, ie. more than NWAVES
  */
-int
-get_one_model (filename, onemod)
-     char filename[];
-     struct Model *onemod;
+int 
+get_one_model (char filename[], struct Model *onemod)
 {
   FILE *ptr;
   char dummy[LINELEN];
@@ -365,10 +360,8 @@ int nmodel_error = 0;
 int nmodel_terror = 0;
 
 
-int
-model (spectype, par)
-     int spectype;
-     double par[];
+int 
+model (int spectype, double par[])
 
 
 {

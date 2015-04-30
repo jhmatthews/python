@@ -58,10 +58,8 @@ History:
 double old_t, old_g, old_freqmin, old_freqmax;
 double jump[] = { 913.8 };
 
-double
-one_continuum (spectype, t, g, freqmin, freqmax)
-     int spectype;
-     double t, g, freqmin, freqmax;
+double 
+one_continuum (int spectype, double t, double g, double freqmin, double freqmax)
 {
   double par[2];		// For python we assume only two parameter models
   double lambdamin, lambdamax;
@@ -106,10 +104,8 @@ one_continuum (spectype, t, g, freqmin, freqmax)
 
 
 
-double
-emittance_continuum (spectype, freqmin, freqmax, t, g)
-     int spectype;
-     double freqmin, freqmax, t, g;
+double 
+emittance_continuum (int spectype, double freqmin, double freqmax, double t, double g)
 {
   int model (), nwav, n;
   double w, x, lambdamin, lambdamax;
