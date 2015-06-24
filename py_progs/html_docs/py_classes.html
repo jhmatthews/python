@@ -1,0 +1,121 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module py_classes</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>py_classes</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/Users/jmatthews/Documents/Python/py_progs/py_classes.py">/Users/jmatthews/Documents/Python/py_progs/py_classes.py</a></font></td></tr></table>
+    <p><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;University&nbsp;of&nbsp;Southampton&nbsp;--&nbsp;JM&nbsp;--&nbsp;30&nbsp;September&nbsp;2013<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;classes.py<br>
+&nbsp;<br>
+Synopsis:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;classes<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;This&nbsp;is&nbsp;a&nbsp;set&nbsp;of&nbsp;classes&nbsp;for&nbsp;use&nbsp;with&nbsp;the&nbsp;radiative&nbsp;transfer&nbsp;code&nbsp;python<br>
+&nbsp;<br>
+Usage:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;<br>
+Arguments:<br>
+&nbsp;<br>
+Notes:&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Not&nbsp;all&nbsp;fo&nbsp;these&nbsp;classes&nbsp;are&nbsp;necessarily&nbsp;used&nbsp;by&nbsp;the&nbsp;plotting&nbsp;routines<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;These&nbsp;are&nbsp;slightly&nbsp;less&nbsp;relevant&nbsp;now&nbsp;we've&nbsp;started&nbsp;using&nbsp;astropy.io.ascii</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="py_classes.html#chianti_level">chianti_level</a>
+</font></dt><dt><font face="helvetica, arial"><a href="py_classes.html#chianti_rad">chianti_rad</a>
+</font></dt><dt><font face="helvetica, arial"><a href="py_classes.html#level">level</a>
+</font></dt><dt><font face="helvetica, arial"><a href="py_classes.html#line">line</a>
+</font></dt><dt><font face="helvetica, arial"><a href="py_classes.html#specclass">specclass</a>
+</font></dt><dt><font face="helvetica, arial"><a href="py_classes.html#spectotclass">spectotclass</a>
+</font></dt></dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="chianti_level">class <strong>chianti_level</strong></a></font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Stores&nbsp;chianti&nbsp;<a href="#level">level</a>&nbsp;data&nbsp;from&nbsp;file&nbsp;format&nbsp;.elvlc<br>
+See&nbsp;<a href="http://www.chiantidatabase.org/cug.pdf">http://www.chiantidatabase.org/cug.pdf</a>&nbsp;Page&nbsp;8&nbsp;for&nbsp;description<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="chianti_level-__init__"><strong>__init__</strong></a>(self, _index, _config, _notation, _spin, _l, _l_symbol, _j, _multiplicity, _E_obs, _E_obs2, _E_th, _E_th2, _n)</dt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="chianti_rad">class <strong>chianti_rad</strong></a></font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Stores&nbsp;radiative&nbsp;chianti&nbsp;information&nbsp;from&nbsp;wgfa&nbsp;file.<br>
+Contains&nbsp;the&nbsp;wavelengths,&nbsp;gf&nbsp;and&nbsp;A&nbsp;values&nbsp;of&nbsp;the&nbsp;transitions&nbsp;and&nbsp;the&nbsp;indices&nbsp;initial&nbsp;and<br>
+final&nbsp;<a href="#level">level</a>&nbsp;corresponding&nbsp;to&nbsp;the&nbsp;indices&nbsp;of&nbsp;the&nbsp;levels&nbsp;as&nbsp;given&nbsp;in&nbsp;the&nbsp;.elvlc&nbsp;file<br>
+See&nbsp;<a href="http://www.chiantidatabase.org/cug.pdf">http://www.chiantidatabase.org/cug.pdf</a>&nbsp;Page&nbsp;9&nbsp;for&nbsp;description<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="chianti_rad-__init__"><strong>__init__</strong></a>(self, _ll, _lu, _wave, _freq, _osc, _A, _note_low, _note_up)</dt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="level">class <strong>level</strong></a></font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Stores&nbsp;information&nbsp;from&nbsp;a&nbsp;Python&nbsp;levels&nbsp;file<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="level-__init__"><strong>__init__</strong></a>(self, _z, _ion, _lvl, _ionpot, _E, _g, _rad_rate, _bracks, _nnstring)</dt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="line">class <strong>line</strong></a></font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>This&nbsp;is&nbsp;a&nbsp;class&nbsp;analogous&nbsp;to&nbsp;<a href="#line">line</a>&nbsp;ptr&nbsp;in&nbsp;python<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="line-__init__"><strong>__init__</strong></a>(self, _z, _ion, _wavelength, _freq, _osc, _g_l, _g_u, _ll, _lu)</dt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="specclass">class <strong>specclass</strong></a></font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>This&nbsp;is&nbsp;a&nbsp;class&nbsp;for&nbsp;storing&nbsp;any&nbsp;values&nbsp;read&nbsp;from&nbsp;a&nbsp;Python&nbsp;spec&nbsp;file<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="specclass-__init__"><strong>__init__</strong></a>(self, fre, wave, prod, emi, cen, dis, win, sca, hit, spe)</dt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="spectotclass">class <strong>spectotclass</strong></a></font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>This&nbsp;is&nbsp;a&nbsp;class&nbsp;for&nbsp;storing&nbsp;any&nbsp;values&nbsp;read&nbsp;from&nbsp;a&nbsp;Python&nbsp;spec_tot&nbsp;file<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="spectotclass-__init__"><strong>__init__</strong></a>(self, fre, wave, create, emi, cen, dis, win, sca, hit)</dt></dl>
+
+</td></tr></table></td></tr></table>
+</body></html>

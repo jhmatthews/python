@@ -1,0 +1,43 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module pf_update</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>pf_update</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/Users/jmatthews/Documents/Python/py_progs/pf_update.py">/Users/jmatthews/Documents/Python/py_progs/pf_update.py</a></font></td></tr></table>
+    <p><tt>This&nbsp;python&nbsp;script&nbsp;updates&nbsp;a&nbsp;.pf&nbsp;file&nbsp;for&nbsp;a&nbsp;new&nbsp;version&nbsp;of<br>
+a&nbsp;program&nbsp;with&nbsp;new&nbsp;keywords.&nbsp;&nbsp;It&nbsp;inserst&nbsp;new&nbsp;keywords;&nbsp;it<br>
+eliminates&nbsp;keywords&nbsp;that&nbsp;are&nbsp;not&nbsp;in&nbsp;the&nbsp;base.pf&nbsp;file.&nbsp;&nbsp;It<br>
+will&nbsp;not&nbsp;handle&nbsp;the&nbsp;situtation&nbsp;where&nbsp;the&nbsp;order&nbsp;of&nbsp;keywords<br>
+has&nbsp;been&nbsp;changed&nbsp;(because&nbsp;python&nbsp;and&nbsp;other&nbsp;programs&nbsp;often<br>
+do&nbsp;not&nbsp;necessarily&nbsp;have&nbsp;unique&nbsp;keywords.&nbsp;&nbsp;If&nbsp;a&nbsp;new&nbsp;keyword<br>
+is&nbsp;in&nbsp;the&nbsp;same&nbsp;relative&nbsp;position&nbsp;in&nbsp;the&nbsp;new&nbsp;file&nbsp;as&nbsp;the&nbsp;old<br>
+The&nbsp;old&nbsp;value&nbsp;of&nbsp;the&nbsp;keyword&nbsp;will&nbsp;be&nbsp;maintained.<br>
+History<br>
+07jul&nbsp;&nbsp;&nbsp;ksl&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Coded<br>
+07sep&nbsp;&nbsp;&nbsp;ksl&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Updated&nbsp;to&nbsp;make&nbsp;sure&nbsp;a&nbsp;line&nbsp;in&nbsp;a&nbsp;slave<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;file&nbsp;is&nbsp;not&nbsp;written&nbsp;more&nbsp;than&nbsp;once&nbsp;and<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;to&nbsp;allow&nbsp;a&nbsp;master&nbsp;file&nbsp;line&nbsp;to&nbsp;override<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a&nbsp;alave&nbsp;line,&nbsp;if&nbsp;the&nbsp;3rd&nbsp;word&nbsp;is&nbsp;'!!!'</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="sys.html">sys</a><br>
+</td><td width="25%" valign=top></td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-process_a_file"><strong>process_a_file</strong></a>(master, slave)</dt><dd><tt>Update&nbsp;a&nbsp;single&nbsp;pf&nbsp;file&nbsp;using&nbsp;the&nbsp;master&nbsp;as&nbsp;a&nbsp;template</tt></dd></dl>
+</td></tr></table>
+</body></html>

@@ -376,8 +376,6 @@ the same resonance again */
   if (istat == P_ESCAPE)
     {
 
-      /* This seems very defensive.  Is tau ever less than 0? */
-
       if (!(0 <= tau && tau < 1.e4))
 	Error_silent
 	  ("Warning: extract_one: ignoring very high tau  %8.2e at %g\n",
@@ -399,6 +397,17 @@ the same resonance again */
 	   */
 
 	  xxspec[nspec].f[k] += pp->w * exp (-(tau));	//OK increment the spectrum in question
+
+    	/* This seems very defensive.  Is tau ever less than 0? */
+	
+		if (pp->nrscat > 0)		// SWM - Records total distance travelled by extract photon
+		{
+			stuff_v(pstart.x, pp->x);	// Restore photon to initial position (necessary for reweighting schemes)
+			pp->path = pstart.path;
+
+			if (geo.reverb > REV_NONE)		// only want to dump photon if the reverb structures are set up
+			  delay_dump_single(pp, 1);	// Dump photon now weight has been modified
+		}
 
 
 

@@ -530,7 +530,7 @@ get_wind_params()
     }
   else if (geo.wind_type == 3)
     {
-      get_proga_wind_params ();
+      get_hydro_wind_params ();
     }
   else if (geo.wind_type == 4)
     {
@@ -652,7 +652,7 @@ Synopsis:
 Arguments:		
 
 Returns:
- 
+  disk_illum - this is used by python.c and so needs to be returned
  
 Description:	
 
@@ -664,7 +664,7 @@ History:
 **************************************************************/
 
 
-int get_disk_params ()
+double get_disk_params ()
 {
   int disk_illum;
 //        if (geo.disk_radiation) /*NSH 130906 - Commented out this if loop. It was causing problems with restart - bug #44
@@ -730,7 +730,7 @@ int get_disk_params ()
       rddoub ("disk.z0(fractional.height.at.diskrad)", &geo.disk_z0);
       rddoub ("disk.z1(powerlaw.index)", &geo.disk_z1);
     }
-  return (0);
+  return (disk_illum);
 }
 
 
@@ -943,6 +943,37 @@ int get_compton_torus_params ()
   return (0);
 }
 
+/***********************************************************
+             University of Southampton
+Synopsis: 
+  get_meta_params reads in data pertaining to simulation meta-
+  properties like reverberation mapping settings and variance
+  reduction techniques.
+   
+Arguments:    
+Returns:
+ 
+Description:  
+Notes:
+History:
+  1504  SWM   Added
+**************************************************************/
+
+int 
+get_meta_params (void)
+{
+  geo.reverb = REV_NONE;
+  rdint("reverb.type", &geo.reverb);
+  if (geo.reverb == REV_WIND)
+  {
+    geo.reverb_path_bins = 30;
+    geo.reverb_theta_bins = 30;
+    rdint("reverb.path_bins", &geo.reverb_path_bins);
+    rdint("reverb.theta_bins", &geo.reverb_theta_bins);
+  }
+
+  return (0);
+}
 
 
 /***********************************************************

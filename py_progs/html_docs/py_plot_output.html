@@ -1,0 +1,186 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module py_plot_output</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>py_plot_output</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/Users/jmatthews/Documents/Python/py_progs/py_plot_output.py">/Users/jmatthews/Documents/Python/py_progs/py_plot_output.py</a></font></td></tr></table>
+    <p><tt>&nbsp;&nbsp;&nbsp;&nbsp;University&nbsp;of&nbsp;Southampton&nbsp;--&nbsp;JM&nbsp;--&nbsp;November&nbsp;2014<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;py_plot_output.py<br>
+&nbsp;<br>
+Synopsis:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;various&nbsp;plotting&nbsp;routines&nbsp;for&nbsp;making&nbsp;standard&nbsp;plots<br>
+&nbsp;&nbsp;&nbsp;&nbsp;from&nbsp;Python&nbsp;outputs&nbsp;<br>
+&nbsp;<br>
+Usage:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Either&nbsp;import&nbsp;as&nbsp;a&nbsp;module&nbsp;in&nbsp;a&nbsp;python&nbsp;session&nbsp;e.g.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;import&nbsp;py_plot_output&nbsp;as&nbsp;p&nbsp;<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;or&nbsp;run&nbsp;from&nbsp;the&nbsp;command&nbsp;line&nbsp;e.g.&nbsp;<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;py_plot_output&nbsp;root&nbsp;mode&nbsp;[roots&nbsp;to&nbsp;compare]<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+Arguments:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;root&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;root&nbsp;filename&nbsp;to&nbsp;analyse<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;mode&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;mode&nbsp;of&nbsp;plotting&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;wind&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;plot&nbsp;of&nbsp;common&nbsp;wind&nbsp;quantites<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;plot&nbsp;of&nbsp;common&nbsp;ions&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;spec&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;spectrum&nbsp;for&nbsp;different&nbsp;viewing&nbsp;angles<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;spec_comps&nbsp;&nbsp;components&nbsp;contributing&nbsp;to&nbsp;total&nbsp;spectrum&nbsp;e.g.&nbsp;disk,&nbsp;wind<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;compare&nbsp;&nbsp;compare&nbsp;the&nbsp;root&nbsp;to&nbsp;other&nbsp;roots&nbsp;to&nbsp;compare<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;all&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;make&nbsp;all&nbsp;the&nbsp;above&nbsp;plots</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="astropy.html">astropy</a><br>
+<a href="numpy.html">numpy</a><br>
+</td><td width="25%" valign=top><a href="os.html">os</a><br>
+<a href="pylab.html">pylab</a><br>
+</td><td width="25%" valign=top><a href="py_read_output.html">py_read_output</a><br>
+<a href="sys.html">sys</a><br>
+</td><td width="25%" valign=top><a href="py_plot_util.html">py_plot_util</a><br>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-make_spec_comparison_plot"><strong>make_spec_comparison_plot</strong></a>(s_array, labels, fname<font color="#909090">='comparison'</font>, smooth_factor<font color="#909090">=10</font>, angles<font color="#909090">=True</font>, components<font color="#909090">=False</font>)</dt><dd><tt>make&nbsp;a&nbsp;spectrum&nbsp;comparison&nbsp;plot&nbsp;from&nbsp;array&nbsp;of&nbsp;astropy.table.table.Table&nbsp;objects&nbsp;<br>
+&nbsp;<br>
+Parameters<br>
+----------<br>
+s_array:&nbsp;array-like&nbsp;of&nbsp;astropy.table.table.Table&nbsp;objects<br>
+&nbsp;&nbsp;&nbsp;&nbsp;table&nbsp;containing&nbsp;spectrum&nbsp;data&nbsp;outputted&nbsp;from&nbsp;Python&nbsp;<br>
+&nbsp;<br>
+labels:&nbsp;array-like<br>
+&nbsp;&nbsp;&nbsp;&nbsp;strings&nbsp;of&nbsp;labels&nbsp;for&nbsp;each&nbsp;spectrum&nbsp;<br>
+&nbsp;<br>
+fname:&nbsp;str<br>
+&nbsp;&nbsp;&nbsp;&nbsp;filename&nbsp;to&nbsp;save&nbsp;as&nbsp;e.g.&nbsp;sv<br>
+&nbsp;<br>
+smooth_factor:&nbsp;int&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;factor&nbsp;you&nbsp;would&nbsp;like&nbsp;to&nbsp;smooth&nbsp;by,&nbsp;default&nbsp;10<br>
+&nbsp;<br>
+angles:&nbsp;Bool&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Would&nbsp;you&nbsp;like&nbsp;to&nbsp;plot&nbsp;the&nbsp;viewing&nbsp;angle&nbsp;spectra?&nbsp;<br>
+&nbsp;<br>
+components:&nbsp;Bool&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;would&nbsp;you&nbsp;like&nbsp;to&nbsp;plot&nbsp;the&nbsp;individual&nbsp;components&nbsp;e.g.&nbsp;Disk&nbsp;Wind&nbsp;<br>
+&nbsp;<br>
+Returns<br>
+----------<br>
+Success&nbsp;returns&nbsp;0<br>
+Failure&nbsp;returns&nbsp;1<br>
+&nbsp;<br>
+Saves&nbsp;output&nbsp;as&nbsp;"spectrum_%s.png"&nbsp;%&nbsp;(fname)</tt></dd></dl>
+ <dl><dt><a name="-make_spec_plot"><strong>make_spec_plot</strong></a>(s, fname, smooth_factor<font color="#909090">=10</font>, angles<font color="#909090">=True</font>, components<font color="#909090">=False</font>, with_composite<font color="#909090">=False</font>)</dt><dd><tt>make&nbsp;a&nbsp;spectrum&nbsp;plot&nbsp;from&nbsp;astropy.table.table.Table&nbsp;object&nbsp;<br>
+&nbsp;<br>
+Parameters<br>
+----------<br>
+s:&nbsp;astropy.table.table.Table<br>
+&nbsp;&nbsp;&nbsp;&nbsp;table&nbsp;containing&nbsp;spectrum&nbsp;data&nbsp;outputted&nbsp;from&nbsp;Python&nbsp;<br>
+&nbsp;<br>
+fname:&nbsp;str&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;filename&nbsp;to&nbsp;save&nbsp;as&nbsp;e.g.&nbsp;sv<br>
+&nbsp;<br>
+smooth_factor:&nbsp;int&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;factor&nbsp;you&nbsp;would&nbsp;like&nbsp;to&nbsp;smooth&nbsp;by,&nbsp;default&nbsp;10<br>
+&nbsp;<br>
+angles:&nbsp;Bool&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Would&nbsp;you&nbsp;like&nbsp;to&nbsp;plot&nbsp;the&nbsp;viewing&nbsp;angle&nbsp;spectra?&nbsp;<br>
+&nbsp;<br>
+components:&nbsp;Bool&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;would&nbsp;you&nbsp;like&nbsp;to&nbsp;plot&nbsp;the&nbsp;individual&nbsp;components&nbsp;e.g.&nbsp;Disk&nbsp;Wind&nbsp;<br>
+&nbsp;<br>
+Returns<br>
+----------<br>
+Success&nbsp;returns&nbsp;0<br>
+Failure&nbsp;returns&nbsp;1<br>
+&nbsp;<br>
+Saves&nbsp;output&nbsp;as&nbsp;"spectrum_%s.png"&nbsp;%&nbsp;(fname)</tt></dd></dl>
+ <dl><dt><a name="-make_spec_plot_from_class"><strong>make_spec_plot_from_class</strong></a>(s, fname, smooth_factor<font color="#909090">=10</font>, angles<font color="#909090">=True</font>, components<font color="#909090">=False</font>)</dt><dd><tt>make&nbsp;a&nbsp;spectrum&nbsp;plot&nbsp;from&nbsp;py_classes.specclass&nbsp;object<br>
+&nbsp;<br>
+Parameters<br>
+----------<br>
+s:&nbsp;specclass&nbsp;object<br>
+&nbsp;&nbsp;&nbsp;&nbsp;table&nbsp;containing&nbsp;spectrum&nbsp;data&nbsp;outputted&nbsp;from&nbsp;Python&nbsp;<br>
+&nbsp;<br>
+fname:&nbsp;str&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;filename&nbsp;to&nbsp;save&nbsp;as&nbsp;e.g.&nbsp;sv<br>
+&nbsp;<br>
+smooth_factor:&nbsp;int&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;factor&nbsp;you&nbsp;would&nbsp;like&nbsp;to&nbsp;smooth&nbsp;by,&nbsp;default&nbsp;10<br>
+&nbsp;<br>
+angles:&nbsp;Bool&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Would&nbsp;you&nbsp;like&nbsp;to&nbsp;plot&nbsp;the&nbsp;viewing&nbsp;angle&nbsp;spectra?&nbsp;<br>
+&nbsp;<br>
+components:&nbsp;Bool&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;would&nbsp;you&nbsp;like&nbsp;to&nbsp;plot&nbsp;the&nbsp;individual&nbsp;components&nbsp;e.g.&nbsp;Disk&nbsp;Wind&nbsp;<br>
+&nbsp;<br>
+Returns<br>
+----------<br>
+Success&nbsp;returns&nbsp;0<br>
+Failure&nbsp;returns&nbsp;1<br>
+&nbsp;<br>
+Saves&nbsp;output&nbsp;as&nbsp;"spectrum_%s.png"&nbsp;%&nbsp;(fname)</tt></dd></dl>
+ <dl><dt><a name="-make_wind_plot"><strong>make_wind_plot</strong></a>(d, fname, var<font color="#909090">=None</font>, shape<font color="#909090">=(4, 2)</font>, axes<font color="#909090">='log'</font>, den_or_frac<font color="#909090">=0</font>, fname_prefix<font color="#909090">='wind'</font>, lims<font color="#909090">=None</font>)</dt><dd><tt>make&nbsp;a&nbsp;wind&nbsp;plot&nbsp;from&nbsp;astropy.table.table.Table&nbsp;object&nbsp;<br>
+&nbsp;<br>
+Parameters<br>
+----------<br>
+d:&nbsp;astropy.table.table.Table<br>
+&nbsp;&nbsp;&nbsp;&nbsp;table&nbsp;containing&nbsp;wind&nbsp;data&nbsp;outputted&nbsp;from&nbsp;Python&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;==&nbsp;None&nbsp;then&nbsp;this&nbsp;routine&nbsp;will&nbsp;get&nbsp;the&nbsp;data&nbsp;for&nbsp;you<br>
+&nbsp;<br>
+fname:&nbsp;str&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;filename&nbsp;to&nbsp;save&nbsp;as&nbsp;e.g.&nbsp;sv<br>
+&nbsp;<br>
+var:&nbsp;array&nbsp;type&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;array&nbsp;of&nbsp;string&nbsp;colnames&nbsp;to&nbsp;plot&nbsp;<br>
+&nbsp;<br>
+angles:&nbsp;Bool&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Would&nbsp;you&nbsp;like&nbsp;to&nbsp;plot&nbsp;the&nbsp;viewing&nbsp;angle&nbsp;spectra?&nbsp;<br>
+&nbsp;<br>
+components:&nbsp;Bool&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;would&nbsp;you&nbsp;like&nbsp;to&nbsp;plot&nbsp;the&nbsp;individual&nbsp;components&nbsp;e.g.&nbsp;Disk&nbsp;Wind&nbsp;<br>
+&nbsp;<br>
+axes:&nbsp;str&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;lin&nbsp;or&nbsp;log&nbsp;axes<br>
+&nbsp;<br>
+den_or_frac:&nbsp;int<br>
+&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;calculate&nbsp;ion&nbsp;densities<br>
+&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;calculate&nbsp;ion&nbsp;fractions<br>
+&nbsp;<br>
+lims:&nbsp;array-like<br>
+&nbsp;&nbsp;&nbsp;&nbsp;limits&nbsp;of&nbsp;plot,&nbsp;specified&nbsp;as&nbsp;((xmin,xmax),&nbsp;(ymin,&nbsp;tmax))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;can&nbsp;be&nbsp;array&nbsp;or&nbsp;tuple.&nbsp;Default&nbsp;is&nbsp;Nonetype.<br>
+&nbsp;<br>
+Returns<br>
+----------<br>
+Success&nbsp;returns&nbsp;0<br>
+Failure&nbsp;returns&nbsp;1<br>
+&nbsp;<br>
+Saves&nbsp;output&nbsp;as&nbsp;"spectrum_%s.png"&nbsp;%&nbsp;(fname)</tt></dd></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>has_astropy</strong> = True</td></tr></table>
+</body></html>

@@ -132,6 +132,12 @@ int NPHOT;			/* As of python_40, NPHOT must be defined in the main program using
 #define NCOMPS 	10
 #define LINELENGTH 	160
 
+
+/* SWM - Reverb enums */
+ #define REV_NONE 0
+ #define REV_PHOTON 1
+ #define REV_WIND 2
+
 struct geometry
 {
 /* 67 - ksl This section added to allow for restarting the program, and adds parameters used
@@ -374,16 +380,19 @@ struct geometry
 // The next set of parameters describe the input datafiles that are read
   char atomic_filename[132];	/* 54e -- The masterfile for the atomic data */
   char fixed_con_file[132];	/* 54e -- For fixed concentrations, the file specifying concentrations */
+
+  //Added by SWM for reverberation mapping - 0=None, 1=Photon, 2=Wind
+  int reverb, reverb_path_bins, reverb_theta_bins; 
 }
 geo;
 
 
-struct plane
+typedef struct plane /*SWM 10-10-14 - Switched to TypeDef */
 {
   double x[3];			/* A position included in the plane (usally the "center" */
   double lmn[3];		/* A unit vector perpendicular to the plane (usually in the "positive" direction */
-}
-plane_l1, plane_sec, plane_m2_far;	/* these all define planes which are perpendicular to the line of sight from the 
+} plane_dummy, *PlanePtr;
+plane_dummy plane_l1, plane_sec, plane_m2_far;	/* these all define planes which are perpendicular to the line of sight from the 
 					   primary to the seconday */
 
 
@@ -444,7 +453,32 @@ struct blmodel
 blmod;
 
 
+/*
+    SWN 6-2-15
+    Wind paths is defined per cell and contains a binned array holding the spectrum of paths. Layers are
+    For each frequency:
+      For each path bin:
+        What's the total fluxback of all these photons entering the cell?
+*/
+typedef struct wind_paths
+{
+  double* ad_freq_path_flux;  //Array[by frequency, then path] of total flux of photons with the given v&p
+  int*    ai_freq_path_num;   //Array[by frequency, then path] of the number of photons in this bin
+  double* ad_freq_flux;       //Array[by frequency] of total flux of photons with the given v
+  int*    ai_freq_num;        //Array[by frequency] of the number of photons in this bin
+  double  d_flux, d_path;     //Total flux, average path
+  int     i_num;              //Number of photons hitting this cell
+} wind_paths_dummy, *Wind_Paths_Ptr;
 
+typedef struct path_data
+{
+  double* ad_path_bin;              //Array of bins for the path histograms
+  double* ad_freq_bin;              //Array of bins for the frequency histograms
+  int     i_path_bins, i_obs;       //Number of bins, number of observers
+  int     i_theta_res;              //Number of angular bins when outputting observer paths
+} path_data_dummy, *Path_Data_Ptr;
+Path_Data_Ptr path_data;
+Path_Data_Ptr g_path_data;
 
 /* 	This structure defines the wind.  The structure w is allocated in the main
 	routine.  The total size of the structure will be NDIM x MDIM, and the two
@@ -512,7 +546,7 @@ typedef struct wind
 				   where the volume is the volume that is actually filled with material. */
   int inwind;			/* 061104 -- 58b -- ksl -- Moved definitions of for whether a cell is or is not
 				   inwind to #define statements above */
-
+  Wind_Paths_Ptr paths;         // SWM 6-2-15 Path data struct for each cell
 }
 wind_dummy, *WindPtr;
 
@@ -908,6 +942,7 @@ typedef struct photon
 				 */
   int np;			/*NSH 13/4/11 - an internal pointer to the photon number so 
 				   so we can write out details of where the photon goes */
+  double path; /* SWM - Photon path length */
 
 }
 p_dummy, *PhotPtr;

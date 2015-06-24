@@ -65,37 +65,38 @@ def append_sigfile(root,command):
 	f.close()
 
 # Beginning of main routine
+if __name__ == "__main__":		# allows one to run from command line without running automatically with write_docs.py
 
-argc=len(sys.argv)
+	argc=len(sys.argv)
 
-if(argc==1):
-	print "Usage: restart.py [-n max] [-c commandfile] [-C command] root"
+	if(argc==1):
+		print "Usage: restart.py [-n max] [-c commandfile] [-C command] root"
+		sys.exit()
+
+	maxtimes=10
+	commandfile='Doit'
+	command='source '+commandfile
+
+	i=1;
+	while (i<argc):
+		if(sys.argv[i]=='-n'):
+			maxtimes=int(sys.argv[i+1])
+		if(sys.argv[i]=='-c'):
+			commandfile=sys.argv[i+1]
+			command='source '+commandfile
+		if(sys.argv[i]=='-C'):
+			command=sys.argv[i+1]
+		i=i+1
+
+	root=sys.argv[argc-1]
+
+	# Get the status of the previous run of the routine
+	status,restarts=parse_sigfile(root)
+
+	if (status=='OK' and restarts <= maxtimes):
+		print '!! Restarting: Status %s and restarts %d <= maxstarts %d' % (status,restarts,maxtimes)
+		append_sigfile(root,command)
+		os.system(command)
+	else:
+		print '!! Not restarting: Status %s or restarts %d > maxstarts %d' % (status,restarts,maxtimes)
 	sys.exit()
-
-maxtimes=10
-commandfile='Doit'
-command='source '+commandfile
-
-i=1;
-while (i<argc):
-	if(sys.argv[i]=='-n'):
-		maxtimes=int(sys.argv[i+1])
-	if(sys.argv[i]=='-c'):
-		commandfile=sys.argv[i+1]
-		command='source '+commandfile
-	if(sys.argv[i]=='-C'):
-		command=sys.argv[i+1]
-	i=i+1
-
-root=sys.argv[argc-1]
-
-# Get the status of the previous run of the routine
-status,restarts=parse_sigfile(root)
-
-if (status=='OK' and restarts <= maxtimes):
-	print '!! Restarting: Status %s and restarts %d <= maxstarts %d' % (status,restarts,maxtimes)
-	append_sigfile(root,command)
-	os.system(command)
-else:
-	print '!! Not restarting: Status %s or restarts %d > maxstarts %d' % (status,restarts,maxtimes)
-sys.exit()

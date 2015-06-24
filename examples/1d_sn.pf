@@ -31,6 +31,7 @@ spectrum_wavemax                               20000
 no_observers					  1
 angle(0=pole)                                    45
 phase(0=inferior_conjunction)                   0.5
-live.or.die(0).or.extract(anything_else)                    1                  n
+live.or.die(0).or.extract(anything_else)                    1
 spec.type(flambda(1),fnu(2),basic(other)                    2
+reverb.type(0=None,1=Photon,2=Wind) 						0
 Photon.sampling.approach(0=T,1=(f1,f2),2=cv,3=yso,4=user_defined,5=cloudy_test,6=wide,7=AGN,8=logarithmic)                    2

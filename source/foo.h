@@ -103,6 +103,7 @@ double rtsafe(void (*funcd)(double, double *, double *), double x1, double x2, d
 double golden(double ax, double bx, double cx, double (*f)(double), double tol, double *xmin);
 /* trans_phot.c */
 int trans_phot(WindPtr w, PhotPtr p, int iextract);
+int trans_phot_single(WindPtr w, PhotPtr p, int iextract);
 /* phot_util.c */
 int stuff_phot(PhotPtr pin, PhotPtr pout);
 int move_phot(PhotPtr pp, double ds);
@@ -181,14 +182,14 @@ int stellar_vel_grad(double x[], double velgrad[][3]);
 int get_homologous_params(void);
 double homologous_velocity(double x[], double v[]);
 double homologous_rho(double x[]);
-/* proga.c */
-int get_proga_wind_params(void);
-int get_proga(void);
-double proga_velocity(double x[], double v[]);
-double proga_rho(double x[]);
-double proga_temp(double x[]);
-int rtheta_make_zeus_grid(WindPtr w);
-int rtheta_zeus_volumes(WindPtr w);
+/* hydro_import.c */
+int get_hydro_wind_params(void);
+int get_hydro(void);
+double hydro_velocity(double x[], double v[]);
+double hydro_rho(double x[]);
+double hydro_temp(double x[]);
+int rtheta_make_hydro_grid(WindPtr w);
+int rtheta_hydro_volumes(WindPtr w);
 /* corona.c */
 int get_corona_params(void);
 double corona_velocity(double x[], double v[]);
@@ -469,9 +470,10 @@ int get_line_transfer_mode(void);
 int get_radiation_sources(void);
 int get_wind_params(void);
 double get_stellar_params(void);
-int get_disk_params(void);
+double get_disk_params(void);
 int get_bl_and_agn_params(double lstar);
 int get_compton_torus_params(void);
+int get_meta_params(void);
 double setup_dfudge(void);
 int setup_windcone(void);
 int setup_created_files(void);
@@ -484,6 +486,24 @@ int photo_gen_matom(PhotPtr p, double weight, int photstart, int nphot);
 /* macro_gov.c */
 int macro_gov(PhotPtr p, int *nres, int matom_or_kpkt, int *which_out);
 int macro_pops(PlasmaPtr xplasma, double xne);
+/* reverb.c */
+double delay_to_observer(PhotPtr pp);
+int delay_dump_prep(char filename[], int restart_stat, int i_rank);
+int delay_dump_finish(void);
+int delay_dump_combine(int iRanks);
+int delay_dump(PhotPtr p, int np, int iExtracted);
+int delay_dump_single(PhotPtr pp, int extract_phot);
+Path_Data_Ptr path_data_constructor(double r_rad_min, double r_rad_max, int i_path_bins, int i_angles, double freqmin, double freqmax, int i_theta_res);
+int path_data_init(double r_rad_min, double r_rad_max, int i_path_bins, int i_angles, double r_freq_min, double r_freq_max, int i_theta_res);
+Wind_Paths_Ptr wind_paths_constructor(WindPtr wind);
+int reverb_init(WindPtr wind, int nangles, double freqmin, double freqmax);
+int wind_paths_init(WindPtr wind);
+int wind_paths_add_phot(WindPtr wind, PhotPtr pp);
+int wind_paths_gen_phot(WindPtr wind, PhotPtr pp);
+int wind_paths_single_evaluate(Wind_Paths_Ptr paths);
+int wind_paths_evaluate(WindPtr wind);
+int wind_paths_point_index(int i, int j, int k, int i_top);
+int wind_paths_output(WindPtr wind, char c_file_in[]);
 /* py_wind_sub.c */
 int zoom(int direction);
 int overview(WindPtr w, char rootname[]);
@@ -554,4 +574,3 @@ int main(int argc, char *argv[]);
 int one_choice(int choice, char *root, int ochoice);
 int py_wind_help(void);
 /* test_saha.c */
-int main(int argc, char *argv[]);

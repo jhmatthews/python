@@ -37,6 +37,7 @@ live.or.die(0).or.extract(anything_else)   1
 Select_specific_no_of_scatters_in_spectra(y/n)   n
 Select_photons_by_position(y/n)   n
 spec.type(flambda(1),fnu(2),basic(other)   2
-Extra.diagnostics(0=no)   0
-Use.standard.care.factors(1=yes)   1
+Use.standard.care.factors(1=yes)   1 	
+reverb.type(0=None,1=Photon,2=Wind)  0
+Extra.diagnostics(0=no)   0		
 Photon.sampling.approach()   3

@@ -73,44 +73,46 @@ def process_a_file(master,slave):
 	s.close()
 	return(0)
 
-argc=len(sys.argv)
+if __name__ == "__main__":		# allows one to run from command line without running automatically with write_docs.py
 
-if(argc==1):
-	print 'Interactive inputs'
-	master_pf = raw_input("Master parameter file:  ")
-	list_to_update = raw_input("List.to.update:  ")
-elif argc==3:
-	print 'Getting inputs from command line'
-	master_pf=sys.argv[1]
-	list_to_update=sys.argv[2]
-else:
-	print 'Usage is either via command line or intractively'
-	print 'If interactive, simply enter pj_update.py, and answer questions'
-	print 'If command line, enter pf_update.py master.pf list.of.old.pf.files'
-	sys.exit(0)
-	
+	argc=len(sys.argv)
 
-print 'Using ', master_pf, ' as basis for updates'
-print 'Using', list_to_update, ' as list of files to update'
+	if(argc==1):
+		print 'Interactive inputs'
+		master_pf = raw_input("Master parameter file:  ")
+		list_to_update = raw_input("List.to.update:  ")
+	elif argc==3:
+		print 'Getting inputs from command line'
+		master_pf=sys.argv[1]
+		list_to_update=sys.argv[2]
+	else:
+		print 'Usage is either via command line or intractively'
+		print 'If interactive, simply enter pj_update.py, and answer questions'
+		print 'If command line, enter pf_update.py master.pf list.of.old.pf.files'
+		sys.exit(0)
+		
 
-try:
-	master=open(master_pf,'r')
-except IOError:
-	print "File ",master_pf,"does not exist"
-	sys.exit(0)
+	print 'Using ', master_pf, ' as basis for updates'
+	print 'Using', list_to_update, ' as list of files to update'
+
+	try:
+		master=open(master_pf,'r')
+	except IOError:
+		print "File ",master_pf,"does not exist"
+		sys.exit(0)
 
 
-try:
-	list=open(list_to_update,'r')
-except IOError:
-	print "File ",list_to_update,"does not exist"
-	sys.exit(0)
+	try:
+		list=open(list_to_update,'r')
+	except IOError:
+		print "File ",list_to_update,"does not exist"
+		sys.exit(0)
 
-mlines=master.readlines()
-lines=list.readlines()
+	mlines=master.readlines()
+	lines=list.readlines()
 
-for line in lines:
-	process_a_file(mlines,line)
+	for line in lines:
+		process_a_file(mlines,line)
 
 
 

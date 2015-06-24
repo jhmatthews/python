@@ -111,7 +111,7 @@ define_wind ()
       w[n].inwind = W_NOT_INWIND;
     }
 
-
+  //printf ("Got to define wind %i\n",geo.coord_type);
 
   if (geo.wind_type == 9)	//This is the mode where we want the wind and the grid carefully controlled to allow a very thin shell. We ensure that the coordinate type is spherical. 
     {
@@ -131,7 +131,7 @@ define_wind ()
     {
       if (geo.wind_type == 3) //13jun -- nsh - 76 - This is a switch to allow one to use the actual zeus grid in the special case of a 'proga' wind in rtheta coordinates
       	{
-	rtheta_make_zeus_grid (w);
+	rtheta_make_hydro_grid (w);
       	}
       else
 	{
@@ -190,7 +190,7 @@ recreated when a windfile is read into the program
     {
       if (geo.wind_type == 3) //13jun -- nsh - 76 - This is a switch to allow one to use the actual zeus grid in the special case of a 'proga' wind in rtheta coordinates We dont need to work out if cells are in the wind, they are known to be in the wind.
       	{
-	rtheta_zeus_volumes (w);
+	rtheta_hydro_volumes (w);
       	}
       else
 	{
@@ -356,7 +356,7 @@ be optional which variables beyond here are moved to structures othere than Wind
 /* NSH 130530 Next few lines allow the use of the temperature which can be computed from Zeus models to be used as an initial guess for the wind temperature */
       if (geo.wind_type == 3)
 	{
-	  plasmamain[n].t_r = proga_temp (x)/0.9; //This is a kluge, it means that we get the temperature we expect, if we read in a temperature from a zeus file - otherwise it is multiplies by 0.9 //
+	  plasmamain[n].t_r = hydro_temp (x)/0.9; //This is a kluge, it means that we get the temperature we expect, if we read in a temperature from a zeus file - otherwise it is multiplies by 0.9 //
 	}
       else
 	{

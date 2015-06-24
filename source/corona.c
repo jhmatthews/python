@@ -195,8 +195,8 @@ corona_rho (x)
 
   zscale = BOLTZMANN * t / (MPROT * g);
 
-//  rho = geo.corona_base_density * exp (-(x[2]) / geo.corona_scale_height);
-  rho = geo.corona_base_density * exp (-(x[2]) / zscale);
+rho = geo.corona_base_density * exp (-(x[2]) / geo.corona_scale_height);
+//  rho = geo.corona_base_density * exp (-(x[2]) / zscale);
 
   if (rho < 1.e-10)
     rho = 1.e-10;		// A floor to the density appears to be needed for some of the

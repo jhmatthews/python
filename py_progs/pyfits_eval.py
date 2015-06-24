@@ -349,5 +349,6 @@ def gui():
 	ion()
 	root.mainloop()
 
+if __name__ == "__main__":		# allows one to run from command line without running automatically with write_docs.py
 
-gui()
+	gui()

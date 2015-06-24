@@ -1,0 +1,162 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module py_read_output</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>py_read_output</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/Users/jmatthews/Documents/Python/py_progs/py_read_output.py">/Users/jmatthews/Documents/Python/py_progs/py_read_output.py</a></font></td></tr></table>
+    <p><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;University&nbsp;of&nbsp;Southampton&nbsp;--&nbsp;JM&nbsp;--&nbsp;October&nbsp;2014<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;py_read_output.py<br>
+&nbsp;<br>
+Synopsis:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this&nbsp;enables&nbsp;one&nbsp;to&nbsp;read&nbsp;outputs&nbsp;from&nbsp;the&nbsp;Python&nbsp;radiative&nbsp;transfer&nbsp;code.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Where&nbsp;possible,&nbsp;we&nbsp;use&nbsp;the&nbsp;astropy.io&nbsp;module&nbsp;to&nbsp;read&nbsp;outputs.<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;There&nbsp;are&nbsp;also&nbsp;a&nbsp;number&nbsp;of&nbsp;routines&nbsp;for&nbsp;processing&nbsp;and&nbsp;reshaping&nbsp;various&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;data&nbsp;formats<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;see&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;https://github.com/agnwinds/python/wiki/Useful-python-commands-for-reading-and-processing-outputs&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;usage<br>
+&nbsp;<br>
+Usage:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+Arguments:</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="astropy.io.ascii.html">astropy.io.ascii</a><br>
+<a href="py_classes.html">py_classes</a><br>
+</td><td width="25%" valign=top><a href="numpy.html">numpy</a><br>
+<a href="matplotlib.pyplot.html">matplotlib.pyplot</a><br>
+</td><td width="25%" valign=top><a href="subprocess.html">subprocess</a><br>
+<a href="py_plot_util.html">py_plot_util</a><br>
+</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-read_convergence"><strong>read_convergence</strong></a>(root)</dt><dd><tt>check&nbsp;convergence&nbsp;in&nbsp;a&nbsp;diag&nbsp;file</tt></dd></dl>
+ <dl><dt><a name="-read_emissivity"><strong>read_emissivity</strong></a>(root)</dt><dd><tt>Read&nbsp;macro&nbsp;atom&nbsp;emissivities&nbsp;from&nbsp;a&nbsp;root&nbsp;diag&nbsp;file.&nbsp;<br>
+Returns&nbsp;two&nbsp;arrays,&nbsp;kpkt_emiss&nbsp;and&nbsp;matom_emiss.</tt></dd></dl>
+ <dl><dt><a name="-read_pf"><strong>read_pf</strong></a>(root)</dt><dd><tt>reads&nbsp;a&nbsp;Python&nbsp;.pf&nbsp;file&nbsp;and&nbsp;returns&nbsp;a&nbsp;dictionary<br>
+&nbsp;<br>
+Parameters<br>
+----------<br>
+root&nbsp;:&nbsp;file&nbsp;or&nbsp;str<br>
+&nbsp;&nbsp;&nbsp;&nbsp;File,&nbsp;filename&nbsp;to&nbsp;read.&nbsp;&nbsp;<br>
+&nbsp;<br>
+new:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;True&nbsp;means&nbsp;the&nbsp;Created&nbsp;column&nbsp;exists&nbsp;in&nbsp;the&nbsp;file&nbsp;<br>
+&nbsp;<br>
+Returns<br>
+----------<br>
+pf_dict<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Dictionary&nbsp;object&nbsp;containing&nbsp;parameters&nbsp;in&nbsp;pf&nbsp;file</tt></dd></dl>
+ <dl><dt><a name="-read_pywind"><strong>read_pywind</strong></a>(filename, return_inwind<font color="#909090">=False</font>, mode<font color="#909090">='2d'</font>, complete<font color="#909090">=True</font>)</dt><dd><tt>read&nbsp;a&nbsp;py_wind&nbsp;output&nbsp;file&nbsp;using&nbsp;np&nbsp;array&nbsp;reshaping&nbsp;and&nbsp;manipulation<br>
+&nbsp;<br>
+Parameters<br>
+----------<br>
+filename&nbsp;:&nbsp;file&nbsp;or&nbsp;str<br>
+&nbsp;&nbsp;&nbsp;&nbsp;File,&nbsp;filename&nbsp;to&nbsp;read,&nbsp;e.g.&nbsp;root.ne.dat&nbsp;&nbsp;<br>
+&nbsp;<br>
+return_inwind:&nbsp;Bool<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;the&nbsp;array&nbsp;which&nbsp;tells&nbsp;you&nbsp;whether&nbsp;you<br>
+&nbsp;&nbsp;&nbsp;&nbsp;are&nbsp;partly,&nbsp;fully&nbsp;or&nbsp;not&nbsp;inwind.<br>
+&nbsp;<br>
+mode:&nbsp;string&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;can&nbsp;be&nbsp;used&nbsp;to&nbsp;control&nbsp;different&nbsp;coord&nbsp;systems&nbsp;<br>
+&nbsp;<br>
+Returns<br>
+----------<br>
+x,&nbsp;z,&nbsp;value:&nbsp;masked&nbsp;arrays<br>
+&nbsp;&nbsp;&nbsp;&nbsp;value&nbsp;is&nbsp;the&nbsp;quantity&nbsp;you&nbsp;are&nbsp;concerned&nbsp;with,&nbsp;e.g.&nbsp;ne</tt></dd></dl>
+ <dl><dt><a name="-read_pywind_summary"><strong>read_pywind_summary</strong></a>(filename, return_inwind<font color="#909090">=False</font>, mode<font color="#909090">='2d'</font>)</dt><dd><tt>read&nbsp;a&nbsp;py_wind&nbsp;output&nbsp;file&nbsp;using&nbsp;np&nbsp;array&nbsp;reshaping&nbsp;and&nbsp;manipulation<br>
+&nbsp;<br>
+Parameters<br>
+----------<br>
+filename&nbsp;:&nbsp;file&nbsp;or&nbsp;str<br>
+&nbsp;&nbsp;&nbsp;&nbsp;File,&nbsp;filename&nbsp;to&nbsp;read,&nbsp;e.g.&nbsp;root.ne.dat&nbsp;&nbsp;<br>
+&nbsp;<br>
+return_inwind:&nbsp;Bool<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;the&nbsp;array&nbsp;which&nbsp;tells&nbsp;you&nbsp;whether&nbsp;you<br>
+&nbsp;&nbsp;&nbsp;&nbsp;are&nbsp;partly,&nbsp;fully&nbsp;or&nbsp;not&nbsp;inwind.<br>
+&nbsp;<br>
+mode:&nbsp;string&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;can&nbsp;be&nbsp;used&nbsp;to&nbsp;control&nbsp;different&nbsp;coord&nbsp;systems&nbsp;<br>
+&nbsp;<br>
+Returns<br>
+----------<br>
+d:&nbsp;astropy.Table.table.table&nbsp;object<br>
+&nbsp;&nbsp;&nbsp;&nbsp;value&nbsp;is&nbsp;the&nbsp;quantity&nbsp;you&nbsp;are&nbsp;concerned&nbsp;with,&nbsp;e.g.&nbsp;ne</tt></dd></dl>
+ <dl><dt><a name="-read_spectrum"><strong>read_spectrum</strong></a>(filename)</dt><dd><tt>Load&nbsp;data&nbsp;from&nbsp;a&nbsp;spectrum&nbsp;output&nbsp;file&nbsp;from&nbsp;the&nbsp;radiative<br>
+transfer&nbsp;code&nbsp;Python&nbsp;<br>
+&nbsp;<br>
+Parameters<br>
+----------<br>
+filename&nbsp;:&nbsp;file&nbsp;or&nbsp;str<br>
+&nbsp;&nbsp;&nbsp;&nbsp;File,&nbsp;filename,&nbsp;or&nbsp;generator&nbsp;to&nbsp;read.&nbsp;&nbsp;If&nbsp;the&nbsp;filename&nbsp;extension&nbsp;is<br>
+&nbsp;&nbsp;&nbsp;&nbsp;``.gz``&nbsp;or&nbsp;``.bz2``,&nbsp;the&nbsp;file&nbsp;is&nbsp;first&nbsp;decompressed.&nbsp;Note&nbsp;that<br>
+&nbsp;&nbsp;&nbsp;&nbsp;generators&nbsp;should&nbsp;return&nbsp;byte&nbsp;strings&nbsp;for&nbsp;Python&nbsp;3k.<br>
+&nbsp;<br>
+Returns<br>
+----------<br>
+Success:&nbsp;<br>
+spectrum<br>
+&nbsp;&nbsp;&nbsp;&nbsp;returns&nbsp;a&nbsp;Table&nbsp;of&nbsp;class&nbsp;astropy.table.table.Table<br>
+&nbsp;<br>
+Failure&nbsp;returns&nbsp;1</tt></dd></dl>
+ <dl><dt><a name="-read_spectrum_to_class"><strong>read_spectrum_to_class</strong></a>(filename, new<font color="#909090">=True</font>)</dt><dd><tt>reads&nbsp;a&nbsp;Python&nbsp;.spec&nbsp;file&nbsp;and&nbsp;places&nbsp;in&nbsp;specclass&nbsp;array,<br>
+which&nbsp;is&nbsp;returned<br>
+&nbsp;<br>
+Parameters<br>
+----------<br>
+filename&nbsp;:&nbsp;file&nbsp;or&nbsp;str<br>
+&nbsp;&nbsp;&nbsp;&nbsp;File,&nbsp;filename&nbsp;to&nbsp;read.&nbsp;&nbsp;<br>
+&nbsp;<br>
+new:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;True&nbsp;means&nbsp;the&nbsp;Created&nbsp;column&nbsp;exists&nbsp;in&nbsp;the&nbsp;file&nbsp;<br>
+&nbsp;<br>
+Returns<br>
+----------<br>
+Success:&nbsp;<br>
+spectrum<br>
+&nbsp;&nbsp;&nbsp;&nbsp;returns&nbsp;a&nbsp;spectrum&nbsp;class&nbsp;cls.specclass<br>
+&nbsp;<br>
+Failure&nbsp;returns&nbsp;1</tt></dd></dl>
+ <dl><dt><a name="-setpars"><strong>setpars</strong></a>()</dt><dd><tt>set&nbsp;some&nbsp;standard&nbsp;parameters&nbsp;for&nbsp;plotting</tt></dd></dl>
+ <dl><dt><a name="-thinshell_read"><strong>thinshell_read</strong></a>(root)</dt><dd><tt>Read&nbsp;py_wind&nbsp;output&nbsp;filename&nbsp;for&nbsp;thin&nbsp;shell&nbsp;models&nbsp;with&nbsp;one&nbsp;cell</tt></dd></dl>
+ <dl><dt><a name="-write_pf"><strong>write_pf</strong></a>(root, pf_dict)</dt><dd><tt>writes&nbsp;a&nbsp;Python&nbsp;.pf&nbsp;file&nbsp;from&nbsp;a&nbsp;dictionary<br>
+&nbsp;<br>
+Parameters<br>
+----------<br>
+root&nbsp;:&nbsp;file&nbsp;or&nbsp;str<br>
+&nbsp;&nbsp;&nbsp;&nbsp;File,&nbsp;filename&nbsp;to&nbsp;write.&nbsp;&nbsp;<br>
+&nbsp;<br>
+pf_dict:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;dictionary&nbsp;to&nbsp;write<br>
+&nbsp;<br>
+Returns<br>
+----------<br>
+pf_dict<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Dictionary&nbsp;object&nbsp;containing&nbsp;parameters&nbsp;in&nbsp;pf&nbsp;file</tt></dd></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>has_astropy</strong> = True</td></tr></table>
+</body></html>

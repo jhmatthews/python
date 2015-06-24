@@ -757,6 +757,8 @@ int rd_extra(firstword, answer, wordlength)
 	{
 	  *wordlength = (int) (ccc - firstword);
 	}
+  else
+  	*wordlength = strlen (firstword);
 
   sscanf (secondword, "%le", answer);
 

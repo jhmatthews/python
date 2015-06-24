@@ -276,7 +276,7 @@ model_velocity (x, v)
     }
   else if (geo.wind_type == 3)
     {
-      speed = proga_velocity (x, v);
+      speed = hydro_velocity (x, v);
     }
   else if (geo.wind_type == 4)
     {
@@ -390,7 +390,7 @@ model_rho (x)
     }
   else if (geo.wind_type == 3)
     {
-      rho = proga_rho (x);
+      rho = hydro_rho (x);
     }
   else if (geo.wind_type == 4)
     {

@@ -68,4 +68,5 @@ Select_photons_by_position(y/n)   n
 spec.type(flambda(1),fnu(2),basic(other)   1
 Extra.diagnostics(0=no)   0
 Use.standard.care.factors(1=yes)   1
+reverb.type(0=None,1=Photon,2=Wind) 		0
 Photon.sampling.approach(0=T,1=(f1,f2),2=cv,3=yso,4=user_defined,5=cloudy_test,6=wide,7=AGN,8=logarithmic)     2

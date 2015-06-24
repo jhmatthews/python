@@ -114,6 +114,9 @@ define_phot (p, f1, f2, nphot_tot, ioniz_or_final, iwind, freq_sampling)
 				   that you have "enough" photons at high energy */
       ftot = populate_bands (f1, f2, ioniz_or_final, iwind, &xband);
 
+
+      for(n=0; n<NPHOT; n++) p[n].path = 0.0; /* SWM - Zero photon paths */
+
 // Now generate the photons
       iphot_start = 0;
       for (n = 0; n < xband.nbands; n++)
