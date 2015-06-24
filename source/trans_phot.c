@@ -56,6 +56,7 @@ History:
 
 FILE *pltptr;
 int plinit = 0;
+long n_lost_to_dfudge = 0;
 
 int 
 trans_phot (
@@ -233,12 +234,47 @@ trans_phot (
       trans_phot_single (w, &p[nphot], iextract);
 
     }
+
+  /* sometimes photons scatter near the edge of the wind and get pushed out by DFUDGE. We record these */
+  if (n_lost_to_dfudge > 0)
+  	Error("%ld photons were lost due to DFUDGE (=%8.4e)pushing them outside of the wind after scatter\n",
+  		   n_lost_to_dfudge, DFUDGE);
+
+  n_lost_to_dfudge = 0;		// reset the counter
   /* This is the end of the loop over all of the photons; after this the routine returns */
   // 130624 ksl Line added to complete watchdog timeer,
   Log ("\n\n");
 
   return (0);
 }
+
+
+/***********************************************************
+                                       University of Southampton
+ Synopsis:
+   trans_phot_single takes care of the single passage of each photon through the wind
+
+ Arguments:		
+	PhotPtr p;
+	WindPtr w;
+	int iextract	0  -> the live or die option and therefore no need to call extract 
+                       !0  -> the normal option for python and hence the need to call "extract"
+ 
+Returns:
+  
+Description:	
+This routine oversees the propagation of  individual photons.  The routine generates the random
+optical depth a photon can travel before scattering and monitors the
+progress of the photon through the grid.  The real physics is done else
+where, in "translate" or "scatter".
+		
+Notes:
+History:
+ 	1505 	SWM Coded 
+**************************************************************/
+
+
+
 
 int
 trans_phot_single (WindPtr w, PhotPtr p, int iextract)
@@ -547,6 +583,14 @@ trans_phot_single (WindPtr w, PhotPtr p, int iextract)
 	  istat = P_INWIND;
 	  tau = 0;
 	  reposition (w, &pp);
+
+	  /* call walls again to account for instance where DFUDGE 
+	     can take photon outside of the wind after scattering */
+	  istat = walls (&pp, p);
+
+	  if (istat != P_INWIND)
+	  	n_lost_to_dfudge++;
+
 	  stuff_phot (&pp, p);
 	  icell = 0;
 	}
