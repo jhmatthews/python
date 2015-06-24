@@ -374,7 +374,7 @@ spectrum_create (p, f1, f2, nangle, select_extract)
       spectype = p[nphot].origin;
       if (spectype >= 10)
 	spectype -= 10;
-      if (p[nphot].nres > NLINES || p[nphot].nres < 0 || spectype == PTYPE_STAR || spectype == PTYPE_BL || spectype == PTYPE_AGN || spectype == PTYPE_DISK)
+      if (p[nphot].nres > NLINES || p[nphot].nres < 0 || spectype != PTYPE_WIND)
       	p[nphot].w = 0.0;
 
       if ((j = p[nphot].nscat) < 0 || j > MAXSCAT)
