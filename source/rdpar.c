@@ -298,6 +298,9 @@ cpar (filename)
 {
   char old_filename[LINELEN];
 
+  if (rd_rank != 0)
+  	return 0;
+
   fclose (rdout_ptr);
   fclose (rdin_ptr);
   rdpar_stat = 0;

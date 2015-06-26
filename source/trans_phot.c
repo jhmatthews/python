@@ -235,15 +235,16 @@ trans_phot (
 
     }
 
+  /* This is the end of the loop over all of the photons; after this the routine returns */
+  // 130624 ksl Line added to complete watchdog timer,
+  Log ("\n\n");
+
   /* sometimes photons scatter near the edge of the wind and get pushed out by DFUDGE. We record these */
   if (n_lost_to_dfudge > 0)
-  	Error("%ld photons were lost due to DFUDGE (=%8.4e)pushing them outside of the wind after scatter\n",
+  	Error("%ld photons were lost due to DFUDGE (=%8.4e) pushing them outside of the wind after scatter\n",
   		   n_lost_to_dfudge, DFUDGE);
 
   n_lost_to_dfudge = 0;		// reset the counter
-  /* This is the end of the loop over all of the photons; after this the routine returns */
-  // 130624 ksl Line added to complete watchdog timeer,
-  Log ("\n\n");
 
   return (0);
 }
@@ -252,18 +253,20 @@ trans_phot (
 /***********************************************************
                                        University of Southampton
  Synopsis:
-   trans_phot_single takes care of the single passage of each photon through the wind
+   trans_phot_single takes care of the single passage of each photon through the wind.
+   It is called by trans_phot for each photon.
 
  Arguments:		
 	PhotPtr p;
 	WindPtr w;
 	int iextract	0  -> the live or die option and therefore no need to call extract 
-                       !0  -> the normal option for python and hence the need to call "extract"
+                    !0  -> the normal option for python and hence the need to call "extract"
  
 Returns:
   
 Description:	
-This routine oversees the propagation of  individual photons.  The routine generates the random
+This routine oversees the propagation of  individual photons.  
+The routine generates the random
 optical depth a photon can travel before scattering and monitors the
 progress of the photon through the grid.  The real physics is done else
 where, in "translate" or "scatter".
@@ -292,6 +295,7 @@ trans_phot_single (WindPtr w, PhotPtr p, int iextract)
   int nnscat;
   int nerr;
   double p_norm, tau_norm;
+  double x_dfudge_check[3];	
 
   /* Initialize parameters that are needed for the flight of the photon through the wind */
   stuff_phot (p, &pp);
@@ -391,6 +395,8 @@ trans_phot_single (WindPtr w, PhotPtr p, int iextract)
 
 	  /* 57+ -- ksl -- Add check to see if there is a cell in the plasma structure for this.  This is a problem that needs
 	     fixing */
+	  /* 1506 JM -- this appeared to happen due to a rather convoluted problem involving DFUDGE
+	    and not updating the istat variable properly. See Issue #154 for discussion */ 
 
 	  if (wmain[n].nplasma == NPLASMA)
 	    {
@@ -580,16 +586,31 @@ trans_phot_single (WindPtr w, PhotPtr p, int iextract)
 	     so that the photon can continue throug the wind */
 
 	  tau_scat = -log (1. - (rand () + 0.5) / MAXRAND);
-	  istat = P_INWIND;
+	  istat = pp.istat = P_INWIND;	// if we got here, the photon stays in the wind- make sure istat doesn't say scattered still! 
 	  tau = 0;
+	  
+	  stuff_v (pp.x, x_dfudge_check); // this is a vector we use to see if dfudge moved the photon outside the wind cone
 	  reposition (w, &pp);
 
-	  /* call walls again to account for instance where DFUDGE 
-	     can take photon outside of the wind after scattering */
+	  /* JM 1506 -- call walls again to account for instance where DFUDGE 
+	     can take photon outside of the wind and into the disk or star 
+	     after scattering. Note that walls updates the istat in pp as well.
+	     This may not be necessary but I think to account for every eventuality 
+	     it should be done */
 	  istat = walls (&pp, p);
 
-	  if (istat != P_INWIND)
-	  	n_lost_to_dfudge++;
+	  /* This *does not* update istat if the photon scatters outside of the wind-
+	     I guess P_INWIND is really in wind or empty space but not escaped.
+	     translate_in_space will take care of this next time round. All a bit
+	     convoluted but should work. */
+
+      /* JM 1506 -- we don't throw errors here now, but we do keep a track 
+         of how many 4 photons were lost due to DFUDGE pushing them 
+         outside of the wind after scatter */
+	  if (where_in_wind (pp.x) < 0 && where_in_wind (&x_dfudge_check[3]) >= 0)
+	  {
+      	n_lost_to_dfudge++;		// increment the counter (checked at end of trans_phot)
+	  }
 
 	  stuff_phot (&pp, p);
 	  icell = 0;
