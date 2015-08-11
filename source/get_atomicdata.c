@@ -614,8 +614,8 @@ structure does not have this property! */
 		choice = 'f';	/*ground state fractions */
 	      else if (strncmp (word, "Xcol", 4) == 0)
 		choice = 'x';	/*It's a collision strength transition -- old version not used*/
-        else if (strncmp (word, "CollLine", 4) == 0)
-    choice = 'X'; /*It's a macro-atom collision strength line -- JM 1508 Code Sprint */
+        else if (strncmp (word, "CollMacro", 9) == 0)  
+    choice = 'X';  /*It's a macro-atom collision strength line -- JM 1508 Code Sprint */
 	      else if (strncmp (word, "InPhot", 6) == 0)
 		choice = 'A';	/*It's an inner shell ionization for Auger effect */
 		  else if (strncmp (word, "InnerVYS", 8) ==0)
@@ -2115,8 +2115,9 @@ would like to have simple lines for macro-ions */
 
     // Collision strengths associated with macro-atom lines
     case 'X': /*The line contains collision strength information from Chianti / Stuart */
+
       if (sscanf (aline, "%*s %d %d %d %d %le",
-            &z, &istate, &levl, &levu, &upsilon) != 6)
+            &z, &istate, &levl, &levu, &upsilon) != 5)
         {
           Error
       ("get_atomic_data: file %s line %d: Matom collision strengths incorrectly formatted\n",
@@ -2124,6 +2125,7 @@ would like to have simple lines for macro-ions */
           Error ("Get_atomic_data: %s\n", aline);
           exit (0);
         }
+
       
       n = 0;
       while ((line[n].z != z || line[n].istate == istate || 
@@ -2156,7 +2158,7 @@ would like to have simple lines for macro-ions */
 
           m = 0;
           while ((config[m].z != z || config[m].istate != istate
-            || config[m].ilv != levu) && m < nlevels)
+                  || config[m].ilv != levu) && m < nlevels)
           m++;
 
           if (m == nlevels)
