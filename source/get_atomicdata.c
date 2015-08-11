@@ -221,6 +221,7 @@ get_atomic_data (masterfile)
   int n_fluor_yield_tot; //The number of inner shell cross sections with matching fluorescent photon yield arrays
   double I,Ea;  //The ionization energy and mean electron energy for electron yields
   double energy;  //The energy of inner shell fluorescent photons
+  double upsilon; //dimensionless collision strength
 
   /* define which files to read as data files */
 
@@ -310,8 +311,6 @@ get_atomic_data (masterfile)
 	("Allocated %10d bytes for each of %6d elements of       line totaling %10.1f Mb \n",
 	 sizeof (line_dummy), NLINES, 1.e-6 * NLINES * sizeof (line_dummy));
     }
-
-
 
   /* Initialize variables */
 
@@ -435,6 +434,8 @@ get_atomic_data (masterfile)
       line[n].gl = line[n].gu = 0;
       line[n].el = line[n].eu = 0.0;
       line[n].macro_info = -1;
+      line[n].coll_info = 0;
+      line[n].upsilon = 0.0000;   /* dimensionless collision strength for this transition */
     }
 
 /* 081115 nsh The following lines initialise the dielectronic recombination structure */
@@ -533,6 +534,8 @@ get_atomic_data (masterfile)
   lineno = 0;
   nxphot = 0;
   nxcol = 0;
+  nforbidden = 0;
+  ncoll_lines = 0;
 /*mflag is set initially to 1, in order to establish that
 macro-lines need to be read in before any "simple" lines.  This
 is so that we can assure that the first lines in the line array
@@ -610,7 +613,9 @@ structure does not have this property! */
 	      else if (strncmp (word, "Frac", 4) == 0)
 		choice = 'f';	/*ground state fractions */
 	      else if (strncmp (word, "Xcol", 4) == 0)
-		choice = 'x';	/*It's a collision strength line */
+		choice = 'x';	/*It's a collision strength transition -- old version not used*/
+        else if (strncmp (word, "CollLine", 4) == 0)
+    choice = 'X'; /*It's a macro-atom collision strength line -- JM 1508 Code Sprint */
 	      else if (strncmp (word, "InPhot", 6) == 0)
 		choice = 'A';	/*It's an inner shell ionization for Auger effect */
 		  else if (strncmp (word, "InnerVYS", 8) ==0)
@@ -2108,8 +2113,88 @@ would like to have simple lines for macro-ions */
 		    }
 		  break;
 
+    // Collision strengths associated with macro-atom lines
+    case 'X': /*The line contains collision strength information from Chianti / Stuart */
+      if (sscanf (aline, "%*s %d %d %d %d %le",
+            &z, &istate, &levl, &levu, &upsilon) != 6)
+        {
+          Error
+      ("get_atomic_data: file %s line %d: Matom collision strengths incorrectly formatted\n",
+       file, lineno);
+          Error ("Get_atomic_data: %s\n", aline);
+          exit (0);
+        }
+      
+      n = 0;
+      while ((line[n].z != z || line[n].istate == istate || 
+              line[n].levl == levl || line[n].levu == levu) && n < nlines)
+        n++;
 
-// Collision strengths --- Not currently used
+        if (n < nlines)
+      {
+        /* Then there is a match in the linelist */
+        line[n].upsilon = upsilon;         // this is the actual collision strength
+        line[n].coll_info = 1;   // flag saying we have a collision strength
+        ncoll_lines++;
+      }
+        else
+      {
+        /* there's no radiative transition to match this collisional transition- that's OK - we just have a
+           radiatively forbidden transition, as long as there are levels too match */
+          n = 0;
+          while ((config[n].z != z || config[n].istate != istate ||
+                  config[n].ilv != levl) && n < nlevels)
+          n++;
+
+          if (n == nlevels)
+        {
+          Error_silent
+            ("Get_atomic_data: No configuration found to match lower level of collision strength %d\n",
+              lineno);
+          break;
+        }
+
+          m = 0;
+          while ((config[m].z != z || config[m].istate != istate
+            || config[m].ilv != levu) && m < nlevels)
+          m++;
+
+          if (m == nlevels)
+        {
+          Error_silent
+            ("Get_atomic_data: No configuration found to match upper level of collision strength %d\n",
+              lineno);
+          break;
+        }
+
+        /* if we got here then we have a levels match, so we can create a new line to reflect this */
+        line[nlines].nion = config[n].nion;
+        line[nlines].z = z;
+        line[nlines].istate = istate;
+        line[nlines].freq = C / (freq * 1e-8);  /* convert Angstroms to frequency */
+        line[nlines].f = 0.00000;               /* radiatively forbidden */
+        line[nlines].gl = config[n].g;
+        line[nlines].gu = config[m].g;
+        line[nlines].levl = config[n].ilv;
+        line[nlines].levu = config[m].ilv;
+        line[nlines].el = config[n].ex;
+        line[nlines].eu = config[m].ex;
+        line[nlines].nconfigl = n;
+        line[nlines].nconfigu = m;
+
+        line[nlines].upsilon = upsilon;   // this is the actual collision strength
+        line[nlines].coll_info = 1;            // flag saying we have a collision strength
+        
+        /* increment the various counters */
+        nlines++;
+        ncoll_lines++;
+        nforbidden++;
+
+      }        
+
+      break;
+
+    // Old Collision strengths --- Not currently used
 		case 'x':	/*The line contains collision strength information--Gaetz & Salpeter */
 		  if (sscanf (aline, "%*s %*s %d %d %le %le %le %le %le",
 			      &z, &istate, &exx, &lambda, &alpha, &beta,
@@ -2678,6 +2763,8 @@ ion[n].dere_di_flag=1;
      n_bad_gs_rr, gstmin, gstmax);
   Log ("We have read in %3d Scaled electron temperature frequency averaged gaunt factors\n",
        gaunt_n_gsqrd);
+  Log("We have read in %3d Dimensionless collision strengths, %3d of which have no radiative transition (i.e. forbidden)\n",
+       ncoll_lines, nforbidden); 
   Log ("The minimum frequency for photoionization is %8.2e\n", phot_freq_min);
   Log ("The minimum frequency for inner shell ionization is %8.2e\n", inner_freq_min);
 

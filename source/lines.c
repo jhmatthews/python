@@ -231,29 +231,37 @@ q21 (line_ptr, t)
      double t;
 {
   double gaunt;
-  double omega;
-
+  double upsilon;
 
   if (q21_line_ptr != line_ptr || t != q21_t_old)
     {
 
-/*NSH 121024 - the followinglines implement the approximate gaunt factor as described in eq 4.21 in hazy 2*/
-/* NSH 121026 commented out in py74a - not certain that this approximate gaunt factor actually inmproves anything */
-      /*     if (line_ptr->istate == 1) //Neutral
+    /* NSH 121024 - the followinglines implement the approximate 
+       gaunt factor as described in eq 4.21 in hazy 2*/
+    /* NSH 121026 commented out in py74a - not certain that this 
+       approximate gaunt factor actually inmproves anything */
+    /*     if (line_ptr->istate == 1) //Neutral
          {
          gaunt = ((BOLTZMANN*t)/(H*line_ptr->freq))/10.0;
          }
          else
          {
          gaunt = 0.2;
-         } */
+         } 
+    */
+     
+      /* JM 1508 code sprint -- added collisional data */
+      if (line_ptr->coll_info) 
+        {
+          upsilon = line_ptr->upsilon;
+        }
+      else      // default to Van Regemorter if no bound-bound data
+        {
+          gaunt = 1;
+          upsilon = ECS_CONSTANT * line_ptr->gl * gaunt * line_ptr->f / line_ptr->freq;
+        }
 
-
-
-      gaunt = 1;
-      omega =
-	ECS_CONSTANT * line_ptr->gl * gaunt * line_ptr->f / line_ptr->freq;
-      q21_a = 8.629e-6 / (sqrt (t) * line_ptr->gu) * omega;
+      q21_a = 8.629e-6 / (sqrt (t) * line_ptr->gu) * upsilon;
       q21_t_old = t;
     }
 
@@ -269,10 +277,8 @@ q12 (line_ptr, t)
   double q21 ();
   double exp ();
 
-  x =
-    line_ptr->gu / line_ptr->gl * q21 (line_ptr,
-				       t) * exp (-H_OVER_K * line_ptr->freq /
-						 t);
+  x = line_ptr->gu / line_ptr->gl;
+  x *= q21 (line_ptr, t) * exp (-H_OVER_K * line_ptr->freq / t);
 
   return (x);
 }
