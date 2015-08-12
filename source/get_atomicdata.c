@@ -1406,6 +1406,15 @@ for the ionstate.
 			  ion[config[m].nion].phot_info = 1;	/* Mark this ion as using TOPBASE photo */
 			  ion[config[m].nion].ntop_first = ntop_phot;
 			}
+
+      /* JM 1508 -- next line sees if the topbase level just read in is the ground state - 
+         if it is, the ion structure element ntop_ground is set to that topbase level number
+         note that m is the lower level here */
+         if (m == config[ion[config[n].nion].first_nlte_level].ilv)
+        {
+          ion[config[n].nion].ntop_ground = ntop_phot;
+        }
+
 		      ion[config[m].nion].ntop++;
 
 		      // Finish up this section by storing the photionization data properly
@@ -1598,8 +1607,10 @@ for the ionstate.
               nphot_total++;
             }
 
-        else if (ion[nion].phot_info == 1) /*We already have a topbase cross section, but the VFKY 
-			data is superior for the ground state, so we replace that data with the current data*/
+        else if (ion[nion].phot_info == 1 && ion[nion].macro_info != 1) 
+        /* We already have a topbase cross section, but the VFKY 
+			     data is superior for the ground state, so we replace that data with the current data*/
+        /* JM 1508 -- don't do this with macro-atoms for the moment */
 		           {
 				phot_top[ion[nion].ntop_ground].nlev = ion[nion].firstlevel; // ground state
 				phot_top[ion[nion].ntop_ground].nion = nion;
