@@ -358,6 +358,9 @@ bb_estimators_increment (one, p, tau_sobolev, dvds, nn)
   xplasma = &plasmamain[one->nplasma];
   mplasma = &macromain[xplasma->nplasma];
 
+  if (where_in_wind(p->x) < 0)
+    Error("incrementing bb estimators yet outside wind cone!\n");
+
 
   /* 04apr ksl: Start by checking that this was a macro-line */
   /* There should now be a diversion in place before this routine is called

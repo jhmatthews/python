@@ -467,7 +467,7 @@ calloc_estimators (nelem)
      size_Jbar_est, size_gamma_est, size_alpha_est);
 
 
-  for (n = 0; n < nelem; n++)
+  for (n = 0; n < nelem + 1; n++)
     {
       /* JM130625: Commented out free statements due to PYWIND MALLOC MATOM BUG
 	 if (macromain[n].jbar != NULL)
