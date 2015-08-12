@@ -65,6 +65,8 @@ int nlevels_macro;		/* Actual number of macro atom levels. (SS, June 04) */
 int nlines;			/* Actual number of lines that were read in */
 int nlines_macro;		/* Actual number of Macro Atom lines that were read in.  New version of get_atomic
 				   data assumes that macro lines are read in before non-macro lines */
+int ncoll_lines;    // number of collision strengths supplued (CollLine)
+int nforbidden;     // number of collisional transitions with no radiative transition
 #define N_INNER     10 /*Maximum number of inner shell ionization cross sections per ion*/
 int n_inner_tot;       /*The actual number of inner shell ionization cross sections in total*/
 
@@ -248,6 +250,9 @@ typedef struct lines
 				   upper configuration (nconfigu) and then down_index (for deexcitation) or the lower
 				   configuration (nconfigl) and then up_index. (SS) */
   int up_index;
+  int coll_info;    /* do we have a dimensionless collision strength for this transition? 
+                       0, no, 1, yes */
+  double upsilon;   /* dimensionless collision strength */
 }
 line_dummy, *LinePtr;
 
@@ -260,7 +265,6 @@ struct lines fast_line;
 
 int nline_min, nline_max, nline_delt;	/*For calculating which line are likely to be in resonance, see
 					   the routine limit_lines */
-
 
 
 /*structure containing photoionization data */
