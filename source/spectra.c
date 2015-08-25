@@ -504,7 +504,8 @@ spectrum_create (p, f1, f2, nangle, select_extract)
 	  xxspec[5].nphot[i]++;
 	}
 
-      if (j > 0)
+    if (p[nphot].nscat > 0 || p[nphot].nrscat > 0)
+
 	{
 	  xxspec[6].f[k] += p[nphot].w;	/* j is the number of scatters so this constructs */
 	  xxspec[6].lf[k1] += p[nphot].w;	/* logarithmic j is the number of scatters so this constructs */

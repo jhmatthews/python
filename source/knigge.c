@@ -87,7 +87,7 @@ Terminolgy is awful here. -- ksl
 As now represented geo.kn_dratio is the distance to the focus point in stellar radii!
 
 */
-  rddoub ("kn.d", &geo.kn_dratio);
+  rddoub ("kn.d(in_wd_radii)", &geo.kn_dratio);
   Log_silent ("dmin = %f so the ratio d/dmin here is %f  (%.2e %.2e) \n",
 	      dmin, geo.kn_dratio / dmin, geo.diskrad, geo.rstar);
 
@@ -112,8 +112,8 @@ to be modified -- ksl 04jun */
   /* JM 1502 -- added capability for user to adjust launch radii of KWD wind
      required to reproduce Stuart's X-ray models (Sim+ 2008,2010) 
      units are in stellar radii / WD radii / grav radii as in SV model */
-  rddoub ("kn.rmin", &geo.wind_rmin);
-  rddoub ("kn.rmax", &geo.wind_rmax ); 
+  rddoub ("kn.rmin(in_wd_radii)", &geo.wind_rmin);
+  rddoub ("kn.rmax(in_wd_radii)", &geo.wind_rmax ); 
 
   geo.wind_rmin *= geo.rstar;
   geo.wind_rmax *= geo.rstar;

@@ -85,6 +85,7 @@ History:
                         "simple").
 	06may	ksl	57+ -- To allow for plasma structure.  
 	1409	ksl	Changes to accommodate clumping
+	1508  nsh	changes to allow compton scattering to replace thomoson scattering.
 **************************************************************/
 
 struct photon cds_phot_old;
@@ -104,6 +105,7 @@ calculate_ds (w, p, tau_scat, tau, nres, smax, istat)
   int kkk;
   double kap_es;
   double freq_inner, freq_outer, dfreq, ttau, freq_av;
+  double mean_freq;  //A mean freq for use in compton calculations.
   int n, nn, nstart, ndelt;
   double x;
   double ds_current, ds;
@@ -123,7 +125,7 @@ calculate_ds (w, p, tau_scat, tau, nres, smax, istat)
   nplasma = one->nplasma;
   xplasma = &plasmamain[nplasma];
 
-  kap_es = THOMPSON * xplasma->ne * geo.fill;
+//  kap_es = THOMPSON * xplasma->ne * geo.fill; NSH 1508 Moved to after the doppler shift is computed, for compton.
   /* This is the electron scattering opacity per unit length. For the Macro Atom approach we need an 
      equivalent opacity per unit length due to each of the b-f continuua. Call it kap_bf. (SS) */
 
@@ -199,6 +201,21 @@ then the photon frequency will be less. */
   freq_inner = p->freq * (1. - v1 / C);
   freq_outer = phot.freq * (1. - v2 / C);
   dfreq = freq_outer - freq_inner;
+  
+  
+/* NSH 150810 - we use the doppler shifted frequency to compute the Klein-Nishina cross section, if the frequency
+  is high enough, otherwise we just use the thompson cross section.  For the time being, use the average
+  frequency. If we want true fidelity, perhaps we could compute the cross section for every little path
+  section between resonances */
+  
+  mean_freq=(freq_inner+freq_outer)/2.0;
+     
+ kap_es = klein_nishina(mean_freq) * xplasma->ne * geo.fill; /*Compute the angle averaged cross section */
+     
+     
+  
+  
+  
 
 /* The next section checks to see if the frequency difference on
  * the two sides is very small and if not limits the resonances
@@ -1140,12 +1157,13 @@ scatter (p, nres, nnscat)
   double prob_kpkt, kpkt_choice;
   double gamma_twiddle, gamma_twiddle_e, stim_fact;
   int m, llvl, ulvl;
+  double v_dop;
   PlasmaPtr xplasma;
   MacroPtr mplasma;
 
+ // printf ("nres=%i\n",*nres);
 
-
-  stuff_phot (p, &pold);
+  stuff_phot (p, &pold);   //Save the original photon direction
   n = where_in_grid (pold.x);	// Find out where we are
 
   //71 - 1112 Check added to test out spherical wind models 
@@ -1370,7 +1388,18 @@ scatter (p, nres, nnscat)
      to use the thermal trapping model to choose the direction. */
 
 
-  if (*nres == -1 || *nres == -2 || *nres > NLINES || geo.scatter_mode == 0
+  if (*nres == -1)   //Its an electron scatter, so we will call compton to get a direction
+  {
+     vwind_xyz (p, v);  //get the local velocity at the location of the photon
+     v_dop = dot (p->lmn, v);  //get the dot product of the photon direction with the wind, to get the doppler velocity
+	  p->freq=p->freq * (1. - v_dop / C);  //This is the photon frequency in the electron rest frame
+	  compton_dir (p,xplasma);  //Get a new direction using the KN formula
+	  v_dop = dot (p->lmn, v);   //Find the dot product of the new velocity with the wind
+	  p->freq=p->freq / (1. - v_dop / C); //Transform back to the observers frame
+	  
+  }
+	  
+	else if ( *nres == -2 || *nres > NLINES || geo.scatter_mode == 0
       || geo.scatter_mode > 2)
     //geo.scatter_mode > 2 should never happen but to keep consistency with what was here before I've
     //added it as a possibility  SS.  ?? I'm not sure about the geo.scatter mode > 2 stuff.  Seems
@@ -1405,7 +1434,8 @@ scatter (p, nres, nnscat)
   //stuff_v (z_prime, p->lmn);
 
   vwind_xyz (p, v);		/* Get the velocity vector for the wind */
-  doppler (&pold, p, v, *nres);
+  if (*nres !=-1)  //Only do this if its not an electron scatter, otherwise we have already dealt with this
+      doppler (&pold, p, v, *nres);
 
 
 /* We estimate velocities by interpolating between the velocities at the edges of the cell based

@@ -58,7 +58,10 @@ translate (w, pp, tau_scat, tau, nres)
     }
   else if ((pp->grid = where_in_grid (pp->x)) >= 0)
     {
+//		 printf ("photon %i start=%e %e %e %e",pp->np,pp->x[0], pp->x[1], pp->x[2],sqrt(pp->x[0]*pp->x[0]+pp->x[1]*pp->x[1]+pp->x[2]*pp->x[2]));
       istat = translate_in_wind (w, pp, tau_scat, tau, nres);
+//	 printf ("end=%e %e %e %e\n",pp->x[0], pp->x[1], pp->x[2],sqrt(pp->x[0]*pp->x[0]+pp->x[1]*pp->x[1]+pp->x[2]*pp->x[2]));
+		
     }
   else
     {

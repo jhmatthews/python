@@ -48,7 +48,7 @@ communicate_estimators_para ()
 
   /* The size of the helper array for doubles. We transmit 10 numbers 
      for each cell, plus three arrays, each of length NXBANDS */
-  plasma_double_helpers = (14 + 3 * NXBANDS) * NPLASMA;
+  plasma_double_helpers = (15 + 3 * NXBANDS) * NPLASMA;
 
   /* The size of the helper array for integers. We transmit 6 numbers 
      for each cell, plus one array of length NXBANDS */
@@ -89,11 +89,13 @@ communicate_estimators_para ()
       redhelper[mpi_i + 11 * NPLASMA] = plasmamain[mpi_i].j_scatt / np_mpi_global;
       redhelper[mpi_i + 12 * NPLASMA] = plasmamain[mpi_i].ip_direct / np_mpi_global;
       redhelper[mpi_i + 13 * NPLASMA] = plasmamain[mpi_i].ip_scatt / np_mpi_global;
+      redhelper[mpi_i + 14 * NPLASMA] = plasmamain[mpi_i].heat_auger / np_mpi_global;
+
       for (mpi_j = 0; mpi_j < NXBANDS; mpi_j++)
 	{
-	  redhelper[mpi_i + (14 + mpi_j) * NPLASMA] = plasmamain[mpi_i].xj[mpi_j] / np_mpi_global;
-	  redhelper[mpi_i + (14 + NXBANDS + mpi_j) * NPLASMA] = plasmamain[mpi_i].xave_freq[mpi_j] / np_mpi_global;
-	  redhelper[mpi_i + (14 + 2 * NXBANDS + mpi_j) * NPLASMA] = plasmamain[mpi_i].xsd_freq[mpi_j] / np_mpi_global;
+	  redhelper[mpi_i + (15 + mpi_j) * NPLASMA] = plasmamain[mpi_i].xj[mpi_j] / np_mpi_global;
+	  redhelper[mpi_i + (15 + NXBANDS + mpi_j) * NPLASMA] = plasmamain[mpi_i].xave_freq[mpi_j] / np_mpi_global;
+	  redhelper[mpi_i + (15 + 2 * NXBANDS + mpi_j) * NPLASMA] = plasmamain[mpi_i].xsd_freq[mpi_j] / np_mpi_global;
 
 	  /* 131213 NSH populate the band limited min and max frequency arrays */
 	  maxbandfreqhelper[mpi_i * NXBANDS + mpi_j] = plasmamain[mpi_i].fmax[mpi_j];
@@ -136,11 +138,13 @@ communicate_estimators_para ()
       plasmamain[mpi_i].j_scatt = redhelper2[mpi_i + 11 * NPLASMA];
       plasmamain[mpi_i].ip_direct = redhelper2[mpi_i + 12 * NPLASMA];
       plasmamain[mpi_i].ip_scatt = redhelper2[mpi_i + 13 * NPLASMA];
+      plasmamain[mpi_i].heat_auger = redhelper2[mpi_i + 14 * NPLASMA];
+
       for (mpi_j = 0; mpi_j < NXBANDS; mpi_j++)
 	{
-	  plasmamain[mpi_i].xj[mpi_j] = redhelper2[mpi_i + (14 + mpi_j) * NPLASMA];
-	  plasmamain[mpi_i].xave_freq[mpi_j] = redhelper2[mpi_i + (14 + NXBANDS + mpi_j) * NPLASMA];
-	  plasmamain[mpi_i].xsd_freq[mpi_j] = redhelper2[mpi_i + (14 + NXBANDS * 2 + mpi_j) * NPLASMA];
+	  plasmamain[mpi_i].xj[mpi_j] = redhelper2[mpi_i + (15 + mpi_j) * NPLASMA];
+	  plasmamain[mpi_i].xave_freq[mpi_j] = redhelper2[mpi_i + (15 + NXBANDS + mpi_j) * NPLASMA];
+	  plasmamain[mpi_i].xsd_freq[mpi_j] = redhelper2[mpi_i + (15 + NXBANDS * 2 + mpi_j) * NPLASMA];
 
 	  /* 131213 NSH And unpack the min and max banded frequencies to the plasma array */
 	  plasmamain[mpi_i].fmax[mpi_j] = maxbandfreqhelper2[mpi_i * NXBANDS + mpi_j];

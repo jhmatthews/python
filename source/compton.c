@@ -27,6 +27,8 @@
 #include <stdlib.h>
 #include "atomic.h"
 #include "python.h"
+#include <gsl/gsl_rng.h>
+
 
 /**************************************************************************
                     Space Telescope Science Institute
@@ -72,6 +74,8 @@ kappa_comp (xplasma, freq)
   x *= geo.fill;    // multiply by the filling factor- should cancel with density enhancement
   return (x);
 }
+
+
 
 /**************************************************************************
                     Space Telescope Science Institute
@@ -230,3 +234,193 @@ klein_nishina (nu)
 
   return (kn);
 }
+
+double z_rand,sigma_tot,x1; //External variables to allow zfunc to search for the correct fractional energy change
+
+/**************************************************************************
+                    Southampton University
+
+
+  Synopsis:  compton_dir computes a random direction (and hence frequency change)
+			for a photon undergoing compton scattering. At low frequencies, this
+			is just thompson scattering.
+
+  Description:	
+
+  Arguments:  
+			p - the photon currently being scattered, this gives us the current direction and the frequency
+			xplasma- pointer to the current plasma cell
+
+  Returns:   kappa - nothing, but updates the photon frequency and direction
+
+  Notes:   
+
+  History:
+2015	NSH coded as part of teh summer 2015 code sprint
+
+ ************************************************************************/
+
+
+
+int
+	compton_dir (p,xplasma)
+		PhotPtr p;
+        PlasmaPtr xplasma;		// Pointer to current plasma cell
+		
+{
+	double f_min,f_max,f; //The theoretical maxmimum energy change
+	double n,l,m,phi,len;  //The direction cosines of the new photon direction in the frame of reference with q along the photon path
+	struct basis nbasis;  //The basis function which transforms between the photon frame and the pbserver frame	
+	double lmn[3]; /* the individual direction cosines in the rotated frame */
+	double x[3]; /*photon direction in the frame of reference of the original photon*/
+	double dummy[3],c[3];
+	
+	x1=H*p->freq/MELEC/C/C; //compute the ratio of photon energy to electron energy. In the electron rest frame this is just the electron rest mass energ 
+		
+	n=l=m=0.0;  //initialise some variables to avoid warnings
+	
+	
+	if (x1<0.0001) //If the photon energy is much less than electron mass, we just have thompson scattering.
+	{
+		randvec(lmn,1.0); //Generate a normal isotropic scatter
+		f=1.0;   //There is no energy loss
+		stuff_v (lmn, p->lmn);
+	}
+	else
+	{
+		z_rand=rand()/MAXRAND; //Generate a random number between 0 and 1 - this is the random location in the klein nishina scattering distribution - it gives the energy loss and also direction.
+		f_min=1.;         //The minimum energy loss - i.e. no energy loss
+		f_max=1.+(2.*x1);  //The maximum energy loss
+	
+		sigma_tot=sigma_compton_partial(f_max,x1);  //Communicated externally to the integrand function in the zbrent call below, this is the maximum cross section, used to scale the K_N function to lie between 0 and 1.
+	
+		f=zbrent(compton_func,f_min,f_max,1e-8);  //Find the zero point of the function compton_func - this finds the point in the KN function that represents our random energy loss.
+		n=(1.-((f-1.)/x1));   //This is the angle cosine of the new direction in the frame of reference of the photon
+//		printf ("f=%e n=%e fmin=%e fmax=%e\n",f,n,f_min,f_max);
+	
+		if (isfinite(len=sqrt(1.-(n*n)))==0)   //Compute the length of the other sides - the isfinite is to take care of the very rare occasion where n=1!
+		len=0.0;
+		phi = 0.0;           //no need to randomise phi, the random rotation of the vector generating the basis function takes care of this
+
+		l = len*cos (phi);   //compute the angle cosines of the other two dimensions.
+		m = len*sin (phi);
+		
+		randvec(dummy,1.0);  //Get a random vector
+	   
+		cross(dummy, p->lmn, c);  //c will be perpendicular to p->lmn
+				
+//		printf ("c= %e %e %e n=%e acos(n)=%f\n",c[0],c[1],c[2],n,acos(n)*RADIAN);
+		
+		create_basis (p->lmn, c, &nbasis); //create a basis with the first axis in the direction of the original photon direction, c will be perpendicular to the photon direction. Orientaion of the y/z axes are will give the randomization of the phi axis
+		
+		
+		x[0] = n;  //This is the cosine direction of the new photon direction, in the frame of reference where the first axis is in the original photon direction
+		x[1] = l;
+		x[2] = m;
+	  
+
+      project_from (&nbasis, x, lmn);	/* Project the vector from the FOR of the original photon into the observer frame */
+		renorm(lmn,1.0);
+//		Log("f=%e freq=%e  n=%e l_old=%e m_old=%e n_old=%e l_new=%e m_new=%e n_new=%e len=%e\n",f,p->freq,n,p->lmn[0],p->lmn[1],p->lmn[2],lmn[0],lmn[1],lmn[2],length(lmn));
+//	  Log_flush();
+//	  renorm (lmn,1.0);
+
+		stuff_v (lmn,p->lmn);
+//		randvec(a,1.0); //Generate a normal isotropic scatter
+//				f=1.0;   //There is no energy loss
+//		stuff_v (a, p->lmn);
+//	printf ("Original %e %e %e theta %e new %e %e %e\n",pold.lmn[0],pold.lmn[1],pold.lmn[2],n,p->lmn[0],p->lmn[1],p->lmn[2]);		
+		
+	}
+	
+	p->freq=p->freq/f;  //reduce the photon frequency
+	p->w=p->w/f;  //reduce the photon weight by the same ammount to conserve photon numbers
+return(0);
+}
+
+/**************************************************************************
+                    Southampton University
+
+
+  Synopsis:  compton_func is a simple function that is equal to zero when the 
+			external variable z_rand is equal to the normalised KN cross section.
+			It is used in a call to zbrent in the function compton_dir
+
+  Description:	
+
+  Arguments:  
+			f- the fractional energy change which is supplied to sigma_compton_partial
+
+  Returns:   the difference between sigma(f) and the randomised cross section we are searching for
+
+  Notes:   Since this function is called by zbrent, many of the variables have to be communicated
+			externally. These are 
+				x1, the ratio of photon energy to electron rest mass,
+				sigma_tot, the total angle integrated KN cross section
+				z_rand - a randomised number between 0 and 1 representing the normalised cross section we want to find
+		
+
+  History:
+2015	NSH coded as part of the summer 2015 code sprint
+
+ ************************************************************************/
+
+
+double
+	compton_func(f)
+		double f;
+{
+	double ans;
+	ans=(sigma_compton_partial(f,x1)/sigma_tot)-z_rand;
+		return(ans);
+}
+
+/**************************************************************************
+                    Southampton University
+
+
+  Synopsis:  sigma_compton_partial is the KN cross section as a function of the 
+			fractional energy change
+
+  Description:	
+
+  Arguments:  
+			f - the fractional energy change
+			x	the enerrgy of the photon divided by the rest mass energy of an electron
+
+  Returns:   the cross section for the scattering angle that gives this fractional energy change.
+
+  Notes:   
+			Stuart Sim supplied this formula, but coundn't recall where he had found it, although
+			he had rederived it and thinks it is correct!
+
+  History:
+2015	NSH coded as part of the summer 2015 code sprint
+
+ ************************************************************************/
+
+
+double 
+   sigma_compton_partial(f,x)
+      double f; //This is the fractional energy change, nu/nu'
+   double x; //h nu/mec**2 - the energy of the photon divided by the rest energy of an eectron
+   {
+      double term1,term2,term3,tot;
+   
+   term1 = ( (x*x) - (2*x) - 2 ) * log(f) / x / x;
+   term2 = ( ((f*f) -1) / (f * f)) / 2;
+   term3 = ( (f - 1) / x) * ( (1/x) + (2/f) + (1/(x*f)));
+
+   tot = 3 * THOMPSON * (term1 + term2 + term3) / (8 * x);
+
+   return(tot);
+   
+}
+   
+   
+   
+   
+   
+    
+
+
