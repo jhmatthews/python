@@ -280,6 +280,7 @@ macro_pops (xplasma, xne)
   double *a_data, *b_data;
   double *populations;
   int index_fast_col, ierr;
+  double lte_levden[NLTE_LEVELS];
 
   MacroPtr mplasma;
   mplasma = &macromain[xplasma->nplasma];
@@ -316,6 +317,9 @@ macro_pops (xplasma, xne)
       if (ion[ele[index_element].firstion].macro_info == 1
 	  && geo.macro_simple == 0)
 	{
+	  /* compute saha ion abundances and LTE partition functions 
+         and store in lte_levden array */
+      get_lte_matom_populations(lte_levden, index_element, xplasma);
 
 	  /* Having established that the ion requires a macro atom treatment we
 	     are going to construct a matrix of rates between the levels and 
@@ -578,6 +582,16 @@ macro_pops (xplasma, xne)
 
 	  /* Now we can just invert the matrix to get the fractional level populations. */
 
+      /* recast the rates in terms of departure coefficients */
+	  /* to this we multiply each column k by the population of
+	     level k in LTE */
+	  for (nn = 0; nn < n_macro_lvl; nn++)
+	    {
+	      for (mm = 0; mm < n_macro_lvl; mm++)
+		{
+		  rate_matrix[nn][mm] *= lte_levden[config[mm].nden];
+		}
+	    }
 
 	  /********************************************************************************/
 	  /* The block that follows (down to next line of ***s) is to do the
@@ -620,6 +634,21 @@ macro_pops (xplasma, xne)
       free (a_data);	
 	  free (b_data);	
 
+
+      /* convert populations from departure coefficients back into fractions of entire element */
+      for (index_ion = ele[index_element].firstion;
+	       index_ion <
+	       (ele[index_element].firstion + ele[index_element].nions);
+	       index_ion++)
+	    {
+	      for (index_lvl = ion[index_ion].first_nlte_level;
+		       index_lvl <
+		       ion[index_ion].first_nlte_level + ion[index_ion].nlte;
+		       index_lvl++)
+		    {	
+              populations[conf_to_matrix[index_lvl]] *= lte_levden[config[index_lvl].nden];
+		    }
+	    }
 
 
 	  /* MC noise can cause population inversions (particularly amongst highly excited states)

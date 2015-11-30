@@ -113,30 +113,150 @@ levels (xplasma, mode)
       if (ion[nion].nlte > 0)
 	/* Extra if statement added to prevent changing levden of macro atom populations (SS, Apr04) */
 	{
-	  if (ion[nion].macro_info == 0 || geo.macro_ioniz_mode == 0)
-	    {			//Then calculate levels for this ion 
+    if (ion[nion].macro_info == 0 || geo.macro_ioniz_mode == 0)
+      {     //Then calculate levels for this ion 
 
-	      z = xplasma->partition[nion];
+        z = xplasma->partition[nion];
+        nlevden = ion[nion].first_levden;
 
-	      /* N.B. partition functions will most likely have been 
-	         calculated from "lte" levels, at least for * now ??  */
+        /* N.B. partition functions will most likely have been 
+           calculated from "lte" levels, at least for * now ??  */
 
-	      m = ion[nion].first_nlte_level;
-	      m_ground = m;	//store the ground state index - allow for gs energy neq 0 (SS) 
-	      nlevden = ion[nion].first_levden;
-	      xplasma->levden[nlevden] = config[m].g / z;	//Assumes first level is ground state
-	      for (n = 1; n < ion[nion].nlte; n++)
-		{
-		  m++;
-		  nlevden++;
-		  xplasma->levden[nlevden] =
-		    weight * config[m].g *
-		    exp ((-config[m].ex + config[m_ground].ex) / kt) / z;
-		}
-	    }
-	}
+        get_boltzmann_populations(xplasma->levden, nion, weight, t, z, nlevden);
+    
+      }
+  }
     }
 
   return (0);
 
+}
+
+/* get_boltzmann_populations calculates populations for ion nion and
+   places them in an array levden_array,
+   at temperature t, dilution factor w. w=1 is LTE.
+
+   This is used by levels, above, and also by macro-atom level populations
+   which calculate departure coefficients and so need LTE populations.
+
+   nlevden will index the levden array directly in the case of levels()
+   but may be set to zero if we want to store the populations in a temporary array.
+*/
+
+
+int
+get_boltzmann_populations(levden_array, nion, w, t, z, nlevden)
+    double levden_array[NLTE_LEVELS];
+    int nion, nlevden;
+    double w, t, z;
+{
+  double ground;
+  int m, m_ground, n;
+  double kt;
+  m = ion[nion].first_nlte_level;
+  m_ground = m; 
+  levden_array[nlevden] = ground = config[m].g / z;  //Assumes first level is ground state
+
+  kt = BOLTZMANN * t;
+
+  for (n = 1; n < ion[nion].nlte; n++)
+    {
+      m++;
+      nlevden++;
+      levden_array[nlevden] = ground * w * config[m].g *
+        exp ((-config[m].ex + config[m_ground].ex) / kt) / z;
+    }
+
+  return (0);
+}
+
+
+int get_lte_matom_populations(levden_array, nelem, xplasma)
+        double levden_array[NLTE_LEVELS];
+        int nelem;
+        PlasmaPtr xplasma;
+{
+  PlasmaPtr xdummy_lte;
+  plasma_dummy pdum;
+  double nh, ion_fraction, z;
+  int nion, n, nlevden_first;
+
+  nh = xplasma->rho * rho2nh;
+
+  /* create a copy of the plasma pointer and compute LTE populations- 
+     we'll use this to get departure coefficients */
+  xdummy_lte = &pdum;
+  copy_plasma (xplasma, xdummy_lte);
+
+  /* now compute saha ion abundances and LTE partition functions 
+     and store in our copy of the plasma pointer */
+  partition_functions (xdummy_lte, NEBULARMODE_TR);
+  saha (xdummy_lte, xdummy_lte->ne, xdummy_lte->t_r);
+
+  for (nion = ele[nelem].firstion;
+      nion <
+      (ele[nelem].firstion + ele[nelem].nions);
+      nion++)
+      {
+        nlevden_first = ion[nion].first_levden;
+
+        ion_fraction = xdummy_lte->density[nion] / (nh * ele[nelem].abun);
+        z = xdummy_lte->partition[nion];
+
+        /* this gives us population as an ion fraction */
+        get_boltzmann_populations(xdummy_lte->levden, nion, 1.0, xdummy_lte->t_r, z, nlevden_first);
+        
+        /* convert the populations to fraction of entire element by multiplying by ion fraction */
+        for (n = nlevden_first; n < nlevden_first+ion[nion].nlte; n++)
+          {
+            levden_array[n] *= ion_fraction;
+          }
+      }
+  return (0);
+}
+
+
+
+
+
+/**************************************************************************
+
+  Synopsis:  
+
+  Routine to copy the necessary parts of a plasma structure for computing 
+  a set of level populations. x1 points to the cell from which data is copied 
+  and x2 points to the cell to which data is copied.
+  
+  Description:  
+
+  Arguments:  
+
+  Returns:
+
+  Notes:
+
+  History:
+ ************************************************************************/
+
+int
+copy_plasma (x1, x2)
+     PlasmaPtr x1, x2;
+{
+  x2->nwind = x1->nwind;
+  x2->nplasma = x1->nplasma;
+  x2->ne = x1->ne;
+  x2->rho = x1->rho;
+  x2->vol = x1->vol;
+  x2->t_r = x1->t_r;
+  x2->t_e = x1->t_e;
+  x2->w = x1->w;
+
+  /* JM 1409 -- added this for depcoef_overview_specific */
+  x2->partition = x1->partition;
+  x2->density = x1->density;
+
+  /* Note this isn't everything in the cell! 
+     Only the things needed for these routines */
+
+  return (0);
 }

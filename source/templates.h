@@ -280,6 +280,9 @@ int ispy_close(void);
 int ispy(PhotPtr p, int n);
 /* levels.c */
 int levels(PlasmaPtr xplasma, int mode);
+int get_boltzmann_populations(double levden_array[270], int nion, double w, double t, double z, int nlevden);
+int get_lte_matom_populations(double levden_array[270], int nelem, PlasmaPtr xplasma);
+int copy_plasma(PlasmaPtr x1, PlasmaPtr x2);
 /* gradv.c */
 double dvwind_ds(PhotPtr p);
 int dvds_ave(void);
@@ -454,7 +457,6 @@ int matom_emiss_report(void);
 int compute_di_coeffs(double T);
 int compute_qrecomb_coeffs(double T);
 double total_di(WindPtr one, double t_e);
-double total_qrecomb(WindPtr one, double t_e);
 double q_ioniz_dere(int nion, double t_e);
 double q_ioniz(struct topbase_phot *cont_ptr, double electron_temperature);
 double q_recomb_dere(struct topbase_phot *cont_ptr, double electron_temperature);
