@@ -871,6 +871,27 @@ sobolev (one, x, den_ion, lptr, dvds)
   nplasma = one->nplasma;
   xplasma = &plasmamain[nplasma];
 
+  double ztest;
+  double correction_factor = geo.fill;
+
+  if (geo.fill < 1.0 || geo.density_contrast > 0)
+    {
+      ztest = (rand () + 0.5) / MAXRAND;
+
+      if (ztest < geo.fill) 
+        {
+          correction_factor = 1.0;		// use the clumped density
+        }
+
+      else  // then we are outside a clump
+        {
+          correction_factor = geo.density_contrast;
+        }
+    }
+
+  if (correction_factor == 0)
+  	return (0.0);
+
   if ((dvds = fabs (dvds)) == 0.0)	// This forces dvds to be positive -- a good thing!
     {
 	  d1 = d2 = 0.;  // Elimiante warning when complied with clang
@@ -950,7 +971,7 @@ calls to two_level atom
   tau = tau_x_dvds / dvds;
 
   /* JM 1411 -- multiply the optical depth by the filling factor */
-  tau *= geo.fill;
+  tau *= correction_factor;		// converts it to using the appropriate density.
 
   return (tau);
 }

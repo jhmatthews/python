@@ -291,6 +291,9 @@ struct geometry
 
 /* The filling factior for the wind or corona */
   double fill;
+/* the density contrast. Always less than 1. If 0 then we have assumed vacuum */
+  double density_contrast;
+  
 /* Initial values for defining wind structure for a planar geometry.  These are currently only used by balance and this
    may not be the best approach generally and depending on where this ends up. Some consolidation is desirable */
   double pl_vol, pl_vmax;
