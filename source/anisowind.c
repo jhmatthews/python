@@ -95,7 +95,7 @@ randwind (p, lmn, north)
 
 // Next statement gets information needed to recalculate everything
   k = where_in_grid (p->x);
-  tau = sobolev (&wmain[k], p->x, -1., lin_ptr[p->nres], wmain[k].dvds_max);
+  tau = sobolev (&wmain[k], p->x, -1., lin_ptr[p->nres], wmain[k].dvds_max, MEAN_DENSITY);
 
   stuff_v (p->x, xyz);
 
@@ -277,7 +277,7 @@ reweightwind (p)
   if ((x = length (delta)) > DFUDGE)
     {
       k = where_in_grid (p->x);
-      tau = sobolev (&wmain[k], p->x, -1., lin_ptr[p->nres], wmain[k].dvds_max);
+      tau = sobolev (&wmain[k], p->x, -1., lin_ptr[p->nres], wmain[k].dvds_max, MEAN_DENSITY);
       make_pdf_randwind (tau);	// Needed for the normalization
 //      Log
 //      ("Had to calculate the pdf for this photon %d %e tau_scat_min %10.2f norm %10.2f \n",
@@ -441,6 +441,8 @@ randwind_thermal_trapping(p, nnscat)
   double tau, dvds, z, ztest;
   double z_prime[3];
   WindPtr one;
+  int in_clump;
+
 
   /* find the wind pointer for the photon */
   one = &wmain[p->grid];
@@ -448,7 +450,7 @@ randwind_thermal_trapping(p, nnscat)
   /* we want to normalise our rejection method by the escape 
     probability along the vector of maximum velocity gradient.
     First find the sobolev optical depth along that vector */
-  tau_norm = sobolev (one, p->x, -1.0, lin_ptr[p->nres], one->dvds_max);
+  tau_norm = sobolev (one, p->x, -1.0, lin_ptr[p->nres], one->dvds_max, MEAN_DENSITY);
 
   /* then turn into a probability. Note that we take account of
      this in trans_phot before calling extract */
@@ -481,7 +483,7 @@ randwind_thermal_trapping(p, nnscat)
        safety net (as dvds_max is worked out with a sample of directions) */
     ztest = (rand () + 0.5) / MAXRAND * p_norm;   
     dvds = dvwind_ds (p);
-    tau = sobolev (one, p->x, -1.0, lin_ptr[p->nres], dvds);
+    tau = sobolev (one, p->x, -1.0, lin_ptr[p->nres], dvds, MEAN_DENSITY);
 
     z = p_escape_from_tau (tau);  /* probability to see if it escapes in that direction */
   }

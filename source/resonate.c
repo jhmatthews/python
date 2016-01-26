@@ -118,7 +118,7 @@ calculate_ds (w, p, tau_scat, tau, nres, smax, istat)
   double tau_sobolev;
   WindPtr one, two;
   int check_in_grid;
-  int nplasma;
+  int nplasma, in_clump;
   PlasmaPtr xplasma, xplasma2;
 
   one = &w[p->grid];		//Get a pointer to the cell where the photon bundle is located.
@@ -136,6 +136,7 @@ calculate_ds (w, p, tau_scat, tau, nres, smax, istat)
   dvds1 = dvds2 = 0.0;		// To avoid a -03 compile warning
   *nres = -1;
   *istat = P_INWIND;
+  in_clump = 0;
 
   if (ttau < 0.0)
     {
@@ -367,10 +368,10 @@ process. */
 
 		  /* Add the line optical depth  Note that one really should translate the photon to this point 
 		     before doing this (?? What is "this"??)as p-> x is being used to calculate direction of the wind */
-
+        in_clump = in_clump_question();
 
 		tau_sobolev =
-		    sobolev (one, p->x, dd, lin_ptr[nn], dvds);
+		    sobolev (one, p->x, dd, lin_ptr[nn], dvds, in_clump);
 
 		  /* tau_sobolev now stores the optical depth. This is fed into the next statement for the bb estimator
 		     calculation. SS March 2004 */
@@ -854,12 +855,13 @@ History:
 **************************************************************/
 
 double
-sobolev (one, x, den_ion, lptr, dvds)
+sobolev (one, x, den_ion, lptr, dvds, in_clump)
      WindPtr one;		// This is a single cell in the wind
      double x[];
      double den_ion;
      struct lines *lptr;
      double dvds;
+     int in_clump;	// are we in a clump?
 {
   double tau, xden_ion, tau_x_dvds;
   double two_level_atom (), d1, d2;
@@ -872,22 +874,15 @@ sobolev (one, x, den_ion, lptr, dvds)
   xplasma = &plasmamain[nplasma];
 
   double ztest;
-  double correction_factor = geo.fill;
+  double correction_factor;
 
-  if (geo.fill < 1.0 || geo.density_contrast > 0)
-    {
-      ztest = (rand () + 0.5) / MAXRAND;
+  if (in_clump == IN_CLUMP)
+    correction_factor = 1.0;		// use the clumped density
+  else if (in_clump == OUT_OF_CLUMP) // then we are outside a clump
+    correction_factor = geo.density_contrast;
+  else if (in_clump == MEAN_DENSITY) // use the mean density
+    correction_factor = geo.fill;
 
-      if (ztest < geo.fill) 
-        {
-          correction_factor = 1.0;		// use the clumped density
-        }
-
-      else  // then we are outside a clump
-        {
-          correction_factor = geo.density_contrast;
-        }
-    }
 
   if (correction_factor == 0)
   	return (0.0);
@@ -943,7 +938,7 @@ calls to two_level atom
       tau_x_dvds = PI_E2_OVER_M * d1 * lptr->f / (lptr->freq);
       tau = tau_x_dvds / dvds;
 
-      tau *= geo.fill;
+      tau *= correction_factor;
 
       if (tau > 1.e-3)
 	{
@@ -1497,3 +1492,20 @@ detailed spectrum calculation ??
 
   return (0);
 }
+
+
+
+/* this routine decides if we are in a clump or not */
+int in_clump_question()
+{
+  double ztest;
+
+  ztest = (rand () + 0.5) / MAXRAND;
+
+  if (ztest > geo.fill)
+  	return OUT_OF_CLUMP;
+  else
+  	return IN_CLUMP;
+}
+
+

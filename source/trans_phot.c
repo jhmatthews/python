@@ -189,7 +189,7 @@ trans_phot (
 	      tau_norm =
 		sobolev (&wmain[pextract.grid], pextract.x, -1.0,
 			 lin_ptr[pextract.nres],
-			 wmain[pextract.grid].dvds_max);
+			 wmain[pextract.grid].dvds_max, MEAN_DENSITY);
 
 	      /* then turn into a probability */
 	      p_norm = p_escape_from_tau (tau_norm);
@@ -544,7 +544,7 @@ trans_phot_single (WindPtr w, PhotPtr p, int iextract)
 		  tau_norm =
 		    sobolev (&wmain[pextract.grid], pextract.x, -1.0,
 			     lin_ptr[pextract.nres],
-			     wmain[pextract.grid].dvds_max);
+			     wmain[pextract.grid].dvds_max, MEAN_DENSITY);
 
 		  /* then turn into a probability */
 		  p_norm = p_escape_from_tau (tau_norm);

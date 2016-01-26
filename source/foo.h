@@ -122,9 +122,10 @@ double calculate_ds(WindPtr w, PhotPtr p, double tau_scat, double *tau, int *nre
 int select_continuum_scattering_process(double kap_cont, double kap_es, double kap_ff, PlasmaPtr xplasma);
 double kappa_bf(PlasmaPtr xplasma, double freq, int macro_all);
 int kbf_need(double fmin, double fmax);
-double sobolev(WindPtr one, double x[], double den_ion, struct lines *lptr, double dvds);
+double sobolev(WindPtr one, double x[], double den_ion, struct lines *lptr, double dvds, int in_clump);
 int doppler(PhotPtr pin, PhotPtr pout, double v[], int nres);
 int scatter(PhotPtr p, int *nres, int *nnscat);
+int in_clump_question(void);
 /* radiation.c */
 int radiation(PhotPtr p, double ds);
 double kappa_ff(PlasmaPtr xplasma, double freq);

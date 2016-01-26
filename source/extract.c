@@ -312,7 +312,7 @@ have been changed */
 
 	  dvds = dvwind_ds (pp);
 	  ishell = pp->grid;
-	  tau = sobolev (&w[ishell], pp->x, -1.0, lin_ptr[pp->nres], dvds);
+	  tau = sobolev (&w[ishell], pp->x, -1.0, lin_ptr[pp->nres], dvds, MEAN_DENSITY);
 	  if (tau > 0.0)
 	    pp->w *= (1. - exp (-tau)) / tau;
 	  tau = 0.0;

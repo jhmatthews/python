@@ -293,6 +293,11 @@ struct geometry
   double fill;
 /* the density contrast. Always less than 1. If 0 then we have assumed vacuum */
   double density_contrast;
+
+// used by in_clump_question() routine
+#define IN_CLUMP 1
+#define OUT_OF_CLUMP 0
+#define MEAN_DENSITY 2
   
 /* Initial values for defining wind structure for a planar geometry.  These are currently only used by balance and this
    may not be the best approach generally and depending on where this ends up. Some consolidation is desirable */
