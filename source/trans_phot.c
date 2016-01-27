@@ -118,46 +118,6 @@ trans_phot (
 	  Error ("trans_phot:sane_check photon %d has weight %e\n", nphot,
 		 p[nphot].w);
 	}
-      /* Next block added by SS Jan 05 - for anisotropic scattering with extract we want to be sure that everything is
-         initialised (by scatter?) before calling extract for macro atom photons. Insert this call to scatter which should do
-         this. */
-
-
-      if (geo.rt_mode == 2 && geo.scatter_mode == 1)
-	{
-	  if (p[nphot].origin == PTYPE_WIND)
-	    {
-	      if (p[nphot].nres > -1 && p[nphot].nres < NLINES)
-		{
-		  geo.rt_mode = 1;
-		  /* 74a_ksl Check to see when a photon weight is becoming unreal */
-		  if (sane_check (p[nphot].w))
-		    {
-		      Error
-			("trans_phot:sane_check photon %d has weight %e before scatter\n",
-			 nphot, p[nphot].w);
-		    }
-		  if ((nerr =
-		       scatter (&p[nphot], &p[nphot].nres, &nnscat)) != 0)
-		    {
-		      Error
-			("trans_phot: Bad return from scatter %d at point 1",
-			 nerr);
-		    }
-		  /* 74a_ksl Check to see when a photon weight is becoming unreal */
-		  if (sane_check (p[nphot].w))
-		    {
-		      Error
-			("trans_phot:sane_check photon %d has weight %e aftger scatter\n",
-			 nphot, p[nphot].w);
-		    }
-		  geo.rt_mode = 2;
-		}
-	    }
-	}
-
-
-
 
 
       stuff_phot (&p[nphot], &pp);
@@ -186,10 +146,11 @@ trans_phot (
 	    {
 	      /* we normalised our rejection method by the escape probability along the vector of maximum velocity gradient.
 	         First find the sobolev optical depth along that vector */
+	      /* at this point in_clump will have been calculated at the point of photon generation */
 	      tau_norm =
 		sobolev (&wmain[pextract.grid], pextract.x, -1.0,
 			 lin_ptr[pextract.nres],
-			 wmain[pextract.grid].dvds_max, MEAN_DENSITY);
+			 wmain[pextract.grid].dvds_max, pextract.in_clump);
 
 	      /* then turn into a probability */
 	      p_norm = p_escape_from_tau (tau_norm);
@@ -220,7 +181,7 @@ trans_phot (
 		("trans_phot: sane_check photon %d has weight %e before extract\n",
 		 nphot, pextract.w);
 	    }
-	  extract (w, &pextract, pextract.origin);
+	  extract (w, &pextract, pextract.origin, pextract.in_clump);
 
 
 	  // SS if necessary put back the correcy disk illumination
@@ -451,12 +412,13 @@ trans_phot_single (WindPtr w, PhotPtr p, int iextract)
 		("trans_phot:sane_checl photon %d has weight %e before scatter\n",
 		 p->np, pp.w);
 	    }
-	  if ((nerr = scatter (&pp, ptr_nres, &nnscat)) != 0)
+	  if ((nerr = scatter (&pp, ptr_nres, &nnscat) != 0))
 	    {
 	      Error ("trans_phot: Bad return from scatter %d at point 2",
 		     nerr);
 	    }
 	  pp.nscat++;
+
 	  /* 74a_ksl - Check added to search for error in weights */
 
 	  if (sane_check (pp.w))
@@ -465,6 +427,8 @@ trans_phot_single (WindPtr w, PhotPtr p, int iextract)
 		("trans_phot:sane_check photon %d has weight %e after scatter\n",
 		 p->np, pp.w);
 	    }
+
+
 
 	  /* SS June 04: During the spectrum calculation cycles, photons are thrown away when they interact with macro atoms or
 	     become k-packets. This is done by setting their weight to zero (effectively they have been absorbed into either
@@ -541,10 +505,11 @@ trans_phot_single (WindPtr w, PhotPtr p, int iextract)
 		{
 		  /* we normalised our rejection method by the escape probability along the vector of maximum velocity gradient.
 		     First find the sobolev optical depth along that vector */
+		  /* at this point in_clump will have been calculated at the point of photon generation */
 		  tau_norm =
 		    sobolev (&wmain[pextract.grid], pextract.x, -1.0,
 			     lin_ptr[pextract.nres],
-			     wmain[pextract.grid].dvds_max, MEAN_DENSITY);
+			     wmain[pextract.grid].dvds_max, pextract.in_clump);
 
 		  /* then turn into a probability */
 		  p_norm = p_escape_from_tau (tau_norm);
@@ -576,7 +541,7 @@ trans_phot_single (WindPtr w, PhotPtr p, int iextract)
 		    ("trans_phot: sane_check photon %d has weight %e before extract\n",
 		     p->np, pextract.w);
 		}
-	      extract (w, &pextract, PTYPE_WIND);	// Treat as wind photon for purpose of extraction
+	      extract (w, &pextract, PTYPE_WIND, pextract.in_clump);	// Treat as wind photon for purpose of extraction
 	    }
 
 

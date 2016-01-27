@@ -69,10 +69,11 @@ History:
 
 
 int
-extract (w, p, itype)
+extract (w, p, itype, in_clump)
      WindPtr w;
      PhotPtr p;
      int itype;
+     int in_clump;
 {
   int n, mscat, mtopbot;
   struct photon pp;
@@ -177,7 +178,7 @@ one is odd. We do frequency here but weighting is carried out in  extract */
 
 	  /* Now extract the photon */
 
-	  extract_one (w, &pp, itype, n);
+	  extract_one (w, &pp, itype, n, in_clump);
 
 	  /* Make sure phot_hist is on, for just one extraction */
 
@@ -239,10 +240,11 @@ History:
 
 
 int
-extract_one (w, pp, itype, nspec)
+extract_one (w, pp, itype, nspec, in_clump)
      WindPtr w;
      PhotPtr pp;
      int itype, nspec;
+     int in_clump;
 
 {
   int istat, nres;
@@ -286,16 +288,16 @@ to entering extract */
   else if (pp->nres > -1 && pp->nres < NLINES)	// added < NLINES condition for macro atoms (SS)
     {
 
-/* It was a wind photon.  In this case, what we do depends
-on whether it is a photon which arose via line radiation or some other process.
+	/* It was a wind photon.  In this case, what we do depends
+	on whether it is a photon which arose via line radiation or some other process.
 
-If geo.scatter_mode==0 then there is no need to reweight.  This is the
-isotropic assumption.
+	If geo.scatter_mode==0 then there is no need to reweight.  This is the
+	isotropic assumption.
 
-NB--It is important that reweightwind be called after scatter, as there
-are variables which are set in scatter and in aniosowind that are
-used by reweightwind.  02may ksl
-*/
+	NB--It is important that reweightwind be called after scatter, as there
+	are variables which are set in scatter and in aniosowind that are
+	used by reweightwind.  02may ksl
+	*/
 
       if (geo.scatter_mode == 1)
 	{			// Then we have anisotropic scattering
@@ -312,7 +314,7 @@ have been changed */
 
 	  dvds = dvwind_ds (pp);
 	  ishell = pp->grid;
-	  tau = sobolev (&w[ishell], pp->x, -1.0, lin_ptr[pp->nres], dvds, MEAN_DENSITY);
+	  tau = sobolev (&w[ishell], pp->x, -1.0, lin_ptr[pp->nres], dvds, in_clump);
 	  if (tau > 0.0)
 	    pp->w *= (1. - exp (-tau)) / tau;
 	  tau = 0.0;

@@ -147,8 +147,8 @@ int wind_complete(WindPtr w);
 int spec_save(char filename[]);
 int spec_read(char filename[]);
 /* extract.c */
-int extract(WindPtr w, PhotPtr p, int itype);
-int extract_one(WindPtr w, PhotPtr pp, int itype, int nspec);
+int extract(WindPtr w, PhotPtr p, int itype, int in_clump);
+int extract_one(WindPtr w, PhotPtr pp, int itype, int nspec, int in_clump);
 /* pdf.c */
 int pdf_gen_from_func(PdfPtr pdf, double (*func)(double), double xmin, double xmax, int njumps, double jump[]);
 double gen_array_from_func(double (*func)(double), double xmin, double xmax, int pdfsteps);
@@ -291,7 +291,7 @@ int randwind(PhotPtr p, double lmn[3], double north[3]);
 double vrandwind(double x);
 double reweightwind(PhotPtr p);
 int make_pdf_randwind(double tau);
-int randwind_thermal_trapping(PhotPtr p, int *nnscat);
+int randwind_thermal_trapping(PhotPtr p, int *nnscat, int in_clump);
 /* util.c */
 int fraction(double value, double array[], int npts, int *ival, double *f, int mode);
 int linterp(double x, double xarray[], double yarray[], int xdim, double *y, int mode);

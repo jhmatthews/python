@@ -467,6 +467,8 @@ photo_gen_wind (p, weight, freqmin, freqmax, photstart, nphot)
       // if (p[n].nres < 0 || p[n].nres > NLINES || geo.scatter_mode == 0)
       // to allow for isotropic BF continuum emission
       nnscat = 1;
+      p[n].in_clump = in_clump_question();
+
       if (p[n].nres < 0 || geo.scatter_mode != 1)
 	{
 /*  It was either an electron scatter so the  distribution is isotropic, or it
@@ -483,7 +485,7 @@ was a resonant scatter but we want isotropic scattering anyway.  */
 	}
 	  else if (geo.scatter_mode == 2) 
 	{			// It was a line photon and we want anisotropic scattering mode 2
-	  randwind_thermal_trapping (&p[n], &nnscat);
+	  randwind_thermal_trapping (&p[n], &nnscat, p[n].in_clump);
 	}
 	p[n].nnscat = nnscat;
 

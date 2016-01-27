@@ -368,10 +368,11 @@ process. */
 
 		  /* Add the line optical depth  Note that one really should translate the photon to this point 
 		     before doing this (?? What is "this"??)as p-> x is being used to calculate direction of the wind */
-        in_clump = in_clump_question();
+		  /* we make a decision on whether we are in a clump every time we reach a resonance point */
+        p->in_clump = in_clump_question();
 
 		tau_sobolev =
-		    sobolev (one, p->x, dd, lin_ptr[nn], dvds, in_clump);
+		    sobolev (one, p->x, dd, lin_ptr[nn], dvds, p->in_clump);
 
 		  /* tau_sobolev now stores the optical depth. This is fed into the next statement for the bb estimator
 		     calculation. SS March 2004 */
@@ -1440,7 +1441,7 @@ scatter (p, nres, nnscat)
       /* JM 1906 -- added normalisation of the below rejection method. We normalise
          to the escape probability of along the direction of dvds_max, with a safety net of 
          20% in case we missed the maximum */
-      randwind_thermal_trapping(p, nnscat);
+      randwind_thermal_trapping(p, nnscat, p->in_clump);
     }
 
   /* End of modification for thermal trapping model (SS July 04) */

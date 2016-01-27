@@ -571,7 +571,6 @@ photo_gen_kpkt (p, weight, photstart, nphot)
   int get_random_location ();
   double test;
   int nnscat;
-  double dvwind_ds (), sobolev ();
   int nplasma;
 
 
@@ -637,6 +636,7 @@ photo_gen_kpkt (p, weight, photstart, nphot)
       p[n].grid = icell;
 
       nnscat = 1;
+      p[n].in_clump = in_clump_question();
       // Determine the direction of the photon
       // Need to allow for anisotropic emission here
       if (p[n].nres < 0 || p[n].nres > NLINES || geo.scatter_mode == 0)
@@ -656,13 +656,10 @@ photo_gen_kpkt (p, weight, photstart, nphot)
       else if (geo.scatter_mode == 2)
 	{			//It was a line photon and we want the thermal trapping anisotropic model
 
-	  randwind_thermal_trapping(&p[n], &nnscat);
+	  randwind_thermal_trapping(&p[n], &nnscat, p[n].in_clump);
 	}
 
       p[n].nnscat = nnscat;
-
-
-
 
 
       /* The next two lines correct the frequency to first order, but do not result in
@@ -743,7 +740,6 @@ photo_gen_matom (p, weight, photstart, nphot)
   double test;
   int upper;
   int nnscat;
-  double dvwind_ds (), sobolev ();
   int nplasma;
 
 
@@ -836,6 +832,8 @@ photo_gen_matom (p, weight, photstart, nphot)
       // Determine the direction of the photon
       // Need to allow for anisotropic emission here
       nnscat = 1;
+      p[n].in_clump = in_clump_question();
+      
       if (p[n].nres < 0 || p[n].nres > NLINES || geo.scatter_mode == 0)
 	{
 	  /*  It was either an electron scatter so the  distribution is isotropic, or it
@@ -853,7 +851,7 @@ photo_gen_matom (p, weight, photstart, nphot)
       else if (geo.scatter_mode == 2)
 	{			//It was a line photon and we want the thermal trapping anisotropic model
 
-      randwind_thermal_trapping(&p[n], &nnscat);
+      randwind_thermal_trapping(&p[n], &nnscat, p[n].in_clump);
 	}
       p[n].nnscat = nnscat;
 

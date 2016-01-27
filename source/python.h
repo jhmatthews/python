@@ -910,6 +910,7 @@ typedef struct photon
 				   anisotropic scattering to carry the number of
 				   scattering to "extract" when needed for wind
 				   generated photons SS05. */
+  int in_clump;   // is the photon in the clump or not?
   int nrscat;			/* number of resonance scatterings */
   int grid;			/*grid position of the photon in the wind, if
 				   the photon is in the wind.  If the photon is not

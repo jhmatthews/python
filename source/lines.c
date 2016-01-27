@@ -679,6 +679,7 @@ p_escape (line_ptr, xplasma)
 
       /* JM 1411 -- we used to have duplicated code here, but 
          now we call the sobolev function itself */
+      /* use the mean density to calculate escape probabilities */
       tau = sobolev (one, one->x, dd, line_ptr, dvds, MEAN_DENSITY);
 
       /* JM 1408 -- moved calculation of p_escape to subroutine below */
