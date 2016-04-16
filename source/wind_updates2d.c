@@ -180,6 +180,7 @@ WindPtr (w);
 
       nwind = plasmamain[n].nwind;
       volume = w[nwind].vol;
+
       //volume = plasmamain[n].vol; 	// 1411 JM -- we want volume to be the filled volume
       //1504 -- JM No we don't! The mean intensity shouldn't change if we *just* clump
 
@@ -664,7 +665,7 @@ free (commbuffer);
   {
 	  Log("Outputting heatcool file for connecting to zeus\n");
       fptr = fopen ("py_heatcool.dat", "w");
- 	 fprintf(fptr,"i j rcen thetacen vol temp xi ne heat_xray heat_comp heat_lines heat_ff cool_comp cool_lines cool_ff\n");
+  	 fprintf(fptr,"i j rcen thetacen vol temp xi ne heat_xray heat_comp heat_lines heat_ff cool_comp cool_lines cool_ff rho n_h\n");
 	  
   }
 
@@ -728,24 +729,10 @@ free (commbuffer);
 
 
 
-	  if (modes.zeus_connect==1) //If we are running in zeus connect mode, we output heating and cooling rates.
-	  {
-	 		 wind_n_to_ij (plasmamain[nplasma].nwind, &i, &j);
-			 vol=w[plasmamain[nplasma].nwind].vol;
-   		  fprintf(fptr,"%d %d %e %e %e ",i,j,w[plasmamain[nplasma].nwind].rcen,w[plasmamain[nplasma].nwind].thetacen/RADIAN,vol); //output geometric things
-   		  fprintf(fptr,"%e %e %e ",plasmamain[nplasma].t_e,plasmamain[nplasma].xi,plasmamain[nplasma].ne); //output temp, xi and ne to ease plotting of heating rates
-   		  fprintf(fptr,"%e ",(plasmamain[nplasma].heat_photo+plasmamain[nplasma].heat_auger)/vol); //Xray heating - or photoionization
-   		  fprintf(fptr,"%e ",(plasmamain[nplasma].heat_comp)/vol); //Compton heating
-   		  fprintf(fptr,"%e ",(plasmamain[nplasma].heat_lines)/vol); //Line heating 28/10/15 - not currently used in zeus
-   		  fprintf(fptr,"%e ",(plasmamain[nplasma].heat_ff)/vol); //FF heating 28/10/15 - not currently used in zeus
-   		  fprintf(fptr,"%e ",(plasmamain[nplasma].lum_comp)/vol); //Compton cooling
-   		  fprintf(fptr,"%e ",(plasmamain[nplasma].lum_lines+plasmamain[nplasma].lum_fb+plasmamain[nplasma].lum_dr)/vol); //Line cooling must include all recombinatiobs cooling
-   		  fprintf(fptr,"%e\n",(plasmamain[nplasma].lum_ff)/vol); //ff cooling
-	   }
+
     }
 	
-    if (modes.zeus_connect==1) 
-        fclose(fptr);
+
 
   /* JM130621- bugfix for windsave bug- needed so that we have the luminosities from ionization
      cycles in the windsavefile even if the spectral cycles are run */
@@ -780,6 +767,28 @@ free (commbuffer);
 
   asum = wind_luminosity (0.0, VERY_BIG);  /*We call wind_luminosity here to obtain an up to date set of cooling rates*/
 
+
+  if (modes.zeus_connect==1) //If we are running in zeus connect mode, we output heating and cooling rates.
+  {
+	  for (nplasma = 0; nplasma < NPLASMA; nplasma++)
+	  {
+	  
+ 		 wind_n_to_ij (plasmamain[nplasma].nwind, &i, &j);
+		 vol=w[plasmamain[nplasma].nwind].vol;
+	  fprintf(fptr,"%d %d %e %e %e ",i,j,w[plasmamain[nplasma].nwind].rcen,w[plasmamain[nplasma].nwind].thetacen/RADIAN,vol); //output geometric things
+	  fprintf(fptr,"%e %e %e ",plasmamain[nplasma].t_e,plasmamain[nplasma].xi,plasmamain[nplasma].ne); //output temp, xi and ne to ease plotting of heating rates
+	  fprintf(fptr,"%e ",(plasmamain[nplasma].heat_photo+plasmamain[nplasma].heat_auger)/vol); //Xray heating - or photoionization
+	  fprintf(fptr,"%e ",(plasmamain[nplasma].heat_comp)/vol); //Compton heating
+	  fprintf(fptr,"%e ",(plasmamain[nplasma].heat_lines)/vol); //Line heating 28/10/15 - not currently used in zeus
+	  fprintf(fptr,"%e ",(plasmamain[nplasma].heat_ff)/vol); //FF heating 28/10/15 - not currently used in zeus
+	  fprintf(fptr,"%e ",(plasmamain[nplasma].lum_comp)/vol); //Compton cooling
+	  fprintf(fptr,"%e ",(plasmamain[nplasma].lum_lines+plasmamain[nplasma].lum_fb+plasmamain[nplasma].lum_dr)/vol); //Line cooling must include all recombinatiobs cooling
+	  fprintf(fptr,"%e ",(plasmamain[nplasma].lum_ff)/vol); //ff cooling
+	  fprintf(fptr,"%e ",plasmamain[nplasma].rho); //density
+	  fprintf(fptr,"%e\n",plasmamain[nplasma].rho*rho2nh); //hydrogen number density
+   }
+    fclose(fptr);
+}
 
   /* 1108 NSH Added commands to report compton heating */
   Log ("!!wind_update: Absorbed flux    %8.2e  (photo %8.2e ff %8.2e compton %8.2e auger %8.2e induced_compton %8.2e lines %8.2e)\n", 

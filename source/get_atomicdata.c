@@ -179,8 +179,6 @@ get_atomic_data (masterfile)
   int levl, levu;
   int in, il;  //The levels used in inner shell data
   double q;
-  //int nelectrons;
-  //double et, emax, e0, sigma, ya, p, yw, y0, y1;
   double freq, f, exx, lambda, alpha, beta, tm, et, p;
   double the_ground_frac[20];
   char choice;
@@ -966,6 +964,7 @@ a level type has not been established
 		    }
 		  else if (ion[n].lev_type != lev_type)
 		    {
+			    //XXX Why are these lines commented out?  ksl 160212
 //OLD                 Error
 //OLD                   ("Get_atomic_data: file %s  Reading lev_type (%d) for ion %d with lev_type (%d). Not allowed\n",
 //OLD                    file, lev_type, n, ion[n].lev_type);
@@ -1116,7 +1115,7 @@ is already incremented
 		    {
 		      exx *= EV2ERGS;
 		      qqnum = ilv = qnum;
-		      lev_type = -2;	// It's an old stylle record, one which is only here for backward compatibility
+		      lev_type = -2;	// It's an old style record, one which is only here for backward compatibility
 		    }
 		  else
 		    {
@@ -2490,7 +2489,8 @@ BAD_T_RR  5  0  1  1  4.647E-10  0.7484  6.142E+01  1.753E+07*/
 		    }		//end of loop over ions
 
 		  break;
-/* NSH 120921 The following are lines to read in temperature averaged gaunt factors from the data of Sutherland (1997). The atomic file is basically unchaned from the data on the website, just with the top few lines commented out, and a label prepended to each line */
+/* NSH 120921 The following are lines to read in temperature averaged gaunt factors from the data of Sutherland (1997). The atomic file is basically unchanged 
+ * from the data on the website, just with the top few lines commented out, and a label prepended to each line */
 
 		case 'g':
 		  nparam = sscanf (aline, "%*s %le %le %le %le %le", &gsqrdtemp, &gfftemp, &s1temp, &s2temp, &s3temp);	//split and assign the line
@@ -2609,7 +2609,7 @@ ion[n].dere_di_flag=1;
 				if (inner_cross[n].n_fluor_yield==-1) /*This is the first yield data for this vacancy */
 				{
 					inner_fluor_yield[n_fluor_yield_tot].nion=n; /*This yield refers to this ion*/
-					inner_cross[n].n_elec_yield=n_fluor_yield_tot;
+					inner_cross[n].n_fluor_yield=n_fluor_yield_tot;
 					inner_fluor_yield[n_fluor_yield_tot].z=z;
 					inner_fluor_yield[n_fluor_yield_tot].istate=istate;
 					inner_fluor_yield[n_fluor_yield_tot].n=in;

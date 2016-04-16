@@ -131,7 +131,8 @@ History:
  */
 
 char *choice_options = "\n\
-   1=onefile summary n=ne,  R=rho,  v=vel,        i=ion info, j=ave_tau, f=ave_freq, p=nphot, S=sim_alpha\n\
+    1=onefile summary 2=all ions in a given cell\n\
+ 	   n=ne,  R=rho,  v=vel,        i=ion info, j=ave_tau, f=ave_freq, p=nphot, S=sim_alpha\n\
    r=t_r, t=t_e,  w=rad_weight,  s=vol,     l=lum,     C=cooling/heating,  b=adiabatic cooling\n\
    a=abs, c=c4,   g=photo,       h=recomb,  k=tau H,   l=lum,     m=F_rad, x=total, y=mod_te,\n\
    o=overview,    e=everything, P=Partial emission meas, I=Ionisation parameter\n\
@@ -598,6 +599,9 @@ one_choice (choice, root, ochoice)
     case 'u':			/* Go back to full image */
       zoom (1);
       break;
+      case '2':
+      complete_ion_summary(wmain, root, ochoice);  //
+        break;
     case 'q':			/* quit */
       /* Write out a parameterfile that gives all of the commands used in this run */
       cpar ("py_wind.pf");

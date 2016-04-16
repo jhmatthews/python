@@ -35,7 +35,7 @@ integ_brem (freq)
      double freq;
 {
   double answer;
-  answer = geo.const_agn * pow(freq,-0.2) * exp ((-1.0 * H * freq) / (BOLTZMANN * geo.brem_temp));
+  answer = geo.const_agn * pow(freq,geo.brem_alpha) * exp ((-1.0 * H * freq) / (BOLTZMANN * geo.brem_temp));
   return (answer);
 }
 
@@ -45,7 +45,7 @@ double
 		double alpha;
 {
 	double answer;
-	answer=pow(alpha,-0.2)*exp(-1.0*alpha);
+	answer=pow(alpha,geo.brem_alpha)*exp(-1.0*alpha);
 	return(answer);
 }
 
@@ -90,7 +90,7 @@ get_rand_brem (freqmin, freqmax)
   
   
 
-  /*First time through create the array containing the proper boundaries for the integral of the BB function,
+  /*First time through create the array containing the proper boundaries for the integral of the brem function,
      Note calling pdf_gen_from func also defines ylo and yhi */
 
   if (ninit_brem == 0)
@@ -102,7 +102,7 @@ get_rand_brem (freqmin, freqmax)
 	  Error ("get_rand_brem: on return from pdf_gen_from_func %d\n", echeck);
 	}
 	
-      /* We need the integral of the bb function outside of the regions of interest as well */
+      /* We need the integral of the brem function outside of the regions of interest as well */
 	
       cdf_brem_tot = (pow(BREM_ALPHAMIN/100.0,0.8))/0.8+qromb (brem_d, BREM_ALPHAMIN/100.0, BREM_ALPHABIG, 1e-8);
       cdf_brem_lo = (pow(BREM_ALPHAMIN/100.0,0.8))/0.8+qromb (brem_d, BREM_ALPHAMIN/100.0, BREM_ALPHAMIN, 1e-8) / cdf_brem_tot;	//position in the full cdf of low frequcny boundary
@@ -191,7 +191,7 @@ reset.  A careful review of them is warranted.
 
   if (y <= cdf_brem_lo || brem_alphamax < BREM_ALPHAMIN)
     {
-      alpha = get_rand_pow (brem_lo_freq_alphamin, brem_lo_freq_alphamax, -0.2);
+      alpha = get_rand_pow (brem_lo_freq_alphamin, brem_lo_freq_alphamax,geo.brem_alpha);
     }
   else if (y >= cdf_brem_hi || brem_alphamin > BREM_ALPHAMAX)
     {

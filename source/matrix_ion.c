@@ -106,6 +106,7 @@ matrix_ion_populations (xplasma, mode)
   /* JM 1508 -- also compute direct recombination coefficients */
   compute_qrecomb_coeffs(t_e);
 
+
   /* In the following loop, over all ions in the simulation, we compute the radiative recombination rates, and photionization
      rates OUT OF each ionization stage. The PI rates are calculated either using the modelled mean intensity in a cell, or
      using the dilute blackbody approximation, depending on which mode we are in. At the same time, we copy the ion densities
@@ -283,14 +284,14 @@ matrix_ion_populations (xplasma, mode)
 	  b_data[nn] = b_temp[nn];
 	}
 
-	     ierr = solve_matrix (a_data, b_data, nrows, populations);
+	     ierr = solve_matrix (a_data, b_data, nrows, populations, xplasma->nplasma);
 
       if (ierr != 0)
-	Error ("matrix_ion_populations: bad return from solve_matrix\n",ierr);
-	  if (ierr ==2)
-		  Error ("matrix_ion_populations: some matrix rows failing relative error check\n");
-	else if (ierr ==3)
-				 Error ("matrix_ion_populations: some matrix rows failing absolute error check\n");
+	      Error ("matrix_ion_populations: bad return from solve_matrix\n",ierr);
+	    if (ierr ==2)
+		    Error ("matrix_ion_populations: some matrix rows failing relative error check\n");
+	    else if (ierr ==3)
+			  Error ("matrix_ion_populations: some matrix rows failing absolute error check\n");
 
       /* free memory */
       free (a_data);
@@ -382,6 +383,9 @@ matrix_ion_populations (xplasma, mode)
 	{
 	  xplasma->density[nn] = newden[nn];
 	}
+      if ( (sane_check(xplasma->density[nn])) || (xplasma->density[nn] < 0.0) )
+        Error("matrix_ion_populations: ion %i has population %8.4e in cell %i\n", 
+               nn, xplasma->density[nn], xplasma->nplasma);
     }
 
 
@@ -670,16 +674,19 @@ populate_ion_rate_matrix (xplasma, rate_matrix, pi_rates, inner_rates, rr_rates,
 **************************************************************/
 
 int
-solve_matrix (a_data, b_data, nrows, x)
+solve_matrix (a_data, b_data, nrows, x, nplasma)
      double *a_data, *b_data;
      int nrows;
      double *x;
+     int nplasma;
 {
   int mm, ierr, s;
   /* s is the 'sign' of the permutation - is had the value -1^n where n is the number of
      permutations. We dont use it anywhere, but in principle it can be used to refine the
      solution via gsl_linalg_LU_refine */
   double test_val;
+  double det;
+  
   gsl_permutation *p;
   gsl_matrix_view m;
   gsl_vector_view b;
@@ -708,6 +715,11 @@ solve_matrix (a_data, b_data, nrows, x)
   p = gsl_permutation_alloc (nrows);	// NEWKSL
 
   gsl_linalg_LU_decomp (&m.matrix, p, &s);
+
+  det = gsl_linalg_LU_det(&m.matrix, s); // get the determinant to report to user
+
+  if (det == 0)
+    Error("Rate Matrix Determinant is %8.4e for cell %i", det, nplasma);
 
   gsl_linalg_LU_solve (&m.matrix, p, &b.vector, populations);
 
@@ -765,9 +777,8 @@ solve_matrix (a_data, b_data, nrows, x)
     x[mm] = gsl_vector_get (populations, mm);
 
   /* free memory */
-    gsl_vector_free (test_vector);
-
-	gsl_matrix_free (test_matrix);
+  gsl_vector_free (test_vector);
+  gsl_matrix_free (test_matrix);
   gsl_vector_free (populations);
 
   return (ierr);

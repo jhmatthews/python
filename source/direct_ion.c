@@ -7,8 +7,11 @@
 #include "python.h"
 #include "recipes.h"
 
-#include <gsl/gsl_sf_expint.h>	//We need this gsl library to evaluate the first exponential integral
+#include <gsl/gsl_sf_expint.h>  //We need this gsl library to evaluate the first exponential integral
 
+/* Ratio of hnu / kT beyond which we don't bother calculating 
+   see #197 */
+#define ALPHABIG_DIRECT_ION 100.   
 /* direct_ion contains the routines relating to direct (collisional) ionization and 
 threebody recombination */
 
@@ -43,16 +46,15 @@ compute_di_coeffs (T)
     {
       if (ion[n].dere_di_flag == 0)
 	{
-    //printf ("NO COEFFS\n");
 	  di_coeffs[n] = 0.0;
 	}
 
       else
-	{
-	  di_coeffs[n] = q_ioniz_dere(n, T);
-	}
+  {
+    di_coeffs[n] = q_ioniz_dere(n, T);
+  }
 
-    }		//End of loop over ions
+    }   //End of loop over ions
 
   return (0);
 }
@@ -89,9 +91,14 @@ compute_qrecomb_coeffs(T)
   int n, nvmin, ntmin;
   struct topbase_phot *xtop;
 
-  for (n = 0; n < nions; n++)
+  for (n = 0; n < nions; n++) //We need to generate data for the ions doing the recombining.
     {
-      if (ion[n].dere_di_flag == 0)
+      /* There is only any point doing this is we are not a neutral ion */
+
+      if (ion[n].istate > 1)  //There is only any point doing this is we are not a neutral ion
+    {
+
+      if (ion[n-1].dere_di_flag == 0)
   {
     //printf ("NO COEFFS\n");
     qrecomb_coeffs[n] = 0.0;
@@ -100,24 +107,34 @@ compute_qrecomb_coeffs(T)
       else
   {
     /* we need to know about the bound-free jump, so we need the details
-       from the ground state cross-section for this ion */
+       from the ground state cross-section for for the ion below this one */
 
-    ntmin = ion[n].ntop_ground;  /* We only ever use the ground state cont_ptr. 
-                                       This is for topbase */
-    nvmin = ion[n].nxphot;
+    ntmin = ion[n-1].ntop_ground;  /* We only ever use the ground state cont_ptr. 
+                                      This is for topbase */
+    nvmin = ion[n-1].nxphot;
 
-    if (ion[n].phot_info > 0)  //topbase or hybrid VFKY (GS)+TB excited
+    if (ion[n-1].phot_info > 0)  //topbase or hybrid VFKY (GS)+TB excited
       { 
         xtop = &phot_top[ntmin];
       }
-    else if (ion[n].phot_info == 0)  // verner
+    else if (ion[n-1].phot_info == 0)  // verner
       {   //just the ground state ionization fraction.
         xtop = &phot_top[nvmin];
       }
-
+    else
+      {
+        Error ("compute_qrecomb_coeffs: no coll ionization data for ion %i\n",n-1);
+      }
+    
+    /* this will return 0 if there aren't any coeffs */
     qrecomb_coeffs[n] = q_recomb_dere(xtop, T);
   }
 
+    }   //End of if statement for neutral ions
+	else //We are a neutral ion - so there can be no recombination
+	{
+		qrecomb_coeffs[n] = 0.0;
+	}  
     }   //End of loop over ions
 
   return (0);
@@ -148,41 +165,41 @@ History:
 
 double
 total_di (one, t_e)
-     WindPtr one;		// Pointer to the current wind cell - we need the cell volume, this is not in the plasma structure
-     double t_e;		//Current electron temperature of the cell
+     WindPtr one;   // Pointer to the current wind cell - we need the cell volume, this is not in the plasma structure
+     double t_e;    //Current electron temperature of the cell
 
 {
-  double x;			       //The returned variable
-  int nplasma;			   //The cell number in the plasma array
+  double x;            //The returned variable
+  int nplasma;         //The cell number in the plasma array
   PlasmaPtr xplasma;   //pointer to the relevant cell in the plasma structure
-  int n;			         //loop pointers
+  int n;               //loop pointers
 
 
-  nplasma = one->nplasma;	        //Get the correct plasma cell related to this wind cell
-  xplasma = &plasmamain[nplasma];	//copy the plasma structure for that cell to local variable
-  x = 0;			                    //zero the luminosity
+  nplasma = one->nplasma;         //Get the correct plasma cell related to this wind cell
+  xplasma = &plasmamain[nplasma]; //copy the plasma structure for that cell to local variable
+  x = 0;                          //zero the luminosity
 
 
-  compute_di_coeffs (t_e);	      //Calculate the DR coefficients for this cell
+  compute_di_coeffs (t_e);        //Calculate the DR coefficients for this cell
 
 
   for (n = 0; n < nions; n++)
     {
       //We have no DI data for this ion
-      if (ion[n].dere_di_flag == 0)	
-	{
-	  x += 0.0;		//Add nothing to the sum of coefficients
-	}
+      if (ion[n].dere_di_flag == 0) 
+  {
+    x += 0.0;   //Add nothing to the sum of coefficients
+  }
       else
-	{
+  {
     
-	  x += xplasma->vol * xplasma->ne * xplasma->density[n] * di_coeffs[n] *
-	    dere_di_rate[ion[n].nxderedi].xi * EV2ERGS;
+    x += xplasma->vol * xplasma->ne * xplasma->density[n] * di_coeffs[n] *
+      dere_di_rate[ion[n].nxderedi].xi * EV2ERGS;
 
     //printf ("n=%i V=%e ne=%e rho=%e coeff=%e xi=%e cooling=%e\n",n, V , 
     //xplasma->ne , xplasma->density[n] , di_coeffs[n] ,
     //dere_di_rate[ion[n].nxderedi].xi*EV2ERGS,x);
-	}
+  }
     }
   return (x);
 }
@@ -216,6 +233,10 @@ q_ioniz_dere (nion, t_e)
 
   t = (BOLTZMANN * t_e) / (dere_di_rate[nrec].xi * EV2ERGS);
   scaled_t = 1.0 - ((log (2.0)) / (log (2.0 + t)));
+
+  /* 1/t is (hnu) / (k t_e). when this ratio is >100 we return 0, see #197 */
+  if ( (1.0 / t) > ALPHABIG_DIRECT_ION)
+    return 0.0;
 
   if (scaled_t < dere_di_rate[nrec].temps[0])  //we are below the range of DI data data
     {
@@ -296,6 +317,10 @@ q_ioniz (cont_ptr, electron_temperature)
   nion = cont_ptr->nion;
   gaunt = 0.1 * ion[nion].z;      //for now - from Mihalas for hydrogen and Helium
 
+  /* when hnu / kT ratio is >100 we return 0, see #197 */
+  if (u0 > ALPHABIG_DIRECT_ION)
+    return (0.0);
+
 
   /* if ion[n].dere_di_flag == 1 then we have direct ionization data for this ion
      only do this if it is the ground state */
@@ -337,22 +362,44 @@ q_recomb_dere (cont_ptr, electron_temperature)
   int nion;
   double u0;
   double gaunt, coeff;
+  double root_etemp;
 
   gaunt = 0.1;      //for now - from Mihalas for hydrogen
   u0 = cont_ptr->freq[0] * H_OVER_K / electron_temperature;
   nion = cont_ptr->nion;
+
+  /* when hnu / kT ratio is >100 we return 0, see #197 */
+  if (u0 > ALPHABIG_DIRECT_ION)
+    return (0.0);
+
   /* if ion[n].dere_di_flag == 1 then we have direct ionization data for this ion
      only do this if it is the ground state */
   if (ion[nion].dere_di_flag == 1 && config[cont_ptr->nlev].ilv == 1)
     {
-      coeff = 2.07e-16 * config[cont_ptr->nlev].g / config[cont_ptr->uplev].g;
+      root_etemp = sqrt(electron_temperature);     
+      coeff = 2.07e-16 / (root_etemp * root_etemp * root_etemp);
+
+      /* the original way of getting mutilplicity doesn't work for non-matoms, 
+         because uplevel isn't identified */
+      //coeff *= config[cont_ptr->nlev].g / config[cont_ptr->uplev].g;
+
+      /* JM/NSH XXX -- This is the multiplicity of the ground states. 
+         Should be of order 1 so it may be better to just leave it out, 
+         since the collisional ionization cross section is doubtless 
+         averaged over upper states... */   
+      coeff *= ion[nion].g / ion[nion+1].g;   
+  
       coeff *= exp(u0);
       coeff *= q_ioniz_dere(nion, electron_temperature);
 
+
       /* do a sane check here, as there's an exponential which could blow up */
       if (sane_check(coeff))
-        Error("q_recomb is %8.4e for ion %i at temperature %8.4e\n",
+      {
+        Error("q_recomb is %8.4e for ion %i at temperature %8.4e, setting to zero\n",
                coeff, nion, electron_temperature);
+        coeff = 0.0;
+      }
     }
   else 
     coeff = 0.0;
@@ -370,7 +417,7 @@ JM 1301 -- Edited this to avoid need to call q_ioniz and exponential.
 Should improve speed and stability
 
 This equation comes from considering TE and getting the expression
-q_recomb = 2.07e-16 * gl/gu * exp(E/kT) * q_ioniz
+q_recomb = 2.07e-16 * gl/gu * exp(E/kT) * (T_e**-3/2) * q_ioniz
 then substituting the above expression for q_ioniz.
 */
 
@@ -387,6 +434,9 @@ q_recomb (cont_ptr, electron_temperature)
   u0 = cont_ptr->freq[0] * H_OVER_K / electron_temperature;
   gaunt = 0.1 * ion[nion].z;      //for now - from Mihalas for hydrogen and Helium
 
+  /* when hnu / kT ratio is >100 we return 0, see #197 */
+  if (u0 > ALPHABIG_DIRECT_ION)
+    return (0.0);
 
   /* if ion[n].dere_di_flag == 1 then we have direct ionization data for this ion
      only do this if it is the ground state */

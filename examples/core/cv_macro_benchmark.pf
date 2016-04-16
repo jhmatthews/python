@@ -1,8 +1,8 @@
 Wind_type(0=SV,1=Sphere,2=Previous,3=Proga,4=Corona,5=knigge,6=thierry,7=yso,8=elvis,9=shell)   0
 Atomic_data   data/h20_hetop_standard78
 photons_per_cycle   100000
-Ionization_cycles   1
-spectrum_cycles   0
+Ionization_cycles   30
+spectrum_cycles   10
 Coord.system(0=spherical,1=cylindrical,2=spherical_polar,3=cyl_var)   1
 Wind.dim.in.x_or_r.direction   30
 Wind.dim.in.z_or_theta.direction   30

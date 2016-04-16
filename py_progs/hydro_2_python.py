@@ -88,13 +88,18 @@ def get_hdf_data(fname):
 		if name[0:4]=="Data":
 			sds=hdf.select(name)
 			long_name=sds.attributes()["long_name"]
-			short_name=long_name[:-17]
+			for i in range(len(sds.attributes()["long_name"])):
+				if long_name[i:i+2]=="AT":
+					junk=i-1
+			short_name=long_name[:junk]
 			data_sets.append([name,long_name,short_name])
 
 #Get the time from the last long name 
-
-	time=float(long_name[-8:])
-
+	if long_name[junk+9:] != "********":
+		time=float(long_name[junk+9:])
+	else:
+		time=0.0
+		
 #Get the dimensions from the last data set
 
 	dims=len((sds.info()[2]))
@@ -121,10 +126,6 @@ def get_hdf_data(fname):
 	alldat["Dims"]=dims
 
 #Loop over all the data sets in the hdf file - name each of the resulting dictionaries with the short name
-
-
-
-
 
 	for i in range (len(data_sets)):
 		print data_sets[i][2]
@@ -165,6 +166,9 @@ def get_hdf_data(fname):
 	for i in range(len(x2)-1):
 		theta_edge.append(theta_edge[-1]+dtheta)
 		dtheta=dtheta*theta_ratio
+	if (theta_edge[-1]+(x2[-1]-theta_edge[-1])*2.0)>(np.pi/2.0):
+		x2[-1]=(theta_edge[-1]+(np.pi/2.0))/2.0
+
 
 	alldat["r_edge"]=r_edge
 	alldat["theta_edge"]=theta_edge
@@ -296,7 +300,7 @@ elif fname[0:3]=="hdf":
 #We need to compute the temperature in order to supply it to python.
 
 
-temp=(3.0/2.0)*data["TOTAL ENERGY"]
+temp=(2.0/3.0)*data["TOTAL ENERGY"]
 data["TEMPERATURE"]=temp/((data["DENSITY"]/(consts.m_p.cgs*MU))*consts.k_B.cgs)
 
 # Open an output file 

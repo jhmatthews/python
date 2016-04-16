@@ -49,11 +49,14 @@ script:
     - cd ../examples/travis 
     - Setup_Py_Dir
     - py balmer_test > balmer_test.out
-    - cd ..
+    - cd ../core/
     - Setup_Py_Dir
     - py -i cv_macro_benchmark
     - py -i cv_standard
     - py -i -d sv_detailedmode
     - py -i fiducial_agn
     - py -i 1d_sn
+    - cd ../beta/
     - py -i agn_ss_2010_modela.pf
+    - py -i ulx1
+    - py -i ngc5548

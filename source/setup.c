@@ -99,18 +99,21 @@ int parse_command_line(argc, argv)
     else if (strcmp (argv[i], "-d") == 0)
     {
       modes.iadvanced = 1;
-      i++;
     }
     else if (strcmp (argv[i], "-f") == 0)
     {
       modes.fixed_temp = 1;
-      i++;
+    }
+
+    /* JM 1503 -- Sometimes it is useful to vary the random number seed. Set a mode for that */
+    else if (strcmp (argv[i], "--rseed") == 0)
+    {
+      modes.rand_seed_usetime = 1;
     }
     else if (strcmp (argv[i], "-z") == 0)
       {
         modes.zeus_connect = 1;
-		Log ("setting zeus_connect to %i\n",modes.zeus_connect);
-		i++;
+		    Log ("setting zeus_connect to %i\n",modes.zeus_connect);
       }
 
     else if (strcmp (argv[i], "-i") == 0)
@@ -484,7 +487,6 @@ int get_radiation_sources()
     "Rad_type_for_agn(0=bb,1=models,3=power_law,4=cloudy_table,5=bremsstrahlung)_to_make_wind",
     &geo.agn_ion_spectype);
 
-	 printf ("NSH %i\n",geo.agn_ion_spectype);
   /* 130621 - ksl - This is a kluge to add a power law to stellar systems.  What id done
      is to remove the bl emission, which we always assume to some kind of temperature
      driven source, and replace it with a power law source
@@ -848,8 +850,10 @@ int get_bl_and_agn_params (lstar)
 	else if (geo.agn_ion_spectype == SPECTYPE_BREM)
 	{
 		geo.brem_temp=1.16e8; //10kev
+		geo.brem_alpha=-0.2; //This is the cloudy form of bremstrahlung
 		geo.const_agn=1.0;
-		rddoub ("agn_bremsstrahung_temp(K)",&geo.brem_temp);
+		rddoub ("agn_bremsstrahlung_temp(K)",&geo.brem_temp);
+		rddoub ("agn_bremsstrahlung_alpha",&geo.brem_alpha);
 		temp_const_agn = geo.lum_agn / qromb(integ_brem,4.84e17,2.42e18,1e-4);
 		geo.const_agn=temp_const_agn;
       Log ("AGN Input parameters give a Bremsstrahlung constant of %e\n", temp_const_agn);

@@ -30,7 +30,7 @@
 #define ANGSTROM                        1.e-8	/*Definition of an Angstrom in units of this code, e.g. cm */
 
 #define EV2ERGS   			1.602192e-12
-#define RADIAN				57.29578
+#define RADIAN				57.29577951308232
 #define RYD2ERGS                        2.1798741e-11	/* Rydberg in units of ergs */
 
 

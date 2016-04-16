@@ -250,10 +250,10 @@ History:
 
 
 int
-save_photon_stats (one, p, ds)
+save_photon_stats (one, p, ds, w_ave)
      WindPtr one;
      PhotPtr p;
-     double ds;
+     double ds,w_ave;
 {
   int i;
 
@@ -267,8 +267,8 @@ save_photon_stats (one, p, ds)
       if (one->nplasma == ncell_stats[i])
 	{
 	  fprintf (pstatptr,
-		   "PHOTON_DETAILS %3d %8.3e %8.3e %8.3e cell%3d wind cell%3d\n",
-		   geo.wcycle, p->freq, p->w, ds, one->nplasma, one->nwind);
+   "PHOTON_DETAILS cycle %3d n_photon %d freq %8.3e  w %8.3e ave_w %8.3e ds %8.3e nscat %d plasma cell %3d wind cell %3d\n",
+   geo.wcycle, p->np, p->freq, p->w, w_ave,ds, p->nscat, one->nplasma, one->nwind);
 	}
     }
   return (0);
