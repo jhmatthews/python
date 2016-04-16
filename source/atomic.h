@@ -226,6 +226,7 @@ ConfigPtr config;
 typedef struct lines
 {
   int nion;			/*The ion no (in python) of the transition */
+  int n; 		/* internal flag to the line number that this is */
   int z, istate;		/*element and ion associated with the line */
   double gl, gu;		/*multiplicity of lower and upper level respectively */
   int nconfigl, nconfigu;	/*The configuration no (in python) of the transition */

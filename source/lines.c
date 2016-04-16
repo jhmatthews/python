@@ -88,7 +88,6 @@ total_line_emission (one, f1, f2)
   if (xxxpdfwind == 1)
     lum_pdf (&plasmamain[one->nplasma], lum);
 
-
   return (lum);
 
 }
@@ -120,6 +119,7 @@ lum_lines (one, nmin, nmax)
 
       if (dd > LDEN_MIN)
 	{			/* potentially dangerous step to avoid lines with no power */
+		lin_ptr[n]->n=n;
 	  two_level_atom (lin_ptr[n], xplasma, &d1, &d2);
 	  x = foo1 = lin_ptr[n]->gu / lin_ptr[n]->gl * d1 - d2;
 
@@ -142,6 +142,10 @@ lum_lines (one, nmin, nmax)
 	    }
 
 	  lum += lin_ptr[n]->pow = x;
+//	  if (x>1e-13)
+//	  printf ("NSH n=%i line ion=%i state=%i lamb=%e pow=%e p_escape=%e\n",n,lin_ptr[n]->z,lin_ptr[n]->istate,(C/lin_ptr[n]->freq)*1e8,x,foo4);
+	  xplasma->line_cool[n]=x;
+
 	  if (x < 0)
 	    {
 	      Log
@@ -159,6 +163,7 @@ lum_lines (one, nmin, nmax)
 	lin_ptr[n]->pow = 0;
     }
 
+    printf ("total=%e\n",lum);
 
   return (lum);
 }
@@ -233,6 +238,8 @@ q21 (line_ptr, t)
   double gaunt;
   double omega;
   double u0;
+  int nn;
+  int gcount;
 
 
   if (q21_line_ptr != line_ptr || t != q21_t_old)
@@ -253,9 +260,25 @@ q21 (line_ptr, t)
       /* JM 1511 -- For kt >> hnu, we could perhaps adopt equation (6) of Van Regemorter 1962, 
          which give us The Bethe approximation? */
       //else                                    // Bethe approx
-      //gaunt = 3.0 * sqrt(3.0) / 2.0 / PI * (1 - (1.0 / u0));
-
+      //gaunt = 3.0 * sqrt(3.0) / 2.0 / PI * (1- (1.0 / u0));
       omega = ECS_CONSTANT * line_ptr->gl * gaunt * line_ptr->f / line_ptr->freq;
+	 
+	  gcount=0;
+      for (nn=0;nn<nxcol;nn++)
+		  {
+			  if (line_ptr->istate==xcol[nn].istate && line_ptr->z==xcol[nn].z && (fabs(line_ptr->freq-xcol[nn].freq)/line_ptr->freq)<0.001)
+			  {
+				  omega=xcol[nn].alpha*pow((t/xcol[nn].tm),xcol[nn].beta);
+					  			  	gcount++;
+			}
+		  }
+		  
+		  if (gcount>1)
+		  {
+			  Error("q21:more than one gaetz and salpeter coll strength matched for line freq=%e\n",line_ptr->freq);
+		  }
+			  
+//	  printf ("line number %i omega= %e\n",line_ptr->n,omega);
       q21_a = 8.629e-6 / (sqrt (t) * line_ptr->gu) * omega;
       q21_t_old = t;
     }
@@ -774,3 +797,29 @@ line_heat (xplasma, pp, nres)
   return (0);
 
 }
+
+double
+	gaetz_salpeter_omega(nline,T_e)
+		int nline;
+double T_e;
+{
+	double omega;
+	omega=0.0;
+	if (nline==381)
+	{
+		printf ("calc t_e=%e pow=%e total=%e\n",T_e,pow((T_e/1e5),0.108),5.13*pow((T_e/1e5),0.108));
+		omega=5.13*pow((T_e/1e5),0.108);
+	}
+	else if (nline==380)
+	{
+		printf ("calc 380_f=%e 381_f=%e\n",lin_ptr[380]->f,lin_ptr[381]->f);
+		omega=5.13*pow((T_e/1e5),0.108)*lin_ptr[380]->f/lin_ptr[381]->f;
+	}
+	return (omega);
+}
+
+
+
+
+
+

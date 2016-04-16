@@ -677,6 +677,8 @@ typedef struct plasma
   double lum_rad_ioniz;	/* The specfic radiative luminosity in frequencies defined by freqmin
 				   and freqmax.  This will depend on the last call to total_emission */
 
+  double line_cool[NLINES];
+
 
   double dmo_dt[3];		/*Radiative force of wind */
   int npdf;			/* The number of points actually used in the luminosity pdf */

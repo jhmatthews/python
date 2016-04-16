@@ -427,6 +427,7 @@ get_atomic_data (masterfile)
 
   for (n = 0; n < NLINES; n++)
     {
+		line[n].n =-1;  /*Internal line number */
       line[n].freq = -1;
       line[n].f = 0;
       line[n].nion = -1;
@@ -2046,6 +2047,7 @@ would like to have simple lines for macro-ions */
 				 n);
 			      exit (0);
 			    }
+				line[nlines].n=nlines;
 			  line[nlines].nion = n;
 			  line[nlines].z = z;
 			  line[nlines].istate = istate;
@@ -2815,6 +2817,13 @@ or zero so that simple checks of true and false can be used for them */
 	  exit (0);
 	}
     }
+
+
+	for (n=0; n<nions; n++)
+	{
+		printf ("Ion summary %i z=%i istate=%i DR_flag=%i GS_RR_flag=%i TOT_RR_flag=%i \n",n,ion[n].z,ion[n].istate,ion[n].drflag,ion[n].bad_gs_rr_t_flag,ion[n].total_rrflag);
+	}
+
 
 /* Finally evaluate how close we are to limits set in the structures */
 
