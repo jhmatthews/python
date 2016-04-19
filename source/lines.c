@@ -239,7 +239,7 @@ q21 (line_ptr, t)
     {
      
       /* JM 1508 code sprint -- added collisional data */
-      if (line_ptr->coll_info) 
+      if (line_ptr->coll_info == 1 || line_ptr->coll_info == 2) 
         {
           upsilon = line_ptr->upsilon;
         }
@@ -260,7 +260,7 @@ q21 (line_ptr, t)
           which give us The Bethe approximation? */
           //else                                    // Bethe approx
           //gaunt = 3.0 * sqrt(3.0) / 2.0 / PI * (1 - (1.0 / u0));
-          gaunt = 1;
+
           upsilon = ECS_CONSTANT * line_ptr->gl * gaunt * line_ptr->f / line_ptr->freq;
         }
 

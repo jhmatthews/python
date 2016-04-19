@@ -871,6 +871,11 @@ sobolev (one, x, den_ion, lptr, dvds)
   nplasma = one->nplasma;
   xplasma = &plasmamain[nplasma];
 
+  /* if the collision information is 2 then that means we have a collision
+     but no lines. So tau_sobolev is zero! */
+  if (lptr->coll_info == 2)
+  	return 0;
+
   if ((dvds = fabs (dvds)) == 0.0)	// This forces dvds to be positive -- a good thing!
     {
 	  d1 = d2 = 0.;  // Elimiante warning when complied with clang

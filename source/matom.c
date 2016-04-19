@@ -206,7 +206,11 @@ matom (p, nres, escape)
 	    {
 	      line_ptr = &line[config[uplvl].bbd_jump[n]];
 
-	      rad_rate = (a21 (line_ptr) * p_escape (line_ptr, xplasma));
+          if (line_ptr->coll_info < 2)		// then we have a radiative transition
+	        rad_rate = (a21 (line_ptr) * p_escape (line_ptr, xplasma));
+	      else
+	      	rad_rate = 0.0;
+
 	      coll_rate = q21 (line_ptr, t_e);	// this is multiplied by ne below
 
 	      if (coll_rate < 0)
@@ -216,8 +220,11 @@ matom (p, nres, escape)
 
 	      bb_cont = rad_rate + (coll_rate * ne);
 	      jprbs_known[uplvl][m] = jprbs[m] = bb_cont * config[line_ptr->nconfigl].ex;	//energy of lower state
-
-	      eprbs_known[uplvl][m] = eprbs[m] = bb_cont * (config[uplvl].ex - config[line[config[uplvl].bbd_jump[n]].nconfigl].ex);	//energy difference
+ 
+          if (line_ptr->coll_info == 2)
+          	eprbs_known[uplvl][m] = eprbs[m] = 0.0;
+          else
+	        eprbs_known[uplvl][m] = eprbs[m] = bb_cont * (config[uplvl].ex - config[line[config[uplvl].bbd_jump[n]].nconfigl].ex);	//energy difference
 
 	      if (jprbs[m] < 0.)	//test (can be deleted eventually SS)
 		{

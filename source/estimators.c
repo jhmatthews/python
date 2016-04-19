@@ -368,8 +368,10 @@ bb_estimators_increment (one, p, tau_sobolev, dvds, nn)
 
   line_ptr = lin_ptr[nn];
 
-  if (line_ptr->macro_info == 0 || geo.macro_simple == 1)
+  /* JM 1604 -- we should quit if no radiative transition here 8 */
+  if (line_ptr->macro_info == 0 || geo.macro_simple == 1 || line_ptr->coll_info == 2)
     return (-1);
+
 
   /* Start by identifying which estimator we want. Get lower level of
      transition . */
@@ -580,9 +582,11 @@ mc_estimator_normalise (n)
 
       for (j = 0; j < config[i].n_bbu_jump; j++)
 	{
-
+    if (line[config[i].bbu_jump[j]].coll_info != 2)
+      {
+        
 	  /* The correction for stimulated emission is (1 - n_lower * g_upper / n_upper / g_lower) */
-
+   
 	  stimfac =
 	    den_config (xplasma,
 			line[config[i].bbu_jump[j]].nconfigu) /
@@ -619,6 +623,8 @@ mc_estimator_normalise (n)
 			  j] * C * stimfac / 4. / PI / volume / line_freq;
 
 	  mplasma->jbar[config[i].bbu_indx_first + j] = 0.0;
+
+      }
 	}
     }
 

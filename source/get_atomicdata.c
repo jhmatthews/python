@@ -2170,7 +2170,7 @@ would like to have simple lines for macro-ions */
 
         /* Then there is a match in the linelist */
         line[n].upsilon = upsilon;         // this is the actual collision strength
-        line[n].coll_info = 1;   // flag saying we have a collision strength
+        line[n].coll_info = 1;   // flag saying we have a collision strength AND a radiative line
         ncoll_lines++;
       }
         else
@@ -2231,7 +2231,7 @@ would like to have simple lines for macro-ions */
         line[nlines].macro_info = mcoll_flag;   //this better be the same as the ion macro_info - see errors above
 
         line[nlines].upsilon = upsilon;   // this is the actual collision strength
-        line[nlines].coll_info = 1;            // flag saying we have a collision strength
+        line[nlines].coll_info = 2;            // flag saying we have a collision strength but no radiative data
         
         /* Now that we know this is a valid transition for the macro atom record the data 
            only necessary as we don't already have a line for this collisional transition */
