@@ -178,10 +178,9 @@ total_dr (one, t_e)
 	}
       else
 	{
-	  x +=
-	    xplasma->vol * xplasma->ne * xplasma->density[n +
-						      1] * dr_coeffs[n] *
-	    meanke;
+//		x += xplasma->vol * xplasma->ne * xplasma->density[n + 1] * dr_coeffs[n] * meanke;
+//		x += xplasma->vol * xplasma->ne * xplasma->density[n + 1] * dr_coeffs[n] * ion[n].ip;
+		x += 0.0;  //Temporary fix NSH 28/10/15- we are clearly screwing something up here!!
 	}
     }
   return (x);

@@ -232,23 +232,11 @@ q21 (line_ptr, t)
 {
   double gaunt;
   double upsilon;
+  double u0;
+
 
   if (q21_line_ptr != line_ptr || t != q21_t_old)
     {
-
-    /* NSH 121024 - the followinglines implement the approximate 
-       gaunt factor as described in eq 4.21 in hazy 2*/
-    /* NSH 121026 commented out in py74a - not certain that this 
-       approximate gaunt factor actually inmproves anything */
-    /*     if (line_ptr->istate == 1) //Neutral
-         {
-         gaunt = ((BOLTZMANN*t)/(H*line_ptr->freq))/10.0;
-         }
-         else
-         {
-         gaunt = 0.2;
-         } 
-    */
      
       /* JM 1508 code sprint -- added collisional data */
       if (line_ptr->coll_info) 
@@ -257,6 +245,21 @@ q21 (line_ptr, t)
         }
       else      // default to Van Regemorter if no bound-bound data
         {
+          u0 = (BOLTZMANN*t) / (H*line_ptr->freq);
+
+          /* JM 1511 -- the relevant paper to consult here is Van Regemorter 1962. We use an effective gaunt 
+          factor to calculate collision strengths. There is one regime in which kt < hnu. For that
+          consult equation 4.20 and 4.21 of Hazy. */
+
+          if (line_ptr->istate == 1 && u0 < 2)    // neutrals at low energy. Used 2 to give continuous function. 
+            gaunt = u0 / 10.0;
+          else                      // low energy electrons, positive ions
+            gaunt = 0.2;
+
+          /* JM 1511 -- For kt >> hnu, we could perhaps adopt equation (6) of Van Regemorter 1962, 
+          which give us The Bethe approximation? */
+          //else                                    // Bethe approx
+          //gaunt = 3.0 * sqrt(3.0) / 2.0 / PI * (1 - (1.0 / u0));
           gaunt = 1;
           upsilon = ECS_CONSTANT * line_ptr->gl * gaunt * line_ptr->f / line_ptr->freq;
         }

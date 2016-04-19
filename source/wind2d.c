@@ -358,7 +358,7 @@ be optional which variables beyond here are moved to structures othere than Wind
 /* NSH 130530 Next few lines allow the use of the temperature which can be computed from Zeus models to be used as an initial guess for the wind temperature */
       if (geo.wind_type == 3)
 	{
-	  plasmamain[n].t_r = hydro_temp (x)/0.9; //This is a kluge, it means that we get the temperature we expect, if we read in a temperature from a zeus file - otherwise it is multiplies by 0.9 //
+	  plasmamain[n].t_r = hydro_temp (x); //NSH 151126 - slight tidy up here - we now set t_e and t_r to hydro temp, t_e change is below//
 	}
       else
 	{
@@ -383,7 +383,7 @@ be optional which variables beyond here are moved to structures othere than Wind
 	  odd since the input is the wind temperature, but is taken to be the radiation temperature). If we have
 	  a fixed temprature calculation,then the wind temperature is set to be the wind temperature so the
 	  user gets what they are expecting */
-      if (modes.fixed_temp==0)
+      if (modes.fixed_temp==0 && modes.zeus_connect==0) //NSH 151126 - dont multply by 0.9 in zeus connect or fixed temp modes 
 		  plasmamain[n].t_e = plasmamain[n].t_e_old = 0.9 * plasmamain[n].t_r;	//Lucy guess
 	  else
 		  plasmamain[n].t_e = plasmamain[n].t_e_old = plasmamain[n].t_r; //If we want to fix the temperature, we set it to tr which has previously been set to twind.

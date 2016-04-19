@@ -72,7 +72,7 @@ int wind_check(WindPtr www, int n);
 double model_velocity(double x[], double v[]);
 int model_vgrad(double x[], double v_grad[][3]);
 double model_rho(double x[]);
-/* vector.c */
+/* vvector.c */
 double dot(double a[], double b[]);
 double length(double a[]);
 int renorm(double a[], double scalar);
@@ -191,6 +191,9 @@ double hydro_rho(double x[]);
 double hydro_temp(double x[]);
 int rtheta_make_hydro_grid(WindPtr w);
 int rtheta_hydro_volumes(WindPtr w);
+int hydro_frac(double coord, double coord_array[], int imax, int *cell1, int *cell2, double *frac);
+double hydro_interp_value(double array[], int im, int ii, int jm, int jj, double f1, double f2);
+int hydro_restart(void);
 /* corona.c */
 int get_corona_params(void);
 double corona_velocity(double x[], double v[]);
@@ -255,7 +258,7 @@ double gs_rrate(int nion, double T);
 /* diag.c */
 int open_diagfile(void);
 int get_extra_diagnostics(void);
-int save_photon_stats(WindPtr one, PhotPtr p, double ds);
+int save_photon_stats(WindPtr one, PhotPtr p, double ds, double w_ave);
 /* sv.c */
 int get_sv_wind_params(void);
 double sv_velocity(double x[], double v[]);
@@ -317,8 +320,6 @@ int kpkt(PhotPtr p, int *nres, int *escape);
 int fake_matom_bb(PhotPtr p, int *nres, int *escape);
 int fake_matom_bf(PhotPtr p, int *nres, int *escape);
 int emit_matom(WindPtr w, PhotPtr p, int *nres, int upper);
-double q_ioniz(struct topbase_phot *cont_ptr, double electron_temperature);
-double q_recomb(struct topbase_phot *cont_ptr, double electron_temperature);
 /* estimators.c */
 int bf_estimators_increment(WindPtr one, PhotPtr p, double ds);
 int bb_estimators_increment(WindPtr one, PhotPtr p, double tau_sobolev, double dvds, int nn);
@@ -328,6 +329,8 @@ double total_bb_cooling(PlasmaPtr xplasma, double t_e);
 double macro_bb_heating(PlasmaPtr xplasma, double t_e);
 double macro_bf_heating(PlasmaPtr xplasma, double t_e);
 int bb_simple_heat(PlasmaPtr xplasma, PhotPtr p, double tau_sobolev, double dvds, int nn);
+int check_stimulated_recomb(PlasmaPtr xplasma);
+int get_dilute_estimators(PlasmaPtr xplasma);
 double get_gamma(struct topbase_phot *cont_ptr, PlasmaPtr xplasma);
 double gamma_integrand(double freq);
 double get_gamma_e(struct topbase_phot *cont_ptr, PlasmaPtr xplasma);
@@ -452,7 +455,12 @@ double temp_func(double solv_temp);
 int matom_emiss_report(void);
 /* direct_ion.c */
 int compute_di_coeffs(double T);
+int compute_qrecomb_coeffs(double T);
 double total_di(WindPtr one, double t_e);
+double q_ioniz_dere(int nion, double t_e);
+double q_ioniz(struct topbase_phot *cont_ptr, double electron_temperature);
+double q_recomb_dere(struct topbase_phot *cont_ptr, double electron_temperature);
+double q_recomb(struct topbase_phot *cont_ptr, double electron_temperature);
 /* pi_rates.c */
 double calc_pi_rate(int nion, PlasmaPtr xplasma, int mode, int type);
 double tb_planck1(double freq);
@@ -461,7 +469,7 @@ double tb_exp1(double freq);
 /* matrix_ion.c */
 int matrix_ion_populations(PlasmaPtr xplasma, int mode);
 int populate_ion_rate_matrix(PlasmaPtr xplasma, double rate_matrix[nions][nions], double pi_rates[nions], double inner_rates[n_inner_tot], double rr_rates[nions], double b_temp[nions], double xne, int xelem[nions]);
-int solve_matrix(double *a_data, double *b_data, int nrows, double *x);
+int solve_matrix(double *a_data, double *b_data, int nrows, double *x, int nplasma);
 /* para_update.c */
 int communicate_estimators_para(void);
 int gather_spectra_para(int nspec_helper, int nspecs);
@@ -490,6 +498,11 @@ int photo_gen_matom(PhotPtr p, double weight, int photstart, int nphot);
 /* macro_gov.c */
 int macro_gov(PhotPtr p, int *nres, int matom_or_kpkt, int *which_out);
 int macro_pops(PlasmaPtr xplasma, double xne);
+/* brem.c */
+double emittance_brem(double freqmin, double freqmax, double lum, double t);
+double integ_brem(double freq);
+double brem_d(double alpha);
+double get_rand_brem(double freqmin, double freqmax);
 /* reverb.c */
 double delay_to_observer(PhotPtr pp);
 int delay_dump_prep(char filename[], int restart_stat, int i_rank);
@@ -547,6 +560,7 @@ int convergence_all(WindPtr w, char rootname[], int ochoice);
 int model_bands(WindPtr w, char rootname[], int ochoice);
 int heatcool_summary(WindPtr w, char rootname[], int ochoice);
 int complete_physical_summary(WindPtr w, char rootname[], int ochoice);
+int complete_ion_summary(WindPtr w, char rootname[], int ochoice);
 double get_density_or_frac(PlasmaPtr xplasma, int element, int istate, int frac_choice);
 int find_ion(int element, int istate);
 int find_element(int element);
@@ -578,3 +592,4 @@ int main(int argc, char *argv[]);
 int one_choice(int choice, char *root, int ochoice);
 int py_wind_help(void);
 /* test_saha.c */
+int main(int argc, char *argv[]);

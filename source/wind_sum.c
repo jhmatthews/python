@@ -48,7 +48,7 @@ xtemp_rad (w)
   int i, j, n;
   double x;
   int py_wind_min, py_wind_max, py_wind_delta;
-  int nplasma;
+  int nplasma,ntot;
 
   py_wind_min = 0;
   py_wind_max = NDIM;
@@ -114,6 +114,34 @@ xtemp_rad (w)
 	}
       Log ("\n");
     }
+	
+	
+	
+    Log ("\n ntot \n");
+
+    Log ("   z\\x   ");
+    for (i = py_wind_min; i < py_wind_max; i += py_wind_delta)
+Log ("%8.2e ", w[i * MDIM].x[0]);
+    Log ("\n");
+
+    for (j = 0; j < MDIM; j++)
+{
+  Log ("%8.2e ", w[j].x[2]);
+  for (i = py_wind_min; i < py_wind_max; i += py_wind_delta)
+    {
+      n = i * MDIM + j;
+      if (w[n].vol > 0.0)
+	{
+      nplasma = w[n].nplasma;
+	  ntot = plasmamain[nplasma].ntot;
+	}
+      else
+	ntot = 0;
+      Log ("%8d ", ntot);
+    }
+  Log ("\n");
+}
+	
 
   return (0);
 

@@ -1,6 +1,6 @@
 Wind_type(0=SV,1=Sphere,2=Previous,3=Proga,4=Corona,5=knigge,6=thierry,7=yso,8=elvis,9=shell)                    0
 Atomic_data                       data/standard78
-photons_per_cycle                          200000
+photons_per_cycle                          20000000
 Ionization_cycles                               30
 spectrum_cycles                                  20
 Coord.system(0=spherical,1=cylindrical,2=spherical_polar,3=cyl_var)                    1
@@ -16,15 +16,15 @@ Wind_radiation(y=1)                               1
 QSO_BH_radiation(y=1)                             1
 Rad_type_for_disk(0=bb,1=models)_to_make_wind                    0
 Rad_type_for_agn(0=bb,1=models,3=power_law,4=cloudy_table)_to_make_wind                   3
-mstar(msol)                                    1e9
-rstar(cm)                               8.85667e+14
-disk.mdot(msol/yr)                             5
+mstar(msol)                                     1e7
+rstar(cm)                               8.85667e+12
+disk.mdot(msol/yr)                             0.02
 Disk.illumination.treatment(0=no.rerad,1=high.albedo,2=thermalized.rerad,3=analytic)                    0
 Disk.temperature.profile(0=standard;1=readin)                    0
-disk.radmax(cm)                               1e17
+disk.radmax(cm)                               1e15
 lum_agn(ergs/s)                               1e43
 agn_power_law_index                            -0.9
-wind.radmax(cm)                               1e19
+wind.radmax(cm)                               1e17
 wind.t.init                                    1e5
 wind.mdot(msol/yr)                            5
 sv.diskmin(wd_rad)                             50 
@@ -33,7 +33,7 @@ sv.thetamin(deg)                                70
 sv.thetamax(deg)                                82
 sv.mdot_r_exponent                                0
 sv.v_infinity(in_units_of_vescape                    1
-sv.acceleration_length(cm)                    1e18
+sv.acceleration_length(cm)                    1e16
 sv.acceleration_exponent                        1.0
 wind.filling_factor(1=smooth,<1=clumpted)		1
 Rad_type_for_disk(0=bb,1=models,2=uniform)_in_final_spectrum                    0

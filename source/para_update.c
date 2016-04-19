@@ -50,9 +50,9 @@ communicate_estimators_para ()
      for each cell, plus three arrays, each of length NXBANDS */
   plasma_double_helpers = (15 + 3 * NXBANDS) * NPLASMA;
 
-  /* The size of the helper array for integers. We transmit 6 numbers 
+  /* The size of the helper array for integers. We transmit 7 numbers 
      for each cell, plus one array of length NXBANDS */
-  plasma_int_helpers = (6 + NXBANDS) * NPLASMA;
+  plasma_int_helpers = (7 + NXBANDS) * NPLASMA;
 
 
   maxfreqhelper = calloc (sizeof (double), NPLASMA);
@@ -107,6 +107,7 @@ communicate_estimators_para ()
   MPI_Reduce (minbandfreqhelper, minbandfreqhelper2, NPLASMA * NXBANDS, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
   MPI_Reduce (maxbandfreqhelper, maxbandfreqhelper2, NPLASMA * NXBANDS, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
   MPI_Reduce (maxfreqhelper, maxfreqhelper2, NPLASMA, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+  MPI_Barrier (MPI_COMM_WORLD);  
   MPI_Reduce (redhelper, redhelper2, plasma_double_helpers, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
   if (rank_global == 0)
     {
@@ -114,6 +115,7 @@ communicate_estimators_para ()
       Log_parallel ("Zeroth thread successfully received the normalised estimators. About to broadcast.\n");
     }
 
+  MPI_Barrier (MPI_COMM_WORLD);
   MPI_Bcast (redhelper2, plasma_double_helpers, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   MPI_Bcast (maxfreqhelper2, NPLASMA, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   /* 131213 NSH Send out the global min and max band limited frequencies to all threads */
@@ -163,9 +165,11 @@ communicate_estimators_para ()
       iredhelper[mpi_i + 3 * NPLASMA] = plasmamain[mpi_i].ntot_disk;
       iredhelper[mpi_i + 4 * NPLASMA] = plasmamain[mpi_i].ntot_wind;
       iredhelper[mpi_i + 5 * NPLASMA] = plasmamain[mpi_i].ntot_agn;
+      iredhelper[mpi_i + 6 * NPLASMA] = plasmamain[mpi_i].nioniz;
+
       for (mpi_j = 0; mpi_j < NXBANDS; mpi_j++)
 	{
-	  iredhelper[mpi_i + (6 + mpi_j) * NPLASMA] = plasmamain[mpi_i].nxtot[mpi_j];
+	  iredhelper[mpi_i + (7 + mpi_j) * NPLASMA] = plasmamain[mpi_i].nxtot[mpi_j];
 	}
     }
   MPI_Reduce (iredhelper, iredhelper2, plasma_int_helpers, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
@@ -183,9 +187,11 @@ communicate_estimators_para ()
       plasmamain[mpi_i].ntot_disk = iredhelper2[mpi_i + 3 * NPLASMA];
       plasmamain[mpi_i].ntot_wind = iredhelper2[mpi_i + 4 * NPLASMA];
       plasmamain[mpi_i].ntot_agn = iredhelper2[mpi_i + 5 * NPLASMA];
+	    plasmamain[mpi_i].nioniz = iredhelper2[mpi_i + 6 * NPLASMA];
+
       for (mpi_j = 0; mpi_j < NXBANDS; mpi_j++)
 	{
-	  plasmamain[mpi_i].nxtot[mpi_j] = iredhelper2[mpi_i + (6 + mpi_j) * NPLASMA];
+	  plasmamain[mpi_i].nxtot[mpi_j] = iredhelper2[mpi_i + (7 + mpi_j) * NPLASMA];
 	}
     }
 

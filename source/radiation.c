@@ -462,7 +462,7 @@ if (freq > phot_freq_min)
    */
   if (modes.save_cell_stats && ncstat > 0)
     {
-      save_photon_stats (one, p, ds);	// save photon statistics (extra diagnostics)
+      save_photon_stats (one, p, ds, w_ave);	// save photon statistics (extra diagnostics)
     }
 
 
@@ -984,6 +984,8 @@ update_banded_estimators (xplasma, p, ds, w_ave)
       /* IP needs to be radiation density in the cell. We sum wcontributions from
          each photon, then it is normalised in wind_update. */
       xplasma->ip += ((w_ave * ds) / (H * p->freq));
+	  xplasma->xi += (w_ave * ds);
+	
 
       if (p->nscat == 0)
 	{

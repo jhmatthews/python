@@ -279,17 +279,18 @@ macro_pops (xplasma, xne)
   double q_ioniz (), q_recomb ();
   double *a_data, *b_data;
   double *populations;
-  int index_fast_col, ierr;
+  int index_fast_col, ierr, insane, sane_populations;
 
   MacroPtr mplasma;
   mplasma = &macromain[xplasma->nplasma];
-
+  
   /* Start with an outer loop over elements: there are no rates that couple
      levels of different elements so we can always separate them out. */
 
 
   for (index_element = 0; index_element < nelements; index_element++)
     {
+      
 
       /* Zero all elements of the matrix before doing anything else. */
 
@@ -317,6 +318,10 @@ macro_pops (xplasma, xne)
 	  && geo.macro_simple == 0)
 	{
 
+	  sane_populations = 0;
+      while (sane_populations == 0)
+      {
+      
 	  /* Having established that the ion requires a macro atom treatment we
 	     are going to construct a matrix of rates between the levels and 
 	     invert that matrix to get the level populations. The first thing we need 
@@ -408,8 +413,7 @@ macro_pops (xplasma, xne)
 		         including a collisional term (which depends on ne). */
 
 		      line_ptr = &line[config[index_lvl].bbu_jump[index_bbu]];
-		      rate =
-			b12 (line_ptr) *
+		      rate = b12 (line_ptr) *
 			mplasma->jbar_old[config[index_lvl].bbu_indx_first +
 					  index_bbu];
 		      rate += q12 (line_ptr, xplasma->t_e) * xne;
@@ -427,14 +431,14 @@ macro_pops (xplasma, xne)
 		      rate_matrix[lower][lower] += -1. * rate;
 		      rate_matrix[upper][lower] += rate;
 
+		      if (rate < 0.0 || sane_check(rate))
+              {
+		      	Error("macro_pops: bbu rate is %8.4e in cell/matom %i\n", rate, xplasma->nplasma);
+		      }
+
 		      /* There's a radiative jump between these levels, so we want to clean
 		         for popualtion inversions. Flag this jump */
 		      radiative_flag[index_lvl][line_ptr->nconfigu] = 1;
-
-		      if (rate < 0.0 || sane_check(rate))
-		      {
-		      	Error("macro_pops: bbu rate is %8.4e in cell/matom %i\n", rate, xplasma->nplasma);
-		      }
 		    }
 
 		  for (index_bbd = 0;
@@ -446,6 +450,7 @@ macro_pops (xplasma, xne)
 
 		      line_ptr = &line[config[index_lvl].bbd_jump[index_bbd]];
 		      rate = (a21 (line_ptr) * p_escape (line_ptr, xplasma));
+		      //rate =0.0;
 		      rate += q21 (line_ptr, xplasma->t_e) * xne;
 
 		      /* This is the rate out of the level in question. We need to add it
@@ -611,15 +616,14 @@ macro_pops (xplasma, xne)
 
       /* this next routine is a general routine which solves the matrix equation
          via LU decomposition */
-	  ierr = solve_matrix(a_data, b_data, n_macro_lvl, populations);
+	  ierr = solve_matrix(a_data, b_data, n_macro_lvl, populations, xplasma->nplasma);
 
 	  if (ierr != 0)
 	  	Error("macro_pops: bad return from solve_matrix\n");
 
       /* free memory */
       free (a_data);	
-	  free (b_data);	
-
+	  free (b_data);
 
 
 	  /* MC noise can cause population inversions (particularly amongst highly excited states)
@@ -640,6 +644,7 @@ macro_pops (xplasma, xne)
 		{		/* Start loop with lowest level of the ion. For each level in turn check to see if there's a population 
 				   inversion i.e. is  upper_pop > lower_pop * g_upper / g_lower. If it is then replace upper_pop with
 				   lower_pop * g_upper / g_lower. We loop over all levels higher than the currently chosen lower level. */
+		  
 		  for (nn = index_lvl + 1;
 		       nn <
 		       (ion[index_ion].first_nlte_level +
@@ -650,6 +655,7 @@ macro_pops (xplasma, xne)
               if (radiative_flag[index_lvl][nn])
               {
 		        inversion_test = populations[conf_to_matrix[index_lvl]] * config[nn].g / config[index_lvl].g * 0.999999;	//include a correction factor 
+
 		        if (populations[conf_to_matrix[nn]] > inversion_test)
 			  {
 			    populations[conf_to_matrix[nn]] = inversion_test;
@@ -665,6 +671,8 @@ macro_pops (xplasma, xne)
 	     level populations within an ion. Get the ion
 	     populations and write them to one->density[nion]. The level populations
 	     are to be put in "levden". */
+	  insane = 0;
+
 
 	  nn = 0;
 	  mm = 0;
@@ -682,11 +690,6 @@ macro_pops (xplasma, xne)
 		  level_population = populations[conf_to_matrix[index_lvl]];	
 		  this_ion_density += level_population;
 
-		  /* JM 140409 -- add error check for negative populations */
-		  if (level_population < 0.0 || sane_check(level_population))
-		    Error("macro_pops: level %i has frac. pop. %8.4e in cell %i\n", 
-		    	   index_lvl, level_population, xplasma->nplasma);
-
 		  nn++;
 		}
 
@@ -703,6 +706,14 @@ macro_pops (xplasma, xne)
 		    populations[conf_to_matrix[index_lvl]] /
 		    this_ion_density;
 
+		  if (xplasma->levden[config[index_lvl].nden] < 0.0 || sane_check(xplasma->levden[config[index_lvl].nden]))
+		  {
+		  	Error("macro_pops: level %i has frac. pop. %8.4e in cell %i\n", 
+		    	   index_lvl, xplasma->levden[config[index_lvl].nden], xplasma->nplasma);
+		  	insane = 1;
+		  }
+
+          
 		  mm++;
 
 		}
@@ -711,13 +722,37 @@ macro_pops (xplasma, xne)
 		this_ion_density * ele[index_element].abun * xplasma->rho *
 		rho2nh;
 
+		  if (sane_check(xplasma->density[index_ion]) ||  xplasma->density[index_ion] < 0.0 )
+		  {
+		  	Error("macro_pops: ion %i has frac. pop. %8.4e in cell %i\n", 
+		    	   index_ion, xplasma->density[index_ion], xplasma->nplasma);
+		  	insane = 1;
+		  }
+
 
 
 
 	    }
 
-	}
-    }
+      /* if the variable insane has been set to 1 then that means we had either a negative or 
+         non-finite level population somewhere. If that is the case, then set all the estimators
+         to dilute blackbodies instead and go through the solution again */
+      if (insane)
+        {
+          Error("macro_pops: found unreasonable populations in cell %i, so adopting dilute BBody excitation\n", xplasma->nplasma);
+          get_dilute_estimators(xplasma);
+        }
+      /* if we didn't set insane to 1 then we have a realistic set of populations, so set sane_populations to 1 to break
+         the while loop */
+      else
+      	sane_populations = 1;	
+
+	  }  // end of while sane loop
+
+
+	}  // end of if statement for macro-atoms
+    }  // end of elements loop
+
 
   return (0);
   /* All done. (SS, Apr 04) */

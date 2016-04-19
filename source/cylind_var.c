@@ -171,7 +171,7 @@ cylvar_make_grid (w)
       for (j = 0; j < MDIM; j++)
 	{
 	  wind_ij_to_n (i, j, &n);
-	  w[n].x[1] = w[n].xcen[n] = 0;	//The cells are all defined in the xz plane
+	  w[n].x[1] = w[n].xcen[1] = 0;	//The cells are all defined in the xz plane
 
 	  /*Define the grid points */
 	  if (geo.log_linear == 1)

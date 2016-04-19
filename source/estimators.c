@@ -87,7 +87,7 @@ bf_estimators_increment (one, p, ds)
    */
   if (modes.save_cell_stats && ncstat > 0)
     {
-      save_photon_stats(one, p, ds);  // save photon statistics (extra diagnostics)
+      save_photon_stats(one, p, ds,p->w);  // save photon statistics (extra diagnostics)
     }
 
 
@@ -550,7 +550,7 @@ mc_estimator_normalise (n)
        Ideally we don't want to have this so should probably switch this back sometime (SS August 05) !!!BUG */
 
 	  if (phot_top[config[i].bfu_jump[j]].freq[0] < 7.5e12
-	      || phot_top[config[i].bfu_jump[j]].freq[0] > 1.2e16)
+	      || phot_top[config[i].bfu_jump[j]].freq[0] > 5e18)
 	    {
 	      mplasma->gamma_old[config[i].bfu_indx_first + j] =
 		get_gamma (&phot_top[config[i].bfu_jump[j]], xplasma);
@@ -590,7 +590,7 @@ mc_estimator_normalise (n)
 	  stimfac =
 	    stimfac * config[i].g /
 	    config[line[config[i].bbu_jump[j]].nconfigu].g;
-	  if (stimfac < 1.0)
+	  if (stimfac < 1.0 && stimfac >= 0.0)
 	    {
 	      stimfac = 1. - stimfac;	//all's well
 	    }
@@ -638,6 +638,10 @@ mc_estimator_normalise (n)
   xplasma->heat_photo_macro = heat_contribution;
   xplasma->heat_tot += heat_contribution;
 
+  
+  /* finally, check if we have any palces where stimulated recombination wins over
+     photoionization */
+  check_stimulated_recomb(xplasma);
 
   /* Now that we have estimators, set the plag to use them for the level populations */
 
@@ -1090,6 +1094,85 @@ bb_simple_heat (xplasma, p, tau_sobolev, dvds, nn)
   return (0);
 
 }
+
+/**************************************************
+  check_stimulated emission
+*****************************************************/
+
+int check_stimulated_recomb(xplasma)
+     PlasmaPtr xplasma;
+{
+  int i, j;
+  struct topbase_phot *cont_ptr;
+  int st_recomb_err;
+  double st_recomb, gamma, coll_ioniz;
+  MacroPtr mplasma;
+  mplasma = &macromain[xplasma->nplasma];
+
+  st_recomb_err = 0;
+
+  for (i = 0; i < nlte_levels; i++)
+    {
+      for (j = 0; j < config[i].n_bfu_jump; j++)
+  {
+    cont_ptr = &phot_top[config[i].bfu_jump[j]];
+    gamma = mplasma->gamma_old[config[i].bfu_indx_first + j];
+    st_recomb = mplasma->alpha_st_old[config[i].bfu_indx_first + j];
+    st_recomb *= xplasma->ne * den_config (xplasma, cont_ptr->uplev) / den_config (xplasma, cont_ptr->nlev);
+    coll_ioniz = q_ioniz (cont_ptr, xplasma->t_e) * xplasma->ne;
+
+    if (st_recomb > (gamma + coll_ioniz))
+      st_recomb_err += 1;
+  }
+    }
+
+  if (st_recomb_err > 0)
+    Error("check_stimulated_recomb: cell %i had %i bf jumps where ne*n_u/n_l*alpha_st > gamma\n", 
+           xplasma->nplasma, st_recomb_err);
+
+  return (0);
+}
+
+
+
+/**************************************************
+  get_dilute_estimators computes the bound free and 
+  bound bound estimators for a cell from a dilute blackbody.
+  This is the default if macro_pops fails to find a solution
+  for an ion.
+*****************************************************/
+
+int
+get_dilute_estimators (xplasma)
+     PlasmaPtr xplasma;
+{
+
+  int i, j;
+  struct lines *line_ptr;
+  MacroPtr mplasma;
+  mplasma = &macromain[xplasma->nplasma];
+
+
+  for (i = 0; i < nlte_levels; i++)
+    {
+      for (j = 0; j < config[i].n_bfu_jump; j++)
+  {
+    mplasma->gamma_old[config[i].bfu_indx_first + j] = get_gamma (&phot_top[config[i].bfu_jump[j]], xplasma);
+    mplasma->gamma_e_old[config[i].bfu_indx_first + j] = get_gamma_e (&phot_top[config[i].bfu_jump[j]], xplasma);
+    mplasma->alpha_st_e_old[config[i].bfu_indx_first + j] = get_alpha_st_e (&phot_top[config[i].bfu_jump[j]], xplasma);
+    mplasma->alpha_st_old[config[i].bfu_indx_first + j] = get_alpha_st (&phot_top[config[i].bfu_jump[j]], xplasma);
+  }
+      for (j = 0; j < config[i].n_bbu_jump; j++)
+  {
+    line_ptr = &line[config[i].bbu_jump[j]];
+    mplasma->jbar_old[config[i].bbu_indx_first + j] = mean_intensity (xplasma, line_ptr->freq, 1);
+  }
+
+    }
+
+  return (0);
+}
+
 
 
 /**************************************************

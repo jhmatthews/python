@@ -78,6 +78,9 @@ get_knigge_wind_params ()
 								   radius. The value set here is for the minimum collimation, see KWD95.  The coefficient 0.5 is 
 								   approximate */
   geo.kn_v_zero = 1.0;		/* NSH 19/04/11 New parameter - multiple of sound speed to be used as initial velocity of wind */
+  geo.wind_rho_min=1;
+  geo.wind_rho_max=geo.diskrad / geo.rstar;
+
 
 /* There is confusion in various papers concerning whether to use d or d/dmin.  In KWD95, d/dmin was
 used but in later papers, e.g KD97 d in WD radii was used.  I believe d is more natural and so will use it, 
@@ -111,13 +114,18 @@ to be modified -- ksl 04jun */
 
   /* JM 1502 -- added capability for user to adjust launch radii of KWD wind
      required to reproduce Stuart's X-ray models (Sim+ 2008,2010) 
-     units are in stellar radii / WD radii / grav radii as in SV model */
-  rddoub ("kn.rmin(in_wd_radii)", &geo.wind_rmin);
-  rddoub ("kn.rmax(in_wd_radii)", &geo.wind_rmax ); 
+     units are in stellar radii / WD radii / grav radii as in SV model 
+     
+     1509 -- ksl -- This had not be implemented quite right.  Now fixed.  Defaults
+     are for standard KWD model */
 
-  geo.wind_rmin *= geo.rstar;
-  geo.wind_rmax *= geo.rstar;
+  rddoub ("kn.rmin(in_wd_radii)", &geo.wind_rho_min);
+  rddoub ("kn.rmax(in_wd_radii)", &geo.wind_rho_max ); 
+
+  geo.wind_rho_min *= geo.rstar;
+  geo.wind_rho_max *= geo.rstar;
   geo.wind_thetamin = atan (1. / geo.kn_dratio);
+
 /* Somewhat paradoxically diskrad is in cm, while dn_ratio which is really d in KWD95 is 
 in units of WD radii */
   geo.wind_thetamax = atan (geo.diskrad / (geo.kn_dratio * geo.rstar));
@@ -132,8 +140,9 @@ in units of WD radii */
 	      (((geo.kn_dratio * geo.rstar) + zdisk (geo.diskrad))));
     }
 
-  geo.wind_rho_min = geo.wind_rmin;
-  geo.wind_rho_max = geo.wind_rmax;
+  geo.wind_rmin=geo.wind_rho_min;
+  geo.wind_rmax=geo.rmax;
+
   /* The change in the boundary of the wind (as corner of disk -- see above) 
      means that wind_rho_max nees to be redefined so that it is used correctly
      to compute the boundary of the wind elsewhere. */

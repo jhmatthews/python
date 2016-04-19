@@ -227,7 +227,10 @@ create_master_table (rootname)
   c[10]=get_one("dmo_dt_z");
   strcpy (column_name[10], "dmo_dt_z");
 
-  ncols = 11;
+  c[11] = get_one ("ntot");
+  strcpy (column_name[11], "ntot");
+
+  ncols = 12;
 
 
   converge=get_one("converge");
@@ -670,6 +673,11 @@ get_one (variable_name)
 	  {
 		  x[n]=plasmamain[nplasma].dmo_dt[2];
 	  }
+	  else if (strcmp (variable_name, "ntot")==0)
+	  {
+		  x[n]=plasmamain[nplasma].ntot;
+	  }
+
 
 
 

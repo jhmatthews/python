@@ -30,7 +30,7 @@
 #define ANGSTROM                        1.e-8	/*Definition of an Angstrom in units of this code, e.g. cm */
 
 #define EV2ERGS   			1.602192e-12
-#define RADIAN				57.29578
+#define RADIAN				57.29577951308232
 #define RYD2ERGS                        2.1798741e-11	/* Rydberg in units of ergs */
 
 
@@ -527,7 +527,8 @@ typedef struct dere_di_rate
 
 Dere_di_rate dere_di_rate[NIONS];	//Set up the structure
 
-double di_coeffs[NIONS];  //This is an array to store the dr_coeffs 
+double di_coeffs[NIONS];  //This is an array to store the di_coeffs 
+double qrecomb_coeffs[NIONS];  //JM 1508 analogous array for three body recombination 
 
 #define MAX_GAUNT_N_GSQRD 100	//Space set aside for the number of parameters for scaled inverse temperature
 

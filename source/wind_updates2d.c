@@ -100,6 +100,7 @@ WindPtr (w);
   double trad, nh;
   double wtest, xsum, asum, psum, fsum, lsum, csum, icsum, ausum;	/*1108 NSH csum added to sum compton heating 1204 NSH icsum added to sum induced compton heating */
   double volume;
+  double vol;
   char string[LINELEN];
   double t_r_old, t_e_old, dt_r, dt_e;
   double t_r_ave_old, t_r_ave, t_e_ave_old, t_e_ave;
@@ -111,6 +112,8 @@ WindPtr (w);
   double nsh_lum_hhe;
   double nsh_lum_metals;
   int my_nmin, my_nmax;	//Note that these variables are still used even without MPI on
+  FILE *fptr, *fopen (); /*This is the file to communicate with zeus */
+  
 #ifdef MPI_ON
   int num_mpi_cells, num_mpi_extra, position, ndo, n_mpi, num_comm, n_mpi2;
   int size_of_commbuffer;
@@ -123,8 +126,7 @@ WindPtr (w);
 
   /* the commbuffer needs to be larger enough to pack all variables in MPI_Pack and MPI_Unpack routines NSH 1407 - the 
   NIONS changed to nions for the 12 arrays in plasma that are now dynamically allocated */
-  size_of_commbuffer = 8 * (12*nions + NLTE_LEVELS + 2*NTOP_PHOT + 12*NXBANDS + 2*LPDF + NAUGER + 105)*(floor(NPLASMA/np_mpi_global)+1);
-      
+  size_of_commbuffer = 8 * (12*nions + NLTE_LEVELS + 2*NTOP_PHOT + 12*NXBANDS + 2*LPDF + NAUGER + 106)*(floor(NPLASMA/np_mpi_global)+1);
   commbuffer = (char *) malloc(size_of_commbuffer*sizeof(char));
 
   /* JM 1409 -- Initialise parallel only variables */
@@ -178,6 +180,7 @@ WindPtr (w);
 
       nwind = plasmamain[n].nwind;
       volume = w[nwind].vol;
+
       //volume = plasmamain[n].vol; 	// 1411 JM -- we want volume to be the filled volume
       //1504 -- JM No we don't! The mean intensity shouldn't change if we *just* clump
 
@@ -291,6 +294,10 @@ WindPtr (w);
       plasmamain[n].ip_direct /= (C * volume * nh);
       plasmamain[n].ip_scatt /= (C * volume * nh);
 
+/* 1510 NSH Normalise xi, which at this point should be the luminosity of ionizing photons in a cell (just the sum of photon weights) */
+
+		plasmamain[n].xi *= 4.*PI;
+		plasmamain[n].xi /= ( volume * nh);
 
       /* If geo.adiabatic is true, then alculate the adiabatic cooling using the current, i.e 
        * previous value of t_e.  Note that this may not be  best way to determien the cooling. 
@@ -455,6 +462,7 @@ WindPtr (w);
 	      MPI_Pack(&plasmamain[n].ip, 1, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
 	      MPI_Pack(&plasmamain[n].ip_direct, 1, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
 	      MPI_Pack(&plasmamain[n].ip_scatt, 1, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
+	      MPI_Pack(&plasmamain[n].xi, 1, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
 	      MPI_Pack(&dt_e, 1, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
 	      MPI_Pack(&dt_r, 1, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
 	      MPI_Pack(&nmax_e, 1, MPI_INT, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
@@ -585,6 +593,7 @@ WindPtr (w);
 	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, &plasmamain[n].ip, 1, MPI_DOUBLE, MPI_COMM_WORLD);
 	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, &plasmamain[n].ip_direct, 1, MPI_DOUBLE, MPI_COMM_WORLD);
 	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, &plasmamain[n].ip_scatt, 1, MPI_DOUBLE, MPI_COMM_WORLD);
+	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, &plasmamain[n].xi, 1, MPI_DOUBLE, MPI_COMM_WORLD);
 	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, &dt_e_temp, 1, MPI_DOUBLE, MPI_COMM_WORLD);
 	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, &dt_r_temp, 1, MPI_DOUBLE, MPI_COMM_WORLD);
 	      MPI_Unpack(commbuffer, size_of_commbuffer, &position, &nmax_e_temp, 1, MPI_INT, MPI_COMM_WORLD);
@@ -652,6 +661,13 @@ free (commbuffer);
   strcpy (string, "");
   sprintf (string, "# Wind update: Number %d", num_updates);
 
+  if (modes.zeus_connect==1) //If we are running in zeus connect mode - we open a file for heatcool rates
+  {
+	  Log("Outputting heatcool file for connecting to zeus\n");
+      fptr = fopen ("py_heatcool.dat", "w");
+  	 fprintf(fptr,"i j rcen thetacen vol temp xi ne heat_xray heat_comp heat_lines heat_ff cool_comp cool_lines cool_ff rho n_h\n");
+	  
+  }
 
   /* Check the balance between the absorbed and the emitted flux */
 
@@ -712,7 +728,11 @@ free (commbuffer);
       plasmamain[nplasma].lum_adiabatic_ioniz = plasmamain[nplasma].lum_adiabatic;
 
 
+
+
     }
+	
+
 
   /* JM130621- bugfix for windsave bug- needed so that we have the luminosities from ionization
      cycles in the windsavefile even if the spectral cycles are run */
@@ -748,6 +768,28 @@ free (commbuffer);
   asum = wind_luminosity (0.0, VERY_BIG);  /*We call wind_luminosity here to obtain an up to date set of cooling rates*/
 
 
+  if (modes.zeus_connect==1) //If we are running in zeus connect mode, we output heating and cooling rates.
+  {
+	  for (nplasma = 0; nplasma < NPLASMA; nplasma++)
+	  {
+	  
+ 		 wind_n_to_ij (plasmamain[nplasma].nwind, &i, &j);
+		 vol=w[plasmamain[nplasma].nwind].vol;
+	  fprintf(fptr,"%d %d %e %e %e ",i,j,w[plasmamain[nplasma].nwind].rcen,w[plasmamain[nplasma].nwind].thetacen/RADIAN,vol); //output geometric things
+	  fprintf(fptr,"%e %e %e ",plasmamain[nplasma].t_e,plasmamain[nplasma].xi,plasmamain[nplasma].ne); //output temp, xi and ne to ease plotting of heating rates
+	  fprintf(fptr,"%e ",(plasmamain[nplasma].heat_photo+plasmamain[nplasma].heat_auger)/vol); //Xray heating - or photoionization
+	  fprintf(fptr,"%e ",(plasmamain[nplasma].heat_comp)/vol); //Compton heating
+	  fprintf(fptr,"%e ",(plasmamain[nplasma].heat_lines)/vol); //Line heating 28/10/15 - not currently used in zeus
+	  fprintf(fptr,"%e ",(plasmamain[nplasma].heat_ff)/vol); //FF heating 28/10/15 - not currently used in zeus
+	  fprintf(fptr,"%e ",(plasmamain[nplasma].lum_comp)/vol); //Compton cooling
+	  fprintf(fptr,"%e ",(plasmamain[nplasma].lum_lines+plasmamain[nplasma].lum_fb+plasmamain[nplasma].lum_dr)/vol); //Line cooling must include all recombinatiobs cooling
+	  fprintf(fptr,"%e ",(plasmamain[nplasma].lum_ff)/vol); //ff cooling
+	  fprintf(fptr,"%e ",plasmamain[nplasma].rho); //density
+	  fprintf(fptr,"%e\n",plasmamain[nplasma].rho*rho2nh); //hydrogen number density
+   }
+    fclose(fptr);
+}
+
   /* 1108 NSH Added commands to report compton heating */
   Log ("!!wind_update: Absorbed flux    %8.2e  (photo %8.2e ff %8.2e compton %8.2e auger %8.2e induced_compton %8.2e lines %8.2e)\n", 
         xsum, psum, fsum, csum, ausum, icsum, lsum);
@@ -769,7 +811,14 @@ free (commbuffer);
 
 
   /* Print out some diagnositics of the changes in the wind update */
-  t_r_ave_old /= iave;
+		if (modes.zeus_connect==1 || modes.fixed_temp==1)	     //There is no point in computing temperature changes, because we have fixed them!
+   	{
+   		Log ("!!wind_update: We are running in fixed temperature mode - no temperature report\n");
+		
+   	} 
+		else
+		{
+ 	t_r_ave_old /= iave;
   t_e_ave_old /= iave;
   t_r_ave /= iave;
   t_e_ave /= iave;
@@ -788,6 +837,8 @@ free (commbuffer);
        (t_e_ave - t_e_ave_old));
   Log ("Summary  t_r  %6.0f   %6.0f  #t_r and dt_r on this update\n", t_r_ave,
        (t_r_ave - t_r_ave_old));
+   } 
+ 
 
   check_convergence ();
   /* Summarize the radiative temperatures (ksl 04 mar)*/
@@ -831,9 +882,9 @@ free (commbuffer);
       agn_ip /= plasmamain[0].rho * rho2nh;
       /* Report luminosities, IP and other diagnositic quantities */
       Log
-	("OUTPUT Lum_agn= %e T_e= %e N_h= %e N_e= %e alpha= %f IP(sim_2010)= %e Meaured_IP(cloudy)= %e distance= %e volume= %e mean_ds=%e\n",
+	("OUTPUT Lum_agn= %e T_e= %e N_h= %e N_e= %e alpha= %f IP(sim_2010)= %e Meaured_IP(cloudy)= %e Measured_Xi= %e distance= %e volume= %e mean_ds=%e\n",
 	 geo.lum_agn, plasmamain[0].t_e, plasmamain[0].rho * rho2nh,
-	 plasmamain[0].ne, geo.alpha_agn, agn_ip, plasmamain[0].ip, w[n].r,
+	 plasmamain[0].ne, geo.alpha_agn, agn_ip, plasmamain[0].ip, plasmamain[0].xi,w[n].r,
 	 w[n].vol, plasmamain[0].mean_ds / plasmamain[0].n_ds);
 
       /* 1108 NSH Added commands to report compton heating */
@@ -933,6 +984,8 @@ wind_rad_init ()
       plasmamain[n].j = plasmamain[n].ave_freq = plasmamain[n].ntot = 0;
       plasmamain[n].j_direct = plasmamain[n].j_scatt = 0,0;  //NSH 1309 zero j banded by number of scatters
       plasmamain[n].ip = 0.0;
+      plasmamain[n].xi = 0.0;
+
       plasmamain[n].ip_direct = plasmamain[n].ip_scatt = 0.0;
       plasmamain[n].mean_ds = 0.0;
       plasmamain[n].n_ds = 0;

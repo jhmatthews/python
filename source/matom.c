@@ -313,18 +313,13 @@ matom (p, nres, escape)
 	      cont_ptr = &phot_top[config[uplvl].bfu_jump[n]];	//pointer to continuum
 
 	      jprbs_known[uplvl][m] = jprbs[m] = (mplasma->gamma_old[config[uplvl].bfu_indx_first + n] - (mplasma->alpha_st_old[config[uplvl].bfu_indx_first + n] * xplasma->ne * den_config (xplasma, cont_ptr->uplev) / den_config (xplasma, cont_ptr->nlev)) + (q_ioniz (cont_ptr, t_e) * ne)) * config[uplvl].ex;	//energy of lower state
+	     
+          /* this error condition can happen in unconverged hot cells where T_R >> T_E.
+             for the moment we set to 0 and hope spontaneous recombiantion takes care of things */
+	      /* note that we check and report this in check_stimulated_recomb() in estimators.c once a cycle */
 	      if (jprbs[m] < 0.)	//test (can be deleted eventually SS)
 		{
-		  Error ("Negative probability (matom, 6). Abort?\n");
-		  Log
-		    ("mplasma->gamma_old[uplvl][n] %g, (mplasma->alpha_st_old[uplvl][n] * xplasma->ne * den_config (xplasma, cont_ptr->uplev) / den_config (xplasma, cont_ptr->nlev)) %g\n",
-		     mplasma->gamma_old[config[uplvl].bfu_indx_first + n],
-		     (mplasma->alpha_st_old[config[uplvl].bfu_indx_first +
-					    n] * xplasma->ne *
-		      den_config (xplasma,
-				  cont_ptr->uplev) / den_config (xplasma,
-								 cont_ptr->
-								 nlev)));
+		  //Error ("Negative probability (matom, 6). Abort?\n");
 		  jprbs_known[uplvl][m] = jprbs[m] = 0.0;
 
 		}
@@ -720,7 +715,7 @@ kpkt (p, nres, escape)
   MacroPtr mplasma;
 
   double coll_rate, rad_rate;
-  double q_ioniz ();
+  double freqmin, freqmax;
 
 
   /* Idea is to calculated the cooling
@@ -741,6 +736,21 @@ kpkt (p, nres, escape)
   mplasma = &macromain[xplasma->nplasma];
 
   electron_temperature = xplasma->t_e;
+
+  /* JM 1511 -- Fix for issue 187. We need band limits for free free packet
+     generation (see call to one_ff below) */
+  if (geo.ioniz_or_extract)
+    {
+      /* in spectral cycles, so use the boundaries of the photon generation bands */
+      freqmin = xband.f1[0];
+      freqmax = xband.f2[xband.nbands-1];
+    }
+  else
+    {
+      /* in spectral cycles, use the frequency range of the final spectrum */
+      freqmin = em_rnge.fmin;
+      freqmax = em_rnge.fmax;
+    }
 
 
   /* ksl 091108 - If the kpkt destruction rates for this cell are not known they are calculated here.  This happens
@@ -1073,7 +1083,9 @@ kpkt (p, nres, escape)
 
       *nres = -2;
 
-      p->freq = one_ff (one, 7.5e12, 2.626e16);	//get frequency of resulting energy packet
+      /* used to do one_ff (one, 7.5e12, 2.626e16) here,
+         but now use the band boundaries, see #187.*/
+      p->freq = one_ff (one, freqmin, freqmax);	//get frequency of resulting energy packet
 
       return (0);
     }
@@ -1524,62 +1536,5 @@ emit_matom (w, p, nres, upper)
 /* The frequency and the value of nres have been set correctly. All done. */
 
 /********************************************************************************/
-
-
-/******************************************************************************/
-
-/* q_ioniz. This returns the collisional ionization co-efficient
-Calculated following equation 5-79 of Mihalas.
-*/
-
-double
-q_ioniz (cont_ptr, electron_temperature)
-     struct topbase_phot *cont_ptr;
-     double electron_temperature;
-{
-  double coeff;
-  double gaunt;
-  double u0;
-
-  u0 = cont_ptr->freq[0] * H_OVER_K / electron_temperature;
-  gaunt = 0.1;			//for now - from Mihalas for hydrogen
-
-  coeff = 1.55e13 / sqrt (electron_temperature) * gaunt * cont_ptr->x[0] *
-    exp (-1. * u0) / u0;
-
-  return (coeff);
-}
-
-/******************************************************************************/
-
-/* q_recomb. This returns the collisional recombination co-efficient
-Calculated from inverse of q_ioniz.
-
-JM 1301 -- Edited this to avoid need to call q_ioniz and exponential.
-Should improve speed and stability
-
-This equation comes from considering TE and getting the expression
-q_recomb = 2.07e-16 * gl/gu * exp(E/kT) * q_ioniz
-then substituting the above expression for q_ioniz.
-*/
-
-double
-q_recomb (cont_ptr, electron_temperature)
-     struct topbase_phot *cont_ptr;
-     double electron_temperature;
-{
-  double coeff;
-  double gaunt;
-
-
-  gaunt = 0.1;			//for now - from Mihalas for hydrogen
-
-  coeff = 3.2085e-3  / electron_temperature * gaunt * cont_ptr->x[0];	// normal constants * 1/T times gaunt * cross section
-
-  coeff /= cont_ptr->freq[0] * H_OVER_K;			// divide by h nu / k
-  coeff *= config[cont_ptr->nlev].g / config[cont_ptr->uplev].g;
-
-  return (coeff);
-}
 
 

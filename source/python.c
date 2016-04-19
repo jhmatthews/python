@@ -33,7 +33,12 @@ Arguments:
     -f  Fixed temperature mode - does not attempt to chenge the temperature of cells.
 	-e  Alter the maximum number of errors before the program quits
 	-i  Diagnostic mode which quits after reading in inputs. Used for Travis test suite.
-
+	-z  Mode to connect with zeus - it either runs two cycles in this is the first call - in order
+         to obtain a good starting state, else it runs just one cycle. In both cases, it does
+		 not attempt to seek a new temperature, but it does output heating and cooling rates
+    --version print out python version, commit hash and if there were files with uncommitted
+	    changes
+	--seed set the random number seed to be time based, rather than fixed.
 
 	
 	if one simply types py or pyZZ where ZZ is the version number one is queried for a name
@@ -213,6 +218,7 @@ History:
 #include <string.h>
 #include <math.h>
 #include "atomic.h"
+#include <time.h>  //To allow the used of the clock command without errors!!
 
 
 #include "python.h"
@@ -670,6 +676,11 @@ main (argc, argv)
 		}
 	    }
 	}
+	if (modes.zeus_connect==1) /* We are in rad-hydro mode, we want the new density and temperature*/
+		{
+			Log ("We are going to read in the density and temperature from a zeus file\n");
+			get_hydro ();  //This line just populates the hydro structures  
+		}
     }
 
   /* 121219 NSH Set up DFUDGE to be a value that makes some kind of sense
@@ -792,7 +803,7 @@ main (argc, argv)
 
       geo.agn_spectype = 3;
       get_spectype (geo.agn_radiation,
-		    "Rad_type_for_agn(3=power_law,4=cloudy_table)_in_final_spectrum",
+		    "Rad_type_for_agn(3=power_law,4=cloudy_table,5=bremsstrahlung)_in_final_spectrum",
 		    &geo.agn_spectype);
 
 
@@ -994,6 +1005,11 @@ main (argc, argv)
 }
   // Do not reinit if you want to use old windfile
 
+else if (modes.zeus_connect==1) //We have restarted, but are in zeus connect mode, so we want to update density, temp and velocities
+{
+	hydro_restart();
+}
+
   w = wmain;
 
   if (modes.save_cell_stats)
@@ -1003,8 +1019,17 @@ main (argc, argv)
     }
 
   /* initialize the random number generator */
-  //      srand( (n=(unsigned int) clock()));  
-  srand (1084515760+(13*rank_global));
+  /* JM 1503 -- Sometimes it is useful to vary the random number seed. 
+     Default is fixed, but will vary with different processor numbers */
+  /* We don't want to run the same photons each cycle in zeus mode, so 
+     everytime we are using zeus we also set to use the clock */
+  if ( (modes.rand_seed_usetime == 1) || (modes.zeus_connect == 1) )
+    {
+      n=(unsigned int) clock()*(rank_global+1);
+  	  srand(n); 
+  	}
+  else 
+    srand (1084515760+(13*rank_global));
 
   /* 68b - 0902 - ksl - Start with photon history off */
 
@@ -1249,7 +1274,17 @@ main (argc, argv)
 
 
       /* Calculate and store the amount of heating of the disk due to radiation impinging on the disk */
+	/* We only want one process to write to the file */
+#ifdef MPI_ON
+      if (rank_global == 0)
+      {
+#endif
       qdisk_save (files.disk, ztot);
+	  
+#ifdef MPI_ON
+      }
+      MPI_Barrier(MPI_COMM_WORLD);
+#endif
 
 /* Completed writing file describing disk heating */
 
@@ -1260,25 +1295,6 @@ main (argc, argv)
 /* This step shoudl be MPI_parallelised too */
 
       wind_update (w);
-
-/* In a diagnostic mode save the wind file for each cycle (from thread 0) */
-
-      if (modes.keep_ioncycle_windsaves)
-	{
-	  strcpy (dummy, "");
-	  sprintf (dummy, "python%02d.wind_save", geo.wcycle);
-
-#ifdef MPI_ON
-	  if (rank_global == 0)
-	  {
-#endif
-	  wind_save (dummy);
-#ifdef MPI_ON
-          }
-#endif
-	  Log ("Saved wind structure in %s\n", dummy);
-	}
-
 
       Log ("Completed ionization cycle %d :  The elapsed TIME was %f\n",
 	   geo.wcycle, timer ());
@@ -1301,13 +1317,13 @@ main (argc, argv)
 #endif
       spectrum_summary (files.wspec, "w", 0, 6, 0, 1., 0);
       spectrum_summary (files.lspec, "w", 0, 6, 0, 1., 1);	/* output the log spectrum */
-
+      phot_gen_sum (files.phot, "w");	/* Save info about the way photons are created and absorbed
+					   by the disk */
 #ifdef MPI_ON
       }
       MPI_Barrier(MPI_COMM_WORLD);
 #endif
-      phot_gen_sum (files.phot, "w");	/* Save info about the way photons are created and absorbed
-					   by the disk */
+
 
       /* Save everything after each cycle and prepare for the next cycle 
          JM1304: moved geo.wcycle++ after xsignal to record cycles correctly. First cycle is cycle 0. */
@@ -1328,7 +1344,18 @@ main (argc, argv)
 #endif
       wind_save (files.windsave);
       Log_silent ("Saved wind structure in %s after cycle %d\n", files.windsave,
-	   geo.wcycle);
+	               geo.wcycle);
+ /* In a diagnostic mode save the wind file for each cycle (from thread 0) */
+
+       if (modes.keep_ioncycle_windsaves)
+ 	{
+ 	  strcpy (dummy, "");
+ 	  sprintf (dummy, "python%02d.wind_save", geo.wcycle);
+	  wind_save (dummy);
+      Log ("Saved wind structure in %s\n", dummy);
+ 	}
+	   
+	   
 #ifdef MPI_ON
       }
       MPI_Barrier(MPI_COMM_WORLD);
@@ -1533,9 +1560,14 @@ main (argc, argv)
 
 
 /* XXXX -- END CYCLE TO CALCULATE DETAILED SPECTRUM */
-
+#ifdef MPI_ON    
+      if (rank_global == 0)
+      {
+#endif
   phot_gen_sum (files.phot, "a");
-
+#ifdef MPI_ON
+      }
+#endif
 /* 57h - 07jul -- ksl -- Write out the freebound information */
 
 #ifdef MPI_ON
@@ -1909,6 +1941,8 @@ get_spectype (yesno, question, spectype)
 	*spectype = SPECTYPE_POW;	// power law
       else if (stype == 4)
 	*spectype = SPECTYPE_CL_TAB;
+      else if (stype == 5)
+	*spectype = SPECTYPE_BREM;
       else
 	{
 	  if (geo.wind_type == 2)
@@ -2128,6 +2162,9 @@ int init_advanced_modes()
   write_atomicdata = 0;               // print out summary of atomic data 
   modes.quit_after_inputs = 0;		  // testing mode which quits after reading in inputs
   modes.fixed_temp = 0;               // do not attempt to change temperature - used for testing
+  modes.zeus_connect = 0;             // connect with zeus
+  modes.rand_seed_usetime = 0;		  // default random number seed is fixed, not based on time
+  
   //note this is defined in atomic.h, rather than the modes structure 
 
 

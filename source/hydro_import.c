@@ -3,14 +3,15 @@
 
 double hydro_r_cent[MAXHYDRO];
 double hydro_r_edge[MAXHYDRO];
-double hydro_dr_cent[MAXHYDRO];
-double hydro_dr_edge[MAXHYDRO];
 double hydro_theta_cent[MAXHYDRO];
 double hydro_theta_edge[MAXHYDRO];
-double hydro_dtheta_cent[MAXHYDRO];
-double hydro_dtheta_edge[MAXHYDRO];
 int ihydro_r, ihydro_theta, j_hydro_thetamax, ihydro_mod;
 double hydro_thetamax; //The angle at which we want to truncate the theta grid
+double v_r_input[MAXHYDRO*MAXHYDRO];
+double v_theta_input[MAXHYDRO*MAXHYDRO];
+double v_phi_input[MAXHYDRO*MAXHYDRO];
+double rho_input[MAXHYDRO*MAXHYDRO];
+double temp_input[MAXHYDRO*MAXHYDRO];
 
 typedef struct hydro_mod
 {
@@ -121,7 +122,7 @@ get_hydro_wind_params ()
 
 
   Log
-    ("Creating a wind model using a Hydro calculatioon\n");
+    ("Creating a wind model using a Hydro calculation\n");
 
   get_hydro ();
  // geo.wind_rmin = 8.7e8;	/*Radius where wind begins */
@@ -141,7 +142,8 @@ get_hydro_wind_params ()
   Log ("rmax=%e\n",geo.rmax);
   geo.wind_rho_min = 0.0;  //Set wind_rmin 0.0, otherwise wind cones dont work properly 
   Log ("rho_min=%e\n",geo.wind_rho_min);
-  geo.wind_rho_max = geo.rmax;  //This is the outer edge of the
+  geo.wind_rho_max = 0.0;
+	  //geo.rmax;  //This is the outer edge of the
   Log ("rho_max=%e\n",geo.wind_rho_max);
   geo.wind_thetamin = hydro_theta_edge[0];
   Log ("theta_min=%e\n",geo.wind_thetamin);
@@ -214,16 +216,15 @@ get_hydro ()
     }
 
 //	Log ("Hydro datafile = %s\n",datafile);
+ 	hydro_thetamax=89.9;
 
-  	hydro_thetamax=89.9;
+  rddoub ("Hydro_thetamax(degrees - negative means no maximum)", &hydro_thetamax);
 
-
-  rddoub ("Hydro_thetamax(degrees:negative_means_no_maximum)", &hydro_thetamax);
-
-  //If we have set the maximum angle to a negaive value, we mean that we dont want to restrict.
+  //If we have set the maximum anle to a negaive value, we mean that we dont want to restrict.
   if (hydro_thetamax < 0.0) hydro_thetamax=VERY_BIG;
   hydro_thetamax=hydro_thetamax/RADIAN;
   
+
 
 
   ihydro_r = 0;
@@ -253,14 +254,14 @@ get_hydro ()
 			exit (0);
 			}
 		// read read the r and theta coordinates into arrays
-		hydro_r_edge[i] = r_edge;
+		    hydro_r_edge[i] = r_edge;
       		hydro_r_cent[i] = r;
       		hydro_theta_cent[j] = theta;
       		hydro_theta_edge[j] = theta_edge;
 		//keep track of how many r and theta cells there are		
 		if (j>ithetamax) ithetamax=j;
 		if (i>irmax) irmax=i;
-		//If the value of theta in this cell, the edge, is greater than out theta_max, we want to make a note.
+		//If the value of theta in this cell, the edge, is greater than our theta_max, we want to make a note.
     		if (hydro_theta_edge[j] > hydro_thetamax && hydro_theta_edge[j - 1] <= hydro_thetamax)
 			{
 	  		j_hydro_thetamax = j - 1;
@@ -276,12 +277,15 @@ get_hydro ()
  			density above the disk */
 			rho=hydro_ptr[i * MAXHYDRO + j_hydro_thetamax].rho;
 			}
-		hydro_ptr[i * MAXHYDRO + j].temp = temp;	
+		    hydro_ptr[i * MAXHYDRO + j].temp = temp;	
           	hydro_ptr[i * MAXHYDRO + j].rho = rho;
 //			printf ("input rho %e temp %e vr %e vtheta %e vphi %e\n",rho,temp,vr,vtheta,vphi);
-	  	hydro_ptr[i * MAXHYDRO + j].v[0] = vr;
-	  	hydro_ptr[i * MAXHYDRO + j].v[1] = vtheta;
-	  	hydro_ptr[i * MAXHYDRO + j].v[2] = vphi;
+		  	rho_input[i * MAXHYDRO + j] = rho;
+		  	temp_input[i * MAXHYDRO + j] = temp;
+
+	  	v_r_input[i * MAXHYDRO + j] = vr;
+	  	v_theta_input[i * MAXHYDRO + j] = vtheta;
+	  	v_phi_input[i * MAXHYDRO + j] = vphi;
     		}
 	}
    }
@@ -294,7 +298,7 @@ get_hydro ()
 	ihydro_theta=ithetamax;
 	geo.wind_thetamax=90. / RADIAN;
 	hydro_thetamax=90.0/RADIAN;
-	MDIM = geo.mdim = ihydro_theta+1;
+	MDIM = geo.mdim = ihydro_theta+2;
 	}
   else
 	{	
@@ -303,10 +307,13 @@ get_hydro ()
 	geo.wind_thetamax=hydro_thetamax;
 	MDIM = geo.mdim = ihydro_theta+2;
 	}
-
-
-
-
+	/*
+	for (i=0;i<MDIM;i++)
+	{
+		printf ("NSH i=%i theta_edge=%f theta_cen=%f\n",i,hydro_theta_edge[i]*RADIAN,hydro_theta_cent[i]*RADIAN);
+	}
+	printf ("NSH6 geo.wind_thetamax=%f tho_max=%f\n",geo.wind_thetamax,geo.wind_rho_max);
+*/	
 
   if (hydro_r_edge[0] < geo.rstar)
  	{
@@ -324,8 +331,16 @@ get_hydro ()
  
 	geo.coord_type=RTHETA; //At the moment we only deal with RTHETA - in the future we might want to do some clever stuff
 	NDIM = geo.ndim = ihydro_r+3; //We need an inner radial cell to bridge the star and the inside of the wind, and an outer cell
-
-
+	/*
+	for (i=0;i<MDIM;i++)
+	{
+		printf ("hydro_grid i=%i theta_edge=%f theta_cen=%f\n",i,hydro_theta_edge[i]*RADIAN,hydro_theta_cent[i]*RADIAN);
+	}
+	for (i=0;i<NDIM;i++)
+	{
+		printf ("hydro_grid i=%i r_edge=%f r_cen=%f\n",i,hydro_r_edge[i],hydro_r_cent[i]);
+	}
+*/
 
   return (0);
 }
@@ -361,7 +376,7 @@ hydro_velocity (x, v)
   int im, jm;
   double f1, f2;
   double r, theta;
-  double vr, vtheta, vphi;
+  double v_r_interp, v_theta_interp, v_phi_interp;
   double speed;
   double xxx;
 //printf ("Proga_velocity x=%e,%e,%e, v=%e,%e,%e ",x[0],x[1],x[2],v[0],v[1],v[2]);
@@ -381,135 +396,35 @@ hydro_velocity (x, v)
   else
     theta = asin (xxx);
 
- // printf (" r=%e, theta=%f\n",r,theta*RADIAN);
-
-
-
 
 
  // printf ("Proga_theta x %.2g %.2g %.2g  -> r= %.2g theta = %.5g\n", x[0], x[1], x[2], r,theta);
   im = jm = ii = jj = 0;
+  f1=f2=0.0;
+hydro_frac (r,hydro_r_cent,ihydro_r,&im,&ii,&f1);
+hydro_frac (theta,hydro_theta_cent,ihydro_theta,&jm,&jj,&f2);
+v_r_interp=hydro_interp_value(v_r_input,im,ii,jm,jj,f1,f2);		
+
+im = jm = ii = jj = 0;
+f1=f2=0.0;
+
+hydro_frac (r,hydro_r_cent,ihydro_r,&im,&ii,&f1);
+hydro_frac (theta,hydro_theta_cent,ihydro_theta,&jm,&jj,&f2);
 
 
+        v_theta_interp=hydro_interp_value(v_theta_input,im,ii,jm,jj,f1,f2);	
+		
+im = jm = ii = jj = 0;
+f1=f2=0.0;
+hydro_frac (r,hydro_r_cent,ihydro_r,&im,&ii,&f1);
+hydro_frac (theta,hydro_theta_cent,ihydro_theta,&jm,&jj,&f2);	
+v_phi_interp=hydro_interp_value(v_phi_input,im,ii,jm,jj,f1,f2);		
 
-  while (hydro_r_cent[ii] < r && ii <= ihydro_r)	//Search through radius array, until array value is greater than your value of r
-    ii++;
-  while (hydro_theta_cent[jj] < theta && jj <= ihydro_theta)	//Search through theta array until value is greater than your value of theta
-    jj++;
+//printf ("TEST7 %e cos %e sin %e\n",theta,cos(theta),sin(theta));
 
-
-
-  if (ii > 0 && ii < ihydro_r)
-    {				//r is in the normal range
-
-      f1 = (r - hydro_r_cent[ii - 1]) / (hydro_r_cent[ii] - hydro_r_cent[ii - 1]);	//Work out fractional position in the ii-1th radial bin where you want to be
-      im = ii - 1;		//This is the radial bin below your value of r
-
-    }
-  else if (ii == ihydro_r)
-    {				// r is greater than anything in Proga's model
-
-      f1 = 1;			//If we are outside the model set fractional position to 1
-      im = ii - 1;		//And the bin to the outermost
-    }
-  else
-    {
-      f1 = 1;			//Otherwise, we must be inide the innermost bin, so again, set fration to 1
-      im = 0;			// And the bin to the innermost. Lines below to the same for theta.
-    }
-//	printf ("f1=%e im=%i ",f1,im);
-  if (jj > 0 && jj < ihydro_theta)
-    {				// theta is inside the normal range
-
-      f2 =
-	(theta - hydro_theta_cent[jj - 1]) / (hydro_theta_cent[jj] -
-					 hydro_theta_cent[jj - 1]);
-      jm = jj - 1;
-    }
-  else if (jj == ihydro_theta)
-    {				//theta is more than the maximum theta
-
-      f2 = 1;
-      jm = jj - 1;
-    }
-  else
-    {				//theta is less than the expected theta
-
-      f2 = 1;
-      jm = 0;
-    }
-//printf ("f2=%e jm=%i \n",f1,im);
-//printf ("Cells to use are %i %i %i %i\n",im * MAXHYDRO + jm,im * MAXHYDRO + jj,ii*MAXHYDRO+jm,ii*MAXHYDRO+jj);
-//printf ("v_theta= %e %e %e %e\n",hydro_ptr[im * MAXHYDRO + jm].v[1],hydro_ptr[im * MAXHYDRO + jj].v[1],hydro_ptr[ii
-//									    *
-//									    MAXHYDRO
-//									    +
-//									    jm].v
-//								  [1],hydro_ptr[ii
-//									    *
-//									    MAXHYDRO
-//									    +
-//									    jj].v
-//								  [1]);
-  vr =
-    (1. - f1) * ((1. - f2) * hydro_ptr[im * MAXHYDRO + jm].v[0] +
-		 f2 * hydro_ptr[im * MAXHYDRO + jj].v[0]) + f1 * ((1. -
-								   f2) *
-								  hydro_ptr[ii
-									    *
-									    MAXHYDRO
-									    +
-									    jm].v
-								  [0] +
-								  f2 *
-								  hydro_ptr[ii
-									    *
-									    MAXHYDRO
-									    +
-									    jj].v
-								  [0]);
-
-  vtheta =
-    (1. - f1) * ((1. - f2) * hydro_ptr[im * MAXHYDRO + jm].v[1] +
-		 f2 * hydro_ptr[im * MAXHYDRO + jj].v[1]) + f1 * ((1. -
-								   f2) *
-								  hydro_ptr[ii
-									    *
-									    MAXHYDRO
-									    +
-									    jm].v
-								  [1] +
-								  f2 *
-								  hydro_ptr[ii
-									    *
-									    MAXHYDRO
-									    +
-									    jj].v
-								  [1]);
-
-  vphi =
-    (1. - f1) * ((1. - f2) * hydro_ptr[im * MAXHYDRO + jm].v[2] +
-		 f2 * hydro_ptr[im * MAXHYDRO + jj].v[2]) + f1 * ((1. -
-								   f2) *
-								  hydro_ptr[ii
-									    *
-									    MAXHYDRO
-									    +
-									    jm].v
-								  [2] +
-								  f2 *
-								  hydro_ptr[ii
-									    *
-									    MAXHYDRO
-									    +
-									    jj].v
-								  [2]);
-
-
-
-  v[0] = vr * sin (theta) - vtheta * cos (theta);
-  v[1] = vphi;
-  v[2] = vr * cos (theta) + vtheta * sin (theta);
+  v[0] = v_r_interp * sin (theta) + v_theta_interp * cos (theta);
+  v[1] = v_phi_interp;
+  v[2] = v_r_interp * cos (theta) - v_theta_interp * sin (theta);
 
   speed = sqrt (v[0] * v[0] + v[1] * v[1] * v[2] * v[2]);
 
@@ -529,68 +444,24 @@ hydro_rho (x)
   double length ();
   int ii, jj;
   int im, jm;
-  double r, theta, rrho;
+  double r, theta;
+  double rrho;
   double f1, f2;
   r = length (x);
   theta = asin (sqrt (x[0] * x[0] + x[1] * x[1]) / r);
-//     printf ("x %.2g %.2g %.2g  -> r= %.2g theta = %.2g ", x[0], x[1], x[2], r,        theta);
-
-  if (r > hydro_r_cent[ihydro_r])
-    {
-      Log (" r outside hydro grid in hydro_rho\n");
-      rrho = 1.e-23;
-      return (rrho);
-    }
-
-  im = jm = ii = jj = 0;
-  while (hydro_r_cent[ii] < r && ii < ihydro_r)
-    ii++;
-  while (hydro_theta_cent[jj] < theta && jj < ihydro_theta)
-    jj++;
-
-  if (ii > 0)
-    {
-      f1 = (r - hydro_r_cent[ii - 1]) / (hydro_r_cent[ii] - hydro_r_cent[ii - 1]);
-      im = ii - 1;
-    }
-  else
-    f1 = 1;
-
-  if (jj > 0)
-    {
-      f2 =
-	(theta - hydro_theta_cent[jj - 1]) / (hydro_theta_cent[jj] -
-					 hydro_theta_cent[jj - 1]);
-      jm = jj - 1;
-    }
-  else
-    f2 = 1;
+//       printf ("NSH hydro_rho x %e %e %e  -> r= %e theta = %f ", x[0], x[1], x[2], r,        theta);
 
 
-//rrho=hydro_ptr[ii*MAXHYDRO+jj].rho;
-//  printf ("Data rho=%e\n",hydro_ptr[im * MAXHYDRO + jm].rho);
-  rrho =
-    (1. - f1) * ((1. - f2) * hydro_ptr[im * MAXHYDRO + jm].rho +
-		 f2 * hydro_ptr[im * MAXHYDRO + jj].rho) + f1 * ((1. -
-								  f2) *
-								 hydro_ptr[ii
-									   *
-									   MAXHYDRO
-									   +
-									   jm].rho
-								 +
-								 f2 *
-								 hydro_ptr[ii
-									   *
-									   MAXHYDRO
-									   +
-									   jj].rho);
-//  printf ("Rho= %e\n",rrho);
+  hydro_frac (r,hydro_r_cent,ihydro_r,&im,&ii,&f1);
+  hydro_frac (theta,hydro_theta_cent,ihydro_theta,&jm,&jj,&f2);
+
+  		rrho=hydro_interp_value(rho_input,im,ii,jm,jj,f1,f2);		
+
 
   if (rrho < 1e-23)
     rrho = 1e-23;
 
- //  printf ("Grid point %d %d rho %e f1=%f f2=%f\n", ii, jj, rrho,f1,f2);
+//   printf ("Grid point %d %d rho %e f1=%f f2=%f\n", ii, jj, rrho,f1,f2);
 
   return (rrho);
 }
@@ -628,64 +499,25 @@ hydro_temp (x)
   double f1, f2;
   r = length (x);
   theta = asin (sqrt (x[0] * x[0] + x[1] * x[1]) / r);
-  // printf ("x %.2g %.2g %.2g  -> r= %.2g theta = %.2g\n", x[0], x[1], x[2], r,
-//        theta);
-
-  if (r > hydro_r_cent[ihydro_r])
-    {
-      Log (" r outside hydro grid in hydro_temp\n");
-      temp = 1e4;
-      return (temp);
-    }
-
-  im = jm = ii = jj = 0;
-  while (hydro_r_cent[ii] < r && ii < ihydro_r)
-    ii++;
-  while (hydro_theta_cent[jj] < theta && jj < ihydro_theta)
-    jj++;
-
-  if (ii > 0)
-    {
-      f1 = (r - hydro_r_cent[ii - 1]) / (hydro_r_cent[ii] - hydro_r_cent[ii - 1]);
-      im = ii - 1;
-    }
-  else
-    f1 = 1;
-
-  if (jj > 0)
-    {
-      f2 =
-	(theta - hydro_theta_cent[jj - 1]) / (hydro_theta_cent[jj] -
-					 hydro_theta_cent[jj - 1]);
-      jm = jj - 1;
-    }
-  else
-    f2 = 1;
 
 
-//rrho=hydro_ptr[ii*MAXHYDRO+jj].rho;
 
-  temp =
-    (1. - f1) * ((1. - f2) * hydro_ptr[im * MAXHYDRO + jm].temp +
-		 f2 * hydro_ptr[im * MAXHYDRO + jj].temp) + f1 * ((1. -
-								   f2) *
-								  hydro_ptr[ii
-									    *
-									    MAXHYDRO
-									    +
-									    jm].temp
-								  +
-								  f2 *
-								  hydro_ptr[ii
-									    *
-									    MAXHYDRO
-									    +
-									    jj].temp);
+    hydro_frac (r,hydro_r_cent,ihydro_r,&im,&ii,&f1);
+    hydro_frac (theta,hydro_theta_cent,ihydro_theta,&jm,&jj,&f2);
 
-  if (temp < 1e4)		//Set a lower limit.
-    temp = 1e4;
+    temp=hydro_interp_value(temp_input,im,ii,jm,jj,f1,f2);
 
 
+	/* NSH 16/2/29 - removed lower limit - set this in the hydro translation software or hydro model */
+
+//  if (temp < 1e4)		//Set a lower limit.
+//    temp = 1e4;
+  
+
+  
+
+//  if (temp<113000)
+//	  printf ("TEST8 r=%e theta=%e\n",r,theta);
 
   return (temp);
 }
@@ -753,24 +585,27 @@ rtheta_make_hydro_grid (w)
  	  	w[n].r = hydro_r_edge[i-1]; //The -1 is to take account of the fact that i=0 cell is the inner part of the geometry inside the wind
 	  	w[n].rcen = hydro_r_cent[i-1];
 		}
+		w[n].dr=2.0*(w[n].rcen-w[n].r);
 		dtheta=2.0*(hydro_theta_cent[j]-hydro_theta_edge[j]);
-	
 
 
-//		printf ("dtheta=%e test = %e, test2= %e, hydro_thetamax = %e j = %i ihydro_theta=%i\n",dtheta,hydro_theta_cent[j]+(dtheta/2.0),hydro_theta_cent[j]-(dtheta/2.0), hydro_thetamax,j,ihydro_theta);
+//		printf ("dtheta=%e outer_edge = %e, centre = %e, inner_edge= %e, hydro_thetamax = %e j = %i ihydro_theta=%i\n",dtheta,hydro_theta_cent[j]+(dtheta/2.0),hydro_theta_cent[j],hydro_theta_cent[j]-(dtheta/2.0), hydro_thetamax,j,ihydro_theta);
 	  if (hydro_theta_cent[j]+(dtheta/2.0) > hydro_thetamax && hydro_theta_cent[j]-(dtheta/2.0) < hydro_thetamax ) //This cell bridges the boundary - we reset it so the lower edge is at the disk boundary
 		{
-//		printf ("We have reached the disk %e > %e\n",hydro_theta_cent[j]+(hydro_dtheta_cent[j]/2.0), hydro_thetamax);
+		Log ("We have reached the disk %e > %e\n",(hydro_theta_cent[j]+(dtheta/2.0))*RADIAN, hydro_thetamax*RADIAN);
 		theta=hydro_theta_edge[j];
 		thetacen=((hydro_thetamax+theta)/2.0);
-//		printf ("Setting theta=%e thetacen=%e\n",theta,thetacen);
+		Log ("Resetting from theta=%e thetacen=%e to theta=%e thetacen=%e outer=%e\n",hydro_theta_edge[j],
+		hydro_theta_cent[j],theta,thetacen,(theta+2*(thetacen-theta)));
 		}
 		
-	  else if (j >= ihydro_theta)  //We are setting up a cell past where there is any data
+	  else if (j > ihydro_theta)  //We are setting up a cell past where there is any data - this is our own ghost cell
 		{
-//		printf ("we are past ihydro_theta , %i, %i \n",j,ihydro_theta);
+		Log ("we are past ihydro_theta , %i, %i \n",j,ihydro_theta);
 		thetacen = hydro_thetamax; //Set the center and the edge to the maximum extent of the data/interest
 		theta = hydro_thetamax;
+		Log ("Setting theta=%e thetacen=%e\n",theta,thetacen);
+		
 		w[n].inwind = W_NOT_INWIND;
 		}
 	  else 
@@ -785,21 +620,23 @@ rtheta_make_hydro_grid (w)
 	  w[n].x[2] = w[n].r * cos (theta);
 	  w[n].xcen[0] = w[n].rcen * sin (thetacen);
 	  w[n].xcen[2] = w[n].rcen * cos (thetacen);
-//	  printf ("Cell %i r=%e, rcne=%e, theta=%f, thetacen=%f, x=%e, y=%e, z=%e, inwind=%i\n",n,w[n].r,w[n].rcen,w[n].theta,w[n].thetacen,w[n].x[0],w[n].x[1],w[n].x[2],w[n].inwind);
+	  w[n].dtheta=2.0*(w[n].thetacen-w[n].theta);
+	  
+//	  	  	  printf ("NSH1 Cell %i r=%e, rcne=%e, theta=%f, thetacen=%f, x=%e, y=%e, z=%e, inwind=%i\n",n,w[n].r,w[n].rcen,w[n].theta,w[n].thetacen,w[n].x[0],w[n].x[1],w[n].x[2],w[n].inwind);
 
 	}
     }
-/*
+/*	
 for (i = 0; i < NDIM; i++)
 	{
 	wind_ij_to_n (i, 0, &n);
-	printf ("i=%i, n=%i, r=%e, rcen=%e\n",i,n,w[n].r,w[n].rcen);
+//	printf ("hydro_grid i=%i, ihydro_r=%i n=%i, r=%e, rcen=%e\n",i,ihydro_r,n,w[n].r,w[n].rcen);
 	}
 
 for (i = 0; i < MDIM; i++)
 	{
 	wind_ij_to_n (0, i, &n);
-	printf ("j=%i,  ihydrotheta=%i, n=%i, theta=%f, thetacen=%f\n",i,ihydro_theta,n,w[n].theta,w[n].thetacen);
+//	printf ("hydro_grid j=%i,  ihydrotheta=%i, n=%i, theta=%f, thetacen=%f\n",i,ihydro_theta,n,w[n].theta,w[n].thetacen);
 	}
 */
 
@@ -877,22 +714,29 @@ rtheta_hydro_volumes (w)
 	  wind_ij_to_n (i, j, &n);
 	  if (w[n].inwind == W_ALL_INWIND)
 	    {
-
 	      rmin = wind_x[i];
-	      rmax = wind_x[i + 1];
+	      rmax = wind_x[i+1];
 	      thetamin = wind_z[j] / RADIAN;
-	      thetamax = wind_z[j + 1] / RADIAN;
+	      thetamax = wind_z[j+1] / RADIAN;
+		  
+		  
+		  
+		  
+		  
+//		printf ("NSH1 %i %i %i %e %e %f %f ",i,j,n,rmin,rmax,thetamin,thetamax);
 
 	      //leading factor of 2 added to allow for volume above and below plane (SSMay04)
 	      w[n].vol =
 		2. * 2. / 3. * PI * (rmax * rmax * rmax -
 				     rmin * rmin * rmin) * (cos (thetamin) -
 							    cos (thetamax));
+//		  printf ("NSH_vols %i %i rmin %e rmax %e thetamin %e thatmax %e vol %e\n",i,j,rmin,rmax,thetamin,thetamax,w[n].vol);
 	      if (w[n].vol == 0.0)
 		{
 		Log ("Found wind cell (%i) with no volume (%e) in wind, resetting\n",n,w[n].vol);
 		w[n].inwind = W_NOT_INWIND;
 		}
+//		printf ("%e \n",w[n].vol);
 	     }
 	  else
 		w[n].vol=0.0;
@@ -902,3 +746,175 @@ rtheta_hydro_volumes (w)
 }
 
 
+int
+	hydro_frac (coord,coord_array,imax,cell1,cell2,frac)
+		double coord;
+		double coord_array[];
+		int imax;
+		int *cell1,*cell2;
+		double *frac;
+	{	
+		int ii;
+		ii=0;
+		*cell1=0;
+		*cell2=0;
+
+	    while (coord_array[ii] < coord && ii < imax)	//Search through array, until array value is greater than your coordinate
+	      ii++;
+
+
+	    
+
+
+
+
+//if (ii > 0 && ii < imax)
+
+    if (ii > imax)
+	    {				// r is greater than anything in Proga's model
+//  printf ("I DONT THINK WE CAN EVER GET HERE\n");
+	     *frac = 1;			//If we are outside the model set fractional position to 1
+      *cell1 = *cell2 = imax;		//And the bin to the outermost
+		return(0);
+	  }
+	  else if (ii==0)
+	    {
+    *frac = 1;			//Otherwise, we must be inside the innermost bin, so again, set fration to 1
+	    *cell1 = *cell2 = 0;			// And the bin to the innermost. Lines below to the same for theta.
+		 return(0);
+		 }
+ 		else if (ii>0)
+   {				//r is in the normal range
+
+     *frac = (coord - coord_array[ii - 1]) / (coord_array[ii] - coord_array[ii - 1]);	//Work out fractional position in the ii-1th radial bin where you want to be
+     *cell1 = ii - 1;		//This is the radial bin below your value of r
+	  *cell2 = ii;
+	  return(0);
+   }
+		 
+		 
+		 
+
+  return(0);
+}
+
+double
+	hydro_interp_value(array,im,ii,jm,jj,f1,f2)
+		double array[];
+		int im,ii; //the two cells surrounding the cell in the first dim (r)
+		int jm,jj; //the two cells surrounding the cell in the second dim (theta)
+		double f1,f2;  //the fraction between the two values in first and second dim
+	{	
+				double value;
+				double d1,d2;
+				
+//				printf ("TEST7b %i %i %i %i %e %e %e\n",im,ii,jm,jj,f1,f2,array[im * MAXHYDRO + jm]);
+
+				d1=array[im * MAXHYDRO + jm]+f1*(array[ii * MAXHYDRO + jm]-array[im * MAXHYDRO + jm]);
+				d2=array[im * MAXHYDRO + jj]+f1*(array[ii * MAXHYDRO + jj]-array[im * MAXHYDRO + jj]);
+				value=d1+f2*(d2-d1);
+//								printf ("TEST3 %e %e %e\n",d1,d2,value);
+				
+				
+			  
+				
+	
+
+//	    value =
+//    (1. - f1) * ((1. - f2) * array[im * MAXHYDRO + jm] + f2 * array[im * MAXHYDRO + jj]) + 
+//			 f1 *  ((1. - f2) * array[ii * MAXHYDRO + jm] + f2 * array[ii * MAXHYDRO + jj]);
+		return(value);
+	}
+	
+	
+	
+/***********************************************************
+                                       Southampton
+
+ Synopsis:
+	hydro_restart is a subrotine which permits a previous wind save 
+		file to be used in a hydro simulation. The density and temperature
+		for each cell are those from the hydro simulation. The ion fractions
+		are taken from the windsave file
+Arguments:		
+	none 
+ 
+Returns:
+ 
+Description:
+
+	
+	This sets up a restarted hydro model
+
+
+History:
+	16feb	nsh	80 -- Coded and debugged.
+
+
+**************************************************************/
+	
+	
+	
+	
+	
+	int 
+		hydro_restart()
+	{
+		int n,nion;
+		  int nwind;
+		    double x[3];
+			double old_density;
+		  WindPtr w;
+		  
+		    w = wmain;
+			geo.wind_type=3; //Temporarily set the wind type to hydro, so we can use the normal routines
+		  NDIM = ndim = geo.ndim;
+		  MDIM = mdim = geo.mdim;
+		  NDIM2 = NDIM * MDIM;
+		  for (n = 0; n < NDIM2; n++)
+		    {
+		      /* 04aug -- ksl -52 -- The next couple of lines are part of the changes
+		       * made in the program to allow more that one coordinate system in python 
+		       */
+
+        model_velocity (w[n].x, w[n].v);
+        model_vgrad (w[n].x, w[n].v_grad);
+	}
+    for (n = 0; n < NPLASMA; n++)
+      {
+	      nwind = plasmamain[n].nwind;
+	      stuff_v (w[nwind].xcen, x);
+		  old_density=plasmamain[n].rho;
+        plasmamain[n].rho = model_rho (x)/geo.fill;
+		plasmamain[n].t_r = plasmamain[n].t_e =hydro_temp (x);
+		  for (nion=0;nion<nions;nion++) //Change the absolute number densities, fractions remain the same
+		  {
+			 plasmamain[n].density[nion]=plasmamain[n].density[nion]*(plasmamain[n].rho/old_density);
+		 }
+		 plasmamain[n].ne = get_ne (plasmamain[n].density); //get the new electron density
+		 partition_functions (&plasmamain[n], 4);  //ensure the partition functions and level densities are correct
+//	 	if (plasmamain[n].nplasma==0)
+//	 	{
+//	   printf ("BLAH H1_new=%e H2_new=%e ne_new=%e\n ",plasmamain[n].density[0],plasmamain[n].density[1],plasmamain[n].ne);
+//	   printf ("H1 ground_new=%e",plasmamain[n].levden[ion[0].first_levden]);
+//	 }	 
+		 
+		 
+		 
+		 
+		  }
+		  plasmamain[n].ne = get_ne (plasmamain[n].density);  //we also need to update the electron density
+		  partition_functions (&plasmamain[n], 4);	/* WARNING fudge NSH 11/5/14 - this is as a test. We really need a better implementation
+							   of partition functions and levels for a power law illuminating spectrum. We found that
+							   if we didnt make this call, we would end up with undefined levels - which did really
+							   crazy things */
+		  
+		  
+		  
+		  
+		        
+			
+	geo.wind_type=2; //Set the windtype back to restart
+	
+		return(0);
+	}

@@ -2,7 +2,7 @@ Wind_type(0=SV,1=Sphere,2=Previous,3=Proga,4=Corona,5=knigge,6=homologous,7=yso,
 Atomic_data                       data/standard_sn_kurucz
 photons_per_cycle                             80000
 Ionization_cycles                               20
-spectrum_cycles                                 1
+spectrum_cycles                                 10
 Coord.system(0=spherical,1=cylindrical,2=spherical_polar,3=cyl_var)                   0
 Wind.dim.in.x_or_r.direction                     30
 Wind_ionization(0=on.the.spot,1=LTE,2=fixed,3=recalc_bb,5=recalc_pow,6=pairwise_bb,7=pairwise_pow,8=matrix_bb,9=matrix_pow)      3
