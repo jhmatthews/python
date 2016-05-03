@@ -417,6 +417,9 @@ get_matom_f (mode)
   /*This is the end of the update loop that is parallelised. We now need to exchange data between the tasks.
     This is done much the same way as in wind_update */
 #ifdef MPI_ON
+  /* JM Add an MPI Barrier here */
+  MPI_Barrier (MPI_COMM_WORLD);
+    
   for (n_mpi = 0; n_mpi < np_mpi_global; n_mpi++)
     {
       /* here we loop over the number of threads. If the thread is this thread then we pack the macromain information
@@ -487,6 +490,9 @@ get_matom_f (mode)
 	    }
 	}
     }  // end of parallelised section
+
+    /* add an MPI Barrier after unpacking stage */
+    MPI_Barrier (MPI_COMM_WORLD);
   #endif	
 
   } // end of if loop which controls whether to compute the emissivities or not 
