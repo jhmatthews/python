@@ -2,12 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include "log.h"
+#include "maps.h"
 #define LINELEN		256
 #define	OLD		100
 #define	NORMAL		1
 #define REISSUE		-199
-
-
 /***********************************************************
                                        Space Telescope Science Institute
 
@@ -538,6 +537,49 @@ rdstr (question, answer)
   return (query);
 }
 
+/* rdmap is a new function which reads a string mode from the command line
+   or parameter file and converts it to an integer mode to use in the code */
+int
+rdmap (question, answer, map)
+     char question[];
+     int *answer;
+     char map[MAX_MAPS][MAP_LINELENGTH];
+{
+  int query, i, query2;
+  char string_answer[LINELEN];
+  char long_question[LINELEN];
+
+  build_question(question, long_question, map);
+
+  query = rdstr(long_question, string_answer);
+  printf("%s\n\n", string_answer);
+
+  i = 0;
+
+  while (i < MAX_MAPS)
+  {
+  	query2 = strcmp(map[i], string_answer);
+
+  	printf("Searching %i %s %s %i\n", i, map[i], string_answer, query2);
+  	if (query2 == 0)
+  	{
+  	  *answer = i;
+  	  break;
+  	}
+  	i++;
+  }
+
+  if (i == MAX_MAPS)
+  {
+  	Error("Could not find mode %s for question %s\n", string_answer, question);
+  	exit(0);
+  }
+  else 
+  	printf ("%s   %s %i\n", question, string_answer, *answer);
+
+  return (query);
+}
+
 
 int
 rdchar (question, answer)
@@ -803,6 +845,26 @@ int rd_extra(firstword, answer, wordlength)
 }
 
 
+int
+build_question (question, long_question, map)
+    char question[LINELEN];
+    char long_question[LINELEN];
+    char map[MAX_MAPS][MAP_LINELENGTH];
+{
+  int i;
+  strcpy(long_question, question);
+  strcat(long_question, "(options: ");
+  for (i = 0; i < MAX_MAPS; i++)
+    {
+      if (strlen(map[i]) > 0)
+      {
+        strcat(long_question, map[i]);
+        strcat(long_question, ", ");
+      }
+    }
+  strcat(long_question, ")");
 
+  return 0;
+}
 
 

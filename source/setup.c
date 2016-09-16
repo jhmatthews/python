@@ -1542,3 +1542,14 @@ get_standard_care_factors ()
     }
   return (0);
 }
+
+
+int init_maps()
+{
+  strcpy(maps.ion_modes[IONMODE_ML93_FIXTE],"on_the_spot");
+  strcpy(maps.ion_modes[IONMODE_LTE],"lte");
+  strcpy(maps.ion_modes[IONMODE_MATRIX_BB],"matrix_bb");
+  strcpy(maps.ion_modes[IONMODE_MATRIX_SPECTRALMODEL],"matrix_ion");
+
+  return 0;
+}

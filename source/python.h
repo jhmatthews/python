@@ -14,6 +14,7 @@ int verbosity;			/* verbosity level. 0 low, 10 is high */
    declare deparately from templates. This is because some functions
    only use log.h and don't use python.h due to repeated definitions */
 #include "log.h"
+#include "maps.h"   
 
 /* In python_43 the assignment of the WindPtr size has been moved from a fixed
 value determined by values in python.h to a values which are adjustable from
@@ -1294,3 +1295,4 @@ files;
    whether it has already calculated the matom emissivities or not. */
 #define CALCULATE_MATOM_EMISSIVITIES 0
 #define USE_STORED_MATOM_EMISSIVITIES 1
+

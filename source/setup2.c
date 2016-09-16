@@ -900,9 +900,10 @@ init_ionization ()
   // XXX  I is unclear to me why all of this dwon to the next XXX is not moved to a single subroutine.  It all
   // pertains to how the radiatiate tranfer is carreid out
 
-  rdint
-    ("Wind_ionization(0=on.the.spot,1=LTE,2=fixed,3=recalc_bb,6=pairwise_bb,7=pairwise_pow,8=matrix_bb,9=matrix_pow)",
-     &geo.ioniz_mode);
+  init_maps();
+  rdmap
+    ("Wind_ionization",
+     &geo.ioniz_mode, maps.ion_modes);
 
   if (geo.ioniz_mode == IONMODE_FIXED)
     {

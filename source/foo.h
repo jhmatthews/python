@@ -477,6 +477,7 @@ double setup_dfudge(void);
 int setup_windcone(void);
 int setup_created_files(void);
 int get_standard_care_factors(void);
+int init_maps(void);
 /* photo_gen_matom.c */
 double get_kpkt_f(void);
 double get_matom_f(int mode);
