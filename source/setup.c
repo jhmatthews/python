@@ -536,6 +536,7 @@ get_radiation_sources ()
   get_spectype (geo.bl_radiation,
 		"Rad_type_for_bl(0=bb,1=models,3=pow)_to_make_wind",
 		&geo.bl_ion_spectype);
+  
   get_spectype (geo.agn_radiation,
 		"Rad_type_for_agn(0=bb,1=models,3=power_law,4=cloudy_table,5=bremsstrahlung)_to_make_wind",
 		&geo.agn_ion_spectype);
@@ -1545,11 +1546,20 @@ get_standard_care_factors ()
 
 
 int init_maps()
-{
-  strcpy(maps.ion_modes[IONMODE_ML93_FIXTE],"on_the_spot");
-  strcpy(maps.ion_modes[IONMODE_LTE],"lte");
-  strcpy(maps.ion_modes[IONMODE_MATRIX_BB],"matrix_bb");
-  strcpy(maps.ion_modes[IONMODE_MATRIX_SPECTRALMODEL],"matrix_ion");
+{  
+  strcpy(maps.ion_modes[IONMODE_MATRIX_BB],"bb");
+  strcpy(maps.ion_modes[IONMODE_MATRIX_SPECTRALMODEL],"smod");
+
+  if (modes.iadvanced)
+  {
+    strcpy(maps.ion_modes[IONMODE_ML93_FIXTE],"on_the_spot");
+    strcpy(maps.ion_modes[IONMODE_LTE],"lte");
+    strcpy(maps.ion_modes[IONMODE_FIXED],"fixed");
+    strcpy(maps.ion_modes[IONMODE_ML93],"ml93");
+    strcpy(maps.ion_modes[IONMODE_LTE_SIM],"lte_sim");
+    strcpy(maps.ion_modes[IONMODE_PAIRWISE_ML93],"ml93_var_temp");
+    strcpy(maps.ion_modes[IONMODE_PAIRWISE_SPECTRALMODEL],"smod_var_temp");
+  }
 
   return 0;
 }

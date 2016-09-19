@@ -287,6 +287,8 @@ main (argc, argv)
 
   restart_stat = parse_command_line (argc, argv);
 
+  init_maps();		// initialise the maps used to deal with string inputs from the parameter file 
+
   /* If the restart flag has been set, we check to see if a windsave file exists.  If it doues we will 
      we will restart from that point.  If the windsave file does not exist we will start from scratch */
 
@@ -378,7 +380,7 @@ main (argc, argv)
 	     &geo.system_type);
 
       init_geo ();   /* Set values in the geometry structure and the domain stucture to reasonable starting
-			values */      
+						values */      
 
       if (geo.system_type == SYSTEM_TYPE_PREVIOUS)
 	{

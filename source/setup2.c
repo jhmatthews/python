@@ -182,7 +182,7 @@ init_geo ()
   geo.tstar = 40000;
   geo.twind = 40000;
 
-  geo.ioniz_mode = IONMODE_ML93;	/* default is on the spot and find the best t */
+  geo.ioniz_mode = IONMODE_MATRIX_SPECTRALMODEL;	/* default is the "best mode", i.e. spectral model of mean intensity */
   geo.line_mode = 3;		/* default is escape probabilites */
 
   geo.star_radiation = 1;	/* 1 implies star will radiate */
@@ -900,7 +900,6 @@ init_ionization ()
   // XXX  I is unclear to me why all of this dwon to the next XXX is not moved to a single subroutine.  It all
   // pertains to how the radiatiate tranfer is carreid out
 
-  init_maps();
   rdmap
     ("Wind_ionization",
      &geo.ioniz_mode, maps.ion_modes);

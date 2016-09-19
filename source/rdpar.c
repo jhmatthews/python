@@ -537,7 +537,7 @@ rdstr (question, answer)
   return (query);
 }
 
-/* rdmap is a new function which reads a string mode from the command line
+/* JM 1609 -- rdmap is a new function which reads a string mode from the command line
    or parameter file and converts it to an integer mode to use in the code */
 int
 rdmap (question, answer, map)
@@ -551,8 +551,12 @@ rdmap (question, answer, map)
 
   build_question(question, long_question, map);
 
+  /* the initial integer default is stored in *answer.
+     this means that we want to print the string that maps
+     to that integer for the user as default */
+  strcpy(string_answer, map[*answer]);
+
   query = rdstr(long_question, string_answer);
-  printf("%s\n\n", string_answer);
 
   i = 0;
 
@@ -560,7 +564,6 @@ rdmap (question, answer, map)
   {
   	query2 = strcmp(map[i], string_answer);
 
-  	printf("Searching %i %s %s %i\n", i, map[i], string_answer, query2);
   	if (query2 == 0)
   	{
   	  *answer = i;
@@ -852,8 +855,10 @@ build_question (question, long_question, map)
     char map[MAX_MAPS][MAP_LINELENGTH];
 {
   int i;
+
   strcpy(long_question, question);
   strcat(long_question, "(options: ");
+
   for (i = 0; i < MAX_MAPS; i++)
     {
       if (strlen(map[i]) > 0)

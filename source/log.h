@@ -10,7 +10,7 @@ int rdpar_store_record(char *name, char *value);
 int rdpar_save(FILE *file_ptr);
 int message(char string[]);
 int rdstr(char question[], char answer[]);
-int rdmap(char question[], int *answer, char map[10][30]);
+int rdmap(char question[], int *answer, char map[10][160]);
 int rdchar(char question[], char *answer);
 int rdint(char question[], int *answer);
 int rdint2(char question[], int *answer1, int *answer2);
@@ -21,7 +21,7 @@ int get_root(char root[], char total[]);
 int rdpar_set_mpi_rank(int rank);
 int rdpar_set_verbose(int vlevel);
 int rd_extra(char firstword[], double *answer, int *wordlength);
-int build_question(char question[256], char long_question[256], char map[10][30]);
+int build_question(char question[256], char long_question[256], char map[10][160]);
 /* log.c */
 int Log_init(char *filename);
 int Log_append(char *filename);
