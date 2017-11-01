@@ -309,7 +309,6 @@ define_wind ()
   /* Allocate space for the plasma arrays */
 
   calloc_plasma (NPLASMA);
-  printf ("GOING TO CALLOC PLASMA\n");
   calloc_dyn_plasma (NPLASMA);  /*78a NSH 1407 - allocate space for dynamically sized arrays */
   create_maps (CHOICE);         /* Populate the maps from plasmamain & wmain */
 

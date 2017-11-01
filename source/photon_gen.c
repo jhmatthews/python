@@ -692,7 +692,7 @@ star_init (freqmin, freqmax, ioniz_or_final, f)
 {
 //  double lumstar;
   double r,tstar, log_g;
-  double emit, emittance_bb (), emittance_continuum ();
+  double emit;
   int spectype;
 
 /* 57g -- 07jul -- fixed error calculating gravity of star that has been here forever -- ksl */
@@ -713,7 +713,7 @@ star_init (freqmin, freqmax, ioniz_or_final, f)
 
   if (spectype >= 0)
   {
-    emit = emittance_continuum (spectype, freqmin, freqmax, tstar, log_g);
+    emit = emittance_continuum (spectype, freqmin, freqmax, tstar, log_g, EMITTANCE_UNITS);
   }
   else
   {
@@ -801,6 +801,7 @@ photo_gen_star (p, r, t, weight, f1, f2, spectype, istart, nphot)
     }
     else
     {
+      Log("CALLING one_continuum\n");
       p[i].freq = one_continuum (spectype, t, geo.gstar, freqmin, freqmax);
     }
 
@@ -954,7 +955,7 @@ disk_init (rmin, rmax, m, mdot, freqmin, freqmax, ioniz_or_final, ftot)
 
     if (spectype > -1)
     {                           // emittance from a continuum model
-      emit = emittance_continuum (spectype, freqmin, freqmax, t, log_g);
+      emit = emittance_continuum (spectype, freqmin, freqmax, t, log_g, EMITTANCE_UNITS);
     }
     else
     {
@@ -990,7 +991,7 @@ disk_init (rmin, rmax, m, mdot, freqmin, freqmax, ioniz_or_final, ftot)
 
     if (spectype > -1)
     {                           // continuum emittance
-      emit = emittance_continuum (spectype, freqmin, freqmax, t, log_g);
+      emit = emittance_continuum (spectype, freqmin, freqmax, t, log_g, EMITTANCE_UNITS);
     }
     else
     {

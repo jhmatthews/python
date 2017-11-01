@@ -222,7 +222,7 @@ int line_heat(PlasmaPtr xplasma, PhotPtr pp, int nres);
 double upsilon(int n_coll, double u0);
 /* continuum.c */
 double one_continuum(int spectype, double t, double g, double freqmin, double freqmax);
-double emittance_continuum(int spectype, double freqmin, double freqmax, double t, double g);
+double emittance_continuum(int spectype, double freqmin, double freqmax, double t, double g, int units);
 /* emission.c */
 double wind_luminosity(double f1, double f2);
 double total_emission(WindPtr one, double f1, double f2);

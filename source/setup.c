@@ -829,9 +829,12 @@ get_bl_and_agn_params (lstar)
   get_spectype (geo.bl_radiation,
 		"Rad_type_for_bl(0=bb,1=models,3=pow)_to_make_wind",
 		&geo.bl_ion_spectype);
+
   get_spectype (geo.agn_radiation,
 		"Rad_type_for_agn(0=bb,1=models,3=power_law,4=cloudy_table,5=bremsstrahlung)_to_make_wind",
 		&geo.agn_ion_spectype);
+
+  Log("geo.agn_ion_spectype %d\n", geo.agn_ion_spectype);
 
   /* 130621 - ksl - This is a kluge to add a power law to stellar systems.  What id done
      is to remove the bl emission, which we always assume to some kind of temperature
@@ -863,7 +866,7 @@ get_bl_and_agn_params (lstar)
 
       rddoub ("lum_bl(ergs/s)", &geo.lum_bl);
       Log ("OK, the bl lum will be about %.2e the disk lum\n",
-	   geo.lum_bl / xbl);
+	          geo.lum_bl / xbl);
       rddoub ("t_bl", &geo.t_bl);
     }
   else
@@ -890,7 +893,7 @@ get_bl_and_agn_params (lstar)
 
       /* if we have a "blackbody agn" the luminosity is set by Stefan Boltzmann law
          once the AGN blackbody temp is read in, otherwise set by user */
-      if (geo.agn_ion_spectype != SPECTYPE_BB)
+      if (geo.agn_ion_spectype != SPECTYPE_BB && geo.agn_ion_spectype < 0)
 	rddoub ("lum_agn(ergs/s)", &geo.lum_agn);
 
 
@@ -940,6 +943,10 @@ get_bl_and_agn_params (lstar)
 	    4 * PI * geo.r_agn * geo.r_agn * STEFAN_BOLTZMANN *
 	    pow (geo.alpha_agn, 4.);
 	}
+      else if (geo.agn_ion_spectype >= 0) {
+        geo.lum_agn = emittance_continuum (geo.agn_ion_spectype, 1e14, 1e20, 1, 1, LUMINOSITY_UNITS);
+        Log("GEO LUM AGN %8.4e\n\n", geo.lum_agn);
+      }
 
       /* JM 1502 -- lines to add a low frequency power law cutoff. accessible
          only in advanced mode and for non broken power law. 

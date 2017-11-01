@@ -250,12 +250,13 @@ photon_checks (p, freqmin, freqmax, comment)
   int nnn, nn;
 //  double cool_tot_ioniz;  //NSH 16/2/2011 These are now declared externally to allow python to see them
 //  int n_ioniz;
-  int nlabel;
+  int nlabel, frac;
 
   geo.n_ioniz = 0;
   geo.cool_tot_ioniz = 0.0;
   nnn = 0;
   nlabel = 0;
+  frac = 1e-4;
 
 
   /* Next two lines are to allow for fact that photons generated in
@@ -264,13 +265,13 @@ photon_checks (p, freqmin, freqmax, comment)
    * limits
    * 04aug--ksl-increased limit from 0.02 to 0.03, e.g from 6000 km/s to 9000 km/s
    * 11apr--NSH-decreased freqmin to 0.4, to take account of double redshifted photons.
-   * shift.
+   * 1710 -- JM decreased freqmin to 0.3 
    */
 
   Debug ("photon_checks: %s\n", comment);
 
   freqmax *= (1.8);
-  freqmin *= (0.6);
+  freqmin *= (0.2);
   for (nn = 0; nn < NPHOT; nn++)
   {
     p[nn].np = nn;              /*  NSH 13/4/11 This is a line to populate the new internal photon pointer */
@@ -302,7 +303,7 @@ photon_checks (p, freqmin, freqmax, comment)
       p[nn].freq = freqmax;
       nnn++;
     }
-    if (nnn > 100)
+    if (nnn > 1000)
     {
       Error ("photon_checks: Exiting because too many bad photons generated\n");
       exit (0);
@@ -384,19 +385,22 @@ get_spectype (yesno, question, spectype)
       stype = 3;
     else
       stype = 1;
-    /* Now get the response */
+
+    /* Now get the response from the user / parameter file */
     rdint (question, &stype);
+
     /* Now convert the response back to the values which python uses */
     if (stype == 0)
-      *spectype = SPECTYPE_BB;  // bb
+      *spectype = SPECTYPE_BB;          // bb
     else if (stype == 2)
       *spectype = SPECTYPE_UNIFORM;     // uniform
     else if (stype == 3)
-      *spectype = SPECTYPE_POW; // power law
+      *spectype = SPECTYPE_POW;         // power law
     else if (stype == 4)
       *spectype = SPECTYPE_CL_TAB;      // broken power law
     else if (stype == 5)
       *spectype = SPECTYPE_BREM;        // bremstrahlung
+
     else
     {
       if (geo.run_type == SYSTEM_TYPE_PREVIOUS)
@@ -410,7 +414,8 @@ get_spectype (yesno, question, spectype)
       rdstr ("Model_file", model_list);
       get_models (model_list, 2, spectype);
       strcpy (geo.model_list[get_spectype_count], model_list);  // Copy it to geo 
-      strcpy (get_spectype_oldname, model_list);        // Also copy it back to the old name
+      strcpy (get_spectype_oldname, model_list);                // Also copy it back to the old name
+      *spectype = 0;
       get_spectype_count++;
     }
   }

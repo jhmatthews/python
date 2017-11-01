@@ -1398,3 +1398,6 @@ files;
    whether it has already calculated the matom emissivities or not. */
 #define CALCULATE_MATOM_EMISSIVITIES 0
 #define USE_STORED_MATOM_EMISSIVITIES 1
+
+#define EMITTANCE_UNITS 0
+#define LUMINOSITY_UNITS 1

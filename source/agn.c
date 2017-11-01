@@ -67,10 +67,13 @@ agn_init (r, lum, alpha, freqmin, freqmax, ioniz_or_final, f)
     spectype = geo.agn_spectype;        /* type for final spectrum */
   else
     spectype = geo.agn_ion_spectype;    /*type for ionization calculation */
+
+
   if (spectype >= 0)
   {
     /* Assume that if we simulate the continuum for an AGN that emit is the luminosity in a specific range */
-    emit = emittance_continuum (spectype, freqmin, freqmax, lum, alpha);
+    Log("Calling emittance\n");
+    emit = emittance_continuum (spectype, freqmin, freqmax, 1, 1, LUMINOSITY_UNITS);
     *f = emit;
   }
   else if (spectype == SPECTYPE_POW)

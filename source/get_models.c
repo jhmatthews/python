@@ -361,8 +361,6 @@ int
 model (spectype, par)
      int spectype;
      double par[];
-
-
 {
   int j, n;
   int good_models[NMODS];       // Used to establish which models are to be included in creating output model
@@ -375,7 +373,6 @@ model (spectype, par)
   double flux[NWAVES];
   double q1, q2, lambda, tscale, xxx;   // Used for rescaleing according to a bb
   FILE *qptr;
-
 
 
 /* First determine whether we already have interpolated this
@@ -455,7 +452,7 @@ exact model previously */
           weight[n] *= (1. - f);
 
 /* 57g -- If the weight given to a model is going to be zero, it needs to be
-excluded from furthur consideration -- 07jul ksl */
+excluded from further consideration -- 07jul ksl */
         if (weight[n] == 0.0)
           good_models[n] = 0;
 
@@ -605,7 +602,7 @@ even, and so for those cases we want to make sure to calculate the ratio of qs d
     comp[spectype].xmod.par[j] = par[j];
   }
 
-
+  fclose(qptr);
 
 
   return (nwaves);

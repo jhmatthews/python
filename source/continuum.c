@@ -33,7 +33,7 @@ Returns:
 
  
 Description:	
-	
+
 
 Notes:
 	In versions of python prior to python_52, different routines
@@ -158,20 +158,21 @@ one_continuum (spectype, t, g, freqmin, freqmax)
 
 
 double
-emittance_continuum (spectype, freqmin, freqmax, t, g)
+emittance_continuum (spectype, freqmin, freqmax, t, g, units)
      int spectype;
      double freqmin, freqmax, t, g;
+     int units;
 {
   int nwav, n;
   double w, x, lambdamin, lambdamax;
   double dlambda;
   double par[2];
-  int model ();
 
   lambdamin = C / (freqmax * ANGSTROM);
   lambdamax = C / (freqmin * ANGSTROM);
   par[0] = t;
   par[1] = g;
+  Log("t, g, spectype %f %f %d\n", t, g, spectype);
   model (spectype, par);
   nwav=comp[spectype].nwaves;
 
@@ -203,6 +204,9 @@ emittance_continuum (spectype, freqmin, freqmax, t, g)
       x += comp[spectype].xmod.f[n] * dlambda;
     }
   }
-  x *= 4. * PI;
+
+  if (units == EMITTANCE_UNITS)
+    x *= 4. * PI;
+  
   return (x);
 }
