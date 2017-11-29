@@ -118,11 +118,9 @@ spherical_make_grid (w, ndom)
   int j, n;
   int ndim;
 
+
   ndim = zdom[ndom].ndim;
 
-  /* JM question -- shouldn't we be looping over nstart to nstop here? 
-     Or alternatively setting w[n + nstart] where nstart = zdom[ndom].nstart.
-     ksl anwswer -- Yes.  Changed 1605  */
 
   for (j = 0; j < ndim; j++)
   {

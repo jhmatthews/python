@@ -342,7 +342,7 @@ cylind_volumes (ndom, w)
 {
   int i, j, n;
   int jj, kk;
-  double fraction;
+  double fraction, cell_volume;
   double num, denom;
   double r, z;
   double rmax, rmin;
@@ -361,18 +361,24 @@ cylind_volumes (ndom, w)
 
       wind_ij_to_n (ndom, i, j, &n);
 
+      rmin = one_dom->wind_x[i];
+      rmax = one_dom->wind_x[i + 1];
+      zmin = one_dom->wind_z[j];
+      zmax = one_dom->wind_z[j + 1];
+
+      /* this is the full cell volume, which is adjusted by the fraction
+         of the cell that is in the wind later if necessary */
+      //leading factor of 2 added to allow for volume above and below plane (SSMay04)
+      cell_volume = 2 * PI * (rmax * rmax - rmin * rmin) * (zmax - zmin);
+
       // XXX Why is it necessary to do the check indicated by the if statement.   
-      /* 70b - only try to assign the cell if it has not already been assigned */
-      if (w[n].inwind == W_NOT_INWIND)
+      /* JM 1711 -- only try to assign the cell if it has not already been assigned */
+      if (w[n].inwind == W_NOT_ASSIGNED)
       {
-
-        rmin = one_dom->wind_x[i];
-        rmax = one_dom->wind_x[i + 1];
-        zmin = one_dom->wind_z[j];
-        zmax = one_dom->wind_z[j + 1];
-
-        //leading factor of 2 added to allow for volume above and below plane (SSMay04)
-        w[n].vol = 2 * PI * (rmax * rmax - rmin * rmin) * (zmax - zmin);
+        if (one_dom->wind_type == IMPORT) {
+          Error("Shouldn't be redefining inwind in cylind_volumes with imported model.\n");
+          exit(0);
+        }
 
         n_inwind = cylind_is_cell_in_wind (n);
 
@@ -411,11 +417,10 @@ cylind_volumes (ndom, w)
             }
           }
           fraction = num / denom;
-
-
         }
 
         /* OK now make the final assignement of nwind and fix the volumes */
+        /* XXX JM - not clear why these additional if statements are necessary */
         if (jj == 0)
         {
           w[n].inwind = W_NOT_INWIND;   // The cell is not in the wind
@@ -424,12 +429,24 @@ cylind_volumes (ndom, w)
         else if (jj == kk)
         {
           w[n].inwind = W_ALL_INWIND;   // All of cell is inwind
+          w[n].vol = cell_volume;
         }
         else
         {
           w[n].inwind = W_PART_INWIND;  // Some of cell is inwind
-          w[n].vol *= fraction;
+          w[n].vol = cell_volume * fraction;
         }
+      }
+
+      /* JM 1711 -- the following two if statements are for if the inwind values are
+         already assigned, for example by an imported model */
+      /* need to zero volumes for cells not in the wind */
+      else if (w[n].inwind == W_NOT_INWIND) {
+        w[n].vol = 0.0;
+      }
+
+      else if (w[n].inwind == W_ALL_INWIND) {
+        w[n].vol = cell_volume;
       }
     }
   }

@@ -237,7 +237,7 @@ zdisk (r)
  
  
  Returns:
-        The distance to the disk.  The photon is not going to
+    The distance to the disk.  The photon is not going to
 	hit the disk travelling in either direction
 	returns VERY_BIG.
 
@@ -252,7 +252,7 @@ Notes:
  
 History:
         04aug   ksl     52--Coded as part of effort to put 
-			disks with vertical extent into python
+			            disks with vertical extent into python
         04Aug   SS      Several minor modifications made.
                         ds_to_disk now also takes a second
                         input "miss_return" which tells it what
@@ -479,3 +479,160 @@ disk_deriv (s, value, derivative)
   *derivative = (z2 - z1) / ds;
 
 }
+
+
+
+
+/***********************************************************
+                                       Space Telescope Science Institute
+
+ Synopsis:
+	The next couple of routines are for recording information about photons/energy impinging
+	on the disk, which is stored in a disk structure called qdisk.
+
+	qdisk_init() just initializes the structure (once the disk structue has been initialized.
+
+	qdisk_save records the results in a file
+
+Arguments:		
+
+Returns:
+ 
+Description:	
+
+		
+Notes:
+
+	The reason the qdisk is needed as well as disk structure is that whenever the
+	wavelength bands are changed the radii in the disk structure are recalibratied.
+	We want qdisk to have fixed boundaries when this happens.
+
+
+History:
+	04mar	ksl	add section to dump heating of disk.  
+ 			Factor of 2 in area calculation reflects
+ 			fact that disk has two sides
+	04dec	ksl	created variable ztot so fractional heating
+			is correct if multiple subcyles
+	080519	ksl	60a - Added code to calculate the irradiation of the disk
+			in terms of t and w.  This should help to monitor the effect
+			of irradiation on the disk
+	160526	ksl	Modified output file in qdisk_save to be an
+			astropy table
+
+**************************************************************/
+
+
+int
+qdisk_init ()
+{
+  int n;
+  for (n = 0; n < NRINGS; n++)
+  {
+    qdisk.r[n] = disk.r[n];
+    qdisk.t[n] = disk.t[n];
+    qdisk.g[n] = disk.g[n];
+    qdisk.v[n] = disk.v[n];
+    qdisk.heat[n] = 0.0;
+    qdisk.nphot[n] = 0;
+    qdisk.nhit[n] = 0;
+    qdisk.w[n] = 0;
+    qdisk.ave_freq[n] = 0;
+    qdisk.t_hit[0] = 0;
+  }
+  return (0);
+}
+
+int
+qdisk_save (diskfile, ztot)
+     char *diskfile;
+     double ztot;
+{
+  FILE *qptr;
+  int n;
+  double area, theat, ttot;
+  qptr = fopen (diskfile, "w");
+  fprintf (qptr, "r         zdisk     t_disk   heat       nhit nhit/nemit  t_heat    t_irrad  W_irrad  t_tot\n");
+
+  for (n = 0; n < NRINGS; n++)
+  {
+    area = (2. * PI * (qdisk.r[n + 1] * qdisk.r[n + 1] - qdisk.r[n] * qdisk.r[n]));
+    theat = qdisk.heat[n] / area;
+    theat = pow (theat / STEFAN_BOLTZMANN, 0.25);       // theat is temperature if no internal energy production
+    if (qdisk.nhit[n] > 0)
+    {
+
+      qdisk.ave_freq[n] /= qdisk.heat[n];
+      qdisk.t_hit[n] = H * qdisk.ave_freq[n] / (BOLTZMANN * 3.832);     // Basic conversion from freq to T
+      qdisk.w[n] = qdisk.heat[n] / (4. * PI * STEFAN_BOLTZMANN * area * qdisk.t_hit[n] * qdisk.t_hit[n] * qdisk.t_hit[n] * qdisk.t_hit[n]);
+    }
+
+    ttot = pow (qdisk.t[n], 4) + pow (theat, 4);
+    ttot = pow (ttot, 0.25);
+    fprintf (qptr,
+             "%8.3e %8.3e %8.3e %8.3e %5d %8.3e %8.3e %8.3e %8.3e %8.3e\n",
+             qdisk.r[n], zdisk (qdisk.r[n]), qdisk.t[n],
+             qdisk.heat[n], qdisk.nhit[n], qdisk.heat[n] * NRINGS / ztot, theat, qdisk.t_hit[n], qdisk.w[n], ttot);
+  }
+
+  fclose (qptr);
+  return (0);
+}
+
+
+
+/***********************************************************
+	Space Telescope Science Institute
+
+Synopsis:
+	Stuart's routine to read a non-standard disk profile
+	for YSO effort
+
+Arguments:		
+
+Returns:
+ 
+Description:	
+
+		
+Notes:
+	Originally part of main routine; moved to separate routine
+	by ksl sometime in the fall of 08
+
+
+
+History:
+
+**************************************************************/
+
+int
+read_non_standard_disk_profile (tprofile)
+     char *tprofile;
+{
+
+  FILE *fopen (), *fptr;
+  int n;
+  float dumflt1, dumflt2;
+  int dumint;
+
+  if ((fptr = fopen (tprofile, "r")) == NULL)
+  {
+    Error ("Could not open filename %s\n", tprofile);
+    exit (0);
+  }
+
+  fscanf (fptr, "%d\n", &dumint);
+  blmod.n_blpts = dumint;
+  for (n = 0; n < blmod.n_blpts; n++)
+  {
+    fscanf (fptr, "%g %g", &dumflt1, &dumflt2);
+    blmod.r[n] = dumflt1 * 1.e11;
+    blmod.t[n] = dumflt2 * 1.e3;
+  }
+
+  fclose (fptr);
+
+  return (0);
+}
+
+

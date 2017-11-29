@@ -138,7 +138,7 @@ endif
 LDFLAGS= -L$(LIB) -lm -lgsl -lgslcblas 
 
 #Note that version should be a single string without spaces. 
-VERSION = 82b
+VERSION = 82d
 
 
 CHOICE=1             // Compress plasma as much as possible
@@ -164,7 +164,7 @@ foo: foo.o signal.o time.o
 
 # these are the objects required for compiltion of python
 # note that the kpar_source is now separate from this
-python_objects = bb.o get_atomicdata.o photon2d.o photon_gen.o \
+python_objects = bb.o get_atomicdata.o photon2d.o photon_gen.o parse.o init.o \
 		saha.o spectra.o wind2d.o wind.o  vvector.o debug.o recipes.o \
 		trans_phot.o phot_util.o resonate.o radiation.o \
 		wind_updates2d.o windsave.o extract.o cdf.o roche.o random.o \
@@ -172,38 +172,40 @@ python_objects = bb.o get_atomicdata.o photon2d.o photon_gen.o \
 		lines.o  continuum.o get_models.o emission.o cooling.o recomb.o diag.o \
 		sv.o ionization.o  ispy.o   levels.o gradv.o reposition.o \
 		anisowind.o util.o density.o  detail.o bands.o time.o \
-		matom.o estimators.o wind_sum.o yso.o elvis.o cylindrical.o rtheta.o spherical.o  \
+		matom.o estimators.o wind_sum.o yso.o cylindrical.o rtheta.o spherical.o  \
 		cylind_var.o bilinear.o gridwind.o partition.o signal.o auger_ionization.o \
 		agn.o shell_wind.o compton.o torus.o zeta.o dielectronic.o \
 		spectral_estimators.o variable_temperature.o matom_diag.o \
-		log.o lineio.o rdpar.o direct_ion.o pi_rates.o matrix_ion.o para_update.o \
-		setup.o photo_gen_matom.o macro_gov.o windsave2table_sub.o \
+		xlog.o lineio.o rdpar.o direct_ion.o pi_rates.o matrix_ion.o para_update.o \
+		setup.o setup_domains.o photo_gen_matom.o macro_gov.o windsave2table_sub.o \
+		import.o import_spherical.o import_cylindrical.o import_rtheta.o \
 		reverb.o paths.o setup2.o run.o brem.o search_light.o synonyms.o 
 		
 
 
 # For reasons that are unclear to me.  get_models.c cannot be included in the sources
 # Problems ocurr due to the prototypes that are generated.  ksl 160705
-python_source= bb.c get_atomicdata.c python.c photon2d.c photon_gen.c \
+python_source= bb.c get_atomicdata.c python.c photon2d.c photon_gen.c parse.c \
 		saha.c spectra.c wind2d.c wind.c  vvector.c debug.c recipes.c \
-		trans_phot.c phot_util.c resonate.c radiation.c \
+		trans_phot.c phot_util.c resonate.c radiation.c init.c \
 		wind_updates2d.c windsave.c extract.c cdf.c roche.c random.c \
 		stellar_wind.c homologous.c hydro_import.c corona.c knigge.c  disk.c\
 		lines.c  continuum.c emission.c cooling.c recomb.c diag.c \
 		sv.c ionization.c  ispy.c  levels.c gradv.c reposition.c \
 		anisowind.c util.c density.c  detail.c bands.c time.c \
-		matom.c estimators.c wind_sum.c yso.c elvis.c cylindrical.c rtheta.c spherical.c  \
+		matom.c estimators.c wind_sum.c yso.c cylindrical.c rtheta.c spherical.c  \
 		cylind_var.c bilinear.c gridwind.c partition.c signal.c auger_ionization.c \
 		agn.c shell_wind.c compton.c torus.c zeta.c dielectronic.c \
 		spectral_estimators.c variable_temperature.c matom_diag.c \
-		direct_ion.c pi_rates.c matrix_ion.c para_update.c setup.c \
+		direct_ion.c pi_rates.c matrix_ion.c para_update.c setup.c setup_domains.c \
 		photo_gen_matom.c macro_gov.c windsave2table_sub.c \
+		import.c import_spherical.c import_cylindrical.c import_rtheta.c\
 		reverb.c paths.c setup2.c run.c brem.c search_light.c synonyms.c 
 
 #
 # kpar_source is now declared seaprately from python_source so that the file log.h 
 # can be made using cproto
-kpar_source = lineio.c rdpar.c log.c synonyms.c
+kpar_source = lineio.c rdpar.c xlog.c synonyms.c
 
 additional_py_wind_source = py_wind_sub.c py_wind_ion.c py_wind_write.c py_wind_macro.c py_wind.c 
 
@@ -228,12 +230,13 @@ py_wind_objects = py_wind.o get_atomicdata.o py_wind_sub.o windsave.o py_wind_io
 		stellar_wind.o homologous.o sv.o hydro_import.o corona.o knigge.o  disk.o\
 		lines.o vvector.o wind2d.o wind.o  ionization.o  py_wind_write.o levels.o \
 		radiation.o gradv.o phot_util.o anisowind.o resonate.o density.o \
-		matom.o estimators.o yso.o elvis.o photon2d.o cylindrical.o rtheta.o spherical.o  \
+		matom.o estimators.o yso.o photon2d.o cylindrical.o rtheta.o spherical.o \
+		import.o import_spherical.o import_cylindrical.o import_rtheta.o \
 		cylind_var.o bilinear.o gridwind.o py_wind_macro.o partition.o auger_ionization.o\
 		spectral_estimators.o shell_wind.o compton.o torus.o zeta.o dielectronic.o \
-        variable_temperature.o bb.o rdpar.o log.o direct_ion.o diag.o matrix_ion.o \
+        variable_temperature.o bb.o rdpar.o xlog.o direct_ion.o diag.o matrix_ion.o \
 		pi_rates.o photo_gen_matom.o macro_gov.o \
-		time.o reverb.o paths.o synonyms.o cooling.o
+		time.o reverb.o paths.o synonyms.o cooling.o windsave2table_sub.o
 
 
 
@@ -243,8 +246,8 @@ py_wind: startup $(py_wind_objects)
 	mv $@ $(BIN)/py_wind$(VERSION)
 
 
-summarize_atomic: summarize_atomic.o get_atomicdata.o log.o rdpar.o synonyms.o  
-	$(CC) $(CFLAGS) summarize_atomic.o get_atomicdata.o log.o rdpar.o  synonyms.o  -o summarize_atomic
+summarize_atomic: summarize_atomic.o get_atomicdata.o xlog.o rdpar.o synonyms.o  
+	$(CC) $(CFLAGS) summarize_atomic.o get_atomicdata.o xlog.o rdpar.o  synonyms.o  -o summarize_atomic
 	mv $@ $(BIN)
 
 
@@ -254,10 +257,11 @@ table_objects = windsave2table.o windsave2table_sub.o get_atomicdata.o py_wind_s
 		stellar_wind.o homologous.o sv.o hydro_import.o corona.o knigge.o  disk.o\
 		lines.o vvector.o wind2d.o wind.o  ionization.o  py_wind_write.o levels.o \
 		radiation.o gradv.o phot_util.o anisowind.o resonate.o density.o \
-		matom.o estimators.o yso.o elvis.o photon2d.o cylindrical.o rtheta.o spherical.o  \
+		matom.o estimators.o yso.o photon2d.o cylindrical.o rtheta.o spherical.o \
+		import.o import_spherical.o import_cylindrical.o import_rtheta.o  \
 		cylind_var.o bilinear.o gridwind.o py_wind_macro.o partition.o auger_ionization.o\
 		spectral_estimators.o shell_wind.o compton.o torus.o zeta.o dielectronic.o \
-        	variable_temperature.o bb.o rdpar.o log.o direct_ion.o diag.o matrix_ion.o \
+        	variable_temperature.o bb.o rdpar.o xlog.o direct_ion.o diag.o matrix_ion.o \
 		pi_rates.o photo_gen_matom.o macro_gov.o reverb.o paths.o time.o synonyms.o cooling.o   
 
 
@@ -307,7 +311,7 @@ py_grid: bb.o get_atomicdata.o py_grid.o photon2d.o photon_gen.o \
 		stellar_wind.o homologous.o sv.o hydro_import.o corona.o knigge.o  disk.o\
 		lines.o continuum.o get_models.o emission.o recomb.o util.o anisowind.o \
 		sv.o ionization.o  ispy.o   levels.o gradv.o reposition.o \
-		yso.o elvis.o cylindrical.o rtheta.o \
+		yso.o cylindrical.o rtheta.o \
 		matom.o estimators.o wind_sum.o \
 		density.o bands.o detail.o 
 	$(CC)  ${CFLAGS} py_grid.o get_atomicdata.o photon2d.o photon_gen.o \
@@ -319,7 +323,7 @@ py_grid: bb.o get_atomicdata.o py_grid.o photon2d.o photon_gen.o \
 		cdf.o roche.o random.o continuum.o get_models.o  \
 		lines.o ionization.o emission.o  recomb.o reposition.o \
 		sv.o hydro_import.o knigge.o disk.o  levels.o gradv.o density.o \
-		yso.o elvis.o cylindrical.o rtheta.o \
+		yso.o cylindrical.o rtheta.o \
 		matom.o estimators.o wind_sum.o \
 		detail.o \
 		$(LDFLAGS) -o py_grid

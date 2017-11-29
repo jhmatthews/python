@@ -202,8 +202,6 @@ History:
 	05jul	ksl	Changed call from ds_to_cone to ds_to_cone as
 			added cylvar coord system.  Otherwise routine is
 			currently unchanged.  
-	11nov	ksl	Modified to account for elvis wind model with
-			its pillbox at the bottom
 	15aug	ksl	Modifications for domains.  The asumption we make
 			is that the poton is not in any of the wind
 			regions at this point, and that we are looking
@@ -260,14 +258,6 @@ ds_to_wind (pp)
       }
     }
 
-
-    /* Check if the photon hits the pillpox portion of an Elvis wind */
-    if (zdom[ndom].wind_type == ELVIS)
-    {
-      x = ds_to_pillbox (&ptest, zdom[ndom].sv_rmin, zdom[ndom].sv_rmax, zdom[ndom].elvis_offset);
-      if (x < ds)
-        ds = x;
-    }
   }
 
   return (ds);
@@ -578,12 +568,13 @@ walls (p, pold,normal)
     rho = sqrt (p->x[0] * p->x[0] + p->x[1] * p->x[1]);
     if ((rho * rho) < geo.diskrad_sq && fabs (p->x[2]) <= (z = zdisk (rho)))
     {
-      // We are inside the disk
+      // We are inside a vertically extended disk.  So call ds_to_disk to find out where we hit it
       s = ds_to_disk (pold, 0);
+      if (s <= 0){
+          Error("walls: We seem to have ben inside the disk before now\n");
+      }
       stuff_phot (pold, p);
-      // XXX Vertically extended disk needs to be fixed here
-      Error("walls: We are not calculating the where we hit the vertically extended disk correctly\n");
-      move_phot (p, s);
+      move_phot (p, s-DFUDGE);
       return (p->istat = P_HIT_DISK);
     }
   }

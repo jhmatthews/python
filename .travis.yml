@@ -56,3 +56,4 @@ script:
     - py -i ulx1
     - py -i ngc5548
     - py -i lamp_post
+    - py -i cv_import

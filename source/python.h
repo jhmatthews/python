@@ -134,7 +134,7 @@ enum coord_type_enum
 /* List of possible wind_types */
 
 #define SV   			0
-#define	SPHERE  		1
+#define	STAR    		1
 /* PREVIOUS is no longer an allowed type. Reading in an early model is now
  * handled as a system_type 
  */
@@ -144,9 +144,9 @@ enum coord_type_enum
 #define KNIGGE			5
 #define	HOMOLOGOUS 		6
 #define	YSO 			7
-#define	ELVIS 			8
+//OLD #define	ELVIS 			8  Deleted option
 #define	SHELL 			9
-#define	NONE 			10
+#define IMPORT          10      // Model that is read in from a file
 #define	DISK_ATMOS 		11
 
 
@@ -195,7 +195,7 @@ typedef struct domain
 {
   char name[LINELENGTH];
   int wind_type;
-  int ndim, mdim, ndim2;
+  int ndim, mdim, ndim2;       //ndim is the size in the x direction, while mdim is the size in z or theta direction
   int nstart, nstop;            //the beginning and end (-1) location in wmain of this component
   enum coord_type_enum coord_type;
   int log_linear;               /*0 -> the grid spacing will be logarithmic in x and z, 1-> linear */
@@ -238,9 +238,6 @@ typedef struct domain
   double sv_r_scale, sv_alpha;  /* the scale length and power law exponent for the velocity law */
   double sv_v_infinity;         /* the factor by which the velocity at infinity exceeds the excape velocity */
 
-  /* Paramater for the Elvis AGN wind - closely based on SV */
-  double elvis_offset;          /*This is a vertical offset for a region where the
-                                   wind rises vertically from the disk */
 
   /* Parameters defining Knigge Wind */
   double kn_dratio;             /* parameter describing collimation of wind */
@@ -338,7 +335,7 @@ struct geometry
  */
 
   double rmin, rmax, rmax_sq;   /* The maximum distance to which a photon should be followed */
-  double wind_rho_min, wind_rho_max;    /*Min/Max rho for wind in disk plane */
+//OLD  double wind_rho_min, wind_rho_max;    /*Min/Max rho for wind in disk plane */
 
 
 /* Basic paremeters of the system, as opposed to elements of the wind or winds */
@@ -677,7 +674,7 @@ typedef struct wind
   double xcen[3];               /*position of the "center" of a cell (Added by ksl for 52a--04Aug) */
   double r, rcen;               /*radial location of cell (Used for spherical, spherical polar
                                    coordinates. (Added by ksl for 52a --04Aug) */
-  double theta, thetacen;       /*Angle of coordinate from z axis (Added by ksl for 52a -- 04Aug) */
+  double theta, thetacen;       /*Angle of coordinate from z axis in degrees  */
   double dtheta, dr;            /* widths of bins, used in hydro import mode */
   struct cone wcone;            /*56d -- cone structure that defines the bottom edge of the cell in 
                                    CYLVAR coordinates */
@@ -694,7 +691,7 @@ typedef struct wind
                                    global variable DFUDGE in many instances */
   enum inwind_enum
   { W_IN_DISK = -5, W_IGNORE = -2, W_NOT_INWIND = -1,
-    W_ALL_INWIND = 0, W_PART_INWIND = 1
+    W_ALL_INWIND = 0, W_PART_INWIND = 1, W_NOT_ASSIGNED = -999
   } inwind;
   Wind_Paths_Ptr paths, *line_paths;    // SWM 6-2-15 Path data struct for each cell
 }

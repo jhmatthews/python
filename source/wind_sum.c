@@ -62,7 +62,7 @@ xtemp_rad (w)
   for (ndom = 0; ndom < geo.ndomain; ndom++)
     {
 
-      Log ("Results for Dommain %d\n", ndom);
+      Log ("Results for Domain %d:\n", ndom);
       ndim = zdom[ndom].ndim;
       mdim = zdom[ndom].mdim;
       nstart = zdom[ndom].nstart;

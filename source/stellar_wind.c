@@ -88,9 +88,6 @@ get_stellar_wind_params (ndom)
 
   /* define the the variables that determine the gridding */
   zdom[ndom].wind_rho_min = 0;
-  /* Fixed 170530 - These should be the same as zdom[ndom].rmax  ksl */
-  //OLD  zdom[ndom].wind_rho_max = geo.rmax;
-  //OLD  zdom[ndom].zmax = geo.rmax;
   zdom[ndom].wind_rho_max = zdom[ndom].rho_max=zdom[ndom].rmax;
   zdom[ndom].zmax = zdom[ndom].rmax;
 

@@ -97,7 +97,7 @@ one after the other*/
 
   if (geo.disk_type == DISK_VERTICALLY_EXTENDED)
   {
-    geo.wind_rho_max = geo.diskrad - (zdisk (geo.diskrad) * tan (zdom[ndom].wind_thetamax));
+    zdom[ndom].rho_max = geo.diskrad - (zdisk (geo.diskrad) * tan (zdom[ndom].wind_thetamax));
   }
 
   /* if modes.adjust_grid is 1 then we have already adjusted the grid manually */

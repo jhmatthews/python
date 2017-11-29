@@ -56,12 +56,12 @@ rtheta_ds_in_cell (p)
    * what grid cell a photon is in */
 
   if ((p->grid = n = where_in_grid (ndom, p->x)) < 0)
-  {
-    Error ("translate_in_wind: Photon not in grid when routine entered\n");
-    return (n);                 /* Photon was not in wind */
-  }
+    {
+      Error ("translate_in_wind: Photon not in grid when routine entered\n");
+      return (n);		/* Photon was not in wind */
+    }
 
-  wind_n_to_ij (ndom, n, &ix, &iz);     /*Convert the index n to two dimensions */
+  wind_n_to_ij (ndom, n, &ix, &iz);	/*Convert the index n to two dimensions */
 
 
   /* Set up the quadratic equations in the radial  direction */
@@ -69,29 +69,29 @@ rtheta_ds_in_cell (p)
   smax = ds_to_sphere (zdom[ndom].wind_x[ix], p);
   s = ds_to_sphere (zdom[ndom].wind_x[ix + 1], p);
   if (s < smax)
-  {
-    smax = s;
-  }
+    {
+      smax = s;
+    }
 
   /* At this point we have found how far the photon can travel in r in its
      current direction.  Now we must worry about motion in the theta direction  */
 
   s = ds_to_cone (&zdom[ndom].cones_rtheta[iz], p);
   if (s < smax)
-  {
-    smax = s;
-  }
+    {
+      smax = s;
+    }
 
   s = ds_to_cone (&zdom[ndom].cones_rtheta[iz + 1], p);
   if (s < smax)
-  {
-    smax = s;
-  }
+    {
+      smax = s;
+    }
 
   if (smax <= 0)
-  {
-    Error ("rtheta: ds_in_cell %f\n", smax);
-  }
+    {
+      Error ("rtheta: ds_in_cell %f\n", smax);
+    }
   return (smax);
 }
 
@@ -156,11 +156,11 @@ rtheta_make_grid (w, ndom)
    * been defined previously.  ksl 170506
    */
 
-   if (zdom[ndom].zmax == 0)
-	{
-	/* Check if zmax has been set, and if not set it to rmax */
-	zdom[ndom].zmax = zdom[ndom].rmax;
-	}
+  if (zdom[ndom].zmax == 0)
+    {
+      /* Check if zmax has been set, and if not set it to rmax */
+      zdom[ndom].zmax = zdom[ndom].rmax;
+    }
 
   ndim = zdom[ndom].ndim;
   mdim = zdom[ndom].mdim;
@@ -176,55 +176,57 @@ rtheta_make_grid (w, ndom)
   /* First calculate parameters that are to be calculated at the edge of the grid cell.  This is
      mainly the positions and the velocity */
   for (i = 0; i < ndim; i++)
-  {
-    for (j = 0; j < mdim; j++)
     {
-      wind_ij_to_n (ndom, i, j, &n);
+      for (j = 0; j < mdim; j++)
+	{
+	  wind_ij_to_n (ndom, i, j, &n);
 
 
-      /*Define the grid points */
-      if (zdom[ndom].log_linear == 1)
-      {                         // linear intervals
+	  /*Define the grid points */
+	  if (zdom[ndom].log_linear == 1)
+	    {			// linear intervals
 
-        dr = (zdom[ndom].rmax - geo.rstar) / (ndim - 3);
-        w[n].r = geo.rstar + i * dr;
-        w[n].rcen = w[n].r + 0.5 * dr;
-      }
-      else
-      {                         //logarithmic intervals
+	      dr = (zdom[ndom].rmax - geo.rstar) / (ndim - 3);
+	      w[n].r = geo.rstar + i * dr;
+	      w[n].rcen = w[n].r + 0.5 * dr;
+	    }
+	  else
+	    {			//logarithmic intervals
 
-        dlogr = (log10 (zdom[ndom].rmax / geo.rstar)) / (mdim - 3);
-        w[n].r = geo.rstar * pow (10., dlogr * (i - 1));
-        w[n].rcen = 0.5 * geo.rstar * (pow (10., dlogr * (i)) + pow (10., dlogr * (i - 1)));
-      }
+	      dlogr = (log10 (zdom[ndom].rmax / geo.rstar)) / (mdim - 3);
+	      w[n].r = geo.rstar * pow (10., dlogr * (i - 1));
+	      w[n].rcen =
+		0.5 * geo.rstar * (pow (10., dlogr * (i)) +
+				   pow (10., dlogr * (i - 1)));
+	    }
 
-      /* Only the radial distance can be logarithmic */
+	  /* Only the radial distance can be logarithmic */
 
-      theta = w[n].theta = dtheta * j;
-      thetacen = w[n].thetacen = w[n].theta + 0.5 * dtheta;
-      if (theta > 90.)
-      {
-        theta = 90.;
-      }
-      if (thetacen > 90.)
-      {
-        thetacen = 90.;
-      }
+	  theta = w[n].theta = dtheta * j;
+	  thetacen = w[n].thetacen = w[n].theta + 0.5 * dtheta;
+	  if (theta > 90.)
+	    {
+	      theta = 90.;
+	    }
+	  if (thetacen > 90.)
+	    {
+	      thetacen = 90.;
+	    }
 
 
-      /* Now calculate the positions of these points in the xz plane */
-      theta /= RADIAN;
-      thetacen /= RADIAN;
-      w[n].x[1] = w[n].xcen[1] = 0.0;
+	  /* Now calculate the positions of these points in the xz plane */
+	  theta /= RADIAN;
+	  thetacen /= RADIAN;
+	  w[n].x[1] = w[n].xcen[1] = 0.0;
 
-      w[n].x[0] = w[n].r * sin (theta);
-      w[n].x[2] = w[n].r * cos (theta);
+	  w[n].x[0] = w[n].r * sin (theta);
+	  w[n].x[2] = w[n].r * cos (theta);
 
-      w[n].xcen[0] = w[n].rcen * sin (thetacen);
-      w[n].xcen[2] = w[n].rcen * cos (thetacen);
+	  w[n].xcen[0] = w[n].rcen * sin (thetacen);
+	  w[n].xcen[2] = w[n].rcen * cos (thetacen);
 
+	}
     }
-  }
   rtheta_make_cones (ndom, w);
   return (0);
 }
@@ -276,18 +278,19 @@ rtheta_make_cones (ndom, w)
 
   zdom[ndom].cones_rtheta = (ConePtr) calloc (sizeof (cone_dummy), mdim);
   if (zdom[ndom].cones_rtheta == NULL)
-  {
-    Error ("rtheta_make_gid: There is a problem in allocating memory for the cones structure\n");
-    exit (0);
+    {
+      Error
+	("rtheta_make_gid: There is a problem in allocating memory for the cones structure\n");
+      exit (0);
 
-  }
+    }
 
 
   for (n = 0; n < mdim; n++)
-  {
-    zdom[ndom].cones_rtheta[n].z = 0.0;
-    zdom[ndom].cones_rtheta[n].dzdr = 1. / tan (w[n].theta / RADIAN);   // New definition
-  }
+    {
+      zdom[ndom].cones_rtheta[n].z = 0.0;
+      zdom[ndom].cones_rtheta[n].dzdr = 1. / tan (w[n].theta / RADIAN);	// New definition
+    }
 
 
   return (0);
@@ -337,9 +340,9 @@ rtheta_wind_complete (ndom, w)
      have adoped a "rectangular" grid of points.  Note that rectangular does not mean equally spaced. */
 
   for (i = 0; i < ndim; i++)
-  {
-    zdom[ndom].wind_x[i] = w[nstart + i * mdim].r;
-  }
+    {
+      zdom[ndom].wind_x[i] = w[nstart + i * mdim].r;
+    }
   for (j = 0; j < mdim; j++)
     zdom[ndom].wind_z[j] = w[nstart + j].theta;
 
@@ -351,8 +354,10 @@ rtheta_wind_complete (ndom, w)
 
   /* Add something plausible for the edges */
   /* ?? It is bizarre that one needs to do anything like this ???. wind should be defined to include NDIM -1 */
-  zdom[ndom].wind_midx[ndim - 1] = 2. * zdom[ndom].wind_x[ndim - 1] - zdom[ndom].wind_midx[ndim - 2];
-  zdom[ndom].wind_midz[mdim - 1] = 2. * zdom[ndom].wind_z[mdim - 1] - zdom[ndom].wind_midz[mdim - 2];
+  zdom[ndom].wind_midx[ndim - 1] =
+    2. * zdom[ndom].wind_x[ndim - 1] - zdom[ndom].wind_midx[ndim - 2];
+  zdom[ndom].wind_midz[mdim - 1] =
+    2. * zdom[ndom].wind_z[mdim - 1] - zdom[ndom].wind_midz[mdim - 2];
 
   return (0);
 }
@@ -415,6 +420,7 @@ rtheta_volumes (ndom, w)
   double r, theta;
   double dr, dtheta, x[3];
   double rmin, rmax, thetamin, thetamax;
+  double cell_volume;
   int n_inwind;
   int ndim, mdim, ndomain;
 
@@ -422,79 +428,118 @@ rtheta_volumes (ndom, w)
   mdim = zdom[ndom].mdim;
 
   for (i = 0; i < ndim; i++)
-  {
-    for (j = 0; j < mdim; j++)
     {
-      wind_ij_to_n (ndom, i, j, &n);
-      if (w[n].inwind == W_NOT_INWIND)
-      {
+      for (j = 0; j < mdim; j++)
+	{
+	  wind_ij_to_n (ndom, i, j, &n);
 
-        rmin = zdom[ndom].wind_x[i];
-        rmax = zdom[ndom].wind_x[i + 1];
-        thetamin = zdom[ndom].wind_z[j] / RADIAN;
-        thetamax = zdom[ndom].wind_z[j + 1] / RADIAN;
+	  rmin = zdom[ndom].wind_x[i];
+	  rmax = zdom[ndom].wind_x[i + 1];
+	  thetamin = zdom[ndom].wind_z[j] / RADIAN;
+	  thetamax = zdom[ndom].wind_z[j + 1] / RADIAN;
 
-        //leading factor of 2 added to allow for volume above and below plane (SSMay04)
-        w[n].vol = 2. * 2. / 3. * PI * (rmax * rmax * rmax - rmin * rmin * rmin) * (cos (thetamin) - cos (thetamax));
-
-        n_inwind = rtheta_is_cell_in_wind (n);
-        if (n_inwind == W_NOT_INWIND)
-        {
-          fraction = 0.0;       /* Force outside edge volues to zero */
-          jj = 0;
-          kk = RESOLUTION * RESOLUTION;
-        }
-        else if (n_inwind == W_ALL_INWIND)
-        {
-          fraction = 1.0;       /* Force outside edge volues to zero */
-          jj = kk = RESOLUTION * RESOLUTION;
-        }
+	  //leading factor of 2 added to allow for volume above and below plane (SSMay04)
+	  cell_volume =
+	    2. * 2. / 3. * PI * (rmax * rmax * rmax -
+				 rmin * rmin * rmin) * (cos (thetamin) -
+							cos (thetamax));
 
 
-        else
-        {                       /* The grid cell is PARTIALLY in the wind */
-          num = denom = 0;
-          jj = kk = 0;
-          dr = (rmax - rmin) / RESOLUTION;
-          dtheta = (thetamax - thetamin) / RESOLUTION;
-          for (r = rmin + dr / 2; r < rmax; r += dr)
-          {
-            for (theta = thetamin + dtheta / 2; theta < thetamax; theta += dtheta)
-            {
-              denom += r * r * sin (theta);;
-              kk++;
-              x[0] = r * sin (theta);
-              x[1] = 0;
-              x[2] = r * cos (theta);;
-              if (where_in_wind (x, &ndomain) == W_ALL_INWIND)
-              {
-                num += r * r * sin (theta);     /* 0 implies in wind */
-                jj++;
-              }
-            }
-          }
-          fraction = num / denom;
-        }
-
-        /* OK now assign inwind value and final volumes */
-
-        if (jj == 0)
-        {
-          w[n].inwind = W_NOT_INWIND;   // The cell is not in the wind
-          w[n].vol = 0.0;
-        }
-        else if (jj == kk)
-          w[n].inwind = W_ALL_INWIND;   // The cell is completely in the wind
-        else
-        {
-          w[n].inwind = W_PART_INWIND;  //The cell is partially in the wind
-          w[n].vol *= fraction;
-        }
+	  if (w[n].inwind == W_NOT_ASSIGNED)
+	    {
+	      if (zdom[ndom].wind_type == IMPORT)
+		{
+		  Error
+		    ("Shouldn't be redefining inwind in cylind_volumes with imported model.\n");
+		  exit (0);
+		}
 
 
-      }
+	      rmin = zdom[ndom].wind_x[i];
+	      rmax = zdom[ndom].wind_x[i + 1];
+	      thetamin = zdom[ndom].wind_z[j] / RADIAN;
+	      thetamax = zdom[ndom].wind_z[j + 1] / RADIAN;
+
+	      //leading factor of 2 added to allow for volume above and below plane (SSMay04)
+	      w[n].vol = cell_volume;
+
+	      n_inwind = rtheta_is_cell_in_wind (n);
+	      if (n_inwind == W_NOT_INWIND)
+		{
+		  fraction = 0.0;	/* Force outside edge volues to zero */
+		  jj = 0;
+		  kk = RESOLUTION * RESOLUTION;
+		}
+	      else if (n_inwind == W_ALL_INWIND)
+		{
+		  fraction = 1.0;	/* Force outside edge volues to zero */
+		  jj = kk = RESOLUTION * RESOLUTION;
+		}
+
+
+	      else
+		{		/* The grid cell is PARTIALLY in the wind */
+		  num = denom = 0;
+		  jj = kk = 0;
+		  dr = (rmax - rmin) / RESOLUTION;
+		  dtheta = (thetamax - thetamin) / RESOLUTION;
+		  for (r = rmin + dr / 2; r < rmax; r += dr)
+		    {
+		      for (theta = thetamin + dtheta / 2; theta < thetamax;
+			   theta += dtheta)
+			{
+			  denom += r * r * sin (theta);;
+			  kk++;
+			  x[0] = r * sin (theta);
+			  x[1] = 0;
+			  x[2] = r * cos (theta);;
+			  if (where_in_wind (x, &ndomain) == W_ALL_INWIND)
+			    {
+			      num += r * r * sin (theta);	/* 0 implies in wind */
+			      jj++;
+			    }
+			}
+		    }
+		  fraction = num / denom;
+		}
+
+	      /* OK now assign inwind value and final volumes */
+
+	      if (jj == 0)
+		{
+		  w[n].inwind = W_NOT_INWIND;	// The cell is not in the wind
+		  w[n].vol = 0.0;
+		}
+	      else if (jj == kk)
+		w[n].inwind = W_ALL_INWIND;	// The cell is completely in the wind
+	      else
+		{
+		  w[n].inwind = W_PART_INWIND;	//The cell is partially in the wind
+		  w[n].vol *= fraction;
+		}
+
+
+	    }
+	  /* JM/ksl 1711 -- the following two if statements are for if the inwind values are
+	     already assigned, for example by an imported model */
+	  /* need to zero volumes for cells not in the wind */
+	  /* XXX - the logic is pretty awkward.  It seems as if we already knew a cell was in or ou
+	   * of the wind, then we should put these at the top rather than at the bottom of the
+	   * loop, here and in cylindrical_volummes
+	   */
+
+	  else if (w[n].inwind == W_NOT_INWIND)
+	    {
+	      w[n].vol = 0.0;
+	    }
+
+	  else if (w[n].inwind == W_ALL_INWIND)
+	    {
+	      w[n].vol = cell_volume;
+	    }
+
+	}
     }
-  }
 
   return (0);
 }
@@ -556,14 +601,14 @@ rtheta_where_in_grid (ndom, x)
 
   /* Check to see if x is outside the region of the calculation */
 
-  if (r > zdom[ndom].wind_x[ndim - 1])  /* Fixed version */
-  {
-    return (-2);                /* x is outside grid */
-  }
+  if (r > zdom[ndom].wind_x[ndim - 1])	/* Fixed version */
+    {
+      return (-2);		/* x is outside grid */
+    }
   else if (r < zdom[ndom].wind_x[0])
-  {
-    return (-1);                /*x is inside grid */
-  }
+    {
+      return (-1);		/*x is inside grid */
+    }
 
   /* Locate the position in i and j */
   fraction (r, zdom[ndom].wind_x, ndim, &i, &f, 0);
@@ -604,8 +649,8 @@ rtheta_where_in_grid (ndom, x)
 
 int
 rtheta_get_random_location (n, x)
-     int n;                     // Wind cell in which to create position
-     double x[];                // Returned position
+     int n;			// Wind cell in which to create position
+     double x[];		// Returned position
 {
   int i, j;
   int inwind;
@@ -626,26 +671,29 @@ rtheta_get_random_location (n, x)
 
   inwind = W_NOT_INWIND;
   while (inwind != W_ALL_INWIND)
-  {
-    r = sqrt (rmin * rmin + (rand () / (MAXRAND - 0.5)) * (rmax * rmax - rmin * rmin));
+    {
+      r =
+	sqrt (rmin * rmin +
+	      (rand () / (MAXRAND - 0.5)) * (rmax * rmax - rmin * rmin));
 
-    theta = asin (sthetamin + (rand () / MAXRAND) * (sthetamax - sthetamin));
+      theta =
+	asin (sthetamin + (rand () / MAXRAND) * (sthetamax - sthetamin));
 
-    phi = 2. * PI * (rand () / MAXRAND);
+      phi = 2. * PI * (rand () / MAXRAND);
 
 /* Project from r, theta phi to x y z  */
 
-    x[0] = r * cos (phi) * sin (theta);
-    x[1] = r * sin (phi) * sin (theta);
-    x[2] = r * cos (theta);
-    inwind = where_in_wind (x, &ndomain);       /* Some photons will not be in the wind
-                                                   because the boundaries of the wind split the grid cell */
-  }
+      x[0] = r * cos (phi) * sin (theta);
+      x[1] = r * sin (phi) * sin (theta);
+      x[2] = r * cos (theta);
+      inwind = where_in_wind (x, &ndomain);	/* Some photons will not be in the wind
+						   because the boundaries of the wind split the grid cell */
+    }
 
-  zz = rand () / MAXRAND - 0.5; //positions above are all at +z distances
+  zz = rand () / MAXRAND - 0.5;	//positions above are all at +z distances
 
   if (zz < 0)
-    x[2] *= -1;                 /* The photon is in the bottom half of the wind */
+    x[2] *= -1;			/* The photon is in the bottom half of the wind */
 
   return (inwind);
 
@@ -703,34 +751,34 @@ rtheta_extend_density (ndom, w)
   mdim = zdom[ndom].mdim;
 
   for (i = 0; i < ndim - 1; i++)
-  {
-    for (j = 0; j < mdim - 1; j++)
     {
-      wind_ij_to_n (ndom, i, j, &n);
-      if (w[n].vol == 0)
+      for (j = 0; j < mdim - 1; j++)
+	{
+	  wind_ij_to_n (ndom, i, j, &n);
+	  if (w[n].vol == 0)
 
-      {                         /*Then this grid point is not in the wind */
+	    {			/*Then this grid point is not in the wind */
 
-        wind_ij_to_n (ndom, i + 1, j, &m);
-        if (w[m].vol > 0)
-        {                       /*Then the windcell in the +x direction is in the wind and
-                                   we can copy the densities to the grid cell n  */
-          w[n].nplasma = w[m].nplasma;
+	      wind_ij_to_n (ndom, i + 1, j, &m);
+	      if (w[m].vol > 0)
+		{		/*Then the windcell in the +x direction is in the wind and
+				   we can copy the densities to the grid cell n  */
+		  w[n].nplasma = w[m].nplasma;
 
-        }
-        else if (i > 0)
-        {
-          wind_ij_to_n (ndom, i - 1, j, &m);
-          if (w[m].vol > 0)
-          {                     /*Then the grid cell in the -x direction is in the wind and
-                                   we can copy the densities to the grid cell n */
-            w[n].nplasma = w[m].nplasma;
+		}
+	      else if (i > 0)
+		{
+		  wind_ij_to_n (ndom, i - 1, j, &m);
+		  if (w[m].vol > 0)
+		    {		/*Then the grid cell in the -x direction is in the wind and
+				   we can copy the densities to the grid cell n */
+		      w[n].nplasma = w[m].nplasma;
 
-          }
-        }
-      }
+		    }
+		}
+	    }
+	}
     }
-  }
 
   return (0);
 
@@ -755,7 +803,7 @@ of these are in the wind
 
 int
 rtheta_is_cell_in_wind (n)
-     int n;                     /* The wind cell number */
+     int n;			/* The wind cell number */
 {
   int i, j;
   double r, theta;
@@ -774,17 +822,17 @@ rtheta_is_cell_in_wind (n)
   mdim = zdom[ndom].mdim;
 
   if (i >= (ndim - 2) && j >= (mdim - 2))
-  {
-    return (W_NOT_INWIND);
-  }
+    {
+      return (W_NOT_INWIND);
+    }
 
   /* Assume that if all four corners are in the wind that the
    * entire cell is in the wind */
 
   if (check_corners_inwind (n) == 4)
-  {
-    return (W_ALL_INWIND);
-  }
+    {
+      return (W_ALL_INWIND);
+    }
 
   /* So at this point, we have dealt with the easy cases */
 
@@ -802,43 +850,43 @@ rtheta_is_cell_in_wind (n)
 
 
   for (theta = thetamin + dtheta / 2.; theta < thetamax; theta += dtheta)
-  {
-    x[0] = rmin * sin (theta);
-    x[2] = rmin * cos (theta);;
-
-    if (where_in_wind (x, &ndomain) == W_ALL_INWIND)
     {
-      return (W_PART_INWIND);
-    }
+      x[0] = rmin * sin (theta);
+      x[2] = rmin * cos (theta);;
 
-    x[0] = rmax * sin (theta);
-    x[2] = rmax * cos (theta);;
-    if (where_in_wind (x, &ndomain) == W_ALL_INWIND)
-    {
-      return (W_PART_INWIND);
-    }
+      if (where_in_wind (x, &ndomain) == W_ALL_INWIND)
+	{
+	  return (W_PART_INWIND);
+	}
 
-  }
+      x[0] = rmax * sin (theta);
+      x[2] = rmax * cos (theta);;
+      if (where_in_wind (x, &ndomain) == W_ALL_INWIND)
+	{
+	  return (W_PART_INWIND);
+	}
+
+    }
 
 
 
   for (r = rmin + dr / 2.; r < rmax; r += dr)
-  {
-    x[0] = r * sin (thetamin);
-    x[2] = r * cos (thetamin);;
-    if (where_in_wind (x, &ndomain) == W_ALL_INWIND)
     {
-      return (W_PART_INWIND);
-    }
+      x[0] = r * sin (thetamin);
+      x[2] = r * cos (thetamin);;
+      if (where_in_wind (x, &ndomain) == W_ALL_INWIND)
+	{
+	  return (W_PART_INWIND);
+	}
 
-    x[0] = r * sin (thetamax);
-    x[2] = r * cos (thetamax);;
-    if (where_in_wind (x, &ndomain) == W_ALL_INWIND)
-    {
-      return (W_PART_INWIND);
-    }
+      x[0] = r * sin (thetamax);
+      x[2] = r * cos (thetamax);;
+      if (where_in_wind (x, &ndomain) == W_ALL_INWIND)
+	{
+	  return (W_PART_INWIND);
+	}
 
-  }
+    }
 
 
   /* If one has reached this point, then this wind cell is not in the wind */
