@@ -50,3 +50,7 @@ software/gsl-1.15/*/*.dSYM
 
 # atomic data files should not be tracked by this repository 
 data/
+
+# for the moment, ignore doxygen outputs
+docs/doxygen/html
+docs/doxygen/latex
