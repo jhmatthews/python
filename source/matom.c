@@ -37,9 +37,22 @@
  * Macro Atom jumping/deactivaion probabilities following Lucy and so deduces
  * the process by which deactivation occurs. At output "nres" identifies this 
  * process and the packet information has been updated.
+ *
+ * The process for activating a macro-atom is illustrated with this figure from
+ * JM's thesis:
+ * \image html matom_flowchart.png "Macro-atom flowchart" width=500
  * 
  *
  * @notes
+ * 
+ * Relevant References:
+ *    - <a href="http://adsabs.harvard.edu/abs/2002A%26A...384..725L">Lucy (2002)</a>
+ *    - <a href="http://adsabs.harvard.edu/abs/2003A%26A...403..261L">Lucy (2003)</a>
+ *    - <a href="http://adsabs.harvard.edu/abs/2005MNRAS.363..615S">Sim et al. (2005)</a>
+ *    - <a href="https://eprints.soton.ac.uk/400903/1/Final%2520thesis%2520for%2520award.pdf">
+ * Matthews PhD Thesis</a>, Chapter 3
+ *
+ *
  * ksl-- There is a lot of arithmetic required to keep track of indices.  I would
  * be inclined to figure out a way to avoid this.  One possibility would be to record the
  * go_to level in an array when one is calculating the emission probabilities. This would
@@ -549,10 +562,16 @@ int temp_choice;                        //choice of type of calcualation for alp
 /** @name  alpha_sp 
  *  @brief the matom estimator for the spontaneous recombination rate.
  * 
- * The rate is given by 
- * 
- *    (4 pi /c2) (gu/gl) (h2/2 pi m k T)^(3/2) 
- * times the integral of   a(nu) nu2 exp [(chi- h nu)/kT].
+ *  The estimator is given by 
+ *   \f[
+ *     \alpha_{sp}=\frac{4 \pi}{c^2}
+ *              \frac{g_u}{g_l}
+ *              \left( \frac{h^2}{2\pi m_e k T} \right)^{3/2}
+ *              \int_{\nu_0}^\infty  \sigma_\nu \nu^2 
+ *              \exp \left(\frac{\chi- h \nu}{kT} \right) d\nu
+ *   \f]
+ * This is equation 13 of 
+ * <a href="http://adsabs.harvard.edu/abs/2003A%26A...403..261L">Lucy (2003)</a>. 
  * 
  * @notes
  * 04jul30	ksl	Modified so that one does not need to have multiple versions
