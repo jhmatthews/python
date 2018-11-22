@@ -142,6 +142,8 @@ get_domain_params (ndom)
       if (zdom[ndom].coord_type != SPHERICAL)
         rddoub ("@geo.zlog_scale", &zdom[ndom].zlog_scale);
     }
+
+    modes.report_frozen = rdchoice ("@Diag.report_frozen_in_cells(yes,no)", "1,0", answer);
   }
 
   zdom[ndom].ndim2 = zdom[ndom].ndim * zdom[ndom].mdim;

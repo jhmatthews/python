@@ -1370,6 +1370,7 @@ struct advanced_modes
   int fixed_temp;               // do not alter temperature from that set in the parameter file
   int zeus_connect;             // We are connecting to zeus, do not seek new temp and output a heating and cooling file
   int rand_seed_usetime;        // default random number seed is fixed, not based on time
+  int report_frozen;            // report diagnostics on frozen in ionization 
 }
 modes;
 

@@ -1271,14 +1271,15 @@ int
 check_grid ()
 {
   int ndom, n;
-  double l_sob, vth, lambda_t, nh;
+  double l_sob, vth, lambda_t, nh, alpha;
+  double speed_cen, speed1, t_flow, t_recomb;
   double delta_r, delta_x, delta_z, delta_vz, delta_vx;
   double v1[3], v2[3];
   WindPtr one;
   PlasmaPtr xplasma;
-  int n_dv, n_tau;
+  int n_dv, n_tau, n_frozen;
 
-  n_dv = n_tau = 0;
+  n_dv = n_tau = n_frozen = 0;
 
   for (n = 0; n < NPLASMA; n++)
   {
@@ -1305,12 +1306,12 @@ check_grid ()
     /* Thomson mean free path 1/sigma*nh */
     lambda_t = 1.0 / THOMPSON * nh;
 
-    /* get the velocity at cell corner and cell edge in x and z */
-    model_velocity (ndom, one->x, v1);
-    model_velocity (ndom, one->xcen, v2);
+    /* get the velocity at cell corner and cell centre in x and z */
+    speed1 = model_velocity (ndom, one->x, v1);
+    speed_cen = model_velocity (ndom, one->xcen, v2);
 
     delta_vx = fabs (v1[0] - v2[0]);
-    delta_vz = fabs (v1[1] - v2[1]);
+    delta_vz = fabs (v1[2] - v2[2]);
 
     /* if we have errors then increment the error counters */
     if (delta_r / lambda_t > 1)
@@ -1327,17 +1328,35 @@ check_grid ()
       //       n, ndom);
     }
 
+    /* get approximate recombination time based on rough ne=nh and 
+       Case B recomb coefficient from Osterbrock for 10,000K gas */
+    alpha = 2.59e-13;
+    t_recomb = 1.0 / alpha / nh;
+    t_flow = delta_r / speed_cen;
+
+    /* increment frozen in counter */
+    if (t_flow <= t_recomb)
+    {
+      n_frozen++;
+      Error("check_grid: flow_time (%8.4e) < recomb_time (%8.4e) in cell %i domain %i\n",
+             t_flow, t_recomb, n, ndom);
+      Log("check_grid: speed: %8.4e length %8.4e nh %8.4e\n", speed_cen, delta_r, nh);
+    }
   }
 
   /* report problems to user in a summary error message */
   if (n_dv > 0)
-    Error ("check_grid: velocity changes by >1,000 km/s in %i cells\n", n_dv);
+    Error ("check_grid: velocity changes by >1,000 km/s in %d cells\n", n_dv);
 
   if (n_tau > 0)
-    Error ("check_grid: optical depth may be high in %i\n", n_tau);
+    Error ("check_grid: optical depth may be high in %d\n", n_tau);
 
   if (n_dv > 0 || n_tau > 0)
     Error ("check_grid: some cells have large changes. Consider modifying zlog_scale or grid dims\n");
+
+  if (n_frozen > 0)
+    Error ("check_grid: %d cells may have short flow time compared to recomb time- possible frozen ionization.\n",
+            n_frozen);
 
   return (0);
 }
