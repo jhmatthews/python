@@ -30,70 +30,68 @@
 #define	LINELEN 256
 
 
-char *old_names[] =
-  { "mstar", "rstar", "Disk.illumination.treatment", "disk.type",
+char *old_names[] = { "mstar", "rstar", "Disk.illumination.treatment", "disk.type",
   "Disk_radiation", "Rad_type_for_disk", "disk.mdot", "T_profile_file",
-    "disk.radmax",
+  "disk.radmax",
   "stellar_wind_mdot", "stellar.wind.radmin", "stellar.wind_vbase",
-    "stellar.wind.v_infinity", "stellar.wind.acceleration_exponent",
-    "spectrum_wavemin","spectrum_wavemax","no_observers","angle",
-    "phase","live.or.die","spec.type","mstar","rstar","Star_radiation",
-    "tstar","Rad_type_for_star","Rad_type_for_star",
-    "Rad_type_for_disk","Rad_type_for_bl","Boundary_layer_radiation",
-    "Rad_type_for_bl","t_bl","lum_bl","homologous_boundary_mdot","msec",
-    "period","shell_wind_mdot","Photon.sampling.approach","Num.of.frequency.bands",
-    "Lowest_energy_to_be_considered","Highest_energy_to_be_considered","Band.boundary",
-    "Band.minimum_fraction",
-    "agn_bremsstrahlung_temp","agn_bremsstrahlung_alpha","agn_blackbody_temp",
-    "agn_power_law_cutoff","geometry_for_pl_source","lamp_post.height",
-    "@Select_specific_no_of_scatters_in_spectra","@Select_scatters","@Select_photons_by_position",
-    "@Select_location","@rho","@z","@azimuth","@r",
-    "@save_cell_statistics","@ispymode","@keep_ioncycle_windsaves","@make_ioncycle_tables",
-    "@save_extract_photons", "@print_dvds_info","@track_resonant_scatters",
-    "@Use.standard.care.factors","@Fractional.distance.photon.may.travel",
-    "@Lowest.ion.density.contributing.to.photoabsorption", "@Keep.photoabs.during.final.spectrum",
-    "@adjust_grid",
-    "filling_factor","Coord.system","@write_atomicdata","Fixed.concentrations.filename",
-    "@Extra.diagnostics","File.with.model2read","Number.of.wind.components","Old_windfile",
-    "Model_file","agn_power_law_index", "hydro_file","Hydro_thetamax",
-    "kn.acceleration_exponent", "kn.acceleration_length", "kn.d", "kn.mdot_r_exponent",
-    "kn.rmax", "kn.rmin", "kn.v_infinity", "kn.v_zero",
-    NULL
-
+  "stellar.wind.v_infinity", "stellar.wind.acceleration_exponent",
+  "spectrum_wavemin", "spectrum_wavemax", "no_observers", "angle",
+  "phase", "live.or.die", "spec.type", "mstar", "rstar", "Star_radiation",
+  "tstar", "Rad_type_for_star", "Rad_type_for_star",
+  "Rad_type_for_disk", "Rad_type_for_bl", "Boundary_layer_radiation",
+  "Rad_type_for_bl", "t_bl", "lum_bl", "homologous_boundary_mdot", "msec",
+  "period", "shell_wind_mdot", "Photon.sampling.approach", "Num.of.frequency.bands",
+  "Lowest_energy_to_be_considered", "Highest_energy_to_be_considered", "Band.boundary",
+  "Band.minimum_fraction",
+  "agn_bremsstrahlung_temp", "agn_bremsstrahlung_alpha", "agn_blackbody_temp",
+  "agn_power_law_cutoff", "geometry_for_pl_source", "lamp_post.height",
+  "@Select_specific_no_of_scatters_in_spectra", "@Select_scatters", "@Select_photons_by_position",
+  "@Select_location", "@rho", "@z", "@azimuth", "@r",
+  "@save_cell_statistics", "@ispymode", "@keep_ioncycle_windsaves", "@make_ioncycle_tables",
+  "@save_extract_photons", "@print_dvds_info", "@track_resonant_scatters",
+  "@Use.standard.care.factors", "@Fractional.distance.photon.may.travel",
+  "@Lowest.ion.density.contributing.to.photoabsorption", "@Keep.photoabs.during.final.spectrum",
+  "@adjust_grid",
+  "filling_factor", "Coord.system", "@write_atomicdata", "Fixed.concentrations.filename",
+  "@Extra.diagnostics", "File.with.model2read", "Number.of.wind.components", "Old_windfile",
+  "Model_file", "agn_power_law_index", "hydro_file", "Hydro_thetamax",
+  "kn.acceleration_exponent", "kn.acceleration_length", "kn.d", "kn.mdot_r_exponent",
+  "kn.rmax", "kn.rmin", "kn.v_infinity", "kn.v_zero",
+  NULL
 };
 
 char *new_names[] = { "Central.object.mass", "Central.object.radius",
   "Surface.reflection.or.absorption", "Disk.type", "Disk.radiation",
-    "Disk.rad_type_to_make_wind",
+  "Disk.rad_type_to_make_wind",
   "Disk.mdot", "Disk.T_profile_file", "Disk.radmax",
   "Stellar_wind.mdot", "Stellar_wind.radmin", "Stellar_wind.vbase",
-    "Stellar_wind.v_infinity", "Stellar_wind.acceleration_exponent",
-    "Spectrum.wavemin","Spectrum.wavemax","Spectrum.no_observers",
-    "Spectrum.angle","Spectrum.orbit_phase","Spectrum.live_or_die",
-    "Spectrum.type","Central_object.mass","Central_object.radius",
-    "Central_object.radiation","Central_object.temp","Central_object.rad_type_to_make_wind",
-    "Central_object.rad_type_in_final_spectrum",
-    "Disk.rad_type_in_final_spectrum","Boundary_layer.rad_type_in_final_spectrum",
-    "Boundary_layer.radiation","Boundary_layer.rad_type_to_make_wind","Boundary_layer.temp",
-    "Boundary_layer.luminosity","Homologous.boundary_mdot","Binary.mass_sec",
-    "Binary.period","Shell.wind_mdot","Photon_sampling.approach","Photon_sampling.nbands",
-    "Photon_sampling.low_energy_limit","Photon_sampling.high_energy_limit","Photon_sampling.band_boundary",
-    "Photon_sampling.band_min_frac",
-    "AGN.bremsstrahlung_temp","AGN.bremsstrahlung_alpha","AGN.blackbody_temp",
-    "AGN.power_law_cutoff","AGN.geometry_for_pl_source","AGN.lamp_post_height",
-    "@Spectrum.select_specific_no_of_scatters_in_spectra","@Spectrum.select_scatters","@Spectrum.select_photons_by_position",
-    "@Spectrum.select_location","@Spectrum.select_rho","@Spectrum.select_z","@Spectrum.select_azimuth","@Spectrum.select_r",
-    "@Diag.save_cell_statistics","@Diag.ispymode","@Diag.keep_ioncycle_windsaves","@Diag.make_ioncycle_tables",
-    "@Diag.save_extract_photons", "@Diag.print_dvds_info","@Diag.track_resonant_scatters",
-    "@Diag.use_standard_care_factors","@Diag.fractional_distance_photon_may_travel",
-    "@Diag.lowest_ion_density_for_photoabs", "@Diag.keep_photoabs_in_final_spectra",
-    "@Diag.adjust_grid",
-    "Wind.filling_factor","Wind.coord_system","@Diag.write_atomicdata", "Wind.fixed_concntrations_file",
-    "@Diag.extra","Wind.model2import","Wind.number_of_components","Wind.old_windfile",
-    "Input_spectra.model_file","AGN.power_law_index", "Hydro.file","Hydro.thetamax",
-    "KWD.acceleration_exponent", "KWD.acceleration_length", "KWD.d", "KWD.mdot_r_exponent",
-    "KWD.rmax", "KWD.rmin", "KWD.v_infinity", "KWD.v_zero",
-    NULL
+  "Stellar_wind.v_infinity", "Stellar_wind.acceleration_exponent",
+  "Spectrum.wavemin", "Spectrum.wavemax", "Spectrum.no_observers",
+  "Spectrum.angle", "Spectrum.orbit_phase", "Spectrum.live_or_die",
+  "Spectrum.type", "Central_object.mass", "Central_object.radius",
+  "Central_object.radiation", "Central_object.temp", "Central_object.rad_type_to_make_wind",
+  "Central_object.rad_type_in_final_spectrum",
+  "Disk.rad_type_in_final_spectrum", "Boundary_layer.rad_type_in_final_spectrum",
+  "Boundary_layer.radiation", "Boundary_layer.rad_type_to_make_wind", "Boundary_layer.temp",
+  "Boundary_layer.luminosity", "Homologous.boundary_mdot", "Binary.mass_sec",
+  "Binary.period", "Shell.wind_mdot", "Photon_sampling.approach", "Photon_sampling.nbands",
+  "Photon_sampling.low_energy_limit", "Photon_sampling.high_energy_limit", "Photon_sampling.band_boundary",
+  "Photon_sampling.band_min_frac",
+  "AGN.bremsstrahlung_temp", "AGN.bremsstrahlung_alpha", "AGN.blackbody_temp",
+  "AGN.power_law_cutoff", "AGN.geometry_for_pl_source", "AGN.lamp_post_height",
+  "@Spectrum.select_specific_no_of_scatters_in_spectra", "@Spectrum.select_scatters", "@Spectrum.select_photons_by_position",
+  "@Spectrum.select_location", "@Spectrum.select_rho", "@Spectrum.select_z", "@Spectrum.select_azimuth", "@Spectrum.select_r",
+  "@Diag.save_cell_statistics", "@Diag.ispymode", "@Diag.keep_ioncycle_windsaves", "@Diag.make_ioncycle_tables",
+  "@Diag.save_extract_photons", "@Diag.print_dvds_info", "@Diag.track_resonant_scatters",
+  "@Diag.use_standard_care_factors", "@Diag.fractional_distance_photon_may_travel",
+  "@Diag.lowest_ion_density_for_photoabs", "@Diag.keep_photoabs_in_final_spectra",
+  "@Diag.adjust_grid",
+  "Wind.filling_factor", "Wind.coord_system", "@Diag.write_atomicdata", "Wind.fixed_concntrations_file",
+  "@Diag.extra", "Wind.model2import", "Wind.number_of_components", "Wind.old_windfile",
+  "Input_spectra.model_file", "AGN.power_law_index", "Hydro.file", "Hydro.thetamax",
+  "KWD.acceleration_exponent", "KWD.acceleration_length", "KWD.d", "KWD.mdot_r_exponent",
+  "KWD.rmax", "KWD.rmin", "KWD.v_infinity", "KWD.v_zero",
+  NULL
 };
 
 
@@ -143,7 +141,7 @@ int
 check_synonyms (new_question, old_question)
      char new_question[], old_question[];
 {
-  int i,n;
+  int i, n;
   char *line;
   char firstword[LINELEN];
   int nwords, wordlength;
@@ -154,18 +152,24 @@ check_synonyms (new_question, old_question)
    */
 
   int n_old_names = -1;
-  while (old_names[++n_old_names] != NULL) { /* do nothing */}
+  while (old_names[++n_old_names] != NULL)
+  {                             /* do nothing */
+  }
 
   int n_new_names = -1;
-  while (new_names[++n_new_names] != NULL) { /* do nothing */}
+  while (new_names[++n_new_names] != NULL)
+  {                             /* do nothing */
+  }
 
-  if (n_new_names!=n_old_names || number_of_names != n_old_names){
-	Error("check_synonums: %d %d %d\n",number_of_names,n_old_names,n_new_names);
-	n=MIN(n_new_names,n_old_names);
-	for (i=0;i<n;i++){
-		Log("%3d %40s %40s\n",i,old_names[i],new_names[i]);
-	}
-	exit(0);
+  if (n_new_names != n_old_names || number_of_names != n_old_names)
+  {
+    Error ("check_synonums: %d %d %d\n", number_of_names, n_old_names, n_new_names);
+    n = MIN (n_new_names, n_old_names);
+    for (i = 0; i < n; i++)
+    {
+      Log ("%3d %40s %40s\n", i, old_names[i], new_names[i]);
+    }
+    exit (0);
   }
 
 
@@ -179,9 +183,9 @@ check_synonyms (new_question, old_question)
 
 
   if (nwords == 0)
-    {
-      return (0);
-    }
+  {
+    return (0);
+  }
 
 
 /* Strip off everthing prior to open paren, leaving the bare parameter name that was passed as the new
@@ -189,11 +193,11 @@ check_synonyms (new_question, old_question)
  */
 
   if ((ccc = index (firstword, '(')) != NULL)
-    {
-      wordlength = (int) (ccc - firstword);
-      if (wordlength == 0)
-	return (0);
-    }
+  {
+    wordlength = (int) (ccc - firstword);
+    if (wordlength == 0)
+      return (0);
+  }
 
 
 /* firstword is the bare parameter name for the current way the parameter is expressed elsewhere.
@@ -202,17 +206,17 @@ check_synonyms (new_question, old_question)
 
 
   for (n = 0; n < number_of_names; n++)
+  {
+    if (strncmp (new_names[n], firstword, wordlength) == 0)
     {
-      if (strncmp (new_names[n], firstword, wordlength) == 0)
-	{
-//OLD	  Log
-//OLD	    ("Matched keyword %s in .pf file to %s in current python version\n",
+//OLD     Log
+//OLD       ("Matched keyword %s in .pf file to %s in current python version\n",
 //OLD     new_question, old_names[n]);
-	  strcpy (old_question, old_names[n]);
-	  return (1);
-	}
-
+      strcpy (old_question, old_names[n]);
+      return (1);
     }
+
+  }
 
   return (0);
 

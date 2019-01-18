@@ -69,15 +69,15 @@ define_wind ()
 
   n = 0;
   for (ndom = 0; ndom < geo.ndomain; ndom++)
-    {
-      zdom[ndom].nstart = n;
-      n += zdom[ndom].ndim * zdom[ndom].mdim;
-      zdom[ndom].nstop = n;
-      //PLACEHOLDER  we should not really need to define NDIM and MDIM here, we may need NDIM2
-      /* NDIM2 here is the total dimensions of the grid, summed over all domains
-         and is used to allocate the wind pointer */
-      geo.ndim2 = NDIM2 += zdom[ndom].ndim * zdom[ndom].mdim;
-    }
+  {
+    zdom[ndom].nstart = n;
+    n += zdom[ndom].ndim * zdom[ndom].mdim;
+    zdom[ndom].nstop = n;
+    //PLACEHOLDER  we should not really need to define NDIM and MDIM here, we may need NDIM2
+    /* NDIM2 here is the total dimensions of the grid, summed over all domains
+       and is used to allocate the wind pointer */
+    geo.ndim2 = NDIM2 += zdom[ndom].ndim * zdom[ndom].mdim;
+  }
 
   calloc_wind (NDIM2);
 
@@ -85,82 +85,80 @@ define_wind ()
 
   /* Assign the domains to each cell */
   for (ndom = 0; ndom < geo.ndomain; ndom++)
+  {
+    for (n = zdom[ndom].nstart; n < zdom[ndom].nstop; n++)
     {
-      for (n = zdom[ndom].nstart; n < zdom[ndom].nstop; n++)
-	{
-	  w[n].ndom = ndom;	// Assign each wind cell to a domain
-	}
+      w[n].ndom = ndom;         // Assign each wind cell to a domain
     }
+  }
 
   /* initialize inwind and dfudge to a known state for all wind cells */
   for (n = 0; n < NDIM2; n++)
-    {
-      w[n].inwind = W_NOT_ASSIGNED;
-      w[n].dfudge = DFUDGE;
-    }
+  {
+    w[n].inwind = W_NOT_ASSIGNED;
+    w[n].dfudge = DFUDGE;
+  }
 
   for (ndom = 0; ndom < geo.ndomain; ndom++)
+  {
+
+    Log ("Define wind coord_type %d for domain %d\n", zdom[ndom].coord_type, ndom);
+
+    if (zdom[ndom].wind_type == IMPORT)
     {
-
-      Log ("Define wind coord_type %d for domain %d\n", zdom[ndom].coord_type,
-	   ndom);
-
-      if (zdom[ndom].wind_type == IMPORT)
-	{
-	  import_make_grid (w, ndom);
-	}
-      else if (zdom[ndom].wind_type == SHELL)	/* nsh: This is the mode where we want the wind and the grid carefully
-						   controlled to allow a very thin shell. We ensure that the coordinate type is spherical.
-						 */
-	{
-	  Log
-	    ("We are making a thin shell type grid to match a thin shell wind. This is totally aphysical and should only be used for testing purposes\n");
-	  shell_make_grid (w, ndom);
-	}
-      else if (zdom[ndom].coord_type == SPHERICAL)
-	{
-	  spherical_make_grid (w, ndom);
-	}
-      else if (zdom[ndom].coord_type == CYLIND)
-	{
-	  cylind_make_grid (ndom, w);
-	}
-      else if (zdom[ndom].coord_type == RTHETA)
-	{
-	  if (zdom[ndom].wind_type == HYDRO)	/* 13jun -- nsh - 76 - This is a switch to allow one to use the
-						   actual zeus grid in the special case of a 'proga' wind in rtheta
-						   coordinates
-						 */
-	    {
-	      rtheta_make_hydro_grid (w, ndom);
-	    }
-	  else
-	    {
-	      rtheta_make_grid (w, ndom);
-	    }
-	}
-      else if (zdom[ndom].coord_type == CYLVAR)
-	{
-	  cylvar_make_grid (w, ndom);
-	}
-      else
-	{
-	  Error ("define_wind: Don't know how to make coordinate type %d\n",
-		 zdom[ndom].coord_type);
-	}
-      for (n = zdom[ndom].nstart; n < zdom[ndom].nstop; n++)
-	{
-	  /* For imported models we we have already set the velocities
-	   * at the edges of cells so this should not be done again
-	   */
-	  if (zdom[ndom].wind_type != IMPORT)
-	    {
-	      model_velocity (ndom, w[n].x, w[n].v);
-	    }
-	  model_vgrad (ndom, w[n].x, w[n].v_grad);
-	}
-
+      import_make_grid (w, ndom);
     }
+    else if (zdom[ndom].wind_type == SHELL)     /* nsh: This is the mode where we want the wind and the grid carefully
+                                                   controlled to allow a very thin shell. We ensure that the coordinate type is spherical.
+                                                 */
+    {
+      Log
+        ("We are making a thin shell type grid to match a thin shell wind. This is totally aphysical and should only be used for testing purposes\n");
+      shell_make_grid (w, ndom);
+    }
+    else if (zdom[ndom].coord_type == SPHERICAL)
+    {
+      spherical_make_grid (w, ndom);
+    }
+    else if (zdom[ndom].coord_type == CYLIND)
+    {
+      cylind_make_grid (ndom, w);
+    }
+    else if (zdom[ndom].coord_type == RTHETA)
+    {
+      if (zdom[ndom].wind_type == HYDRO)        /* 13jun -- nsh - 76 - This is a switch to allow one to use the
+                                                   actual zeus grid in the special case of a 'proga' wind in rtheta
+                                                   coordinates
+                                                 */
+      {
+        rtheta_make_hydro_grid (w, ndom);
+      }
+      else
+      {
+        rtheta_make_grid (w, ndom);
+      }
+    }
+    else if (zdom[ndom].coord_type == CYLVAR)
+    {
+      cylvar_make_grid (w, ndom);
+    }
+    else
+    {
+      Error ("define_wind: Don't know how to make coordinate type %d\n", zdom[ndom].coord_type);
+    }
+    for (n = zdom[ndom].nstart; n < zdom[ndom].nstop; n++)
+    {
+      /* For imported models we we have already set the velocities
+       * at the edges of cells so this should not be done again
+       */
+      if (zdom[ndom].wind_type != IMPORT)
+      {
+        model_velocity (ndom, w[n].x, w[n].v);
+      }
+      model_vgrad (ndom, w[n].x, w[n].v_grad);
+    }
+
+  }
   wind_complete (w);
 
   /* Now determine the valid volumes of each cell and also determine whether the cells are in all
@@ -169,41 +167,39 @@ define_wind ()
 
   for (ndom = 0; ndom < geo.ndomain; ndom++)
 
+  {
+    if (zdom[ndom].coord_type == SPHERICAL)
     {
-      if (zdom[ndom].coord_type == SPHERICAL)
-	{
-	  spherical_volumes (ndom, w);
-	}
-      else if (zdom[ndom].coord_type == CYLIND)
-	{
-	  cylind_volumes (ndom, w);
-	}
-      else if (zdom[ndom].coord_type == RTHETA)
-	{
-	  /* 13jun -- nsh - 76 - This is a switch to allow one to use
-	     the actual zeus grid in the special case of a 'proga' wind
-	     in rtheta coordinates We dont need to work out if cells are
-	     in the wind, they are known to be in the wind. */
-	  if (zdom[ndom].wind_type == HYDRO)
-	    {
-	      rtheta_hydro_volumes (ndom, w);
-	    }
-	  else
-	    {
-	      rtheta_volumes (ndom, w);
-	    }
-	}
-      else if (zdom[ndom].coord_type == CYLVAR)
-	{
-	  cylvar_volumes (ndom, w);
-	}
-      else
-	{
-	  Error
-	    ("define_wind: Don't know how to make volumes for coordinate type %d\n",
-	     zdom[ndom].coord_type);
-	}
+      spherical_volumes (ndom, w);
     }
+    else if (zdom[ndom].coord_type == CYLIND)
+    {
+      cylind_volumes (ndom, w);
+    }
+    else if (zdom[ndom].coord_type == RTHETA)
+    {
+      /* 13jun -- nsh - 76 - This is a switch to allow one to use
+         the actual zeus grid in the special case of a 'proga' wind
+         in rtheta coordinates We dont need to work out if cells are
+         in the wind, they are known to be in the wind. */
+      if (zdom[ndom].wind_type == HYDRO)
+      {
+        rtheta_hydro_volumes (ndom, w);
+      }
+      else
+      {
+        rtheta_volumes (ndom, w);
+      }
+    }
+    else if (zdom[ndom].coord_type == CYLVAR)
+    {
+      cylvar_volumes (ndom, w);
+    }
+    else
+    {
+      Error ("define_wind: Don't know how to make volumes for coordinate type %d\n", zdom[ndom].coord_type);
+    }
+  }
 
 
 
@@ -216,63 +212,54 @@ define_wind ()
 
   NPLASMA = 0;
   for (ndom = 0; ndom < geo.ndomain; ndom++)
+  {
+    n_vol = n_inwind = n_part = 0;
+    for (n = zdom[ndom].nstart; n < zdom[ndom].nstop; n++)
     {
-      n_vol = n_inwind = n_part = 0;
-      for (n = zdom[ndom].nstart; n < zdom[ndom].nstop; n++)
-	{
-	  if (w[n].vol > 0.0)
-	    n_vol++;
-	  if (w[n].inwind == W_ALL_INWIND)
-	    n_inwind++;
-	  if (w[n].inwind == W_PART_INWIND)
-	    n_part++;
+      if (w[n].vol > 0.0)
+        n_vol++;
+      if (w[n].inwind == W_ALL_INWIND)
+        n_inwind++;
+      if (w[n].inwind == W_PART_INWIND)
+        n_part++;
 
-	}
-      NPLASMA += n_vol;
-      Log
-	("wind2d: For domain %d there are %3d cells of which %d are in inwind, %d partially in_wind, & %d with pos. vol\n",
-	 ndom, zdom[ndom].ndim2, n_inwind, n_part, n_vol);
-
-
-      if (zdom[ndom].coord_type != SPHERICAL
-	  && zdom[ndom].wind_type != IMPORT)
-	{
-	  for (n = zdom[ndom].nstart; n < zdom[ndom].nstop; n++)
-	    {
-	      n_inwind = check_corners_inwind (n);
-
-	      if (w[n].vol == 0 && n_inwind > 0)
-		{
-		  wind_n_to_ij (ndom, n, &i, &j);
-		  Error
-		    ("wind2d: Cell %3d (%2d,%2d) in domain %d has %d corners in wind, but zero volume\n",
-		     n, i, j, ndom, n_inwind);
-		  w[n].inwind = W_IGNORE;
-		}
-	      if (w[n].inwind == W_PART_INWIND && n_inwind == 4)
-		{
-		  wind_n_to_ij (ndom, n, &i, &j);
-		  Error
-		    ("wind2d: Cell %3d (%2d,%2d) in domain %d has 4 corners in wind, but is only partially in wind\n",
-		     n, i, j, ndom);
-		}
-	    }
-
-	}
-      else if (zdom[ndom].coord_type == SPHERICAL)
-	{
-	  Log
-	    ("Not checking corners_in_wind for SPHERICAL coordinates used in domain %d\n",
-	     ndom);
-	}
-      else if (zdom[ndom].wind_type == IMPORT)
-	{
-	  /* JM 1711 -- we don't want to check corners in the case of an imported model */
-	  Log
-	    ("Not checking corners_in_wind for imported model, domain %d\n",
-	     ndom);
-	}
     }
+    NPLASMA += n_vol;
+    Log
+      ("wind2d: For domain %d there are %3d cells of which %d are in inwind, %d partially in_wind, & %d with pos. vol\n",
+       ndom, zdom[ndom].ndim2, n_inwind, n_part, n_vol);
+
+
+    if (zdom[ndom].coord_type != SPHERICAL && zdom[ndom].wind_type != IMPORT)
+    {
+      for (n = zdom[ndom].nstart; n < zdom[ndom].nstop; n++)
+      {
+        n_inwind = check_corners_inwind (n);
+
+        if (w[n].vol == 0 && n_inwind > 0)
+        {
+          wind_n_to_ij (ndom, n, &i, &j);
+          Error ("wind2d: Cell %3d (%2d,%2d) in domain %d has %d corners in wind, but zero volume\n", n, i, j, ndom, n_inwind);
+          w[n].inwind = W_IGNORE;
+        }
+        if (w[n].inwind == W_PART_INWIND && n_inwind == 4)
+        {
+          wind_n_to_ij (ndom, n, &i, &j);
+          Error ("wind2d: Cell %3d (%2d,%2d) in domain %d has 4 corners in wind, but is only partially in wind\n", n, i, j, ndom);
+        }
+      }
+
+    }
+    else if (zdom[ndom].coord_type == SPHERICAL)
+    {
+      Log ("Not checking corners_in_wind for SPHERICAL coordinates used in domain %d\n", ndom);
+    }
+    else if (zdom[ndom].wind_type == IMPORT)
+    {
+      /* JM 1711 -- we don't want to check corners in the case of an imported model */
+      Log ("Not checking corners_in_wind for imported model, domain %d\n", ndom);
+    }
+  }
 
 
 
@@ -280,16 +267,16 @@ define_wind ()
    * to contain only those cells which are in the wind. */
 
   calloc_plasma (NPLASMA);
-  calloc_dyn_plasma (NPLASMA);	
-  create_maps ();		/* Populate the maps between plasmamain & wmain */
+  calloc_dyn_plasma (NPLASMA);
+  create_maps ();               /* Populate the maps between plasmamain & wmain */
 
   /* JM 1502 -- we want the macro structure to be allocated in geo.rt_mode = RT_MODE_MACRO. see #138  */
 
   if (geo.rt_mode == RT_MODE_MACRO)
-    {
-      calloc_macro (NPLASMA);
-      calloc_estimators (NPLASMA);
-    }
+  {
+    calloc_macro (NPLASMA);
+    calloc_estimators (NPLASMA);
+  }
 
 
 /* 06may -- At this point we have calculated the volumes of all of the cells and it should
@@ -299,113 +286,110 @@ be optional which variables beyond here are moved to structures othere than Wind
 /* Now calculate parameters that need to be calculated at the center of the grid cell */
 
   for (n = 0; n < NPLASMA; n++)
+  {
+    nwind = plasmamain[n].nwind;
+    ndom = wmain[nwind].ndom;
+    stuff_v (w[nwind].xcen, x);
+
+    /* Next two lines allow for clumping */
+    plasmamain[n].rho = model_rho (ndom, x) / zdom[ndom].fill;
+    plasmamain[n].vol = w[nwind].vol * zdom[ndom].fill; // Copy volumes
+
+    /* This is where we initialise the spectral models for the wind. */
+
+    for (nn = 0; nn < NXBANDS; nn++)
     {
-      nwind = plasmamain[n].nwind;
-      ndom = wmain[nwind].ndom;
-      stuff_v (w[nwind].xcen, x);
-
-      /* Next two lines allow for clumping */
-      plasmamain[n].rho = model_rho (ndom, x) / zdom[ndom].fill;
-      plasmamain[n].vol = w[nwind].vol * zdom[ndom].fill;	// Copy volumes
-
-      /* This is where we initialise the spectral models for the wind. */
-
-      for (nn = 0; nn < NXBANDS; nn++)
-	{
-	  plasmamain[n].spec_mod_type[nn] = SPEC_MOD_FAIL;	/*NSH 120817 - setting this to
-								   a negative number means that at the outset, we assume we do not have a
-								   suitable model for the cell */
-	  plasmamain[n].exp_temp[nn] = geo.tmax;	/*NSH 120817 - as an initial guess,
-							   set this number to the hottest part of the model -
-							   this should define where any exponential dropoff becomes important */
-	  plasmamain[n].exp_w[nn] = 0.0;	/* 120817 Who knows what this should be! */
-	  plasmamain[n].pl_alpha[nn] = geo.alpha_agn;	/*As an initial guess we assume the whole wind is
-							   optically thin and so the spectral index for a PL illumination will be the
-							   same everywhere.  */
-	  plasmamain[n].pl_log_w[nn] = -1e99;	/*131114 - a tiny weight - just to fill the variable */
+      plasmamain[n].spec_mod_type[nn] = SPEC_MOD_FAIL;  /*NSH 120817 - setting this to
+                                                           a negative number means that at the outset, we assume we do not have a
+                                                           suitable model for the cell */
+      plasmamain[n].exp_temp[nn] = geo.tmax;    /*NSH 120817 - as an initial guess,
+                                                   set this number to the hottest part of the model -
+                                                   this should define where any exponential dropoff becomes important */
+      plasmamain[n].exp_w[nn] = 0.0;    /* 120817 Who knows what this should be! */
+      plasmamain[n].pl_alpha[nn] = geo.alpha_agn;       /*As an initial guess we assume the whole wind is
+                                                           optically thin and so the spectral index for a PL illumination will be the
+                                                           same everywhere.  */
+      plasmamain[n].pl_log_w[nn] = -1e99;       /*131114 - a tiny weight - just to fill the variable */
 
 
-	  plasmamain[n].fmin_mod[nn] = 1e99;	/* Set the minium model frequency to the max frequency in the band - means it will never be used which is correct at this time - there is no model */
-	  plasmamain[n].fmax_mod[nn] = 1e-99;	/* Set the maximum model frequency to the min frequency in the band */
+      plasmamain[n].fmin_mod[nn] = 1e99;        /* Set the minium model frequency to the max frequency in the band - means it will never be used which is correct at this time - there is no model */
+      plasmamain[n].fmax_mod[nn] = 1e-99;       /* Set the maximum model frequency to the min frequency in the band */
 
-	}
+    }
 
 
 /* NSH 130530 Next few lines allow the use of the temperature which can be computed from Zeus models to be
  * used as an initial guess for the wind temperature */
 
-      if (zdom[ndom].wind_type == HYDRO)
-	{
-	  plasmamain[n].t_r = hydro_temp (x);	//NSH 151126 - slight tidy up here - we now set t_e and t_r to hydro temp, t_e change is below//
-	}
-      else
-	{
-	  plasmamain[n].t_r = geo.twind_init;
-	}
+    if (zdom[ndom].wind_type == HYDRO)
+    {
+      plasmamain[n].t_r = hydro_temp (x);       //NSH 151126 - slight tidy up here - we now set t_e and t_r to hydro temp, t_e change is below//
+    }
+    else
+    {
+      plasmamain[n].t_r = geo.twind_init;
+    }
 
 
-      /* Initialize variables having to do with converence in initial stages */
-      plasmamain[n].gain = 0.5;
-      plasmamain[n].dt_e_old = 0.0;
-      plasmamain[n].dt_e = 0.0;
+    /* Initialize variables having to do with converence in initial stages */
+    plasmamain[n].gain = 0.5;
+    plasmamain[n].dt_e_old = 0.0;
+    plasmamain[n].dt_e = 0.0;
 
 /* The next lines set the electrom temperature to 0.9 times the radiation temperature (which is a bit
 	  odd since the input is the wind temperature, but is taken to be the radiation temperature). If we have
 	  a fixed temprature calculation,then the wind temperature is set to be the wind temperature so the
 	  user gets what they are expecting */
 
-      if (modes.fixed_temp == 0 && modes.zeus_connect == 0)	//NSH 151126 - dont multply by 0.9 in zeus connect or fixed temp modes
-	plasmamain[n].t_e = plasmamain[n].t_e_old = 0.9 * plasmamain[n].t_r;	//Lucy guess
-      else
-	plasmamain[n].t_e = plasmamain[n].t_e_old = plasmamain[n].t_r;
-      //If we want to fix the temperature, we set it to tr which has previously been set to twind.
+    if (modes.fixed_temp == 0 && modes.zeus_connect == 0)       //NSH 151126 - dont multply by 0.9 in zeus connect or fixed temp modes
+      plasmamain[n].t_e = plasmamain[n].t_e_old = 0.9 * plasmamain[n].t_r;      //Lucy guess
+    else
+      plasmamain[n].t_e = plasmamain[n].t_e_old = plasmamain[n].t_r;
+    //If we want to fix the temperature, we set it to tr which has previously been set to twind.
 
 
 
 /* Calculate an initial guess for the weight of the PL spectrum (constant / area of a sphere / 4pi) */
 
 
-      rrstar =
-	1. - (geo.rstar * geo.rstar) / (x[0] * x[0] + x[1] * x[1] +
-					x[2] * x[2]);
+    rrstar = 1. - (geo.rstar * geo.rstar) / (x[0] * x[0] + x[1] * x[1] + x[2] * x[2]);
 
-      if (rrstar > 0)
-	{
-	  plasmamain[n].w = 0.5 * (1 - sqrt (rrstar));
-	}
-      else
-	plasmamain[n].w = 0.5;	//Modification to allow for possibility that grid point is inside star
-
-      /* Determine the initial ionizations, either LTE or  fixed_concentrations */
-      if (geo.ioniz_mode != IONMODE_FIXED)
-	{			/* Carry out an LTE determination of the ionization (using T_r */
-	  ierr = ion_abundances (&plasmamain[n], IONMODE_LTE_TR);
-	}
-      else
-	{			/* Set the concentrations to specified values */
-	  ierr = ion_abundances (&plasmamain[n], IONMODE_FIXED);
-	}
-      if (ierr != 0)
-	{
-	  Error
-	    ("wind_define after ion_abundances: cell %d rho %8.2e t_r %8.2 t_e %8.2e w %8.2e\n",
-	     n, plasmamain[n].rho, plasmamain[n].t_r, plasmamain[n].t_e,
-	     plasmamain[n].w);
-	}
-
-      /* Initialize arrays for scatters and the pairwise ionization denominator and temperature
-       */
-
-      for (j = 0; j < nions; j++)
-	{
-	  plasmamain[n].PWdenom[j] = 0.0;
-	  plasmamain[n].PWnumer[j] = 0.0;
-	  plasmamain[n].PWdtemp[j] = 0.0;
-	  plasmamain[n].PWntemp[j] = 0.0;
-	  plasmamain[n].scatters[j] = 0;
-	  plasmamain[n].xscatters[j] = 0;
-	}
+    if (rrstar > 0)
+    {
+      plasmamain[n].w = 0.5 * (1 - sqrt (rrstar));
     }
+    else
+      plasmamain[n].w = 0.5;    //Modification to allow for possibility that grid point is inside star
+
+    /* Determine the initial ionizations, either LTE or  fixed_concentrations */
+    if (geo.ioniz_mode != IONMODE_FIXED)
+    {                           /* Carry out an LTE determination of the ionization (using T_r */
+      ierr = ion_abundances (&plasmamain[n], IONMODE_LTE_TR);
+    }
+    else
+    {                           /* Set the concentrations to specified values */
+      ierr = ion_abundances (&plasmamain[n], IONMODE_FIXED);
+    }
+    if (ierr != 0)
+    {
+      Error
+        ("wind_define after ion_abundances: cell %d rho %8.2e t_r %8.2 t_e %8.2e w %8.2e\n",
+         n, plasmamain[n].rho, plasmamain[n].t_r, plasmamain[n].t_e, plasmamain[n].w);
+    }
+
+    /* Initialize arrays for scatters and the pairwise ionization denominator and temperature
+     */
+
+    for (j = 0; j < nions; j++)
+    {
+      plasmamain[n].PWdenom[j] = 0.0;
+      plasmamain[n].PWnumer[j] = 0.0;
+      plasmamain[n].PWdtemp[j] = 0.0;
+      plasmamain[n].PWntemp[j] = 0.0;
+      plasmamain[n].scatters[j] = 0;
+      plasmamain[n].xscatters[j] = 0;
+    }
+  }
 
 
 /* Calculate the the divergence of the wind at the center of each grid cell */
@@ -421,28 +405,27 @@ be optional which variables beyond here are moved to structures othere than Wind
 /*06may -- ksl -- This is awkward because liminosities are now part of plasma structure */
 
   for (i = 0; i < NPLASMA; i++)
+  {
+    if (geo.adiabatic)
     {
-      if (geo.adiabatic)
-	{
-	  nwind = plasmamain[i].nwind;
-	  plasmamain[i].cool_adiabatic =
-	    adiabatic_cooling (&w[nwind], plasmamain[i].t_e);
-	}
-      else
-	{
-	  plasmamain[i].cool_adiabatic = 0.0;
-	}
-
-      if (geo.nonthermal)
-	{
-	  nwind = plasmamain[i].nwind;
-	  plasmamain[i].heat_shock = shock_heating (&w[nwind]);
-	}
-      else
-	{
-	  plasmamain[i].heat_shock = 0.0;
-	}
+      nwind = plasmamain[i].nwind;
+      plasmamain[i].cool_adiabatic = adiabatic_cooling (&w[nwind], plasmamain[i].t_e);
     }
+    else
+    {
+      plasmamain[i].cool_adiabatic = 0.0;
+    }
+
+    if (geo.nonthermal)
+    {
+      nwind = plasmamain[i].nwind;
+      plasmamain[i].heat_shock = shock_heating (&w[nwind]);
+    }
+    else
+    {
+      plasmamain[i].heat_shock = 0.0;
+    }
+  }
 
 
 
@@ -451,7 +434,7 @@ be optional which variables beyond here are moved to structures othere than Wind
   dvds_ave ();
 
 
-  wind_check (w, -1);		// Check the wind for reasonability
+  wind_check (w, -1);           // Check the wind for reasonability
 
   /* zero the counters which record diagnostics for mean_intensity */
   nerr_Jmodel_wrong_freq = 0;
@@ -478,51 +461,42 @@ be optional which variables beyond here are moved to structures othere than Wind
 */
 
   for (ndom = 0; ndom < geo.ndomain; ndom++)
+  {
+    if (zdom[ndom].coord_type == CYLIND)
     {
-      if (zdom[ndom].coord_type == CYLIND)
-	{
-	  Log
-	    ("Warning: wind2d.c: next lines may not make sense with multiple domains\n");
-	  ndim = zdom[ndom].ndim;
-	  mdim = zdom[ndom].mdim;
-	  nstart = zdom[ndom].nstart;
+      Log ("Warning: wind2d.c: next lines may not make sense with multiple domains\n");
+      ndim = zdom[ndom].ndim;
+      mdim = zdom[ndom].mdim;
+      nstart = zdom[ndom].nstart;
 
-	  mdotwind = 0;
-	  mdotbase = 0;
-	  for (i = 0; i < ndim - 1; i++)
-	    {
-	      n = nstart + i * mdim + (mdim / 2);
+      mdotwind = 0;
+      mdotbase = 0;
+      for (i = 0; i < ndim - 1; i++)
+      {
+        n = nstart + i * mdim + (mdim / 2);
 // rr is router * router - rinner *rinner for this shell
-	      rr =
-		w[n + mdim].x[0] * w[n + mdim].x[0] + w[n + mdim].x[1] * w[n +
-									   mdim].
-		x[1] - (w[n].x[0] * w[n].x[0] + w[n].x[1] * w[n].x[1]);
-	      if (w[nstart + i * mdim].inwind == W_ALL_INWIND)
-		{
-		  nplasma = w[nstart + i * mdim].nplasma;
-		  mdotbase +=
-		    plasmamain[nplasma].rho * PI * rr * w[nstart +
-							  i * mdim].v[2];
-		}
-	      if (w[n].inwind == W_ALL_INWIND)
-		{
-		  nplasma = w[n].nplasma;
-		  mdotwind += plasmamain[nplasma].rho * PI * rr * w[n].v[2];
-		}
-	    }
+        rr = w[n + mdim].x[0] * w[n + mdim].x[0] + w[n + mdim].x[1] * w[n + mdim].x[1] - (w[n].x[0] * w[n].x[0] + w[n].x[1] * w[n].x[1]);
+        if (w[nstart + i * mdim].inwind == W_ALL_INWIND)
+        {
+          nplasma = w[nstart + i * mdim].nplasma;
+          mdotbase += plasmamain[nplasma].rho * PI * rr * w[nstart + i * mdim].v[2];
+        }
+        if (w[n].inwind == W_ALL_INWIND)
+        {
+          nplasma = w[n].nplasma;
+          mdotwind += plasmamain[nplasma].rho * PI * rr * w[n].v[2];
+        }
+      }
 
-	  /* Factor of 2 to allow for wind on both sides of disk */
-	  Log ("m dot wind: Domain %d Desired %g   Base %g Calculated %g\n",
-	       ndom, zdom[ndom].wind_mdot, 2. * mdotbase, 2. * mdotwind);
-	  mdot_wind (w, 1.e6, zdom[ndom].rmax / 2.);
-	}
-      else
-	{
-	  Error
-	    ("wind2d.c: Not currently able to calculate mdot wind for coordtype %d in domain %d\n",
-	     zdom[ndom].coord_type, ndom);
-	}
+      /* Factor of 2 to allow for wind on both sides of disk */
+      Log ("m dot wind: Domain %d Desired %g   Base %g Calculated %g\n", ndom, zdom[ndom].wind_mdot, 2. * mdotbase, 2. * mdotwind);
+      mdot_wind (w, 1.e6, zdom[ndom].rmax / 2.);
     }
+    else
+    {
+      Error ("wind2d.c: Not currently able to calculate mdot wind for coordtype %d in domain %d\n", zdom[ndom].coord_type, ndom);
+    }
+  }
 
   return (0);
 }
@@ -610,40 +584,39 @@ where_in_grid (ndom, x)
   double fx, fz;
 
 
-  if (wig_x != x[0] || wig_y != x[1] || wig_z != x[2])	// Calculate if new position
+  if (wig_x != x[0] || wig_y != x[1] || wig_z != x[2])  // Calculate if new position
+  {
+
+    if (zdom[ndom].coord_type == CYLIND)
     {
-
-      if (zdom[ndom].coord_type == CYLIND)
-	{
-	  n = cylind_where_in_grid (ndom, x);
-	}
-      else if (zdom[ndom].coord_type == RTHETA)
-	{
-	  n = rtheta_where_in_grid (ndom, x);
-	}
-      else if (zdom[ndom].coord_type == SPHERICAL)
-	{
-	  n = spherical_where_in_grid (ndom, x);
-	}
-      else if (zdom[ndom].coord_type == CYLVAR)
-	{
-	  n = cylvar_where_in_grid (ndom, x, 0, &fx, &fz);
-	}
-      else
-	{
-	  Error ("where_in_grid: Unknown coord_type %d for domain %d\n",
-		 zdom[ndom].coord_type, ndom);
-	  exit (0);
-	}
-
-
-      /* Store old positions to short-circuit calculation if asked for same position more
-         than once */
-      wig_x = x[0];
-      wig_y = x[1];
-      wig_z = x[2];
-      wig_n = n;
+      n = cylind_where_in_grid (ndom, x);
     }
+    else if (zdom[ndom].coord_type == RTHETA)
+    {
+      n = rtheta_where_in_grid (ndom, x);
+    }
+    else if (zdom[ndom].coord_type == SPHERICAL)
+    {
+      n = spherical_where_in_grid (ndom, x);
+    }
+    else if (zdom[ndom].coord_type == CYLVAR)
+    {
+      n = cylvar_where_in_grid (ndom, x, 0, &fx, &fz);
+    }
+    else
+    {
+      Error ("where_in_grid: Unknown coord_type %d for domain %d\n", zdom[ndom].coord_type, ndom);
+      exit (0);
+    }
+
+
+    /* Store old positions to short-circuit calculation if asked for same position more
+       than once */
+    wig_x = x[0];
+    wig_y = x[1];
+    wig_z = x[2];
+    wig_n = n;
+  }
 
   return (wig_n);
 }
@@ -766,42 +739,41 @@ vwind_xyz (ndom, p, v)
 
 
   if (ndom < 0 || ndom >= geo.ndomain)
-    {
-      Error ("vwind_xyz: Received invalid domain  %d\n", ndom);
-    }
+  {
+    Error ("vwind_xyz: Received invalid domain  %d\n", ndom);
+  }
 
   coord_fraction (ndom, 0, p->x, nnn, frac, &nelem);
 
   for (i = 0; i < 3; i++)
-    {
+  {
 
-      x = 0;
-      for (nn = 0; nn < nelem; nn++)
-	x += wmain[nnn[nn]].v[i] * frac[nn];
+    x = 0;
+    for (nn = 0; nn < nelem; nn++)
+      x += wmain[nnn[nn]].v[i] * frac[nn];
 
-      vv[i] = x;
-    }
+    vv[i] = x;
+  }
 
   rho = sqrt (p->x[0] * p->x[0] + p->x[1] * p->x[1]);
 
   if (zdom[ndom].coord_type == SPHERICAL)
-    {				// put the velocity into cylindrical coordinates on the xz axis
-      x = sqrt (vv[0] * vv[0] + vv[2] * vv[2]);	//v_r
-      r = length (p->x);
-      vv[0] = rho / r * x;
-      vv[2] = p->x[2] / r * x;
-    }
-  else if (p->x[2] < 0)		// For 2d coord syatems, velocity is reversed if the photon is in the lower hemisphere.
+  {                             // put the velocity into cylindrical coordinates on the xz axis
+    x = sqrt (vv[0] * vv[0] + vv[2] * vv[2]);   //v_r
+    r = length (p->x);
+    vv[0] = rho / r * x;
+    vv[2] = p->x[2] / r * x;
+  }
+  else if (p->x[2] < 0)         // For 2d coord syatems, velocity is reversed if the photon is in the lower hemisphere.
     vv[2] *= -1;
 
   if (rho == 0)
-    {				// Then we will not be able to project from a cylindrical ot a cartesian system
-      Error
-	("vwind_xyz: Cannot determine an xyz velocity on z axis. Returnin 0,0,v[2]\n");
-      v[0] = v[1] = 0;
-      v[2] = vv[2];
-      return (0);
-    }
+  {                             // Then we will not be able to project from a cylindrical ot a cartesian system
+    Error ("vwind_xyz: Cannot determine an xyz velocity on z axis. Returnin 0,0,v[2]\n");
+    v[0] = v[1] = 0;
+    v[2] = vv[2];
+    return (0);
+  }
 
   /* Now we have v in cylindrical coordinates, but we would like it in cartesian coordinates.
      Note that could use project_from_cyl_xyz(p->x,vv,v) ?? */
@@ -813,9 +785,9 @@ vwind_xyz (ndom, p, v)
   v[2] = vv[2];
 
   if (sane_check (v[0]) || sane_check (v[1]) || sane_check (v[2]))
-    {
-      Error ("vwind_xyz: %f %f %f\n", v[0], v[1], v[2]);
-    }
+  {
+    Error ("vwind_xyz: %f %f %f\n", v[0], v[1], v[2]);
+  }
 
 
   return (0);
@@ -863,64 +835,63 @@ wind_div_v ()
 
 
   for (icell = 0; icell < NDIM2; icell++)
+  {
+    /* Find the center of the cell */
+
+    stuff_v (wmain[icell].xcen, x_zero);        /*Gget the centre of the current cell in the loop */
+    ndom = wmain[icell].ndom;
+
+    delta = 0.01 * x_zero[2];   //delta is the distance across which we measure e.g. dv_x/dx
+    if (delta == 0)
     {
-      /* Find the center of the cell */
-
-      stuff_v (wmain[icell].xcen, x_zero);	/*Gget the centre of the current cell in the loop */
-      ndom = wmain[icell].ndom;
-
-      delta = 0.01 * x_zero[2];	//delta is the distance across which we measure e.g. dv_x/dx
-      if (delta == 0)
-	{
-	  Error ("wind_div_v: Cell %d has xcen[2]==0.  This is surprising\n",
-		 icell);
-	  delta = wmain[icell].dfudge;
-	}
-
-
-      /* for each of x,y,z we first create a copy of the vector at the center. We then step 0.5*delta
-         in positive and negative directions and evaluate the difference in velocities. Dividing this by
-         delta gives the value of dv_x/dx, and the sum of these gives the divergence. If issues arise
-         see bug report #70. */
-
-
-      /* Calculate dv_x/dx at this position */
-      stuff_v (x_zero, ppp.x);
-      ppp.x[0] += 0.5 * delta;
-      vwind_xyz (ndom, &ppp, v2);
-      ppp.x[0] -= delta;
-      vwind_xyz (ndom, &ppp, v1);
-      div = xxx[0] = (v2[0] - v1[0]) / delta;
-
-      /* Calculate dv_y/dy */
-      stuff_v (x_zero, ppp.x);
-      ppp.x[1] += 0.5 * delta;
-      vwind_xyz (ndom, &ppp, v2);
-      ppp.x[1] -= delta;
-      vwind_xyz (ndom, &ppp, v1);
-      div += xxx[1] = (v2[1] - v1[1]) / delta;
-
-
-      /* Calculate dv_z/dz */
-      stuff_v (x_zero, ppp.x);
-      ppp.x[2] += 0.5 * delta;
-      vwind_xyz (ndom, &ppp, v2);
-      ppp.x[2] -= delta;
-      vwind_xyz (ndom, &ppp, v1);
-      div += xxx[2] = (v2[2] - v1[2]) / delta;
-
-
-      /* we have now evaluated the divergence, so can store in the wind pointer */
-      wmain[icell].div_v = div;
-
-      if (div < 0 && (wind_div_err < 0 || wmain[icell].inwind == W_ALL_INWIND))
-	{
-	  Error
-	    ("wind_div_v: div v %e negative in cell %d Domain %d. Major problem if inwind (%d) == 0\n",
-	     div, icell, wmain[icell].ndom, wmain[icell].inwind);
-	  wind_div_err++;
-	}
+      Error ("wind_div_v: Cell %d has xcen[2]==0.  This is surprising\n", icell);
+      delta = wmain[icell].dfudge;
     }
+
+
+    /* for each of x,y,z we first create a copy of the vector at the center. We then step 0.5*delta
+       in positive and negative directions and evaluate the difference in velocities. Dividing this by
+       delta gives the value of dv_x/dx, and the sum of these gives the divergence. If issues arise
+       see bug report #70. */
+
+
+    /* Calculate dv_x/dx at this position */
+    stuff_v (x_zero, ppp.x);
+    ppp.x[0] += 0.5 * delta;
+    vwind_xyz (ndom, &ppp, v2);
+    ppp.x[0] -= delta;
+    vwind_xyz (ndom, &ppp, v1);
+    div = xxx[0] = (v2[0] - v1[0]) / delta;
+
+    /* Calculate dv_y/dy */
+    stuff_v (x_zero, ppp.x);
+    ppp.x[1] += 0.5 * delta;
+    vwind_xyz (ndom, &ppp, v2);
+    ppp.x[1] -= delta;
+    vwind_xyz (ndom, &ppp, v1);
+    div += xxx[1] = (v2[1] - v1[1]) / delta;
+
+
+    /* Calculate dv_z/dz */
+    stuff_v (x_zero, ppp.x);
+    ppp.x[2] += 0.5 * delta;
+    vwind_xyz (ndom, &ppp, v2);
+    ppp.x[2] -= delta;
+    vwind_xyz (ndom, &ppp, v1);
+    div += xxx[2] = (v2[2] - v1[2]) / delta;
+
+
+    /* we have now evaluated the divergence, so can store in the wind pointer */
+    wmain[icell].div_v = div;
+
+    if (div < 0 && (wind_div_err < 0 || wmain[icell].inwind == W_ALL_INWIND))
+    {
+      Error
+        ("wind_div_v: div v %e negative in cell %d Domain %d. Major problem if inwind (%d) == 0\n",
+         div, icell, wmain[icell].ndom, wmain[icell].inwind);
+      wind_div_err++;
+    }
+  }
 
   return (0);
 }
@@ -960,32 +931,32 @@ rho (w, x)
   int ndom, ndomain;
 
 
-  if (where_in_wind (x, &ndomain) < 0)	//note that where_in_wind is independent of grid.
+  if (where_in_wind (x, &ndomain) < 0)  //note that where_in_wind is independent of grid.
     return (0.0);
 
   if ((ndom = ndomain) < 0)
-    {
-      Error ("rho: Domain not fournd %d\n", ndomain);
-      return (0.0);
-    }
+  {
+    Error ("rho: Domain not fournd %d\n", ndomain);
+    return (0.0);
+  }
 
   n = coord_fraction (ndom, 1, x, nnn, frac, &nelem);
 
   if (n < 0)
-    {
-      dd = 0;
-    }
+  {
+    dd = 0;
+  }
   else
+  {
+
+    dd = 0;
+    for (nn = 0; nn < nelem; nn++)
     {
-
-      dd = 0;
-      for (nn = 0; nn < nelem; nn++)
-	{
-	  nplasma = w[nnn[nn]].nplasma;
-	  dd += plasmamain[nplasma].rho * frac[nn];
-	}
-
+      nplasma = w[nnn[nn]].nplasma;
+      dd += plasmamain[nplasma].rho * frac[nn];
     }
+
+  }
 
 
   return (dd);
@@ -1022,10 +993,10 @@ rho (w, x)
 int
 mdot_wind (w, z, rmax)
      WindPtr w;
-     double z;			// The height (usually small) above the disk at which mdot will be calculated
-     double rmax;		// The radius at which mdot will be calculated
+     double z;                  // The height (usually small) above the disk at which mdot will be calculated
+     double rmax;               // The radius at which mdot will be calculated
 {
-  struct photon p;		//needed because vwind_xyz has a call which involves a photon
+  struct photon p;              //needed because vwind_xyz has a call which involves a photon
   double r, dr, rmin;
   double theta, dtheta;
   double den, rho ();
@@ -1043,23 +1014,22 @@ mdot_wind (w, z, rmax)
   rmin = geo.rstar;
 
   if (rmax <= rmin)
-    {
-      Error ("mdot_wind: rmax %g is less than %g, so returning\n", rmax,
-	     rmin);
-      return (0.0);
-    }
+  {
+    Error ("mdot_wind: rmax %g is less than %g, so returning\n", rmax, rmin);
+    return (0.0);
+  }
 
   dr = (rmax - rmin) / NSTEPS;
   mdot = 0;
   p.x[1] = x[1] = 0.0;
   p.x[2] = x[2] = z;
   for (r = dr / 2; r < rmax; r += dr)
-    {
-      p.x[0] = x[0] = r;
-      den = rho (w, x);
-      vwind_xyz (ndom, &p, v);
-      mdot += 2 * PI * r * dr * den * v[2];
-    }
+  {
+    p.x[0] = x[0] = r;
+    den = rho (w, x);
+    vwind_xyz (ndom, &p, v);
+    mdot += 2 * PI * r * dr * den * v[2];
+  }
 
   mplane = 2. * mdot;
 
@@ -1070,19 +1040,18 @@ mdot_wind (w, z, rmax)
   p.x[1] = x[1] = 0.0;
   q[1] = 0;
   for (theta = dtheta / 2; theta < (PI / 2.); theta += dtheta)
-    {
-      p.x[0] = x[0] = r * sin (theta);
-      p.x[2] = x[2] = r * cos (theta);
-      q[0] = sin (theta);
-      q[2] = cos (theta);
-      den = rho (w, x);
-      vwind_xyz (ndom, &p, v);
-      mdot += 2 * PI * rmax * rmax * sin (theta) * dtheta * den * dot (v, q);
-    }
-  msphere = 2 * mdot;		// Factor of two because wind is in both hemispheres
+  {
+    p.x[0] = x[0] = r * sin (theta);
+    p.x[2] = x[2] = r * cos (theta);
+    q[0] = sin (theta);
+    q[2] = cos (theta);
+    den = rho (w, x);
+    vwind_xyz (ndom, &p, v);
+    mdot += 2 * PI * rmax * rmax * sin (theta) * dtheta * den * dot (v, q);
+  }
+  msphere = 2 * mdot;           // Factor of two because wind is in both hemispheres
 
-  Log ("Wind Mdot Desired %e Plane %e Sphere(%e) %e\n", zdom[ndom].wind_mdot,
-       mplane, rmax, msphere);
+  Log ("Wind Mdot Desired %e Plane %e Sphere(%e) %e\n", zdom[ndom].wind_mdot, mplane, rmax, msphere);
 
   return (0);
 }
@@ -1108,35 +1077,34 @@ mdot_wind (w, z, rmax)
 
 int
 get_random_location (n, x)
-     int n;			// Cell in which to create position
-     double x[];		// Returned position
+     int n;                     // Cell in which to create position
+     double x[];                // Returned position
 {
   int ndom;
 
   ndom = wmain[n].ndom;
 
   if (zdom[ndom].coord_type == CYLIND)
-    {
-      cylind_get_random_location (n, x);
-    }
+  {
+    cylind_get_random_location (n, x);
+  }
   else if (zdom[ndom].coord_type == RTHETA)
-    {
-      rtheta_get_random_location (n, x);
-    }
+  {
+    rtheta_get_random_location (n, x);
+  }
   else if (zdom[ndom].coord_type == SPHERICAL)
-    {
-      spherical_get_random_location (n, x);
-    }
+  {
+    spherical_get_random_location (n, x);
+  }
   else if (zdom[ndom].coord_type == CYLVAR)
-    {
-      cylvar_get_random_location (n, x);
-    }
+  {
+    cylvar_get_random_location (n, x);
+  }
   else
-    {
-      Error ("get_random_location: Don't know this coord_type %d\n",
-	     zdom[ndom].coord_type);
-      exit (0);
-    }
+  {
+    Error ("get_random_location: Don't know this coord_type %d\n", zdom[ndom].coord_type);
+    exit (0);
+  }
 
   return (0);
 }
@@ -1164,14 +1132,14 @@ zero_scatters ()
 {
   int n, j;
 
-  for (n = 0; n < NPLASMA; n++)	/*NSH 1107 - changed loop to only run over nions to avoid running over the
-				   end of the array after the arry was dynamically allocated in 78a */
+  for (n = 0; n < NPLASMA; n++) /*NSH 1107 - changed loop to only run over nions to avoid running over the
+                                   end of the array after the arry was dynamically allocated in 78a */
+  {
+    for (j = 0; j < nions; j++)
     {
-      for (j = 0; j < nions; j++)
-	{
-	  plasmamain[n].scatters[j] = 0;
-	}
+      plasmamain[n].scatters[j] = 0;
     }
+  }
 
   return (0);
 }
@@ -1271,20 +1239,16 @@ check_corners_inwind (n)
   n_inwind = 0;
 
   if (i < (one_dom->ndim - 2) && j < (one_dom->mdim - 2))
-    {
-      if (where_in_wind (wmain[n].x, &ndomain) == W_ALL_INWIND
-	  && ndom == ndomain)
-	n_inwind++;
-      if (where_in_wind (wmain[n + 1].x, &ndomain) == W_ALL_INWIND
-	  && ndom == ndomain)
-	n_inwind++;
-      if (where_in_wind (wmain[n + one_dom->mdim].x, &ndomain) == W_ALL_INWIND
-	  && ndom == ndomain)
-	n_inwind++;
-      if (where_in_wind (wmain[n + one_dom->mdim + 1].x, &ndomain) ==
-	  W_ALL_INWIND && ndom == ndomain)
-	n_inwind++;
-    }
+  {
+    if (where_in_wind (wmain[n].x, &ndomain) == W_ALL_INWIND && ndom == ndomain)
+      n_inwind++;
+    if (where_in_wind (wmain[n + 1].x, &ndomain) == W_ALL_INWIND && ndom == ndomain)
+      n_inwind++;
+    if (where_in_wind (wmain[n + one_dom->mdim].x, &ndomain) == W_ALL_INWIND && ndom == ndomain)
+      n_inwind++;
+    if (where_in_wind (wmain[n + one_dom->mdim + 1].x, &ndomain) == W_ALL_INWIND && ndom == ndomain)
+      n_inwind++;
+  }
 
   return (n_inwind);
 }
@@ -1335,53 +1299,53 @@ check_grid ()
   n_dv = n_tau = 0;
 
   for (n = 0; n < NPLASMA; n++)
+  {
+    /* get the relevant pointers for this cell */
+    xplasma = &plasmamain[n];
+    one = &wmain[xplasma->nplasma];
+    ndom = one->ndom;
+
+    /* Hydrogen density, ne should be roughly this */
+    nh = xplasma->rho * rho2nh;
+
+    /* thermal speed */
+    vth = sqrt (1.5 * BOLTZMANN * xplasma->t_e / MPROT);
+
+    /* sobolev length -- this could be used for a check but isn't yet */
+    l_sob = vth / one->dvds_ave;
+
+    /* get approximate cell extents */
+    delta_z = 2.0 * (one->xcen[2] - one->x[2]);
+    delta_x = 2.0 * (one->xcen[0] - one->x[0]);
+
+    delta_r = sqrt (delta_x * delta_x + delta_z * delta_z);
+
+    /* Thomson mean free path 1/sigma*nh */
+    lambda_t = 1.0 / THOMPSON * nh;
+
+    /* get the velocity at cell corner and cell edge in x and z */
+    model_velocity (ndom, one->x, v1);
+    model_velocity (ndom, one->xcen, v2);
+
+    delta_vx = fabs (v1[0] - v2[0]);
+    delta_vz = fabs (v1[1] - v2[1]);
+
+    /* if we have errors then increment the error counters */
+    if (delta_r / lambda_t > 1)
     {
-      /* get the relevant pointers for this cell */
-      xplasma = &plasmamain[n];
-      one = &wmain[xplasma->nplasma];
-      ndom = one->ndom;
-
-      /* Hydrogen density, ne should be roughly this */
-      nh = xplasma->rho * rho2nh;
-
-      /* thermal speed */
-      vth = sqrt (1.5 * BOLTZMANN * xplasma->t_e / MPROT);
-
-      /* sobolev length -- this could be used for a check but isn't yet */
-      l_sob = vth / one->dvds_ave;
-
-      /* get approximate cell extents */
-      delta_z = 2.0 * (one->xcen[2] - one->x[2]);
-      delta_x = 2.0 * (one->xcen[0] - one->x[0]);
-
-      delta_r = sqrt (delta_x * delta_x + delta_z * delta_z);
-
-      /* Thomson mean free path 1/sigma*nh */
-      lambda_t = 1.0 / THOMPSON * nh;
-
-      /* get the velocity at cell corner and cell edge in x and z */
-      model_velocity (ndom, one->x, v1);
-      model_velocity (ndom, one->xcen, v2);
-
-      delta_vx = fabs (v1[0] - v2[0]);
-      delta_vz = fabs (v1[1] - v2[1]);
-
-      /* if we have errors then increment the error counters */
-      if (delta_r / lambda_t > 1)
-	{
-	  n_tau++;
-	  //Error("check_grid: optical depth may be high in cell %i domain %i\n",
-	  //       n, ndom);
-	}
-
-      if (delta_vx > 1e8 || delta_vz > 1e8)
-	{
-	  n_dv++;
-	  //Error("check_grid: velocity changes by >1,000 km/s across cell %i domain %i\n",
-	  //       n, ndom);
-	}
-
+      n_tau++;
+      //Error("check_grid: optical depth may be high in cell %i domain %i\n",
+      //       n, ndom);
     }
+
+    if (delta_vx > 1e8 || delta_vz > 1e8)
+    {
+      n_dv++;
+      //Error("check_grid: velocity changes by >1,000 km/s across cell %i domain %i\n",
+      //       n, ndom);
+    }
+
+  }
 
   /* report problems to user in a summary error message */
   if (n_dv > 0)
@@ -1391,8 +1355,7 @@ check_grid ()
     Error ("check_grid: optical depth may be high in %i\n", n_tau);
 
   if (n_dv > 0 || n_tau > 0)
-    Error
-      ("check_grid: some cells have large changes. Consider modifying zlog_scale or grid dims\n");
+    Error ("check_grid: some cells have large changes. Consider modifying zlog_scale or grid dims\n");
 
   return (0);
 }

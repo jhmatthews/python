@@ -51,8 +51,8 @@
 
 double
 total_line_emission (one, f1, f2)
-     WindPtr one;		/* WindPtr to a specific cell in the wind */
-     double f1, f2;		/* Minimum and maximum frequency */
+     WindPtr one;               /* WindPtr to a specific cell in the wind */
+     double f1, f2;             /* Minimum and maximum frequency */
 {
 
   double lum;
@@ -101,8 +101,8 @@ total_line_emission (one, f1, f2)
 
 double
 lum_lines (one, nmin, nmax)
-     WindPtr one;		/* WindPtr to a specific cell in the wind */
-     int nmin, nmax;		/* The min and max index in lptr array for which the power is to be calculated */
+     WindPtr one;               /* WindPtr to a specific cell in the wind */
+     int nmin, nmax;            /* The min and max index in lptr array for which the power is to be calculated */
 {
   int n;
   double lum, x, z;
@@ -120,47 +120,46 @@ lum_lines (one, nmin, nmax)
   t_e = xplasma->t_e;
   lum = 0;
   for (n = nmin; n < nmax; n++)
-    {
-      dd = xplasma->density[lin_ptr[n]->nion];
+  {
+    dd = xplasma->density[lin_ptr[n]->nion];
 
-      if (dd > LDEN_MIN)
-	{			/* potentially dangerous step to avoid lines with no power */
-	  two_level_atom (lin_ptr[n], xplasma, &d1, &d2);
-	  x = foo1 = lin_ptr[n]->gu / lin_ptr[n]->gl * d1 - d2;
+    if (dd > LDEN_MIN)
+    {                           /* potentially dangerous step to avoid lines with no power */
+      two_level_atom (lin_ptr[n], xplasma, &d1, &d2);
+      x = foo1 = lin_ptr[n]->gu / lin_ptr[n]->gl * d1 - d2;
 
-	  z = exp (-H_OVER_K * lin_ptr[n]->freq / t_e);
+      z = exp (-H_OVER_K * lin_ptr[n]->freq / t_e);
 
 
 //Next lines required if want to use escape probabilities
 
-	  q = 1. - scattering_fraction (lin_ptr[n], xplasma);
+      q = 1. - scattering_fraction (lin_ptr[n], xplasma);
 
-	  x *= foo2 = q * a21 (lin_ptr[n]) * z / (1. - z);
+      x *= foo2 = q * a21 (lin_ptr[n]) * z / (1. - z);
 
-	  x *= foo3 = H * lin_ptr[n]->freq * xplasma->vol;
-	  if (geo.line_mode == 3)
-	    x *= foo4 = p_escape (lin_ptr[n], xplasma);	// Include effects of line trapping
-	  else
-	    {
-	      foo4 = 0.0;	// Added to prevent compilation warning
-	    }
-
-	  lum += lin_ptr[n]->pow = x;
-	  if (x < 0)
-	    {
-	      Log
-		("lum_lines: foo %10.3g (%10.3g %10.3g %10.3g) %10.3g %10.3g %10.3g %10.3g %10.3g %10.3g %10.3g\n",
-		 foo1, d1, d2, dd, foo2, foo3, foo4, lin_ptr[n]->el,
-		 xplasma->t_r, t_e, xplasma->w);
-	    }
-	  if (sane_check (x) != 0)
-	    {
-	      Error ("total_line_emission:sane_check %e %e\n", x, z);
-	    }
-	}
+      x *= foo3 = H * lin_ptr[n]->freq * xplasma->vol;
+      if (geo.line_mode == 3)
+        x *= foo4 = p_escape (lin_ptr[n], xplasma);     // Include effects of line trapping
       else
-	lin_ptr[n]->pow = 0;
+      {
+        foo4 = 0.0;             // Added to prevent compilation warning
+      }
+
+      lum += lin_ptr[n]->pow = x;
+      if (x < 0)
+      {
+        Log
+          ("lum_lines: foo %10.3g (%10.3g %10.3g %10.3g) %10.3g %10.3g %10.3g %10.3g %10.3g %10.3g %10.3g\n",
+           foo1, d1, d2, dd, foo2, foo3, foo4, lin_ptr[n]->el, xplasma->t_r, t_e, xplasma->w);
+      }
+      if (sane_check (x) != 0)
+      {
+        Error ("total_line_emission:sane_check %e %e\n", x, z);
+      }
     }
+    else
+      lin_ptr[n]->pow = 0;
+  }
 
 
   return (lum);
@@ -231,36 +230,32 @@ q21 (line_ptr, t)
 
 
   if (q21_line_ptr != line_ptr || t != q21_t_old)
+  {
+
+
+    u0 = (BOLTZMANN * t) / (H * line_ptr->freq);
+
+    if (line_ptr->istate == 1 && u0 < 2)        // neutrals at low energy. Used 2 to give continuous function.
+      gaunt = u0 / 10.0;
+    else                        // low energy electrons, positive ions
+      gaunt = 0.2;
+
+
+
+    if (line_ptr->coll_index < 0)       //if we do not have a collision strength for this line use the g-bar formulation
     {
-
-
-      u0 = (BOLTZMANN * t) / (H * line_ptr->freq);
-
-      if (line_ptr->istate == 1 && u0 < 2)	// neutrals at low energy. Used 2 to give continuous function.
-	gaunt = u0 / 10.0;
-      else			// low energy electrons, positive ions
-	gaunt = 0.2;
-
-
-
-      if (line_ptr->coll_index < 0)	//if we do not have a collision strength for this line use the g-bar formulation
-	{
-	  omega =
-	    ECS_CONSTANT * line_ptr->gl * gaunt * line_ptr->f /
-	    line_ptr->freq;
-	}
-      else			//otherwise use the collision strength directly. NB what we call omega, most people including hazy call upsilon.
-	{
-	  omega = upsilon (line_ptr->coll_index, u0);
-	  gbar =
-	    omega / ECS_CONSTANT / line_ptr->gl / line_ptr->f *
-	    line_ptr->freq;
-	}
-
-
-      q21_a = 8.629e-6 / (sqrt (t) * line_ptr->gu) * omega;
-      q21_t_old = t;
+      omega = ECS_CONSTANT * line_ptr->gl * gaunt * line_ptr->f / line_ptr->freq;
     }
+    else                        //otherwise use the collision strength directly. NB what we call omega, most people including hazy call upsilon.
+    {
+      omega = upsilon (line_ptr->coll_index, u0);
+      gbar = omega / ECS_CONSTANT / line_ptr->gl / line_ptr->f * line_ptr->freq;
+    }
+
+
+    q21_a = 8.629e-6 / (sqrt (t) * line_ptr->gu) * omega;
+    q21_t_old = t;
+  }
 
   return (q21_a);
 }
@@ -290,10 +285,7 @@ q12 (line_ptr, t)
   double q21 ();
   double exp ();
 
-  x =
-    line_ptr->gu / line_ptr->gl * q21 (line_ptr,
-				       t) * exp (-H_OVER_K * line_ptr->freq /
-						 t);
+  x = line_ptr->gu / line_ptr->gl * q21 (line_ptr, t) * exp (-H_OVER_K * line_ptr->freq / t);
 
   return (x);
 }
@@ -306,7 +298,7 @@ q12 (line_ptr, t)
    99jan        ksl Modified so would shortcircuit calculation if
    called multiple times for same a
  */
-#define A21_CONSTANT 7.429297e-22	// 8 * PI * PI * E * E / (MELEC * C * C * C)
+#define A21_CONSTANT 7.429297e-22       // 8 * PI * PI * E * E / (MELEC * C * C * C)
 
 struct lines *a21_line_ptr;
 double a21_a;
@@ -334,13 +326,11 @@ a21 (line_ptr)
   double freq;
 
   if (a21_line_ptr != line_ptr)
-    {
-      freq = line_ptr->freq;
-      a21_a =
-	A21_CONSTANT * line_ptr->gl / line_ptr->gu * freq * freq *
-	line_ptr->f;
-      a21_line_ptr = line_ptr;
-    }
+  {
+    freq = line_ptr->freq;
+    a21_a = A21_CONSTANT * line_ptr->gl / line_ptr->gu * freq * freq * line_ptr->f;
+    a21_line_ptr = line_ptr;
+  }
 
   return (a21_a);
 }
@@ -385,9 +375,9 @@ a21 (line_ptr)
  */
 
 
- struct lines *old_line_ptr;
- double old_ne, old_te, old_w, old_tr, old_dd;
- double old_d1, old_d2, old_n2_over_n1;
+struct lines *old_line_ptr;
+double old_ne, old_te, old_w, old_tr, old_dd;
+double old_d1, old_d2, old_n2_over_n1;
 
 /**********************************************************/
 /**
@@ -438,17 +428,16 @@ two_level_atom (line_ptr, xplasma, d1, d2)
   double xw;
   double ne, te, w, tr, dd;
   int nion;
-  double J;			//Model of the specific intensity
+  double J;                     //Model of the specific intensity
 
 
   //Check and exit if this routine is called for a macro atom, since this should never happen
 
-  if (line_ptr->macro_info == 1 && geo.rt_mode == RT_MODE_MACRO
-      && geo.macro_simple == 0)
-    {
-      Error ("Calling two_level_atom for macro atom line. Abort.\n");
-      exit (0);
-    }
+  if (line_ptr->macro_info == 1 && geo.rt_mode == RT_MODE_MACRO && geo.macro_simple == 0)
+  {
+    Error ("Calling two_level_atom for macro atom line. Abort.\n");
+    exit (0);
+  }
 
 /* Move variables used in the calculation from the xplasma structure into subroutine variables */
   ne = xplasma->ne;
@@ -461,20 +450,19 @@ two_level_atom (line_ptr, xplasma, d1, d2)
   /* Calculate the number density of the lower level for the transition using the partition function */
   ;
   if (ion[nion].nlevels > 0)
-    {
-      dd *= config[ion[nion].firstlevel].g / xplasma->partition[nion];
-    }
+  {
+    dd *= config[ion[nion].firstlevel].g / xplasma->partition[nion];
+  }
 
-  if (old_line_ptr == line_ptr && old_ne == ne && old_te == te && old_w == w
-      && old_tr == tr && old_dd == dd)
-    {				// Then there is no need to recalculate eveything
-      *d1 = old_d1;
-      *d2 = old_d2;
-    }
+  if (old_line_ptr == line_ptr && old_ne == ne && old_te == te && old_w == w && old_tr == tr && old_dd == dd)
+  {                             // Then there is no need to recalculate eveything
+    *d1 = old_d1;
+    *d2 = old_d2;
+  }
   else
-    {
-      if (line_ptr->el == 0.0)
-	{			// Then the lower level is the ground state
+  {
+    if (line_ptr->el == 0.0)
+    {                           // Then the lower level is the ground state
 
 /* For a ground state connected transition we correct for the partition
 function in calculating the density of the lower level, and then we
@@ -484,39 +472,38 @@ function directly is the allowance for collisions, and also for the
 possibility that not all lines have upper levels that are included
 in the configuration structure. 01dec ksl */
 
-	  a = a21 (line_ptr);
-	  q = q21 (line_ptr, te);
-	  freq = line_ptr->freq;
-	  g2_over_g1 = line_ptr->gu / line_ptr->gl;
+      a = a21 (line_ptr);
+      q = q21 (line_ptr, te);
+      freq = line_ptr->freq;
+      g2_over_g1 = line_ptr->gu / line_ptr->gl;
 
 
-	  c21 = ne * q;
-	  c12 = c21 * g2_over_g1 * exp (-H_OVER_K * freq / te);
+      c21 = ne * q;
+      c12 = c21 * g2_over_g1 * exp (-H_OVER_K * freq / te);
 
 
-	  z = (C * C) / (2. * H * freq * freq * freq);	//This is the factor which relates the A coefficient to the b coefficient
+      z = (C * C) / (2. * H * freq * freq * freq);      //This is the factor which relates the A coefficient to the b coefficient
 
 
-	  /* we call mean intensity with mode 1 - this means we are happy to use the
-	     dilute blackbody approximation even if we havent run enough spectral cycles
-	     to have a model for J */
-	  J = mean_intensity (xplasma, freq, 1);
+      /* we call mean intensity with mode 1 - this means we are happy to use the
+         dilute blackbody approximation even if we havent run enough spectral cycles
+         to have a model for J */
+      J = mean_intensity (xplasma, freq, 1);
 
-	  /* this equation is equivalent to equation 4.29 in NSH's thesis with the
-	     einstein b coefficients replaced by a multiplied by suitable conversion
-	     factors from the einstein relations. */
-	  n2_over_n1 =
-	    (c12 + g2_over_g1 * a * z * J) / (c21 + a * (1. + (J * z)));
-
+      /* this equation is equivalent to equation 4.29 in NSH's thesis with the
+         einstein b coefficients replaced by a multiplied by suitable conversion
+         factors from the einstein relations. */
+      n2_over_n1 = (c12 + g2_over_g1 * a * z * J) / (c21 + a * (1. + (J * z)));
 
 
 
-	  *d1 = dd;
-	  *d2 = *d1 * n2_over_n1;
 
-	}
-      else
-	{			// The transition has both levels above the ground state
+      *d1 = dd;
+      *d2 = *d1 * n2_over_n1;
+
+    }
+    else
+    {                           // The transition has both levels above the ground state
 
 /*
  * In the event that both levels are above the ground state, we assume
@@ -525,9 +512,9 @@ in the configuration structure. 01dec ksl */
  * is matastable in which case we set the weight to 1 and force equlibrium
 */
 
-	  gg = ion[line_ptr->nion].g;
-	  z = w / (exp (line_ptr->eu / (BOLTZMANN * tr)) + w - 1.);
-	  n2_over_ng = line_ptr->gu / gg * z;
+      gg = ion[line_ptr->nion].g;
+      z = w / (exp (line_ptr->eu / (BOLTZMANN * tr)) + w - 1.);
+      n2_over_ng = line_ptr->gu / gg * z;
 
 /* For lower level, use an on the spot approximation if the lower level has a short radiative lifetive;
 Othewise, assert that the lower level is metastable and set the radiative weight to 1
@@ -537,27 +524,27 @@ ERROR -- or conceptually
 07mar - ksl - We still need to determine whether this makes sense at all !!
 */
 
-	  xw = w;		// Assume all lower levels are allowed at present
+      xw = w;                   // Assume all lower levels are allowed at present
 
-	  z = xw / (exp (line_ptr->el / (BOLTZMANN * tr)) + xw - 1.);
-	  n1_over_ng = line_ptr->gl / gg * z;
+      z = xw / (exp (line_ptr->el / (BOLTZMANN * tr)) + xw - 1.);
+      n1_over_ng = line_ptr->gl / gg * z;
 
-	  *d1 = dd * n1_over_ng;
-	  *d2 = dd * n2_over_ng;
-	  n2_over_n1 = n2_over_ng / n1_over_ng;
-	}
-
-
-      old_line_ptr = line_ptr;
-      old_ne = ne;
-      old_te = te;
-      old_w = w;
-      old_tr = tr;
-      old_dd = dd;
-      old_d1 = (*d1);
-      old_d2 = (*d2);
-      old_n2_over_n1 = n2_over_n1;
+      *d1 = dd * n1_over_ng;
+      *d2 = dd * n2_over_ng;
+      n2_over_n1 = n2_over_ng / n1_over_ng;
     }
+
+
+    old_line_ptr = line_ptr;
+    old_ne = ne;
+    old_te = te;
+    old_w = w;
+    old_tr = tr;
+    old_dd = dd;
+    old_d1 = (*d1);
+    old_d2 = (*d2);
+    old_n2_over_n1 = n2_over_n1;
+  }
 
   return (old_n2_over_n1);
 
@@ -689,13 +676,13 @@ scattering_fraction (line_ptr, xplasma)
   double a, c, z;
   double sf;
   double ne, te;
-  double w;			/* the radiative weight, and radiation tempeature */
+  double w;                     /* the radiative weight, and radiation tempeature */
 
   if (geo.line_mode == 0)
-    return (0.0);		//purely absorbing atmosphere
+    return (0.0);               //purely absorbing atmosphere
 
   else if (geo.line_mode == 1)
-    return (1.);		//purely scattering atmosphere
+    return (1.);                //purely scattering atmosphere
 
   //Populate variable from previous calling structure
   ne = xplasma->ne;
@@ -707,33 +694,30 @@ scattering_fraction (line_ptr, xplasma)
   z = 1.0 - a;
   a = a21 (line_ptr);
   c = ne * q21 (line_ptr, te) * z;
-  q = c / (a + c);		//q == epsilon in Rybicki and elsewhere
+  q = c / (a + c);              //q == epsilon in Rybicki and elsewhere
 
   if (geo.line_mode == 2)
-    return (1 - q);		//single scattering atmosphere
+    return (1 - q);             //single scattering atmosphere
 
   else if (geo.line_mode == 3)
-    {				// atmosphere with  line trapping
+  {                             // atmosphere with  line trapping
 
-      escape = p_escape (line_ptr, xplasma);
-      //The following is exact
-      sf = (1. - q) * escape / (q + escape * (1. - q));
-      if (sane_check (sf))
-	{
-	  Error
-	    ("scattering fraction:sane_check sf %8.2e q %8.2e escape %8.2e w %8.2e\n",
-	     sf, q, escape, w);
-	}
-      return (sf);
+    escape = p_escape (line_ptr, xplasma);
+    //The following is exact
+    sf = (1. - q) * escape / (q + escape * (1. - q));
+    if (sane_check (sf))
+    {
+      Error ("scattering fraction:sane_check sf %8.2e q %8.2e escape %8.2e w %8.2e\n", sf, q, escape, w);
     }
+    return (sf);
+  }
 
   else
-    {				// Unknown treatment of line radiation
+  {                             // Unknown treatment of line radiation
 
-      Error ("scattering_fraction: Cannot handle %d line_mode\n",
-	     geo.line_mode);
-      exit (0);
-    }
+    Error ("scattering_fraction: Cannot handle %d line_mode\n", geo.line_mode);
+    exit (0);
+  }
 
 }
 
@@ -749,9 +733,9 @@ scattering_fraction (line_ptr, xplasma)
   1411 JM -- changed to use the sobolev function to calculate tau.
  */
 
- struct lines *pe_line_ptr;
- double pe_ne, pe_te, pe_dd, pe_dvds, pe_w, pe_tr;
- double pe_escape;
+struct lines *pe_line_ptr;
+double pe_ne, pe_te, pe_dd, pe_dvds, pe_w, pe_tr;
+double pe_escape;
 
 /**********************************************************/
 /**
@@ -777,15 +761,15 @@ p_escape (line_ptr, xplasma)
   double tau, two_level_atom ();
   double escape;
   double ne, te;
-  double dd;			/* density of the relevent ion */
+  double dd;                    /* density of the relevent ion */
   double dvds;
-  double w, tr;			/* the radiative weight, and radiation tempeature */
+  double w, tr;                 /* the radiative weight, and radiation tempeature */
   WindPtr one;
 
 //Populate variable from previous calling structure
   ne = xplasma->ne;
   te = xplasma->t_e;
-  tr = xplasma->t_r;		//JM1308 in pre 76b versions this was incorrectly set to xplasma->t_e
+  tr = xplasma->t_r;            //JM1308 in pre 76b versions this was incorrectly set to xplasma->t_e
   w = xplasma->w;
   dd = xplasma->density[line_ptr->nion];
 
@@ -794,32 +778,31 @@ p_escape (line_ptr, xplasma)
 
 // Band-aid to prevent divide by zero in calculation of tau below
   if (dvds <= 0.0)
-    {
-      Error ("Warning: p_escape: dvds <=0 \n");
-      return (0.0);
-    }
-  if (pe_line_ptr != line_ptr || pe_ne != ne || pe_te != te || pe_dd != dd
-      || pe_dvds != dvds || pe_w != w || pe_tr != tr)
-    {
+  {
+    Error ("Warning: p_escape: dvds <=0 \n");
+    return (0.0);
+  }
+  if (pe_line_ptr != line_ptr || pe_ne != ne || pe_te != te || pe_dd != dd || pe_dvds != dvds || pe_w != w || pe_tr != tr)
+  {
 
-      /* JM 1411 -- we used to have duplicated code here, but
-         now we call the sobolev function itself */
-      tau = sobolev (one, one->x, dd, line_ptr, dvds);
+    /* JM 1411 -- we used to have duplicated code here, but
+       now we call the sobolev function itself */
+    tau = sobolev (one, one->x, dd, line_ptr, dvds);
 
-      /* JM 1408 -- moved calculation of p_escape to subroutine below */
-      escape = p_escape_from_tau (tau);
+    /* JM 1408 -- moved calculation of p_escape to subroutine below */
+    escape = p_escape_from_tau (tau);
 
 
-      pe_line_ptr = line_ptr;
-      pe_ne = ne;
-      pe_te = te;
-      pe_dd = dd;
-      pe_dvds = dvds;
-      pe_w = w;
-      pe_tr = tr;
+    pe_line_ptr = line_ptr;
+    pe_ne = ne;
+    pe_te = te;
+    pe_dd = dd;
+    pe_dvds = dvds;
+    pe_w = w;
+    pe_tr = tr;
 
-      pe_escape = escape;
-    }
+    pe_escape = escape;
+  }
 
 
   return (pe_escape);
@@ -914,9 +897,9 @@ line_heat (xplasma, pp, nres)
   sf = scattering_fraction (lin_ptr[nres], xplasma);
 
   if (sane_check (sf))
-    {
-      Error ("line_heat:sane_check scattering fraction %g\n", sf);
-    }
+  {
+    Error ("line_heat:sane_check scattering fraction %g\n", sf);
+  }
   x = pp->w * (1. - sf);
   xplasma->heat_lines += x;
   xplasma->heat_tot += x;
@@ -955,59 +938,53 @@ upsilon (n_coll, u0)
      int n_coll;
      double u0;
 {
-  double x;			//The scaled temperature
-  double y;			//The scaled collision sterngth
-  double upsilon;		//The actual collision strength
+  double x;                     //The scaled temperature
+  double y;                     //The scaled collision sterngth
+  double upsilon;               //The actual collision strength
 
   /* first we compute x. This is the "reduced temperature" from
      Burgess & Tully 1992. */
   if (coll_stren[n_coll].type == 1 || coll_stren[n_coll].type == 4)
-    {
-      x =
-	1. -
-	(log (coll_stren[n_coll].scaling_param) /
-	 log (u0 + coll_stren[n_coll].scaling_param));
-    }
+  {
+    x = 1. - (log (coll_stren[n_coll].scaling_param) / log (u0 + coll_stren[n_coll].scaling_param));
+  }
   else if (coll_stren[n_coll].type == 2 || coll_stren[n_coll].type == 3)
-    {
-      x = u0 / (u0 + coll_stren[n_coll].scaling_param);
-    }
+  {
+    x = u0 / (u0 + coll_stren[n_coll].scaling_param);
+  }
   else
-    {
-      Error ("upsilon - coll_stren %i has no type %g\n",
-	     coll_stren[n_coll].type);
-      exit (0);
-    }
+  {
+    Error ("upsilon - coll_stren %i has no type %g\n", coll_stren[n_coll].type);
+    exit (0);
+  }
 
 
   /* we now compute y from the interpolation formulae
      y is the reduced upsilon from Burgess & Tully 1992. */
-  linterp (x, coll_stren[n_coll].sct, coll_stren[n_coll].scups,
-	   coll_stren[n_coll].n_points, &y, 0);
+  linterp (x, coll_stren[n_coll].sct, coll_stren[n_coll].scups, coll_stren[n_coll].n_points, &y, 0);
 
   /*  now we extract upsilon from y  - there are four different parametrisations */
 
   if (coll_stren[n_coll].type == 1)
-    {
-      upsilon = y * (log (u0 + exp (1)));
-    }
+  {
+    upsilon = y * (log (u0 + exp (1)));
+  }
   else if (coll_stren[n_coll].type == 2)
-    {
-      upsilon = y;
-    }
+  {
+    upsilon = y;
+  }
   else if (coll_stren[n_coll].type == 3)
-    {
-      upsilon = y / (u0 + 1);
-    }
+  {
+    upsilon = y / (u0 + 1);
+  }
   else if (coll_stren[n_coll].type == 4)
-    {
-      upsilon = y * (log (u0 + coll_stren[n_coll].scaling_param));
-    }
+  {
+    upsilon = y * (log (u0 + coll_stren[n_coll].scaling_param));
+  }
   else
-    {
-      Error ("upsilon - coll_stren %i has no type %g\n",
-	     coll_stren[n_coll].type);
-      exit (0);
-    }
+  {
+    Error ("upsilon - coll_stren %i has no type %g\n", coll_stren[n_coll].type);
+    exit (0);
+  }
   return (upsilon);
 }

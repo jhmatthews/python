@@ -187,7 +187,7 @@ sv_velocity (x, v, ndom)
 
   v[2] = vl * cos (theta);
 
-  if (x[2] < 0)                 
+  if (x[2] < 0)
     v[2] *= (-1);
 
   /* At this point we have calculated the velocity in the xz plane, which

@@ -53,15 +53,15 @@ compute_di_coeffs (T)
 {
   int n;
 
-  for (n = 0; n < nions; n++)  //Loop over all ions
+  for (n = 0; n < nions; n++)   //Loop over all ions
   {
-    if (ion[n].dere_di_flag == 0)   //If there isnt DI data for the ion
+    if (ion[n].dere_di_flag == 0)       //If there isnt DI data for the ion
     {
-      di_coeffs[n] = 0.0;   //Set the DI rate to zero
+      di_coeffs[n] = 0.0;       //Set the DI rate to zero
     }
     else
     {
-      di_coeffs[n] = q_ioniz_dere (n, T);  //Otherwise compute the rate
+      di_coeffs[n] = q_ioniz_dere (n, T);       //Otherwise compute the rate
     }
   }                             //End of loop over ions
 
@@ -98,13 +98,13 @@ q_ioniz_dere (nion, t_e)
 
   imin = imax = -1;             //Set to avoid compiler warning
 
-  nrec = ion[nion].nxderedi;  // find the correct coefficient via an index in the ion structure
+  nrec = ion[nion].nxderedi;    // find the correct coefficient via an index in the ion structure
 
 
   t = (BOLTZMANN * t_e) / (dere_di_rate[nrec].xi * EV2ERGS);
-  scaled_t = 1.0 - ((log (2.0)) / (log (2.0 + t)));   //The fit is in 'reduced temperature' units
+  scaled_t = 1.0 - ((log (2.0)) / (log (2.0 + t)));     //The fit is in 'reduced temperature' units
 
-  /* 1/t is (hnu) / (k t_e). when this ratio is >100 we return 0, see #197 The integral will fail if we try to do it*/
+  /* 1/t is (hnu) / (k t_e). when this ratio is >100 we return 0, see #197 The integral will fail if we try to do it */
   if ((1.0 / t) > ALPHABIG_DIRECT_ION)
     return 0.0;
 
@@ -114,7 +114,7 @@ q_ioniz_dere (nion, t_e)
     Log_silent ("compute_di_coeffs: Requested temp %e is below limit of data for ion %i(Tmin= %e)\n",
                 scaled_t, nion, dere_di_rate[nrec].temps[0]);
     imax = 1;
-    imin = 0;  //We will try to extrapolate
+    imin = 0;                   //We will try to extrapolate
   }
 
   else if (scaled_t >= dere_di_rate[nrec].temps[dere_di_rate[nrec].nspline - 1])        //we are above the range of GS data
@@ -122,7 +122,7 @@ q_ioniz_dere (nion, t_e)
     Log_silent ("compute_di_coeffs: Requested temp %e is above limit (%e) of data for ion %i\n",
                 scaled_t, dere_di_rate[nrec].temps[dere_di_rate[nrec].nspline - 1], nion);
     imax = dere_di_rate[nrec].nspline - 1;
-    imin = dere_di_rate[nrec].nspline - 2;  //We will try to extrapolate.
+    imin = dere_di_rate[nrec].nspline - 2;      //We will try to extrapolate.
   }
 
   else                          //We are within the range of tabulated data
@@ -132,7 +132,7 @@ q_ioniz_dere (nion, t_e)
       if (dere_di_rate[nrec].temps[i] <= scaled_t && scaled_t < dere_di_rate[nrec].temps[i + 1])        //We have bracketed the correct temperature
       {
         imin = i;
-        imax = i + 1;   //Set the indices to straddle the required temperature
+        imax = i + 1;           //Set the indices to straddle the required temperature
       }
     }
   }
@@ -145,18 +145,18 @@ q_ioniz_dere (nion, t_e)
   dt = ((scaled_t) - (dere_di_rate[nrec].temps[imin]));
   rate = dere_di_rate[nrec].rates[imin] + drdt * dt;
 
-  coeff = pow (t, -0.5) * pow (dere_di_rate[nrec].xi, -1.5) * rate;   //perform the interpolation
+  coeff = pow (t, -0.5) * pow (dere_di_rate[nrec].xi, -1.5) * rate;     //perform the interpolation
 
-  if (exp (-1.0 / t) < (1.0 / VERY_BIG))   //Check to make sure the exponential integral will give a sensible result
+  if (exp (-1.0 / t) < (1.0 / VERY_BIG))        //Check to make sure the exponential integral will give a sensible result
   {
-    exp_int = 0.0;    //If its too small, it will just be zero
+    exp_int = 0.0;              //If its too small, it will just be zero
   }
   else
   {
     exp_int = gsl_sf_expint_E1 (1.0 / t);       //Evaluate the first exponential integral using gsl library.
   }
 
-  coeff *= exp_int;   //Finalise the coefficient.
+  coeff *= exp_int;             //Finalise the coefficient.
 
   return (coeff);
 }
@@ -206,7 +206,7 @@ total_di (one, t_e)
     {
       x += 0.0;                 //Add nothing to the sum of coefficients
     }
-    else    //Multiply the rate coeff by the density of electrons and ions, by the ionization potential (in eV), the volume and convert to ergs
+    else                        //Multiply the rate coeff by the density of electrons and ions, by the ionization potential (in eV), the volume and convert to ergs
     {
       x += xplasma->vol * xplasma->ne * xplasma->density[n] * di_coeffs[n] * dere_di_rate[ion[n].nxderedi].xi * EV2ERGS;
     }
@@ -250,9 +250,9 @@ compute_qrecomb_coeffs (T)
   {
     if (ion[n].istate > 1)      //We cannot recombine to anything from the neutral iom
     {
-      if (ion[n - 1].dere_di_flag == 0)   //If there isn't a collisional ionization rate for the lower ion
+      if (ion[n - 1].dere_di_flag == 0) //If there isn't a collisional ionization rate for the lower ion
       {
-			qrecomb_coeffs[n] = 0.0;   //We can't do anything - so set the rate to zero
+        qrecomb_coeffs[n] = 0.0;        //We can't do anything - so set the rate to zero
       }
 
       else
@@ -262,7 +262,7 @@ compute_qrecomb_coeffs (T)
 
         ntmin = ion[n - 1].ntop_ground; /* We only ever use the ground state cont_ptr.
                                            This is for topbase */
-        nvmin = ion[n - 1].nxphot;    //VFKY
+        nvmin = ion[n - 1].nxphot;      //VFKY
 
         if (ion[n - 1].phot_info > 0)   //topbase or hybrid VFKY (GS)+TB excited
         {
@@ -272,13 +272,13 @@ compute_qrecomb_coeffs (T)
         {                       //just the ground state ionization fraction.
           xtop = &phot_top[nvmin];
         }
-        else    //We dont have any information about the bound-free jump
+        else                    //We dont have any information about the bound-free jump
         {
           Error ("compute_qrecomb_coeffs: no coll ionization data for ion %i\n", n - 1);
         }
 
         /* this will return 0 if there aren't any coeffs */
-        qrecomb_coeffs[n] = q_recomb_dere (xtop, T);  //We have everything we need, so calculate the coeff
+        qrecomb_coeffs[n] = q_recomb_dere (xtop, T);    //We have everything we need, so calculate the coeff
       }
 
     }                           //End of if statement for neutral ions
@@ -337,10 +337,10 @@ q_recomb_dere (cont_ptr, electron_temperature)
     coeff = 2.07e-16 / (root_etemp * root_etemp * root_etemp);
 
     /* We now multiply by the ratio of the multiplicity of the ground states.
-      Dere's data comes from a vast range of sources, some PI cross sections
-	  include excited states, others dont. We will make the approximation
-	  of using juast the ground state multiplicities. If there is an error
-	  introduced here it will be small */
+       Dere's data comes from a vast range of sources, some PI cross sections
+       include excited states, others dont. We will make the approximation
+       of using juast the ground state multiplicities. If there is an error
+       introduced here it will be small */
     coeff *= ion[nion].g / ion[nion + 1].g;
 
     coeff *= exp (u0);

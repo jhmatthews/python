@@ -51,7 +51,7 @@
 #include	<strings.h>
 #include	<string.h>
 #include 	"atomic.h"
-#include	"python.h"	//This needs to come before modlel.h so that what is in models.h is used
+#include	"python.h"      //This needs to come before modlel.h so that what is in models.h is used
 #include         "models.h"
 #define    	BIG 1e32
 
@@ -122,9 +122,9 @@ int get_models_init = 0;
 
 int
 get_models (modellist, npars, spectype)
-     char modellist[];		// filename containing location and associated parameters of models
-     int npars;			// Number of parameters which vary for these models
-     int *spectype;		//  The returned spectrum type
+     char modellist[];          // filename containing location and associated parameters of models
+     int npars;                 // Number of parameters which vary for these models
+     int *spectype;             //  The returned spectrum type
 
 
 {
@@ -139,11 +139,11 @@ get_models (modellist, npars, spectype)
   nwaves = 0;
 
   if (get_models_init == 0)
-    {
-      nmods_tot = 0;
-      ncomps = 0;		// The number of different sets of models that have been read in
-      get_models_init = 1;
-    }
+  {
+    nmods_tot = 0;
+    ncomps = 0;                 // The number of different sets of models that have been read in
+    get_models_init = 1;
+  }
 
   /* Now check if this set of models has been read in previously.  If so return the
    * spectype when this was read.
@@ -151,22 +151,21 @@ get_models (modellist, npars, spectype)
 
   n = 0;
   while (n < ncomps)
+  {
+    if (strcmp (modellist, comp[n].name) == 0)
     {
-      if (strcmp (modellist, comp[n].name) == 0)
-	{
-	  *spectype = n;
-	  return (0);
-	}
-      n++;
+      *spectype = n;
+      return (0);
     }
+    n++;
+  }
 
 
   if ((mptr = fopen (modellist, "r")) == NULL)
-    {
-      Error ("get_models:Could not open file %s containing list of models \n",
-	     modellist);
-      exit (0);
-    }
+  {
+    Error ("get_models:Could not open file %s containing list of models \n", modellist);
+    exit (0);
+  }
 
 /* Now initialize the model summary structure */
   strcpy (comp[ncomps].name, modellist);
@@ -176,82 +175,74 @@ get_models (modellist, npars, spectype)
   comp[ncomps].xcdf.limit2 = -99.;
 
 /* Now get all the models of this type */
-  n = nmods_tot;		// This is the starting point since may have read models in before
+  n = nmods_tot;                // This is the starting point since may have read models in before
 /* Establish initial limits on xmin and xmax so that they can be properly populated */
   for (m = 0; m < NPARS; m++)
-    {
-      xmin[m] = (BIG);
-      xmax[m] = (-BIG);
-      comp[ncomps].xmod.par[m] = -99;
-    }
+  {
+    xmin[m] = (BIG);
+    xmax[m] = (-BIG);
+    comp[ncomps].xmod.par[m] = -99;
+  }
 
-  nw = -1;			// Initiallize nw
+  nw = -1;                      // Initiallize nw
   while (n < NMODS && (fgets (dummy, LINELENGTH, mptr)) != NULL)
+  {
+    if (dummy[0] == '#' || dummy[0] == '!')
     {
-      if (dummy[0] == '#' || dummy[0] == '!')
-	{
-	}			//skip comment lines in models
-      else
-	{
-	  nxpar =
-	    sscanf (dummy, "%s %lf %lf %lf %lf %lf %lf %lf %lf %lf",
-		    mods[n].name, &xpar[0], &xpar[1], &xpar[2], &xpar[3],
-		    &xpar[4], &xpar[5], &xpar[6], &xpar[7], &xpar[8]);
-	  if (nxpar < npars)
-	    {
-	      Error ("get_models: nxpar (%d) < npars (%d) in line %s\n",
-		     nxpar, npars, dummy);
-	      exit (0);
-	    }
-	  for (m = 0; m < npars; m++)
-	    {
-	      mods[n].par[m] = xpar[m];
-	      if (xpar[m] > xmax[m])
-		xmax[m] = xpar[m];
-	      if (xpar[m] < xmin[m])
-		xmin[m] = xpar[m];
-	    }
-	  for (mm = m; mm < NPARS; mm++)
-	    mods[n].par[mm] = -99;
+    }                           //skip comment lines in models
+    else
+    {
+      nxpar =
+        sscanf (dummy, "%s %lf %lf %lf %lf %lf %lf %lf %lf %lf",
+                mods[n].name, &xpar[0], &xpar[1], &xpar[2], &xpar[3], &xpar[4], &xpar[5], &xpar[6], &xpar[7], &xpar[8]);
+      if (nxpar < npars)
+      {
+        Error ("get_models: nxpar (%d) < npars (%d) in line %s\n", nxpar, npars, dummy);
+        exit (0);
+      }
+      for (m = 0; m < npars; m++)
+      {
+        mods[n].par[m] = xpar[m];
+        if (xpar[m] > xmax[m])
+          xmax[m] = xpar[m];
+        if (xpar[m] < xmin[m])
+          xmin[m] = xpar[m];
+      }
+      for (mm = m; mm < NPARS; mm++)
+        mods[n].par[mm] = -99;
 
-	  nwaves = get_one_model (mods[n].name, &mods[n]);
-	  if (nw > 0 && nwaves != nw)
-	    {
-	      Error
-		("get_models: file %s has %d wavelengths, others have %d\n",
-		 mods[n].name, nwaves, nw);
-	      exit (0);
-	    }
+      nwaves = get_one_model (mods[n].name, &mods[n]);
+      if (nw > 0 && nwaves != nw)
+      {
+        Error ("get_models: file %s has %d wavelengths, others have %d\n", mods[n].name, nwaves, nw);
+        exit (0);
+      }
 
-	  if ((n % 100) == 0)
-	    Log ("Model n %d %s\n", n, mods[n].name);
-	  n++;
-	}
+      if ((n % 100) == 0)
+        Log ("Model n %d %s\n", n, mods[n].name);
+      n++;
     }
+  }
 
   if (n == NMODS)
-    {
-      Error
-	("get_models: Reached maximum number of models %d. Please increase NMODS in .h file \n",
-	 n);
-      exit (0);
-    }
+  {
+    Error ("get_models: Reached maximum number of models %d. Please increase NMODS in .h file \n", n);
+    exit (0);
+  }
 /* Now complete the initialization of the modsum structure */
   comp[ncomps].modstop = nmods_tot = n;
   comp[ncomps].nmods = comp[ncomps].modstop - comp[ncomps].modstart;
   comp[ncomps].nwaves = nwaves;
   for (n = 0; n < nwaves; n++)
-    {
-      comp[ncomps].xmod.w[n] = mods[comp[ncomps].modstart].w[n];
-    }
+  {
+    comp[ncomps].xmod.w[n] = mods[comp[ncomps].modstart].w[n];
+  }
 
   if (comp[ncomps].nmods == 0)
-    {
-      Error
-	("get_models: No models from %s were read. Please check list of models!\n",
-	 comp[ncomps].name);
-      exit (0);
-    }
+  {
+    Error ("get_models: No models from %s were read. Please check list of models!\n", comp[ncomps].name);
+    exit (0);
+  }
 
   /* The next 3 lines set a normalization that is used by kslfit.  They are mostly
    * not relevant to python, where comp[ncomp[.min[0] refers to a normalization for
@@ -260,12 +251,12 @@ get_models (modellist, npars, spectype)
   comp[ncomps].max[0] = 1000;
 
   for (m = 0; m < npars; m++)
-    {
-      comp[ncomps].min[m] = xmin[m];
-      comp[ncomps].max[m] = xmax[m];
-    }
+  {
+    comp[ncomps].min[m] = xmin[m];
+    comp[ncomps].max[m] = xmax[m];
+  }
 
-  *spectype = ncomps;		// Set the spectype
+  *spectype = ncomps;           // Set the spectype
   ncomps++;
   return (*spectype);
 }
@@ -297,30 +288,29 @@ get_one_model (filename, onemod)
   double w, f;
 
   if ((ptr = fopen (filename, "r")) == NULL)
-    {
-      Error ("Could not open filename %s\n", filename);
-      exit (0);
-    }
+  {
+    Error ("Could not open filename %s\n", filename);
+    exit (0);
+  }
   n = 0;
   while (n < NWAVES && (fgets (dummy, LINELEN, ptr)) != NULL)
+  {
+    if ((dummy[0] != '#'))
     {
-      if ((dummy[0] != '#'))
-	{
-	  sscanf (dummy, "%le %le", &w, &f);
-	  onemod->w[n] = w;
-	  onemod->f[n] = f;
+      sscanf (dummy, "%le %le", &w, &f);
+      onemod->w[n] = w;
+      onemod->f[n] = f;
 
-	  n++;
-	}
+      n++;
     }
+  }
   onemod->nwaves = n;
 
 
   if (n >= NWAVES)
-    {
-      Error ("get_one_model: model %s has more than %d wavelengths\n",
-	     filename, NWAVES);
-    }
+  {
+    Error ("get_one_model: model %s has more than %d wavelengths\n", filename, NWAVES);
+  }
 
 
   fclose (ptr);
@@ -387,15 +377,15 @@ model (spectype, par)
 
 {
   int j, n;
-  int good_models[NMODS];	// Used to establish which models are to be included in creating output model
-  double xmin[NPARS], xmax[NPARS];	// The vertices of a completely filled grid
-  double weight[NMODS];		// The weights assigned to the models
+  int good_models[NMODS];       // Used to establish which models are to be included in creating output model
+  double xmin[NPARS], xmax[NPARS];      // The vertices of a completely filled grid
+  double weight[NMODS];         // The weights assigned to the models
   double hi, lo, delta, wtot;
   int ngood;
   double f;
   int nwaves;
   double flux[NWAVES];
-  double q1, q2, lambda, tscale, xxx;	// Used for rescaleing according to a bb
+  double q1, q2, lambda, tscale, xxx;   // Used for rescaleing according to a bb
 
 
 
@@ -404,88 +394,88 @@ exact model previously */
 
   n = 0;
   while (n < comp[spectype].npars && comp[spectype].xmod.par[n] == par[n])
-    {
-      n++;
-    }
+  {
+    n++;
+  }
   if (n == comp[spectype].npars)
-    {
-      return (0);		// This was the model stored in comp already
-    }
+  {
+    return (0);                 // This was the model stored in comp already
+  }
 
 
   /* First identify the models of interest */
   n = 0;
   while (n < comp[spectype].modstart)
-    {
-      weight[n] = good_models[n] = 0;
-      n++;
-    }
+  {
+    weight[n] = good_models[n] = 0;
+    n++;
+  }
   while (n < comp[spectype].modstop)
-    {
-      weight[n] = good_models[n] = 1;
-      n++;
-    }
+  {
+    weight[n] = good_models[n] = 1;
+    n++;
+  }
   while (n < nmods_tot)
-    {
-      weight[n] = good_models[n] = 0;
-      n++;
-    }
+  {
+    weight[n] = good_models[n] = 0;
+    n++;
+  }
 
   for (j = 0; j < comp[spectype].npars; j++)
+  {
+    xmax[j] = comp[spectype].max[j];
+    xmin[j] = comp[spectype].min[j];
+    hi = BIG;
+    lo = -BIG;
+    for (n = comp[spectype].modstart; n < comp[spectype].modstop; n++)
     {
-      xmax[j] = comp[spectype].max[j];
-      xmin[j] = comp[spectype].min[j];
-      hi = BIG;
-      lo = -BIG;
-      for (n = comp[spectype].modstart; n < comp[spectype].modstop; n++)
-	{
-	  if (good_models[n])
-	    {
-	      delta = mods[n].par[j] - par[j];
-	      if (delta > 0.0 && delta < hi)
-		{
-		  xmax[j] = mods[n].par[j];
-		  hi = delta;
-		}
-	      if (delta <= 0.0 && delta >= lo)
-		{
-		  xmin[j] = mods[n].par[j];
-		  lo = delta;
-		}
-	    }
-	}
-      /*   So at this point we know what xmin[j] and xmax[j] and we
-         need to prune good_models
+      if (good_models[n])
+      {
+        delta = mods[n].par[j] - par[j];
+        if (delta > 0.0 && delta < hi)
+        {
+          xmax[j] = mods[n].par[j];
+          hi = delta;
+        }
+        if (delta <= 0.0 && delta >= lo)
+        {
+          xmin[j] = mods[n].par[j];
+          lo = delta;
+        }
+      }
+    }
+    /*   So at this point we know what xmin[j] and xmax[j] and we
+       need to prune good_models
+     */
+    for (n = comp[spectype].modstart; n < comp[spectype].modstop; n++)
+    {
+      // Next lines excludes the models which are out of range.
+      if (mods[n].par[j] > xmax[j] || mods[n].par[j] < xmin[j])
+        good_models[n] = 0;
+      /* Next line modifies the weight of this model assuming a regular grid
+         If xmax==xmin, then par[j] was outside of the range of the models and
+         so we need to weight the remaining models fully.
        */
-      for (n = comp[spectype].modstart; n < comp[spectype].modstop; n++)
-	{
-	  // Next lines excludes the models which are out of range.
-	  if (mods[n].par[j] > xmax[j] || mods[n].par[j] < xmin[j])
-	    good_models[n] = 0;
-	  /* Next line modifies the weight of this model assuming a regular grid
-	     If xmax==xmin, then par[j] was outside of the range of the models and
-	     so we need to weight the remaining models fully.
-	   */
 
-	  if (good_models[n] && xmax[j] > xmin[j])
-	    {
-	      f = (par[j] - xmin[j]) / (xmax[j] - xmin[j]);
-	      if (mods[n].par[j] == xmax[j])
-		{
-		  // Then the model is at the maximum for this parameter
-		  weight[n] *= f;
-		}
-	      else
-		weight[n] *= (1. - f);
+      if (good_models[n] && xmax[j] > xmin[j])
+      {
+        f = (par[j] - xmin[j]) / (xmax[j] - xmin[j]);
+        if (mods[n].par[j] == xmax[j])
+        {
+          // Then the model is at the maximum for this parameter
+          weight[n] *= f;
+        }
+        else
+          weight[n] *= (1. - f);
 
 /*If the weight given to a model is going to be zero, it needs to be
 excluded from furthur consideration */
-	      if (weight[n] == 0.0)
-		good_models[n] = 0;
+        if (weight[n] == 0.0)
+          good_models[n] = 0;
 
-	    }
-	}
+      }
     }
+  }
 
   /* At this point, we should have all the input models we want to include in the
      final output weighting, as well as the relative weighting of the models.
@@ -494,66 +484,63 @@ excluded from furthur consideration */
   wtot = 0;
   ngood = 0;
   for (n = comp[spectype].modstart; n < comp[spectype].modstop; n++)
+  {
+    if (good_models[n])
     {
-      if (good_models[n])
-	{
-	  wtot += weight[n];
-	  ngood++;
-	}
+      wtot += weight[n];
+      ngood++;
     }
+  }
   if (wtot == 0)
-    {
-      Error
-	("model: Wtot must be greater than 0 or something is badly wrong\n");
-      exit (0);
-    }
+  {
+    Error ("model: Wtot must be greater than 0 or something is badly wrong\n");
+    exit (0);
+  }
   for (n = comp[spectype].modstart; n < comp[spectype].modstop; n++)
-    {
-      if (good_models[n])
-	weight[n] /= wtot;
-    }
+  {
+    if (good_models[n])
+      weight[n] /= wtot;
+  }
 
 // So now we know the absolute weighting.
 
   if (ngood == 0)
-    {
-      Error ("model: No models from %s survived pruning\n",
-	     comp[spectype].name);
-      exit (0);
-    }
+  {
+    Error ("model: No models from %s survived pruning\n", comp[spectype].name);
+    exit (0);
+  }
   else if (ngood == 1 && nmodel_error < 20)
+  {
+    Error ("model: Only one model after pruning for parameters, consider larger model grid\n");
+    for (n = comp[spectype].modstart; n < comp[spectype].modstop; n++)
     {
-      Error
-	("model: Only one model after pruning for parameters, consider larger model grid\n");
-      for (n = comp[spectype].modstart; n < comp[spectype].modstop; n++)
-	{
-	  if (good_models[n])
-	    {
-	      Error ("model: %s %8.2f %8.2f\n", mods[n].name, par[0], par[1]);
-	    }
-	}
-      nmodel_error++;
+      if (good_models[n])
+      {
+        Error ("model: %s %8.2f %8.2f\n", mods[n].name, par[0], par[1]);
+      }
     }
+    nmodel_error++;
+  }
 
   nwaves = comp[spectype].nwaves;
 
 // Now create the spectrum
   for (j = 0; j < nwaves; j++)
-    {
-      flux[j] = 0;
-    }
+  {
+    flux[j] = 0;
+  }
 
 
   for (n = comp[spectype].modstart; n < comp[spectype].modstop; n++)
+  {
+    if (good_models[n])
     {
-      if (good_models[n])
-	{
-	  for (j = 0; j < nwaves; j++)
-	    {
-	      flux[j] += weight[n] * mods[n].f[j];
-	    }
-	}
+      for (j = 0; j < nwaves; j++)
+      {
+        flux[j] += weight[n] * mods[n].f[j];
+      }
     }
+  }
 
 
 
@@ -569,68 +556,66 @@ Note that in the algorithm below we have to worry that the exp can become quite 
 even, and so for those cases we want to make sure to calculate the ratio of qs directly
 */
 
-  if (par[0] < comp[spectype].min[0] || par[0] > comp[spectype].max[0])	// is temp outside grid range
+  if (par[0] < comp[spectype].min[0] || par[0] > comp[spectype].max[0]) // is temp outside grid range
+  {
+    for (j = 0; j < nwaves; j++)        // cycle through wavelength bins
     {
-      for (j = 0; j < nwaves; j++)	// cycle through wavelength bins
-	{
-	  lambda = comp[spectype].xmod.w[j] * 1.e-8;	// Convert lamda to cgs
+      lambda = comp[spectype].xmod.w[j] * 1.e-8;        // Convert lamda to cgs
 
 
-	  /* tscale is temperature to use in the BB function by which we need to scale the flux.
-	     tscale can be larger or smaller than our actual temperature */
-	  if (par[0] < comp[spectype].min[0])
-	    tscale = comp[spectype].min[0];	// lowest temperature model
+      /* tscale is temperature to use in the BB function by which we need to scale the flux.
+         tscale can be larger or smaller than our actual temperature */
+      if (par[0] < comp[spectype].min[0])
+        tscale = comp[spectype].min[0]; // lowest temperature model
 
-	  else if (par[0] > comp[spectype].max[0])
-	    tscale = comp[spectype].max[0];	// highest temperature model
-
-
-	  /* calculate h*nu/kT for both temperatures */
-
-	  q1 = H_OVER_K * C / (lambda * par[0]);	//  h*nu/kT for model desired
-
-	  q2 = H_OVER_K * C / (lambda * tscale);	//  h*nu/kT for model that exists
+      else if (par[0] > comp[spectype].max[0])
+        tscale = comp[spectype].max[0]; // highest temperature model
 
 
-	  /* q can be large- line below is attempt to keep exponents in range in that case */
-	  if (q1 > 50. || q2 > 50.)
-	    {
-	      xxx = exp (q2 - q1);	// q2 - q1 should be negative since q1 is model desired
-	    }
-	  else
-	    {
-	      q2 = exp (q2) - 1.0;	// Model that exists has higher temperature
-	      q1 = exp (q1) - 1.0;	// Model desired has lower T, hence q1 is larger
-	      xxx = q2 / q1;
-	    }
+      /* calculate h*nu/kT for both temperatures */
 
-	  /* multiply flux by scaling factor */
-	  flux[j] *= xxx;
-	}
+      q1 = H_OVER_K * C / (lambda * par[0]);    //  h*nu/kT for model desired
 
-	  /* nmodel_terror counts number of models where this is true. */
-	  if (nmodel_terror < 20)
-	    {
-	      Error
-		("model: Rescaling spectra because parameter %f outside bound %f of spectra in grid\n",
-		 par[0], tscale);
+      q2 = H_OVER_K * C / (lambda * tscale);    //  h*nu/kT for model that exists
 
-	      nmodel_terror++;
-	    }
+
+      /* q can be large- line below is attempt to keep exponents in range in that case */
+      if (q1 > 50. || q2 > 50.)
+      {
+        xxx = exp (q2 - q1);    // q2 - q1 should be negative since q1 is model desired
+      }
+      else
+      {
+        q2 = exp (q2) - 1.0;    // Model that exists has higher temperature
+        q1 = exp (q1) - 1.0;    // Model desired has lower T, hence q1 is larger
+        xxx = q2 / q1;
+      }
+
+      /* multiply flux by scaling factor */
+      flux[j] *= xxx;
     }
+
+    /* nmodel_terror counts number of models where this is true. */
+    if (nmodel_terror < 20)
+    {
+      Error ("model: Rescaling spectra because parameter %f outside bound %f of spectra in grid\n", par[0], tscale);
+
+      nmodel_terror++;
+    }
+  }
 
 
 
   /* End of section to reweight the spectra. we can now copy fluxes to structure */
 
   for (j = 0; j < nwaves; j++)
-    {
-      comp[spectype].xmod.f[j] = flux[j];
-    }
+  {
+    comp[spectype].xmod.f[j] = flux[j];
+  }
   for (j = 0; j < comp[spectype].npars; j++)
-    {
-      comp[spectype].xmod.par[j] = par[j];
-    }
+  {
+    comp[spectype].xmod.par[j] = par[j];
+  }
 
 
 

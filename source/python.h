@@ -82,8 +82,8 @@ double DENSITY_PHOT_MIN;        /* This constant is a minimum density for the pu
 #define VMAX                		1.e9
 #define TAU_MAX				20.     /* Sets an upper limit in extract on when
                                                    a photon can be assumed to be completely absorbed */
-	
-#define DELTA_V				1.		/*This is the accuracy in velocity space (cm/s) that we sample edges when producing freebound photons*/	
+
+#define DELTA_V				1.      /*This is the accuracy in velocity space (cm/s) that we sample edges when producing freebound photons */
 
 #define DANG_LIVE_OR_DIE   2.0  /* If constructing photons from a live or die run of the code, the
                                    angle over which photons will be accepted must be defined */
@@ -149,7 +149,7 @@ enum coord_type_enum
 #define KNIGGE			5
 #define	HOMOLOGOUS 		6
 #define	YSO 			7
-//OLD #define	ELVIS 			8  Deleted option
+//OLD #define   ELVIS                   8  Deleted option
 #define	SHELL 			9
 #define IMPORT          10      // Model that is read in from a file
 #define	DISK_ATMOS 		11
@@ -194,13 +194,13 @@ cone_dummy, *ConePtr;
 
 /* End of structures which are used to define boundaries to the emission regions */
 
-#define NDIM_MAX 500          // maximum size of the grid in each dimension
+#define NDIM_MAX 500            // maximum size of the grid in each dimension
 
 typedef struct domain
 {
   char name[LINELENGTH];
   int wind_type;
-  int ndim, mdim, ndim2;       //ndim is the size in the x direction, while mdim is the size in z or theta direction
+  int ndim, mdim, ndim2;        //ndim is the size in the x direction, while mdim is the size in z or theta direction
   int nstart, nstop;            //the beginning and end (-1) location in wmain of this component
   enum coord_type_enum coord_type;
   int log_linear;               /*0 -> the grid spacing will be logarithmic in x and z, 1-> linear */
@@ -229,7 +229,7 @@ typedef struct domain
   /* Generic parameters for the wind */
   double wind_mdot, stellar_wind_mdot;  /* Mass loss rate in disk and stellar wind */
   double rmin, rmax;            /*Spherical extent of the wind */
-  double zmin,zmax;                  /* Vertical extent of the wind, often the same as rmas */
+  double zmin, zmax;            /* Vertical extent of the wind, often the same as rmas */
   double wind_rho_min, wind_rho_max;    /*Min/Max rho for wind in disk plane */
   double wind_thetamin, wind_thetamax;  /*Angles defining inner and outer cones of wind, measured from disk plane */
   double mdot_norm;             /*A normalization factor used in SV wind, and Knigge wind */
@@ -294,7 +294,7 @@ int current_domain;             // This integer is used by py_wind only
   of sytem, with the exception 
 */
 
-#define RUN_TYPE_NEW       0   
+#define RUN_TYPE_NEW       0
 #define RUN_TYPE_RESTART   1
 #define RUN_TYPE_PREVIOUS  3
 
@@ -353,15 +353,15 @@ struct geometry
  * outside these regions are assumed to have hit something or be freely moving through space.
  */
 
-  double rmax, rmax_sq;   /* The maximum distance to which a photon should be followed */
+  double rmax, rmax_sq;         /* The maximum distance to which a photon should be followed */
 
 /* Basic paremeters of the system, as opposed to elements of the wind or winds */
 
   double mstar, rstar, rstar_sq, tstar, gstar;  /* Basic parameters for the star (often a WD) in the system */
-  double tstar_init;                    /* The temperature of the star, before backscattering is taken into account*/
+  double tstar_init;            /* The temperature of the star, before backscattering is taken into account */
   double lum_star_init, lum_star_back;  /* The luminosity of the star as determined by tstar_init */
 
-  double twind_init;                 /* initial temperature of wind.  As written applies to all domains */
+  double twind_init;            /* initial temperature of wind.  As written applies to all domains */
   double tmax;                  /*NSH 120817 the maximum temperature of any element of the model 
                                    - used to help estimate things for an exponential representation of the spectrum in a cell */
 
@@ -372,19 +372,19 @@ struct geometry
 
   int disk_type;
 
-#define BACK_RAD_ABSORB_AND_DESTROY  0        /* Disk simply absorbs the radiation and it is lost */
-#define BACK_RAD_SCATTER            1        /* Disk reradiates the radiation immediately via electron scattering */
-#define BACK_RAD_ABSORB_AND_HEAT     2        /* Correct disk temperature for illumination by photons 
-                                                   which hit the dsik.  Disk radiation is absorbed and changes 
-                                                   the temperature of the disk for future ionization cycles
-                                                 */
+#define BACK_RAD_ABSORB_AND_DESTROY  0  /* Disk simply absorbs the radiation and it is lost */
+#define BACK_RAD_SCATTER            1   /* Disk reradiates the radiation immediately via electron scattering */
+#define BACK_RAD_ABSORB_AND_HEAT     2  /* Correct disk temperature for illumination by photons 
+                                           which hit the dsik.  Disk radiation is absorbed and changes 
+                                           the temperature of the disk for future ionization cycles
+                                         */
 
-  int absorb_reflect;            /*Controls what happens when a photong hits the disk or star
+  int absorb_reflect;           /*Controls what happens when a photong hits the disk or star
                                  */
 
-#define DISK_TPROFILE_STANDARD          0   // This is a standard Shakura-Sunyaev disk. The profile depends on mstar and mdot_disk
-#define DISK_TPROFILE_READIN            1   // Here the temperature profile for the disk is simply read in as a function of radius
-#define DISK_TPROFILE_YSO               2   // The so-called YSO option was created for the YSO case
+#define DISK_TPROFILE_STANDARD          0       // This is a standard Shakura-Sunyaev disk. The profile depends on mstar and mdot_disk
+#define DISK_TPROFILE_READIN            1       // Here the temperature profile for the disk is simply read in as a function of radius
+#define DISK_TPROFILE_YSO               2       // The so-called YSO option was created for the YSO case
   int disk_tprofile;            /* This is an variable used to specify a standard accretion disk (0) or
                                    one that has been read in and stored. */
   double disk_mdot;             /* mdot of  DISK */
@@ -456,11 +456,11 @@ struct geometry
 
   /* Define the choices for calculating the FB, see, e.g. integ_fb */
 
-#define FB_FULL         0   /* Calculate fb emissivity including energy associated with the threshold*/
-#define FB_REDUCED      1   /* Calculqate the fb emissivity without the threshold energy */
-#define FB_RATE         2   /* Calulate the fb recombinarion rate  */
-  
-  
+#define FB_FULL         0       /* Calculate fb emissivity including energy associated with the threshold */
+#define FB_REDUCED      1       /* Calculqate the fb emissivity without the threshold energy */
+#define FB_RATE         2       /* Calulate the fb recombinarion rate  */
+
+
   /* Define the modes for free bound integrals */
 #define OUTER_SHELL  1
 #define INNER_SHELL  2
@@ -468,7 +468,7 @@ struct geometry
   /* The frequency bands used when calculating parameters like a power law slope in limited regions. */
 
 #define  NXBANDS 20             /* the maximum number of bands (frequency intervals that can be defined for
-storing coarse spectra for each plasma cell*/
+                                   storing coarse spectra for each plasma cell */
 
   int nxfreq;                   /* the number of frequency intervals actually used */
   double xfreq[NXBANDS + 1];    /* the frequency boundaries for the coarse spectra  */
@@ -493,7 +493,7 @@ storing coarse spectra for each plasma cell*/
                                  */
   int nonthermal;               /* 0 --> No extra heating due to shocks
                                    1 --> Extra heating due to shocks (etc)  (Added for FU Ori)
-                                */
+                                 */
 
   double shock_factor;          /* A scaling factor used for including an extra heating term (for FU Ori stars
                                  */
@@ -506,19 +506,19 @@ storing coarse spectra for each plasma cell*/
   double pl_t_r, pl_t_e, pl_w;
   double pl_nh;
 
-  /* Variables having to do with heating and cooling*/
+  /* Variables having to do with heating and cooling */
 
   double lum_tot, lum_star, lum_disk, lum_bl, lum_wind; /* The total luminosities of the disk, star, bl, & wind 
                                                            are actually not used in a fundamental way in the program */
   double lum_agn;               /*The total luminosity of the AGN or point source at the center */
   double lum_ff, lum_rr, lum_lines;     /* The luminosity of the wind as a result of ff, fb, and line radiation */
-  double cool_rr;				/*1706 NSH - the cooling rate due to radiative recombination - not the same as the luminosity */
-  double cool_comp;              /*1108 NSH The luminosity of the wind as a result of compton cooling */
-  double cool_di;                /* 1409 NSH The direct ionization luminosity */
-  double cool_dr;                /*1109 NSH The luminosity of the wind due to dielectronic recombination */
-  double cool_adiabatic;         /*1209 NSH The cooling of the wind due to adiabatic expansion */
+  double cool_rr;               /*1706 NSH - the cooling rate due to radiative recombination - not the same as the luminosity */
+  double cool_comp;             /*1108 NSH The luminosity of the wind as a result of compton cooling */
+  double cool_di;               /* 1409 NSH The direct ionization luminosity */
+  double cool_dr;               /*1109 NSH The luminosity of the wind due to dielectronic recombination */
+  double cool_adiabatic;        /*1209 NSH The cooling of the wind due to adiabatic expansion */
   double heat_adiabatic;        /*1307 NSH The heating of the wind due to adiabatic heating - split out from cool_adiabatic to get an accurate idea of whether it is important */
-  double heat_shock; /*1806 - ksl - The amount of extra heating going into the wind due to shock heating. Added for FU Ori project */
+  double heat_shock;            /*1806 - ksl - The amount of extra heating going into the wind due to shock heating. Added for FU Ori project */
 
   double f_tot, f_star, f_disk, f_bl, f_agn, f_wind;    /* The integrated specific L between a freq min and max which are
                                                            used to establish the fraction of photons of various types */
@@ -528,7 +528,7 @@ storing coarse spectra for each plasma cell*/
   double lum_ff_ioniz, lum_rr_ioniz, lum_lines_ioniz;
   double cool_rr_ioniz;
   double cool_comp_ioniz;
-  double cool_di_ioniz;          /* 1409 NSH The direct ionization luminosity */
+  double cool_di_ioniz;         /* 1409 NSH The direct ionization luminosity */
   double cool_dr_ioniz;
   double cool_adiabatic_ioniz;
   double lum_wind_ioniz, lum_star_ioniz, lum_disk_ioniz, lum_bl_ioniz, lum_tot_ioniz;
@@ -609,7 +609,7 @@ geo;
 
 
 /* xdisk is a structure that is used to store information about the disk in a system */
-#define NRINGS	3001             /* The actual number of rings completely defined
+#define NRINGS	3001            /* The actual number of rings completely defined
                                    is NRINGS-1 ... or from 0 to NRINGS-2.  This is
                                    because you need an outer radius...but the rest
                                    of this element is not filled in. */
@@ -799,7 +799,7 @@ typedef struct plasma
                                                    and heat_photo. SS June 04. */
   double heat_photo, heat_z;    /*photoionization heating total and of metals */
   double heat_auger;            /* photoionization heating due to inner shell ionizations */
-  double abs_photo,abs_auger;    /* this is the energy absorbed from the photon filed by these processes - different to the heating rate because of the binding energy */
+  double abs_photo, abs_auger;  /* this is the energy absorbed from the photon filed by these processes - different to the heating rate because of the binding energy */
   double w;                     /*The dilution factor of the wind */
 
   int ntot;                     /*Total number of photon passages */
@@ -828,13 +828,13 @@ typedef struct plasma
   double *xscatters;            /* 68b - Diagnostic measure of energy scattered out of beam on extract. 78 - changed to dynamic allocation */
   double *heat_ion;             /* The amount of energy being transferred to the electron pool
                                    by this ion via photoionization. 78 - changed to dynamic allocation */
-  double *cool_rr_ion;              /* The amount of energy being released from the electron pool
+  double *cool_rr_ion;          /* The amount of energy being released from the electron pool
                                    by this ion via recombination. 78 - changed to dynamic allocation */
-  double *lum_rr_ion;              /* The recombination luminosity
-	                                   by this ion via recombination. 78 - changed to dynamic allocation */
-	  
+  double *lum_rr_ion;           /* The recombination luminosity
+                                   by this ion via recombination. 78 - changed to dynamic allocation */
+
   double *cool_dr_ion;
-  double j, ave_freq;      /*Respectively mean intensity, intensity_averaged frequency, 
+  double j, ave_freq;           /*Respectively mean intensity, intensity_averaged frequency, 
                                    luminosity and absorbed luminosity of shell */
   double xj[NXBANDS], xave_freq[NXBANDS];       /* 1108 NSH frequency limited versions of j and ave_freq */
   double fmin[NXBANDS];         /* the minimum freqneucy photon seen in a band - this is incremented during photon flight */
@@ -851,27 +851,27 @@ typedef struct plasma
   double max_freq;              /*1208 NSH The maximum frequency photon seen in this cell */
   double cool_tot;              /*The total cooling in a cell */
   /* The total luminosity of all processes in the cell (Not the same 
-                                   as what escapes the cell) */
+     as what escapes the cell) */
   double lum_lines, lum_ff, cool_adiabatic;
-  double lum_rr, lum_rr_metals;   /* 1706 NSH - the radiative recobination luminosity - not the same as the cooling rate */
-  double cool_comp;              /* 1108 NSH The compton luminosity of the cell */
-  double cool_di;                /* 1409 NSH The direct ionization luminosity */
-  double cool_dr;                /* 1109 NSH The dielectronic recombination luminosity of the cell */
-  double cool_rr, cool_rr_metals;         /*fb luminosity & fb of metals metals */
+  double lum_rr, lum_rr_metals; /* 1706 NSH - the radiative recobination luminosity - not the same as the cooling rate */
+  double cool_comp;             /* 1108 NSH The compton luminosity of the cell */
+  double cool_di;               /* 1409 NSH The direct ionization luminosity */
+  double cool_dr;               /* 1109 NSH The dielectronic recombination luminosity of the cell */
+  double cool_rr, cool_rr_metals;       /*fb luminosity & fb of metals metals */
   double lum_tot, lum_tot_old;  /* The specific radiative luminosity in frequencies defined by freqmin
                                    and freqmax.  This will depend on the last call to total_emission */
 
   double cool_tot_ioniz;
   double lum_lines_ioniz, lum_ff_ioniz, cool_adiabatic_ioniz;
   double lum_rr_ioniz;
-  double cool_comp_ioniz;        /* 1108 NSH The compton luminosity of the cell */
-  double cool_di_ioniz;          /* 1409 NSH The direct ionization luminosity */
-  double cool_dr_ioniz;          /* 1109 NSH The dielectronic recombination luminosity of the cell */
-  double cool_rr_ioniz, cool_rr_metals_ioniz;     /*fb luminosity & fb of metals metals */
+  double cool_comp_ioniz;       /* 1108 NSH The compton luminosity of the cell */
+  double cool_di_ioniz;         /* 1409 NSH The direct ionization luminosity */
+  double cool_dr_ioniz;         /* 1109 NSH The dielectronic recombination luminosity of the cell */
+  double cool_rr_ioniz, cool_rr_metals_ioniz;   /*fb luminosity & fb of metals metals */
   double lum_tot_ioniz;         /* The specfic radiative luminosity in frequencies defined by freqmin
                                    and freqmax.  This will depend on the last call to total_emission */
 
-  double heat_shock;            /*1805 ksl - An extra heating term added to allow for shock heating of the plasma (Implementef for FU Ori Project*/
+  double heat_shock;            /*1805 ksl - An extra heating term added to allow for shock heating of the plasma (Implementef for FU Ori Project */
 
   double comp_nujnu;            /* 1701 NSH The integral of alpha(nu)nuj(nu) used to computecompton cooling-  only needs computing once per cycle */
 
@@ -999,7 +999,7 @@ int size_Jbar_est, size_gamma_est, size_alpha_est;
 #define TMAX_FACTOR			1.5     /*Factor by which t_e can exceed
                                                    t_r in order for absorbed to 
                                                    match emitted flux */
-//OLD - moved to zeta.c #define TMIN				2000.
+//OLD - moved to zeta.c #define TMIN                            2000.
 /* ??? TMIN appears to be used both for the minimum temperature and for 
    calculating the fraction of recombinations that go to the ground state.  This
    looks like a problem ksl-98jul???? It is used in py_wind_updates2d, zeta.c, and py_wind_ion.c */
@@ -1057,53 +1057,53 @@ typedef struct photon
     P_HIT_DISK = 7,             //Banged into disk
     P_SEC = 8,                  //Photon hit secondary
     P_ADIABATIC = 9             //records that a photon created a kpkt which was destroyed by adiabatic cooling
-      } istat;                      /*status of photon. */
+  } istat;                      /*status of photon. */
 
-      int nscat;                    /*number of scatterings */
-      int nres;                     /*For line scattering, indicates the actual transition; 
-                                      for continuum scattering, meaning 
-                                      depends on matom vs non-matin. See headers of emission.c 
-                                      or matom.c for details. */
-      int nnscat;                   /* Used for the thermal trapping model of
-                                       anisotropic scattering to carry the number of
-                                       scattering to "extract" when needed for wind
-                                       generated photons SS05. */
-      int nrscat;                   /* number of resonance scatterings */
-      int grid;                     /*grid position of the photon in the wind, if
-                                       the photon is in the wind.  If the photon is not
-                                       in the wind, then -1 implies inside the wind cone and  
-                                       -2 implies outside the wind */
+  int nscat;                    /*number of scatterings */
+  int nres;                     /*For line scattering, indicates the actual transition; 
+                                   for continuum scattering, meaning 
+                                   depends on matom vs non-matin. See headers of emission.c 
+                                   or matom.c for details. */
+  int nnscat;                   /* Used for the thermal trapping model of
+                                   anisotropic scattering to carry the number of
+                                   scattering to "extract" when needed for wind
+                                   generated photons SS05. */
+  int nrscat;                   /* number of resonance scatterings */
+  int grid;                     /*grid position of the photon in the wind, if
+                                   the photon is in the wind.  If the photon is not
+                                   in the wind, then -1 implies inside the wind cone and  
+                                   -2 implies outside the wind */
 
-      enum origin_enum
-      { PTYPE_STAR = 0,
-        PTYPE_BL = 1,
-        PTYPE_DISK = 2,
-        PTYPE_WIND = 3,
-        PTYPE_AGN = 4,
-        PTYPE_STAR_MATOM = 10,
-        PTYPE_BL_MATOM = 11,
-        PTYPE_DISK_MATOM = 12,
-        PTYPE_WIND_MATOM = 13,
-        PTYPE_AGN_MATOM = 14
-      } origin, origin_orig;        /* Where this photon originated.  If the photon has
-                                       scattered its "origin" may be changed to "wind". */
-      /* note that we add 10 to origin when processed by a macro-atom
-         which means we need these values in the enum list.  In making spectra in spectrum_create
-         10 is subtracted from the types.  If ever this logic is changed one must the be careful
-       that it is fixed in create_spectra as well.  
-       
-       Comment - ksl - 180712 - The logic for all of this is obscure to me, since we keep track of the
-       photons origin separately.  At some point one might want to revisit the necessity for this
-       */
-      int np;                       /*NSH 13/4/11 - an internal pointer to the photon number so 
-                                       so we can write out details of where the photon goes */
-      double path;                  /* SWM - Photon path length */
-    }
-    p_dummy, *PhotPtr;
+  enum origin_enum
+  { PTYPE_STAR = 0,
+    PTYPE_BL = 1,
+    PTYPE_DISK = 2,
+    PTYPE_WIND = 3,
+    PTYPE_AGN = 4,
+    PTYPE_STAR_MATOM = 10,
+    PTYPE_BL_MATOM = 11,
+    PTYPE_DISK_MATOM = 12,
+    PTYPE_WIND_MATOM = 13,
+    PTYPE_AGN_MATOM = 14
+  } origin, origin_orig;        /* Where this photon originated.  If the photon has
+                                   scattered its "origin" may be changed to "wind". */
+  /* note that we add 10 to origin when processed by a macro-atom
+     which means we need these values in the enum list.  In making spectra in spectrum_create
+     10 is subtracted from the types.  If ever this logic is changed one must the be careful
+     that it is fixed in create_spectra as well.  
 
-    PhotPtr photmain;               /* A pointer to all of the photons that have been created in a subcycle. Added to ease 
-                                       breaking the main routine of python into separate rooutines for inputs and running the
-                                       program */
+     Comment - ksl - 180712 - The logic for all of this is obscure to me, since we keep track of the
+     photons origin separately.  At some point one might want to revisit the necessity for this
+   */
+  int np;                       /*NSH 13/4/11 - an internal pointer to the photon number so 
+                                   so we can write out details of where the photon goes */
+  double path;                  /* SWM - Photon path length */
+}
+p_dummy, *PhotPtr;
+
+PhotPtr photmain;               /* A pointer to all of the photons that have been created in a subcycle. Added to ease 
+                                   breaking the main routine of python into separate rooutines for inputs and running the
+                                   program */
 
     /* minimum value for tau for p_escape_from_tau function- below this we 
        set to p_escape_ to 1 */
@@ -1116,15 +1116,15 @@ typedef struct photon
      */
 
 #define MAX_PHOT_HIST	1000
-    int n_phot_hist, phot_hist_on, phot_history_spectrum;
-    struct photon xphot_hist[MAX_PHOT_HIST];
+int n_phot_hist, phot_hist_on, phot_history_spectrum;
+struct photon xphot_hist[MAX_PHOT_HIST];
 
-    struct basis
-    {
-      double a[3][3];
+struct basis
+{
+  double a[3][3];
 
-    }
-    basis_cartesian;
+}
+basis_cartesian;
 
 
     /* The next section defines the spectrum arrays.  The spectrum structure contains
@@ -1139,25 +1139,25 @@ typedef struct photon
 
 
 
-#define SPECTYPE_RAW        0    // As written this produces L_nu and so to get a Luminosity one needs to integrate
+#define SPECTYPE_RAW        0   // As written this produces L_nu and so to get a Luminosity one needs to integrate
 #define SPECTYPE_FLAMBDA    1
 #define SPECTYPE_FNU        2
 #define D_SOURCE 100.0          // distance to the source in parsecs for genearating spectra
 
 #define MSPEC                            7
-    int nspectra;                   /* After create_spectrum, the number of elements allocated for s, or 
-                                       alternatively the number of spectra one has to work with.  Note that
-                                       general s[0],s[1] and s[2] are the escaping, scattered and absorbed photons,
-                                       while elements higher than this will contain spectra as seen by different observers */
+int nspectra;                   /* After create_spectrum, the number of elements allocated for s, or 
+                                   alternatively the number of spectra one has to work with.  Note that
+                                   general s[0],s[1] and s[2] are the escaping, scattered and absorbed photons,
+                                   while elements higher than this will contain spectra as seen by different observers */
 
 
-    int nscat[MAXSCAT + 1], nres[MAXSCAT + 1], nstat[NSTAT];
+int nscat[MAXSCAT + 1], nres[MAXSCAT + 1], nstat[NSTAT];
 
-    typedef struct spectrum
-    {
-      char name[40];
-      float freqmin, freqmax, dfreq;
-      float lfreqmin, lfreqmax, ldfreq;     /* NSH 1302 - values for logarithmic spectra */
+typedef struct spectrum
+{
+  char name[40];
+  float freqmin, freqmax, dfreq;
+  float lfreqmin, lfreqmax, ldfreq;     /* NSH 1302 - values for logarithmic spectra */
   double lmn[3];
   double mmax, mmin;            /* Used only in live or die situations, mmax=cos(angle-DANG_LIVE_OR_DIE)
                                    and mmim=cos(angle+DANG_LIVE_OR_DIE).   In actually defining this
@@ -1175,8 +1175,8 @@ typedef struct photon
                                    >0     -> select only photons whose "last" position is above the disk
                                    <0    -> select only photons whose last position is below the disk */
   double x[3], r;               /* The position and radius of a special region from which to extract spectra. 
-                                x is taken to be the center of the region and r is taken to be the radius of
-                               the region.   */
+                                   x is taken to be the center of the region and r is taken to be the radius of
+                                   the region.   */
   double f[NWAVE];              /* The spectrum in linear (wavelength or frequency) units */
   double lf[NWAVE];             /* The specturm in log (wavelength or frequency)  units  */
   double lfreq[NWAVE];          /* We need to hold what freqeuncy intervals our logarithmic spectrum has been taken over */
@@ -1210,32 +1210,32 @@ have access to the proper normalization.
 
 */
 
- 
-#define NCDF 30000 //The default size for these arrays
-#define FUNC_CDF  200 //The size for CDFs made from functional form CDFs
-#define ARRAY_PDF 1000 //The size for PDFs to be turned into CDFs from arrays
 
- 
- typedef struct Cdf
- {
-   double x[NCDF];           /* Positions for which the CDF is calculated */
-   double y[NCDF];           /* The value of the CDF at x */
-   double d[NCDF];           /* 57i -- the rate of change of the CDF at x */
-   double limit1, limit2;        /* Limits (running from 0 to 1) that define a portion
-                                    of the CDF to sample */
-   double x1, x2;                /* limits if they exist on what is returned */
-   double norm;                  //The scaling factor which would renormalize the CDF
-   int ncdf;                     /* Size of this CDF */
- }
-  *CdfPtr, cdf_dummy; 
-  
-  struct Cdf cdf_ff; 
-  struct Cdf cdf_fb; 
-  struct Cdf cdf_vcos;
-  struct Cdf cdf_bb;
-  struct Cdf cdf_brem;
-  
- 
+#define NCDF 30000              //The default size for these arrays
+#define FUNC_CDF  200           //The size for CDFs made from functional form CDFs
+#define ARRAY_PDF 1000          //The size for PDFs to be turned into CDFs from arrays
+
+
+typedef struct Cdf
+{
+  double x[NCDF];               /* Positions for which the CDF is calculated */
+  double y[NCDF];               /* The value of the CDF at x */
+  double d[NCDF];               /* 57i -- the rate of change of the CDF at x */
+  double limit1, limit2;        /* Limits (running from 0 to 1) that define a portion
+                                   of the CDF to sample */
+  double x1, x2;                /* limits if they exist on what is returned */
+  double norm;                  //The scaling factor which would renormalize the CDF
+  int ncdf;                     /* Size of this CDF */
+}
+ *CdfPtr, cdf_dummy;
+
+struct Cdf cdf_ff;
+struct Cdf cdf_fb;
+struct Cdf cdf_vcos;
+struct Cdf cdf_bb;
+struct Cdf cdf_brem;
+
+
 
 
 /* Variable used to allow something to be printed out the first few times
@@ -1304,9 +1304,9 @@ xband;
 struct fbstruc
 {
   double f1, f2;
-  double cool[NIONS][NTEMPS];		//cooling rate due to radiative recombination
-  double lum[NIONS][NTEMPS];           //emissivity due to radiative recombinaion
-  double cool_inner[NIONS][NTEMPS];    //cooling rate due to recombinations to inner shells
+  double cool[NIONS][NTEMPS];   //cooling rate due to radiative recombination
+  double lum[NIONS][NTEMPS];    //emissivity due to radiative recombinaion
+  double cool_inner[NIONS][NTEMPS];     //cooling rate due to recombinations to inner shells
 }
 freebound[NFB];
 
@@ -1420,10 +1420,10 @@ files;
 
 /* modes for kpkt calculations */
 #define KPKT_MODE_CONTINUUM  0  /* only account for k->r processes */
-#define KPKT_MODE_ALL        1  /* account for all cooling processes */  
+#define KPKT_MODE_ALL        1  /* account for all cooling processes */
 
 /* Variable introducted to cut off macroatom / estimator integrals when exponential function reaches extreme values. Effectivevly a max limit imposed on x = hnu/kT terms */
-#define ALPHA_MATOM_NUMAX_LIMIT 30 /* maximum value for h nu / k T to be considered in integrals */
+#define ALPHA_MATOM_NUMAX_LIMIT 30      /* maximum value for h nu / k T to be considered in integrals */
 
 
 /* non-radiative heat flow mode */
@@ -1445,5 +1445,3 @@ files;
 #define BOUND_OUTER_RHO 8
 
 int xxxbound;
-
- 

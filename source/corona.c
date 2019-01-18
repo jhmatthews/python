@@ -224,7 +224,7 @@ corona_rho (ndom, x)
     exit (0);
   }
 
-  rho = zdom[ndom].corona_base_density * exp (-(fabs(x[2])) / zdom[ndom].corona_scale_height);
+  rho = zdom[ndom].corona_base_density * exp (-(fabs (x[2])) / zdom[ndom].corona_scale_height);
 
   if (rho < 1.e-10)
     rho = 1.e-10;               // A floor to the density appears to be needed for some of the

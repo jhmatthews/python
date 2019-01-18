@@ -52,7 +52,7 @@
 /// This is the initial value of PDFSTEPS
 #define PDFSTEPS 10000
 
-/// This is the value of pdfsteps at this point in time		
+/// This is the value of pdfsteps at this point in time         
 int pdf_steps_current;
 
 /// Flag to say whether structures to hold a cdf have been initialised
@@ -106,47 +106,45 @@ cdf_gen_from_func (cdf, func, xmin, xmax, njumps, jump)
 
   /* Check the input data before proceeding
 
-  First check to see that xmin is actually less than xmax
+     First check to see that xmin is actually less than xmax
 
-  Then  check that, if there are jumps, they are in order
+     Then  check that, if there are jumps, they are in order
 
-  Next find the indices into the jump array that contains jumps in between xmin and xmax
+     Next find the indices into the jump array that contains jumps in between xmin and xmax
 
-  At this point njump_min will point to the first jump which is betewen xmin and
-  xmax or it will equal to njumps in which case there were no jumps which were greater
-  than xmin.
+     At this point njump_min will point to the first jump which is betewen xmin and
+     xmax or it will equal to njumps in which case there were no jumps which were greater
+     than xmin.
 
-  Similarly njump_max will be the point to the first jump above xmax or if there are
-  no jumps above xmax, then it will be njumps.
-  */
+     Similarly njump_max will be the point to the first jump above xmax or if there are
+     no jumps above xmax, then it will be njumps.
+   */
 
   if (xmax <= xmin)
-    {
-      Error ("pdf_gen_from_func: xmin %g <= xmax %g\n", xmin, xmax);
-      exit (0);
-    }
+  {
+    Error ("pdf_gen_from_func: xmin %g <= xmax %g\n", xmin, xmax);
+    exit (0);
+  }
   if (njumps > 0)
+  {
+    for (j = 1; j < njumps; j++)
     {
-      for (j = 1; j < njumps; j++)
-	{
-	  if (jump[j] <= jump[j - 1])
-	    {
-	      Error
-		("pdf_gen_from_func: jump[%d]=%g <=jump[%d]=%g out of order\n",
-		 j, jump[j], j - 1, jump[j - 1]);
-	      exit (0);
-	    }
-	}
-      njump_min = 0;
-      while (njump_min < njumps && jump[njump_min] <= xmin)
-	njump_min++;
-      njump_max = 0;
-      while (njump_max < njumps && jump[njump_max] < xmax)
-	njump_max++;
-
-
-      njumps = njump_max - njump_min;
+      if (jump[j] <= jump[j - 1])
+      {
+        Error ("pdf_gen_from_func: jump[%d]=%g <=jump[%d]=%g out of order\n", j, jump[j], j - 1, jump[j - 1]);
+        exit (0);
+      }
     }
+    njump_min = 0;
+    while (njump_min < njumps && jump[njump_min] <= xmin)
+      njump_min++;
+    njump_max = 0;
+    while (njump_max < njumps && jump[njump_max] < xmax)
+      njump_max++;
+
+
+    njumps = njump_max - njump_min;
+  }
 
   /* OK, all the input data seems OK */
 
@@ -167,13 +165,13 @@ cdf_gen_from_func (cdf, func, xmin, xmax, njumps, jump)
   pdfsteps = PDFSTEPS;
 
   while (n < 3)
-    {
-      delta = gen_array_from_func (func, xmin, xmax, pdfsteps);
-      if (delta < 0.1 / FUNC_CDF) //FUNC_CDF is set in python.h - it is the number of steps we want in the final CDF
-	break;
-      pdfsteps *= 10;
-      n = n + 1;
-    }
+  {
+    delta = gen_array_from_func (func, xmin, xmax, pdfsteps);
+    if (delta < 0.1 / FUNC_CDF) //FUNC_CDF is set in python.h - it is the number of steps we want in the final CDF
+      break;
+    pdfsteps *= 10;
+    n = n + 1;
+  }
 
 
   xstep = (xmax - xmin) / pdfsteps;
@@ -191,50 +189,50 @@ cdf_gen_from_func (cdf, func, xmin, xmax, njumps, jump)
   cdf->x[0] = xmin;
   cdf->y[0] = 0;
 
-  n = 0;			//This is the position in pdf_array - we start at 0
-  mm = 1;			//This is the index to a desired value of y at the end of the CDF we want it to equal 1!
-  j = njump_min;		//This refers to the jumps
-  for (m = 1; m < FUNC_CDF; m++)  //Loop over the number of required points in the downsampled CDF
+  n = 0;                        //This is the position in pdf_array - we start at 0
+  mm = 1;                       //This is the index to a desired value of y at the end of the CDF we want it to equal 1!
+  j = njump_min;                //This refers to the jumps
+  for (m = 1; m < FUNC_CDF; m++)        //Loop over the number of required points in the downsampled CDF
+  {
+    y = (float) mm / (FUNC_CDF - njumps);       // Desired value of y for the next point in the down sampled CDF
+
+    while (pdf_array[n] < y && n < pdfsteps)    // Work one's way through pdf_array, until we hit the next required value of y
     {
-      y = (float) mm / (FUNC_CDF - njumps);	// Desired value of y for the next point in the down sampled CDF
-
-      while (pdf_array[n] < y && n < pdfsteps)	// Work one's way through pdf_array, until we hit the next required value of y
-	{
-	  if (j < njump_max && jump[j] <= xmin + (n + 1) * xstep) //We have passed a jump before hitting our next required value of y - we want to make a point here
-	    {
-	      cdf->x[m] = xmin + (n + 1) * xstep;	//Not exactly jump but close- - we set the next x point in the CDF to the X point we just passed
-	      cdf->y[m] = pdf_array[n];             //And we set the y point in the CDF to the corresponding Y point
-	      j++;		//increment the jump number
-	      m++;		//increment the pdf structure number
-	    }
-	  n++;  //This is the index increment for the pdf_array we are going thruogh
-	}
-	// The while has triggered - we have passed out next required value of y - so we make a point in the new down sampled CDF
-      /* So at this point pdf_array[n-1] < x and pdf_array[n]>x */
-      cdf->x[m] = xmin + (n + 1) * xstep;
-      cdf->y[m] = pdf_array[n];
-      mm++;			// increment the number associated with the desired y ignoring jumps
-      /* So pdf->y will contain numbers from 0 to 1 */
+      if (j < njump_max && jump[j] <= xmin + (n + 1) * xstep)   //We have passed a jump before hitting our next required value of y - we want to make a point here
+      {
+        cdf->x[m] = xmin + (n + 1) * xstep;     //Not exactly jump but close- - we set the next x point in the CDF to the X point we just passed
+        cdf->y[m] = pdf_array[n];       //And we set the y point in the CDF to the corresponding Y point
+        j++;                    //increment the jump number
+        m++;                    //increment the pdf structure number
+      }
+      n++;                      //This is the index increment for the pdf_array we are going thruogh
     }
+    // The while has triggered - we have passed out next required value of y - so we make a point in the new down sampled CDF
+    /* So at this point pdf_array[n-1] < x and pdf_array[n]>x */
+    cdf->x[m] = xmin + (n + 1) * xstep;
+    cdf->y[m] = pdf_array[n];
+    mm++;                       // increment the number associated with the desired y ignoring jumps
+    /* So pdf->y will contain numbers from 0 to 1 */
+  }
 
-  cdf->x[FUNC_CDF] = xmax;  //Set the last x point in the downsampled CDF
-  cdf->y[FUNC_CDF] = 1.0;   //And the last y point must equal 1.
-  cdf->norm = 1.;		/* pdf_gen_from array produces a properly nomalized cdf and so the
-				   normalization is 1.  110629 ksl */
-  cdf->ncdf = FUNC_CDF;  //The number of points is
+  cdf->x[FUNC_CDF] = xmax;      //Set the last x point in the downsampled CDF
+  cdf->y[FUNC_CDF] = 1.0;       //And the last y point must equal 1.
+  cdf->norm = 1.;               /* pdf_gen_from array produces a properly nomalized cdf and so the
+                                   normalization is 1.  110629 ksl */
+  cdf->ncdf = FUNC_CDF;         //The number of points is
 
 /* Calculate the gradients */
   if (calc_cdf_gradient (cdf))
-    {
-      Error ("cdf_gen_from_func: Errro returned from calc_cdf_gradient\n");
-    }				// 57ib
+  {
+    Error ("cdf_gen_from_func: Errro returned from calc_cdf_gradient\n");
+  }                             // 57ib
 
 
   /* Check the cdf */
   if ((icheck = cdf_check (cdf)) != 0)
-    {
-      Error ("cdf_gen_from_function: error %d on cdf_check\n", icheck);
-    }
+  {
+    Error ("cdf_gen_from_function: error %d on cdf_check\n", icheck);
+  }
   return (icheck);
 
 }
@@ -279,7 +277,7 @@ gen_array_from_func (func, xmin, xmax, pdfsteps)
   int idiag;
   double delta;
 
-  xstep = (xmax - xmin) / pdfsteps;  //The size of the step in the x variable
+  xstep = (xmax - xmin) / pdfsteps;     //The size of the step in the x variable
   idiag = 0;
 
   /* First, allocate an array for internal use, if that
@@ -287,76 +285,73 @@ gen_array_from_func (func, xmin, xmax, pdfsteps)
 
 
   if (init_pdf == 0 || pdf_steps_current < pdfsteps)
+  {
+
+    if (pdf_array != NULL)
+      free (pdf_array);
+
+    if ((pdf_array = calloc (sizeof (x), pdfsteps)) == NULL)
     {
-
-      if (pdf_array != NULL)
-	free (pdf_array);
-
-      if ((pdf_array = calloc (sizeof (x), pdfsteps)) == NULL)
-	{
-	  Error ("pdf: Could not allocate space for pdf_array\n");
-	  exit (0);
-	}
-      init_pdf = 1;
-      pdf_steps_current = pdfsteps;
+      Error ("pdf: Could not allocate space for pdf_array\n");
+      exit (0);
     }
+    init_pdf = 1;
+    pdf_steps_current = pdfsteps;
+  }
 
 
-  for (n = 0; n < pdfsteps; n++) //Loop over the required number of steps in the cdf
+  for (n = 0; n < pdfsteps; n++)        //Loop over the required number of steps in the cdf
+  {
+    x = xmin + (n + 0.5) * xstep;       /*The next value of x - it is midway between points on the required cdf because we
+                                           will be adding the new z value onto the cumlative total, we assume the function is best approximated over the
+                                           whole rage from x[n] to x[n+1] by using the value of the function between the two */
+    if ((z = (*func) (x)) < 0 || z > VERY_BIG || sane_check (z))        //check the function return is sensible
     {
-      x = xmin + (n + 0.5) * xstep;  /*The next value of x - it is midway between points on the required cdf because we
-		  will be adding the new z value onto the cumlative total, we assume the function is best approximated over the
-		  whole rage from x[n] to x[n+1] by using the value of the function between the two */
-      if ((z = (*func) (x)) < 0 || z > VERY_BIG || sane_check (z))  //check the function return is sensible
-	{
-	  Error ("pdf_gen_from_func: probability density %g < 0 at %g\n", z,
-		 x);
-	}
-      if (n == 0) //We are at the start of the cdf
-	pdf_array[0] = z;
-      else
-	pdf_array[n] = pdf_array[n - 1] + z;  //increment the cdf by the value of the function at the modpoint between points
-      /* Check to see if the integral seems too large */
-      if (pdf_array[n] > 1.0e100 && idiag == 0)
-	{
-	  idiag = 1;
-	  Log ("pdf_gen_from_func: ZOWIE  n %d z %g pdf_array[n] %g x %g\n",
-	       n, z, pdf_array[n], x);
-	  for (m = 0; m < n; m += 100)
-	    {
-	      z = (*func) (x);
-	      Log ("pdf_gen_from_func: zowie n %d x %g z %g pdf_array %g\n",
-		   m, x = xmin + (0.5 * m) * xstep, z, pdf_array[m]);
-	    }
-	}
+      Error ("pdf_gen_from_func: probability density %g < 0 at %g\n", z, x);
     }
+    if (n == 0)                 //We are at the start of the cdf
+      pdf_array[0] = z;
+    else
+      pdf_array[n] = pdf_array[n - 1] + z;      //increment the cdf by the value of the function at the modpoint between points
+    /* Check to see if the integral seems too large */
+    if (pdf_array[n] > 1.0e100 && idiag == 0)
+    {
+      idiag = 1;
+      Log ("pdf_gen_from_func: ZOWIE  n %d z %g pdf_array[n] %g x %g\n", n, z, pdf_array[n], x);
+      for (m = 0; m < n; m += 100)
+      {
+        z = (*func) (x);
+        Log ("pdf_gen_from_func: zowie n %d x %g z %g pdf_array %g\n", m, x = xmin + (0.5 * m) * xstep, z, pdf_array[m]);
+      }
+    }
+  }
   /* Thus, pdf_array is proportional to  the definite integral from xmin to x
      (where x=xmin+(n+1)*xstep) */
 
-  sum = pdf_array[pdfsteps - 1]; //The total integral is just the last point
+  sum = pdf_array[pdfsteps - 1];        //The total integral is just the last point
 
   if (sane_check (sum))
-    {
-      Error ("pdf_gen_from_func:sane_check Sum %f is NaN\n", sum);
-    }
+  {
+    Error ("pdf_gen_from_func:sane_check Sum %f is NaN\n", sum);
+  }
 
   /* Renormalize the array so that this really is a cumulative distribution function */
   delta = 0;
   for (n = 0; n < pdfsteps; n++)
+  {
+    pdf_array[n] /= sum;
+    if (n > 0)
     {
-      pdf_array[n] /= sum;
-      if (n > 0)
-	{
-	  x = pdf_array[n] - pdf_array[n - 1];
-	  if (x > delta)
-	    {
-	      delta = x; /*This is the difference in cumlative probability between
-		  adjacent points - it is a measure of the discretisation. If it is too
-		large then we may want to use a finer grid to get a smoother cdf. */
-	    }
-	}
-
+      x = pdf_array[n] - pdf_array[n - 1];
+      if (x > delta)
+      {
+        delta = x;              /*This is the difference in cumlative probability between
+                                   adjacent points - it is a measure of the discretisation. If it is too
+                                   large then we may want to use a finer grid to get a smoother cdf. */
+      }
     }
+
+  }
 
 
   return (delta);
@@ -415,49 +410,43 @@ cdf_gen_from_array (cdf, x, y, n_xy, xmin, xmax)
 /* Perform various checks on the inputs */
 
 
-  if (n_xy > NCDF) //If the supplied data array is larger than the output array - fixed as NCDF
-    {
-      Error
-	("cdf_gen_from_array: supplied data %i is larger than default aray size %i - increase NCDF\n",
-	 n_xy, NCDF);
-      exit (0);
-    }
+  if (n_xy > NCDF)              //If the supplied data array is larger than the output array - fixed as NCDF
+  {
+    Error ("cdf_gen_from_array: supplied data %i is larger than default aray size %i - increase NCDF\n", n_xy, NCDF);
+    exit (0);
+  }
 
 
-  if (xmax < xmin) //This must be a mistake, the limits are reversed
-    {
-      Error ("cdf_gen_from_array: xmin %g <= xmax %g\n", xmin, xmax);
-      exit (0);
-    }
+  if (xmax < xmin)              //This must be a mistake, the limits are reversed
+  {
+    Error ("cdf_gen_from_array: xmin %g <= xmax %g\n", xmin, xmax);
+    exit (0);
+  }
 
-	/*We are now going to crawl down the input array, checking for mistakes.
-	Firstly we want to see if all the array values are equal to zero.
-    */
+  /*We are now going to crawl down the input array, checking for mistakes.
+     Firstly we want to see if all the array values are equal to zero.
+   */
 
 
   allzero = 0;
 
-  for (n = 1; n < n_xy; n++)  //Go over all elements
+  for (n = 1; n < n_xy; n++)    //Go over all elements
+  {
+    if (x[n] <= x[n - 1])       //One x-point is less than the one above - this will cause problems later
     {
-      if (x[n] <= x[n - 1]) //One x-point is less than the one above - this will cause problems later
-	{
-	  Error
-	    ("cdf_gen_from_array: input x not in ascending order at element %5d/%5d  %11.6e %11.6e\n",
-	     n, n_xy, x[n - 1], x[n]);
-	  exit (0);
-	}
-      if (y[n] < 0)   //A negative point!
-	{
-	  Error
-	    ("cdf_gen_from_array: probability density %g < 0 at element %d\n",
-	     y[n], n);
-	  exit (0);
-	}
-      else if (y[n] > 0)  //At least one point is positive
-	{
-	  allzero = 1; //So they are not all zero.
-	}
+      Error ("cdf_gen_from_array: input x not in ascending order at element %5d/%5d  %11.6e %11.6e\n", n, n_xy, x[n - 1], x[n]);
+      exit (0);
     }
+    if (y[n] < 0)               //A negative point!
+    {
+      Error ("cdf_gen_from_array: probability density %g < 0 at element %d\n", y[n], n);
+      exit (0);
+    }
+    else if (y[n] > 0)          //At least one point is positive
+    {
+      allzero = 1;              //So they are not all zero.
+    }
+  }
 
 
 
@@ -467,35 +456,36 @@ cdf_gen_from_array (cdf, x, y, n_xy, xmin, xmax)
    */
 
 
-	/*Firstly, find the point in the input array that matches the required start point
-	we step up thruogh the input data until we reach a point where the x-point is greater
-	than xmin, or we reach the end of the array */
+  /*Firstly, find the point in the input array that matches the required start point
+     we step up thruogh the input data until we reach a point where the x-point is greater
+     than xmin, or we reach the end of the array */
 
-  nmin=0;
-  while (x[nmin]<xmin && nmin<n_xy)
+  nmin = 0;
+  while (x[nmin] < xmin && nmin < n_xy)
   {
-      nmin++;
+    nmin++;
   }
 
   /*This next deals with what happens if we ran off the end of the array in the last loop */
 
-  if (nmin==n_xy)
+  if (nmin == n_xy)
   {
-      Error("cdf_gen_from_array: xmin greater than all array values\n");
-      exit(0);
+    Error ("cdf_gen_from_array: xmin greater than all array values\n");
+    exit (0);
   }
 
   /* if xmin is equal to one of the values in the x array then nmin will point to that value, but otherwise it
-      will be slightly larger and we will need to fix this*/
+     will be slightly larger and we will need to fix this */
 
   // if nmin=0 then it is also possible that the xmin was below the array XXXXX we should deal with this case then!
 
 
   /* The next loop finds the location of the uppermost required x-value in the supplied array */
 
-  nmax=nmin;
-  while (x[nmax]<xmax && nmax<n_xy) {
-      nmax++;
+  nmax = nmin;
+  while (x[nmax] < xmax && nmax < n_xy)
+  {
+    nmax++;
   }
 
 
@@ -503,34 +493,36 @@ cdf_gen_from_array (cdf, x, y, n_xy, xmin, xmax)
 
   /*now deal with a few pathological cases */
 
-  if (nmax==nmin)
+  if (nmax == nmin)
   {
-      Error("cdf_gen_from_array: nmin and mnax are identical which is not desirable\n");
-      exit(0);
+    Error ("cdf_gen_from_array: nmin and mnax are identical which is not desirable\n");
+    exit (0);
   }
 
-  if (nmax==n_xy) /*We have run past the end of the array in finding the uppermost xvalue
-	  this will cause issues later, so we need to work out what a sensible value for nmax
-	  should be*/
+  if (nmax == n_xy)             /*We have run past the end of the array in finding the uppermost xvalue
+                                   this will cause issues later, so we need to work out what a sensible value for nmax
+                                   should be */
   {
-	  if (x[nmax-1]<=xmax) /* hopefully the last X value is less than or equal to xmax */
-	  {
-	  nmax--;
-  	  }
+    if (x[nmax - 1] <= xmax)    /* hopefully the last X value is less than or equal to xmax */
+    {
+      nmax--;
+    }
   }
 
 
   /* Now we want to deal with situations where xmin and xmax are between elements. For now
    * we do not worry about interpolating XXXXX this needs fixing up - if we are going to
-  interpolate, we should do it- in pathological cases this can go very wrong*/
+   interpolate, we should do it- in pathological cases this can go very wrong*/
 
-  if (nmin>0 && x[nmin]>xmin){
-      nmin--;
-      x[nmin]=xmin;
+  if (nmin > 0 && x[nmin] > xmin)
+  {
+    nmin--;
+    x[nmin] = xmin;
   }
 
-  if (x[nmax-1]>xmax) {
-      x[nmax-1]=xmax;
+  if (x[nmax - 1] > xmax)
+  {
+    x[nmax - 1] = xmax;
   }
 
   /* So at this point we want the array running from nmin to nmax-1 */
@@ -544,7 +536,7 @@ cdf_gen_from_array (cdf, x, y, n_xy, xmin, xmax)
    * ksl - It was not obvious why we car if part of the array is 0, and it could just as well happen in the middle of the array as at the ends
    * for now I am commented all of this out
 
-     Start first */
+   Start first */
 
 
 
@@ -554,83 +546,78 @@ cdf_gen_from_array (cdf, x, y, n_xy, xmin, xmax)
 
 // ksl I don;t believe the first two cases can happen at this point
   if (nmax == nmin)
-    {
-      Error ("cdf_gen_from_array - only one point in supplied PDF\n");
-      exit (0);
-    }
+  {
+    Error ("cdf_gen_from_array - only one point in supplied PDF\n");
+    exit (0);
+  }
 
 
   if (xmax < x[0] || xmin > x[n_xy - 1] || allzero == 0)
-    {				// These are special (probably nonsensical) cases
-      cdf->x[0] = xmin;
-      cdf->y[0] = 0.;
-      cdf->x[1] = xmax;
-      cdf->y[1] = 1.;
-      cdf->norm = 1.0;
-      cdf->ncdf = 1;
-      Error
-	("cdf_gen_from_array: all y's were zero or xmin xmax out of range of array x-- returning uniform distribution %d\n",
-	 allzero);
+  {                             // These are special (probably nonsensical) cases
+    cdf->x[0] = xmin;
+    cdf->y[0] = 0.;
+    cdf->x[1] = xmax;
+    cdf->y[1] = 1.;
+    cdf->norm = 1.0;
+    cdf->ncdf = 1;
+    Error ("cdf_gen_from_array: all y's were zero or xmin xmax out of range of array x-- returning uniform distribution %d\n", allzero);
 
-    }
+  }
   else
-    {
+  {
 /* So at this point, have unscaled probability density in pdf_x, pdf_y for the points
  * specified by the input array but we want the cumulative distribution
  * We also have assured that there is one value of pdf_x that corresponds to all of the jumps
  */
 
-      // The following lines perform an integration via the trapezoid rule - each point contains
-      // the integral up to that poont, so it starts at 0 and ends at the total
+    // The following lines perform an integration via the trapezoid rule - each point contains
+    // the integral up to that poont, so it starts at 0 and ends at the total
 
-      cdf_n = (nmax - nmin); //The number of points in the integration
-      cdf->x[0] = x[nmin];  //The initial x - point in the cdf
-      cdf->y[0] = 0.0;      //The initial y value of the cdf - must be zero at the start
-      for (n = 1; n < cdf_n + 1; n++)  //Loop over all the CDF
-	{
-	  cdf->x[n] = x[nmin + n];  //The next point in the cdf is just the next point in the input array - no regridding
-	  cdf->y[n] =
-	    cdf->y[n - 1] + 0.5 * (y[nmin + n - 1] +
-				   y[nmin + n]) * (x[nmin + n] - x[nmin + n -
-								   1]);   //Just the average value of y over the interval.
-	}
-
-      cdf->y[cdf_n]=cdf->y[n-1]+y[nmin+cdf_n]*(x[nmax]-x[nmax-1]);  //This interpolates to get the last point in the CDF
-
-      sum = cdf->y[cdf_n];	//the total integrated pdf
-      for (n = 1; n <= cdf_n; n++) //Loop over the CDF and divide each poont by the max (final) point
-	{
-	  cdf->y[n] /= sum;	//this is now a cdf - we go from 0 to 1.
-	}
-
-      cdf->ncdf = cdf_n;
-      cdf->x[cdf->ncdf] = x[nmax];
-      cdf->y[cdf->ncdf] = 1.0;
-      cdf->norm = sum;
-
+    cdf_n = (nmax - nmin);      //The number of points in the integration
+    cdf->x[0] = x[nmin];        //The initial x - point in the cdf
+    cdf->y[0] = 0.0;            //The initial y value of the cdf - must be zero at the start
+    for (n = 1; n < cdf_n + 1; n++)     //Loop over all the CDF
+    {
+      cdf->x[n] = x[nmin + n];  //The next point in the cdf is just the next point in the input array - no regridding
+      cdf->y[n] = cdf->y[n - 1] + 0.5 * (y[nmin + n - 1] + y[nmin + n]) * (x[nmin + n] - x[nmin + n - 1]);      //Just the average value of y over the interval.
     }
+
+    cdf->y[cdf_n] = cdf->y[n - 1] + y[nmin + cdf_n] * (x[nmax] - x[nmax - 1]);  //This interpolates to get the last point in the CDF
+
+    sum = cdf->y[cdf_n];        //the total integrated pdf
+    for (n = 1; n <= cdf_n; n++)        //Loop over the CDF and divide each poont by the max (final) point
+    {
+      cdf->y[n] /= sum;         //this is now a cdf - we go from 0 to 1.
+    }
+
+    cdf->ncdf = cdf_n;
+    cdf->x[cdf->ncdf] = x[nmax];
+    cdf->y[cdf->ncdf] = 1.0;
+    cdf->norm = sum;
+
+  }
 
 
 /* Calculate the gradients */
   if (calc_cdf_gradient (cdf))
-    {
-      Error ("cdf_gen_from_array: Error returned from calc_cdf_gradient\n");
-    }				// 57ib
+  {
+    Error ("cdf_gen_from_array: Error returned from calc_cdf_gradient\n");
+  }                             // 57ib
   /* XXX Why is this needed, it would seem suffiecient to write evrything to a file */
 
   if ((echeck = cdf_check (cdf)) != 0)
-    {
-      Error ("cdf_gen_from_array: error %d on cdf_check\n", echeck);
-      for (n = 0; n < n_xy; n++)
-	Log ("pdf_n=%i %e %e\n", pdf_n, x[n], y[n]);
-      for (n = 0; n < cdf->ncdf + 1; n++)
-	Log("cdf_n=%i %e %e\n", n, cdf->x[n], cdf->y[n]);
+  {
+    Error ("cdf_gen_from_array: error %d on cdf_check\n", echeck);
+    for (n = 0; n < n_xy; n++)
+      Log ("pdf_n=%i %e %e\n", pdf_n, x[n], y[n]);
+    for (n = 0; n < cdf->ncdf + 1; n++)
+      Log ("cdf_n=%i %e %e\n", n, cdf->x[n], cdf->y[n]);
 
 
-      exit (0);
-    }
+    exit (0);
+  }
 
-  cdf_to_file(cdf,"foo.diag"); //output the CDF to a file
+  cdf_to_file (cdf, "foo.diag");        //output the CDF to a file
   return (echeck);
 
 }
@@ -658,32 +645,32 @@ cdf_get_rand (cdf)
   double a, b, c, s[2];
   int xquadratic ();
 /* Find the interval within which x lies */
-  r=random_number(0.0,1.0); //This *exludes* 0.0 and 1.0.
-  i = gsl_interp_bsearch (cdf->y, r, 0, cdf->ncdf); //find the interval in the CDF where this number lies
+  r = random_number (0.0, 1.0); //This *exludes* 0.0 and 1.0.
+  i = gsl_interp_bsearch (cdf->y, r, 0, cdf->ncdf);     //find the interval in the CDF where this number lies
 
 /* Now calculate a place within that interval - we use the gradient of the CDF to get a more accurate value between the CDF points */
-  q=random_number(0.0,1.0);
+  q = random_number (0.0, 1.0);
   a = 0.5 * (cdf->d[i + 1] - cdf->d[i]);
   b = cdf->d[i];
   c = (-0.5) * (cdf->d[i + 1] + cdf->d[i]) * q;
   if ((j = xquadratic (a, b, c, s)) < 0)
-    {
-      Error ("cdf_get_rand: %d\n", j);
-    }
+  {
+    Error ("cdf_get_rand: %d\n", j);
+  }
   else
+  {
+    q = s[j];
+    if (q < 0 || q > 1)
     {
-      q = s[j];
-      if (q < 0 || q > 1)
-	{
-	  Error ("cdf_get_rand: q out of range %d  %f\n", j, q);
-	}
+      Error ("cdf_get_rand: q out of range %d  %f\n", j, q);
     }
+  }
 
   x = cdf->x[i] * (1. - q) + cdf->x[i + 1] * q;
   if (!(cdf->x[0] <= x && x <= cdf->x[cdf->ncdf]))
-    {
-      Error ("cdf_get_rand: %g %d %g %g\n", r, i, q, x);
-    }
+  {
+    Error ("cdf_get_rand: %g %d %g %g\n", r, i, q, x);
+  }
   return (x);
 }
 
@@ -739,58 +726,57 @@ cdf_limit (cdf, xmin, xmax)
   int i;
   double q;
   if (cdf->y[cdf->ncdf] != 1.0)
-    {
-      Error ("cdf_limit: cdf not defined!)");
-      exit (0);
-    }
+  {
+    Error ("cdf_limit: cdf not defined!)");
+    exit (0);
+  }
   if (xmin >= cdf->x[cdf->ncdf])
-    {
-      Error ("cdf_limit: xmin %g > cdf->x[cdf->ncdf] %g\n", xmin,
-	     cdf->x[cdf->ncdf]);
-    }
+  {
+    Error ("cdf_limit: xmin %g > cdf->x[cdf->ncdf] %g\n", xmin, cdf->x[cdf->ncdf]);
+  }
   if (xmax <= cdf->x[0])
-    {
-      Error ("cdf_limit: xmax %g < cdf->x[0] %g\n", xmax, cdf->x[0]);
-      exit (0);
-    }
+  {
+    Error ("cdf_limit: xmax %g < cdf->x[0] %g\n", xmax, cdf->x[0]);
+    exit (0);
+  }
 
 /* Set the limits for the minimum */
 
   if (xmin <= cdf->x[0])
-    {
-      cdf->limit1 = 0;
-      cdf->x1 = cdf->x[0];
-    }
+  {
+    cdf->limit1 = 0;
+    cdf->x1 = cdf->x[0];
+  }
   else
+  {
+    cdf->x1 = xmin;
+    i = 0;
+    while (xmin > cdf->x[i])
     {
-      cdf->x1 = xmin;
-      i = 0;
-      while (xmin > cdf->x[i])
-	{
-	  i++;
-	}
-      q = (xmin - cdf->x[i - 1]) / (cdf->x[i] - cdf->x[i - 1]);
-      cdf->limit1 = cdf->y[i - 1] + q * (cdf->y[i] - cdf->y[i - 1]);
+      i++;
     }
+    q = (xmin - cdf->x[i - 1]) / (cdf->x[i] - cdf->x[i - 1]);
+    cdf->limit1 = cdf->y[i - 1] + q * (cdf->y[i] - cdf->y[i - 1]);
+  }
 
 /* Now set the limits for the maximum */
 
   if (xmax >= cdf->x[cdf->ncdf])
-    {
-      cdf->limit2 = 1.0;
-      cdf->x2 = cdf->x[cdf->ncdf];
-    }
+  {
+    cdf->limit2 = 1.0;
+    cdf->x2 = cdf->x[cdf->ncdf];
+  }
   else
+  {
+    cdf->x2 = xmax;
+    i = cdf->ncdf;
+    while (xmax <= cdf->x[i])
     {
-      cdf->x2 = xmax;
-      i = cdf->ncdf;
-      while (xmax <= cdf->x[i])
-	{
-	  i--;
-	}
-      q = (xmax - cdf->x[i]) / (cdf->x[i + 1] - cdf->x[i]);
-      cdf->limit2 = cdf->y[i] + q * (cdf->y[i + 1] - cdf->y[i]);
+      i--;
     }
+    q = (xmax - cdf->x[i]) / (cdf->x[i + 1] - cdf->x[i]);
+    cdf->limit2 = cdf->y[i] + q * (cdf->y[i + 1] - cdf->y[i]);
+  }
 
   return (0);
 }
@@ -823,7 +809,7 @@ cdf_get_rand_limit (cdf)
   double q;
   double a, b, c, s[2];
   int xquadratic ();
-  r=random_number(0.0,1.0); //
+  r = random_number (0.0, 1.0); //
 
   r = r * cdf->limit2 + (1. - r) * cdf->limit1;
   i = r * cdf->ncdf;
@@ -832,28 +818,28 @@ cdf_get_rand_limit (cdf)
   while (cdf->y[i] > r && i > 0)
     i--;
   while (TRUE)
+  {
+    q = random_number (0.0, 1.0);
+    a = 0.5 * (cdf->d[i + 1] - cdf->d[i]);
+    b = cdf->d[i];
+    c = (-0.5) * (cdf->d[i + 1] + cdf->d[i]) * q;
+    if ((j = xquadratic (a, b, c, s)) < 0)
     {
-	  q=random_number(0.0,1.0);
-      a = 0.5 * (cdf->d[i + 1] - cdf->d[i]);
-      b = cdf->d[i];
-      c = (-0.5) * (cdf->d[i + 1] + cdf->d[i]) * q;
-      if ((j = xquadratic (a, b, c, s)) < 0)
-	{
-	  Error ("pdf_get_rand: %d\n", j);
-	}
-      else
-	{
-	  q = s[j];
-	  if (q < 0 || q > 1)
-	    {
-	      Error ("cdf_get_rand_limit: q out of range %d  %f\n", j, q);
-	    }
-	}
-
-      x = cdf->x[i] * (1. - q) + cdf->x[i + 1] * q;
-      if (cdf->x1 < x && x < cdf->x2)
-	break;
+      Error ("pdf_get_rand: %d\n", j);
     }
+    else
+    {
+      q = s[j];
+      if (q < 0 || q > 1)
+      {
+        Error ("cdf_get_rand_limit: q out of range %d  %f\n", j, q);
+      }
+    }
+
+    x = cdf->x[i] * (1. - q) + cdf->x[i + 1] * q;
+    if (cdf->x1 < x && x < cdf->x2)
+      break;
+  }
 
   return (x);
 }
@@ -881,18 +867,12 @@ cdf_to_file (cdf, filename)
   FILE *fopen (), *fptr;
   int n;
   fptr = fopen (filename, "w");
-  fprintf (fptr,
-	   "# limits (portion.to.sample)   %10.4g %10.4g\n",
-	   cdf->limit1, cdf->limit2);
-  fprintf (fptr,
-	   "# x1 x2  Range(to.be.returned) %10.4g %10.4g\n",
-	   cdf->x1, cdf->x2);
+  fprintf (fptr, "# limits (portion.to.sample)   %10.4g %10.4g\n", cdf->limit1, cdf->limit2);
+  fprintf (fptr, "# x1 x2  Range(to.be.returned) %10.4g %10.4g\n", cdf->x1, cdf->x2);
   fprintf (fptr, "# norm   Scale.factor          %10.4g \n", cdf->norm);
   fprintf (fptr, "#n x y  1-y d\n");
   for (n = 0; n <= cdf->ncdf; n++)
-    fprintf (fptr,
-	     "%3d %14.8e	%14.8e %14.8e  %14.8e\n",
-	     n, cdf->x[n], cdf->y[n], 1. - cdf->y[n], cdf->d[n]);
+    fprintf (fptr, "%3d %14.8e	%14.8e %14.8e  %14.8e\n", n, cdf->x[n], cdf->y[n], 1. - cdf->y[n], cdf->d[n]);
   fclose (fptr);
   return (0);
 }
@@ -923,59 +903,51 @@ cdf_check (cdf)
   x = cdf->x[0];
   y = cdf->y[0];
   if (y != 0.0)
-    {
-      Error
-	("cdf_check: cumulative distribution function should start at 0 not %e\n",
-	 y);
-      hcheck = 1;
-      Log ("%e %e %e %e\n", cdf->x[0], cdf->y[0], cdf->x[1], cdf->y[1]);
-    }
+  {
+    Error ("cdf_check: cumulative distribution function should start at 0 not %e\n", y);
+    hcheck = 1;
+    Log ("%e %e %e %e\n", cdf->x[0], cdf->y[0], cdf->x[1], cdf->y[1]);
+  }
   if (cdf->y[cdf->ncdf] != 1.0)
-    {
-      Error
-	("cdf_check: cumulative distribution function should end at 1 not %e\n",
-	 cdf->y[cdf->ncdf - 1]);
-      icheck = 1;
-    }
+  {
+    Error ("cdf_check: cumulative distribution function should end at 1 not %e\n", cdf->y[cdf->ncdf - 1]);
+    icheck = 1;
+  }
 
   for (n = 1; n < cdf->ncdf + 1; n++)
+  {
+    // Note the equal sign here
+    if (x <= cdf->x[n])
+      x = cdf->x[n];
+    else
     {
-      // Note the equal sign here
-      if (x <= cdf->x[n])
-	x = cdf->x[n];
-      else
-	{
-	  jcheck = 1;
-	  Error ("cdf_check: x problem n %d x %f pdf->x[n] %f\n", n,
-		 x, cdf->x[n]);
-	}
-      // Note the equal sign here
-      if (y <= cdf->y[n])
-	y = cdf->y[n];
-      else
-	{
-	  kcheck = 1;
-	  Error ("cdf_check: y problem n %d y %f pdf->y[n] %f\n", n,
-		 y, cdf->y[n]);
-	}
+      jcheck = 1;
+      Error ("cdf_check: x problem n %d x %f pdf->x[n] %f\n", n, x, cdf->x[n]);
     }
+    // Note the equal sign here
+    if (y <= cdf->y[n])
+      y = cdf->y[n];
+    else
+    {
+      kcheck = 1;
+      Error ("cdf_check: y problem n %d y %f pdf->y[n] %f\n", n, y, cdf->y[n]);
+    }
+  }
   if (jcheck == 1)
-    {
-      Error ("cdf_check: x values in pdf should be monotonic\n");
-    }
+  {
+    Error ("cdf_check: x values in pdf should be monotonic\n");
+  }
   if (kcheck == 1)
-    {
-      Error
-	("cdf_check: cumulative distribution function should be monotonic\n");
-    }
+  {
+    Error ("cdf_check: cumulative distribution function should be monotonic\n");
+  }
 
   if (hcheck != 0 || icheck != 0 || jcheck != 0 || kcheck != 0)
-    {
-      cdf_to_file (cdf, "cdf.diag");
-      fcheck = hcheck * 1000 + icheck * 100 + jcheck * 10 + kcheck;
-      Error ("cdf_check %d %d %d %d %d\n", fcheck, hcheck,
-	     icheck, jcheck, kcheck);
-    }
+  {
+    cdf_to_file (cdf, "cdf.diag");
+    fcheck = hcheck * 1000 + icheck * 100 + jcheck * 10 + kcheck;
+    Error ("cdf_check %d %d %d %d %d\n", fcheck, hcheck, icheck, jcheck, kcheck);
+  }
 
 /* Next section is a dangerous attempt to repair the cdf  */
 
@@ -984,21 +956,21 @@ cdf_check (cdf)
   if (icheck != 0)
     cdf->y[cdf->ncdf] = 1.0;
   if (jcheck != 0)
+  {
+    for (n = 0; n < cdf->ncdf; n++)
     {
-      for (n = 0; n < cdf->ncdf; n++)
-	{
-	  if (cdf->x[n] >= cdf->x[n + 1])
-	    cdf->x[n + 1] = cdf->x[n] + 1.e-20;
-	}
+      if (cdf->x[n] >= cdf->x[n + 1])
+        cdf->x[n + 1] = cdf->x[n] + 1.e-20;
     }
+  }
   if (kcheck != 0)
+  {
+    for (n = 0; n < cdf->ncdf; n++)
     {
-      for (n = 0; n < cdf->ncdf; n++)
-	{
-	  if (cdf->y[n] >= cdf->y[n] + 1)
-	    cdf->y[n + 1] = cdf->y[n] + 1.e-20;
-	}
+      if (cdf->y[n] >= cdf->y[n] + 1)
+        cdf->y[n + 1] = cdf->y[n] + 1.e-20;
     }
+  }
 
   return (fcheck);
 }
@@ -1043,33 +1015,31 @@ calc_cdf_gradient (cdf)
 
   istat = 0;
   for (n = 1; n < cdf->ncdf; n++)
+  {
+    dy1 = cdf->y[n] - cdf->y[n - 1];
+    dx1 = cdf->x[n] - cdf->x[n - 1];
+    dy2 = cdf->y[n + 1] - cdf->y[n];
+    dx2 = cdf->x[n + 1] - cdf->x[n];
+    if (dx1 != 0.0 && dx2 != 0.0)
     {
-      dy1 = cdf->y[n] - cdf->y[n - 1];
-      dx1 = cdf->x[n] - cdf->x[n - 1];
-      dy2 = cdf->y[n + 1] - cdf->y[n];
-      dx2 = cdf->x[n + 1] - cdf->x[n];
-      if (dx1 != 0.0 && dx2 != 0.0)
-	{
-	  cdf->d[n] = 0.5 * (dy1 / dx1 + dy2 / dx2);
-	}
-      else if (dx1 != 0.0)
-	{
-	  cdf->d[n] = dy1 / dx1;
-	}
-      else if (dx2 != 0.0)
-	{
-	  cdf->d[n] = dy2 / dx2;
-	}
-      else
-	{
-	  cdf->d[n] = 0.0;
-	  Error
-	    ("calc_cdf_gradient: dx1 and dx2 both 0 at  %3d %11.6e\n", n,
-	     cdf->x[n]);
-	  istat = 1;
-	}
-
+      cdf->d[n] = 0.5 * (dy1 / dx1 + dy2 / dx2);
     }
+    else if (dx1 != 0.0)
+    {
+      cdf->d[n] = dy1 / dx1;
+    }
+    else if (dx2 != 0.0)
+    {
+      cdf->d[n] = dy2 / dx2;
+    }
+    else
+    {
+      cdf->d[n] = 0.0;
+      Error ("calc_cdf_gradient: dx1 and dx2 both 0 at  %3d %11.6e\n", n, cdf->x[n]);
+      istat = 1;
+    }
+
+  }
   /* Fill in the ends */
   cdf->d[0] = cdf->d[1];
 
@@ -1126,10 +1096,10 @@ cdf_array_fixup (x, y, n_xy)
   gsl_sort_index (order, x, 1, n_xy);
 
   for (n = 0; n < n_xy; n++)
-    {
-      xx[n] = x[order[n]];
-      yy[n] = y[order[n]];
-    }
+  {
+    xx[n] = x[order[n]];
+    yy[n] = y[order[n]];
+  }
 
   /* So now I know the order, but there could be two x values that are the same */
 
@@ -1137,20 +1107,20 @@ cdf_array_fixup (x, y, n_xy)
   x[0] = xx[0];
   y[0] = yy[0];
   for (n = 0; n < n_xy; n++)
+  {
+    if (m == 0 && xx[n] > 0)
     {
-      if (m == 0 && xx[n] > 0)
-	{
-	  x[0] = x[n];
-	  y[0] = y[n];
-	  m++;
-	}
-      else if (xx[n] > xx[n - 1])
-	{
-	  x[m] = xx[n];
-	  y[m] = yy[n];
-	  m++;
-	}
+      x[0] = x[n];
+      y[0] = y[n];
+      m++;
     }
+    else if (xx[n] > xx[n - 1])
+    {
+      x[m] = xx[n];
+      y[m] = yy[n];
+      m++;
+    }
+  }
   free (order);
   free (xx);
   free (yy);

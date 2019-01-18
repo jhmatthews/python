@@ -180,9 +180,9 @@ xsignal_rm (char *root)
     /* first check if the file exists */
 
     if ((tmp_ptr = fopen (filename, "r")) == NULL)
-          {
-              return(0);
-          }
+    {
+      return (0);
+    }
 
 
     strcpy (command, "rm ");

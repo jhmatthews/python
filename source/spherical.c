@@ -35,25 +35,25 @@
 //OLD                                        Space Telescope Science Institute
 //OLD
 //OLD  Synopsis:
-//OLD 	spherical_ds_in_cell calculates the distance to the far
+//OLD   spherical_ds_in_cell calculates the distance to the far
 //OLD         boundary of the cell in which the photon bundle resides.
 //OLD
 //OLD  Arguments:
-//OLD  	p	Photon pointer
+//OLD   p       Photon pointer
 //OLD
 //OLD
 //OLD  Returns:
-//OLD  	Distance to the far boundary of the cell in which the photon
-//OLD 	currently resides.  Negative numbers (and zero) should be
-//OLD 	regarded as errors.
+//OLD   Distance to the far boundary of the cell in which the photon
+//OLD   currently resides.  Negative numbers (and zero) should be
+//OLD   regarded as errors.
 //OLD
 //OLD Description:
 //OLD
 //OLD Notes:
 //OLD
 //OLD History:
-//OLD  	05apr	ksl	55d: Adapted from rtheta.c
-//OLD 	15aug	ksl	Domains incorporated
+//OLD   05apr   ksl     55d: Adapted from rtheta.c
+//OLD   15aug   ksl     Domains incorporated
 //OLD
 //OLD **************************************************************/
 
@@ -81,8 +81,8 @@
  **********************************************************/
 
 double
-spherical_ds_in_cell (ndom,p)
-  int ndom;
+spherical_ds_in_cell (ndom, p)
+     int ndom;
      PhotPtr p;
 
 {
@@ -216,9 +216,9 @@ spherical_make_grid (w, ndom)
  **********************************************************/
 
 int
-spherical_wind_complete (ndom,w)
+spherical_wind_complete (ndom, w)
      int ndom;
-	WindPtr w;
+     WindPtr w;
 {
   int i;
   int ndim, nstart;
@@ -465,12 +465,12 @@ spherical_get_random_location (n, x)
   inwind = W_NOT_INWIND;
   while (inwind != W_ALL_INWIND)
   {
-    r = (rmin * rmin * rmin) + (rmax * rmax * rmax - rmin * rmin * rmin) * random_number(0.0,1.0);
+    r = (rmin * rmin * rmin) + (rmax * rmax * rmax - rmin * rmin * rmin) * random_number (0.0, 1.0);
 
     r = pow (r, (1. / 3.));
-    theta = acos (random_number(-1.0,1.0));
+    theta = acos (random_number (-1.0, 1.0));
 
-    phi = 2. * PI * random_number(0.0,1.0);
+    phi = 2. * PI * random_number (0.0, 1.0);
 
 /* Project from r, theta phi to x y z  */
     x[0] = r * cos (phi) * sin (theta);
@@ -556,6 +556,3 @@ spherical_extend_density (ndom, w)
   return (0);
 
 }
-
-
-

@@ -421,7 +421,7 @@ spectrum_create (p, f1, f2, nangle, select_extract)
        * a macro atom it's type is increased by 10.  When we want to construct a spectrum for photons originating
        * from the boundary layer we need to subtract 10 from the type.    See python.h 
        */
-      if (spectype >= 10)      
+      if (spectype >= 10)
         spectype -= 10;
 
       if (spectype == PTYPE_STAR || spectype == PTYPE_BL || spectype == PTYPE_AGN)      // Then it came from the bl or the star
@@ -543,12 +543,13 @@ spectrum_create (p, f1, f2, nangle, select_extract)
    * to record sctteres
    */
 
-  maxscat=0;
+  maxscat = 0;
   for (i = 0; i <= MAXSCAT; i++)
   {
-      if (nscat[i]>0) {
-          maxscat=i;
-      }
+    if (nscat[i] > 0)
+    {
+      maxscat = i;
+    }
   }
 
 
@@ -696,18 +697,22 @@ spectrum_summary (filename, nspecmin, nspecmax, select_spectype, renorm, loglin,
   get_time (string);
   fprintf (fptr, "# Date	%s\n#  \n", string);
 
-  if (select_spectype==SPECTYPE_RAW) {
-      fprintf (fptr, "\n# Units: L_nu spectrum (erg/s/Hz)\n\n");
+  if (select_spectype == SPECTYPE_RAW)
+  {
+    fprintf (fptr, "\n# Units: L_nu spectrum (erg/s/Hz)\n\n");
   }
-  else if (select_spectype==SPECTYPE_FLAMBDA) {
-      fprintf (fptr, "\n# Units: flambda spectrum (erg/s/cm^-2/A) at %.1f parsecs\n\n", D_SOURCE);
+  else if (select_spectype == SPECTYPE_FLAMBDA)
+  {
+    fprintf (fptr, "\n# Units: flambda spectrum (erg/s/cm^-2/A) at %.1f parsecs\n\n", D_SOURCE);
   }
-  else if (select_spectype==SPECTYPE_FNU) {
-      fprintf (fptr, "\n# Units: Lnu spectrum (erg/s/Hz) at %.1f parsecs\n\n", D_SOURCE);
+  else if (select_spectype == SPECTYPE_FNU)
+  {
+    fprintf (fptr, "\n# Units: Lnu spectrum (erg/s/Hz) at %.1f parsecs\n\n", D_SOURCE);
   }
-  else {
-      Error("spectrum_summary: Unknown select_spectype %d\n",select_spectype);
-      exit(0);
+  else
+  {
+    Error ("spectrum_summary: Unknown select_spectype %d\n", select_spectype);
+    exit (0);
   }
 
 

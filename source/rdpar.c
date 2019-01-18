@@ -149,16 +149,16 @@
 #define REISSUE		-199
 
 
-FILE *rdin_ptr, *rdout_ptr;	/* Pointers to the input and output files */
-int rdpar_stat = 0;		/*rdpar_stat=0 initially, 
-				   rd_stat=1 while reading from stdin,
-				   rdpar_stat=2 if reading from file */
-int verbose = 1;		/* verbose = 1 -> printout all errors
-				   verbose=2 -->suppresses some error messages */
+FILE *rdin_ptr, *rdout_ptr;     /* Pointers to the input and output files */
+int rdpar_stat = 0;             /*rdpar_stat=0 initially, 
+                                   rd_stat=1 while reading from stdin,
+                                   rdpar_stat=2 if reading from file */
+int verbose = 1;                /* verbose = 1 -> printout all errors
+                                   verbose=2 -->suppresses some error messages */
 
 char current_filename[LINELEN];
 
-int rd_rank = 0;		// rank of mpi process, set to zero
+int rd_rank = 0;                // rank of mpi process, set to zero
 
 /* Array to record the actual values of rdpar accepted by rdpar.  All values are 
  * stored as strings */
@@ -179,11 +179,11 @@ rdpar_record[MAX_RECORDS];
 #define USED  1
 
 int rdpar_cursor = 0;
-int rdpar_ntot = 0;		// total number of raw input lines
+int rdpar_ntot = 0;             // total number of raw input lines
 struct rdpar_raw
 {
-  char line[LINELEN];		// Raw input line 
-  int icheck;			// Check off to indicate a line has been used
+  char line[LINELEN];           // Raw input line 
+  int icheck;                   // Check off to indicate a line has been used
 }
 input[MAX_RECORDS];
 
@@ -219,30 +219,30 @@ opar (filename)
 
   /* Check that an input file is not currently open */
   if (rdpar_stat == 2)
-    {
-      printf ("Error: opar: A file for reading input is already open.\n");
-      return (rdpar_stat);
-    }
+  {
+    printf ("Error: opar: A file for reading input is already open.\n");
+    return (rdpar_stat);
+  }
 
   /*Open a temporary output file */
   rdpar_init ();
   if ((tmp_ptr = fopen (filename, "r")) == NULL)
-    {
-      printf ("Error: opar: Could not open filename %s\n", filename);
-      printf ("               Proceeding in interactive mode\n");
-      return (rdpar_stat);
-    }
+  {
+    printf ("Error: opar: Could not open filename %s\n", filename);
+    printf ("               Proceeding in interactive mode\n");
+    return (rdpar_stat);
+  }
   else
+  {
+    rdin_ptr = tmp_ptr;
+    rdpar_stat = 2;             /* implies we are now trying to read from a file */
+    while (fgets (input[rdpar_ntot].line, LINELEN, rdin_ptr) != NULL)
     {
-      rdin_ptr = tmp_ptr;
-      rdpar_stat = 2;		/* implies we are now trying to read from a file */
-      while (fgets (input[rdpar_ntot].line, LINELEN, rdin_ptr) != NULL)
-	{
-	  input[rdpar_ntot].icheck = UNUSED;
-	  rdpar_ntot++;
-	}
-      fclose (rdin_ptr);
+      input[rdpar_ntot].icheck = UNUSED;
+      rdpar_ntot++;
     }
+    fclose (rdin_ptr);
+  }
   strcpy (current_filename, filename);
 
 
@@ -287,22 +287,22 @@ add_par (filename)
 
   /* Check that an input file is not currently open */
   if (rdpar_stat != 2)
-    {
-      printf ("Error: add_par: opar needs to be called before add_par\n");
-      return (rdpar_stat);
-    }
+  {
+    printf ("Error: add_par: opar needs to be called before add_par\n");
+    return (rdpar_stat);
+  }
 
   if ((rdin_ptr = fopen (filename, "r")) == NULL)
-    {
-      printf ("Error: add_par: Could not additional file %s\n", filename);
-      return (rdpar_stat);
-    }
+  {
+    printf ("Error: add_par: Could not additional file %s\n", filename);
+    return (rdpar_stat);
+  }
 
   while (fgets (input[rdpar_ntot].line, LINELEN, rdin_ptr) != NULL)
-    {
-      input[rdpar_ntot].icheck = UNUSED;
-      rdpar_ntot++;
-    }
+  {
+    input[rdpar_ntot].icheck = UNUSED;
+    rdpar_ntot++;
+  }
   fclose (rdin_ptr);
 
 
@@ -381,12 +381,12 @@ int
 rdpar_init ()
 {
   FILE *fopen ();
-  rdin_ptr = stdin;		/* Initialize rdin_ptr to standard input */
+  rdin_ptr = stdin;             /* Initialize rdin_ptr to standard input */
   if ((rdout_ptr = fopen ("tmp.rdpar", "w")) == NULL)
-    {
-      printf ("Error: rdpar_init: Problem opening tmp.rdpar\n");
-      exit (0);
-    }
+  {
+    printf ("Error: rdpar_init: Problem opening tmp.rdpar\n");
+    exit (0);
+  }
   rdpar_stat = 1;
   strcpy (current_filename, "tmp.rdpar.out");
   return (NORMAL);
@@ -421,21 +421,21 @@ string_process (question, dummy)
 {
 
   if (rdpar_stat == 0)
-    rdpar_init ();		/* Set rdin_ptr to stdin, and rdout_ptr to file tmp.rdpar */
+    rdpar_init ();              /* Set rdin_ptr to stdin, and rdout_ptr to file tmp.rdpar */
 
 
   if (rdpar_stat == 1)
-    {				/* Then we are reading from stdin */
-      return (string_process_from_command_line (question, dummy));
-    }
+  {                             /* Then we are reading from stdin */
+    return (string_process_from_command_line (question, dummy));
+  }
 
 
   else
-    {				/*Then read from the file */
+  {                             /*Then read from the file */
 
-      return (string_process_from_file (question, dummy));
+    return (string_process_from_file (question, dummy));
 
-    }
+  }
 }
 
 
@@ -476,33 +476,33 @@ string_process_from_command_line (question, dummy)
   fflush (stderr);
   strcpy (tdummy, "");
   if (fgets (tdummy, LINELEN, stdin) == NULL)
-    {
-      printf ("Exiting since rdpar got EOF in interactive mode\n");
-      exit (0);
-    }
+  {
+    printf ("Exiting since rdpar got EOF in interactive mode\n");
+    exit (0);
+  }
   else if (tdummy[0] == '\n')
-    {				//Use the current value
+  {                             //Use the current value
 
-      printf ("%s %s\n", question, dummy);
-      fprintf (rdout_ptr, "%-30s %20s\n", question, dummy);
-      rdpar_store_record (question, dummy);
-      return (OLD);
-    }
+    printf ("%s %s\n", question, dummy);
+    fprintf (rdout_ptr, "%-30s %20s\n", question, dummy);
+    rdpar_store_record (question, dummy);
+    return (OLD);
+  }
   else if (tdummy[0] == '!')
-    {
-      system (&tdummy[1]);	/* Send a command to the system */
-      return (REISSUE);
-    }
+  {
+    system (&tdummy[1]);        /* Send a command to the system */
+    return (REISSUE);
+  }
   else if (strncmp (tdummy, "done", 4) == 0)
     return (EOF);
   else
-    {				//Use the value input from the command line
+  {                             //Use the value input from the command line
 
-      strcpy (dummy, tdummy);
-      fprintf (rdout_ptr, "%-30s %20s", question, dummy);
-      rdpar_store_record (question, dummy);
-      return (NORMAL);
-    }
+    strcpy (dummy, tdummy);
+    fprintf (rdout_ptr, "%-30s %20s", question, dummy);
+    rdpar_store_record (question, dummy);
+    return (NORMAL);
+  }
 }
 
 
@@ -552,123 +552,121 @@ string_process_from_file (question, dummy)
   char *ccc, *index (), *fgets ();
   int nwords, wordlength;
   char old_question[LINELEN];
-  char xfirstword[LINELEN],xquestion[LINELEN];
+  char xfirstword[LINELEN], xquestion[LINELEN];
   int i;
 
   for (rdpar_cursor = 0; rdpar_cursor < rdpar_ntot; rdpar_cursor++)
+  {
+    if (input[rdpar_cursor].icheck == USED)
     {
-      if (input[rdpar_cursor].icheck == USED)
-	{
-	  continue;
-	}
-
-      line = input[rdpar_cursor].line;
-
-      // Parse the first two words of the input line
-
-      strcpy (firstword, "");
-      strcpy (secondword, "");
-      nwords = sscanf (line, "%s %s", firstword, secondword);
-
-      wordlength = strlen (firstword);
-      if (nwords < 2 || wordlength == 0)
-	{
-	  continue;		// Read the next line in the file
-	}
-
-      // Strip off everthing in paren
-      if ((ccc = index (firstword, '(')) != NULL)
-	{
-	  wordlength = (int) (ccc - firstword);
-	  if (wordlength == 0)
-	    {
-	      continue;
-	    }
-	}
-
-
-      // If there is a match go to the section that handles the various possibilities
-
-      if (strncmp (question, firstword, wordlength) == 0)
-	{
-	  break;		// We have matched the keywords
-	}
-
-
-
-      /* Check for synonyms - That is look for keywords in the file we are reading 
-       * that have been replaced by a new keyword
-       */
-
-      if (check_synonyms (question, old_question) == 1
-	  && strncmp (old_question, firstword, wordlength) == 0)
-	{
-	  break;
-	}
-
-      strncpy(xquestion,question,wordlength);
-      strncpy(xfirstword,firstword,wordlength);
-      for (i=0;i<wordlength;i++){
-          xquestion[i]=tolower(xquestion[i]);
-          xfirstword[i]=tolower(xfirstword[i]);
-      }
-
-
-      if (strncmp (xquestion, xfirstword, wordlength) == 0)
-	{
-	  break;		// We have matched the keywords
-	}
-
-
-
-
-      // Print a warning if the lines do not match
-      if (verbose > 1 && rd_rank == 0)
-	printf
-	  ("Warning:  Question (%s) does not match word (%s) in file. Continuing!\n",
-	   question, firstword);
+      continue;
     }
+
+    line = input[rdpar_cursor].line;
+
+    // Parse the first two words of the input line
+
+    strcpy (firstword, "");
+    strcpy (secondword, "");
+    nwords = sscanf (line, "%s %s", firstword, secondword);
+
+    wordlength = strlen (firstword);
+    if (nwords < 2 || wordlength == 0)
+    {
+      continue;                 // Read the next line in the file
+    }
+
+    // Strip off everthing in paren
+    if ((ccc = index (firstword, '(')) != NULL)
+    {
+      wordlength = (int) (ccc - firstword);
+      if (wordlength == 0)
+      {
+        continue;
+      }
+    }
+
+
+    // If there is a match go to the section that handles the various possibilities
+
+    if (strncmp (question, firstword, wordlength) == 0)
+    {
+      break;                    // We have matched the keywords
+    }
+
+
+
+    /* Check for synonyms - That is look for keywords in the file we are reading 
+     * that have been replaced by a new keyword
+     */
+
+    if (check_synonyms (question, old_question) == 1 && strncmp (old_question, firstword, wordlength) == 0)
+    {
+      break;
+    }
+
+    strncpy (xquestion, question, wordlength);
+    strncpy (xfirstword, firstword, wordlength);
+    for (i = 0; i < wordlength; i++)
+    {
+      xquestion[i] = tolower (xquestion[i]);
+      xfirstword[i] = tolower (xfirstword[i]);
+    }
+
+
+    if (strncmp (xquestion, xfirstword, wordlength) == 0)
+    {
+      break;                    // We have matched the keywords
+    }
+
+
+
+
+    // Print a warning if the lines do not match
+    if (verbose > 1 && rd_rank == 0)
+      printf ("Warning:  Question (%s) does not match word (%s) in file. Continuing!\n", question, firstword);
+  }
 
   // Handle the EOF since we were not successful in identifying the keyword
   if (rdpar_cursor == rdpar_ntot)
-    {
-      // printf ("Error: string_proces: Unexpectedly reached EOF\n");
-      printf ("Switching to interactive mode for this variable\n");
-      return (string_process_from_command_line (question, dummy));
-    }
+  {
+    // printf ("Error: string_proces: Unexpectedly reached EOF\n");
+    printf ("Switching to interactive mode for this variable\n");
+    return (string_process_from_command_line (question, dummy));
+  }
   else
-    {
-      input[rdpar_cursor].icheck = USED;
-      rdpar_cursor++;		// This is needed because we have already processed the earlier line
-    }
+  {
+    input[rdpar_cursor].icheck = USED;
+    rdpar_cursor++;             // This is needed because we have already processed the earlier line
+  }
 
 
   // At this point we have the correct line in the input list
 
   if (strncmp (secondword, "$", 1) == 0 || nwords == 1)
-    {				// This if for the case where one wants to read this value only from the command line
-      fprintf (stderr, "%s (%s) :", question, dummy);
-      fflush (stderr);
+  {                             // This if for the case where one wants to read this value only from the command line
+    fprintf (stderr, "%s (%s) :", question, dummy);
+    fflush (stderr);
 
-      strcpy (secondword, dummy);
+    strcpy (secondword, dummy);
 
-      fgets (dummy, LINELEN, stdin);
+    fgets (dummy, LINELEN, stdin);
 
-      if (strcmp (dummy, "\n") == 0)
-	{			/* Store the provided value since \n */
-	  rdpar_store_record (question, secondword);
-	  fprintf (rdout_ptr, "%-40s   %s\n", question, secondword);
-	}
-      else
-	{			/* Store the value received via the command line */
-
-	  rdpar_store_record (question, dummy);
-	  fprintf (rdout_ptr, "%-40s   %s\n", question, dummy);
-	}
-
-      return (NORMAL);
+    if (strcmp (dummy, "\n") == 0)
+    {                           /* Store the provided value since \n */
+      rdpar_store_record (question, secondword);
+      fprintf (rdout_ptr, "%-40s   %s\n", question, secondword);
     }
-  else				// This handles the situation where the variable is actually read from the rdpar file
+    else
+    {                           /* Store the value received via the command line */
+
+      rdpar_store_record (question, dummy);
+      fprintf (rdout_ptr, "%-40s   %s\n", question, dummy);
+    }
+
+    return (NORMAL);
+  }
+  else                          // This handles the situation where the variable is actually read from the rdpar file
     strcpy (dummy, secondword);
   rdpar_store_record (question, secondword);
   fprintf (rdout_ptr, "%-40s   %s\n", question, secondword);
@@ -742,10 +740,9 @@ rdpar_save (file_ptr)
 
 
   for (i = 0; i < rdpar_nrec; i++)
-    {
-      fprintf (file_ptr, "# Var	 %-40s	%s\n", rdpar_record[i].name,
-	       rdpar_record[i].value);
-    }
+  {
+    fprintf (file_ptr, "# Var	 %-40s	%s\n", rdpar_record[i].name, rdpar_record[i].value);
+  }
   return (0);
 }
 
@@ -776,18 +773,18 @@ rdpar_comment (char *format, ...)
   int result = 0;
 
   if (rdpar_stat == 0)
-    rdpar_init ();		/* Set rdin_ptr to stdin, and rdout_ptr to file tmp.rdpar */
+    rdpar_init ();              /* Set rdin_ptr to stdin, and rdout_ptr to file tmp.rdpar */
 
 
   va_start (ap, format);
-  va_copy (ap2, ap);		/* ap is not necessarily preserved by vprintf */
+  va_copy (ap2, ap);            /* ap is not necessarily preserved by vprintf */
 
   if (rd_rank == 0)
-    {
-      fprintf (rdout_ptr, "\n### ");
-      result = vfprintf (rdout_ptr, format, ap2);
-      fprintf (rdout_ptr, "\n");
-    }
+  {
+    fprintf (rdout_ptr, "\n### ");
+    result = vfprintf (rdout_ptr, format, ap2);
+    fprintf (rdout_ptr, "\n");
+  }
   va_end (ap);
   return (result);
 }
@@ -841,23 +838,22 @@ rdstr (question, answer)
   char dummy[LINELEN];
   query = REISSUE;
   if (rdpar_stat == 0)
-    rdpar_init ();		/* Set rdin_ptr to stdin, and rdout_ptr to file tmp.rdpar */
+    rdpar_init ();              /* Set rdin_ptr to stdin, and rdout_ptr to file tmp.rdpar */
   while (query == REISSUE)
+  {
+    sprintf (dummy, "%s", answer);
+    query = string_process (question, dummy);
+    if (query == NORMAL)
     {
-      sprintf (dummy, "%s", answer);
-      query = string_process (question, dummy);
-      if (query == NORMAL)
-	{
-	  if (sscanf (dummy, "%s", answer) != 1)
-	    {
-	      printf ("Could not convert input (%s) to string. Try again\n",
-		      dummy);
-	      query = REISSUE;
-	    }
-	  if (rd_rank == 0 && verbose == 1)
-	    printf ("%s   %s\n", question, answer);
-	}
+      if (sscanf (dummy, "%s", answer) != 1)
+      {
+        printf ("Could not convert input (%s) to string. Try again\n", dummy);
+        query = REISSUE;
+      }
+      if (rd_rank == 0 && verbose == 1)
+        printf ("%s   %s\n", question, answer);
     }
+  }
   return (query);
 }
 
@@ -886,25 +882,23 @@ rdchar (question, answer)
   char dummy[LINELEN];
   query = REISSUE;
   if (rdpar_stat == 0)
-    rdpar_init ();		/* Set rdin_ptr to stdin, and rdout_ptr to file tmp.rdpar */
+    rdpar_init ();              /* Set rdin_ptr to stdin, and rdout_ptr to file tmp.rdpar */
   while (query == REISSUE)
+  {
+    sprintf (dummy, "%c", *answer);
+    query = string_process (question, dummy);
+    if (query == NORMAL)
     {
-      sprintf (dummy, "%c", *answer);
-      query = string_process (question, dummy);
-      if (query == NORMAL)
-	{
-	  if (sscanf (dummy, " %1c", answer) != 1)
-	    {
-	      printf
-		("Could not convert input (%s) to character. Try again\n",
-		 dummy);
-	      query = REISSUE;
-	    }
+      if (sscanf (dummy, " %1c", answer) != 1)
+      {
+        printf ("Could not convert input (%s) to character. Try again\n", dummy);
+        query = REISSUE;
+      }
 
-	  if (rd_rank == 0 && verbose == 1)
-	    printf ("%s   %1c\n", question, *answer);
-	}
+      if (rd_rank == 0 && verbose == 1)
+        printf ("%s   %1c\n", question, *answer);
     }
+  }
   return (query);
 }
 
@@ -932,23 +926,22 @@ rdint (question, answer)
   char dummy[LINELEN];
   query = REISSUE;
   if (rdpar_stat == 0)
-    rdpar_init ();		/* Set rdin_ptr to stdin, and rdout_ptr to file tmp.rdpar */
+    rdpar_init ();              /* Set rdin_ptr to stdin, and rdout_ptr to file tmp.rdpar */
   while (query == REISSUE)
+  {
+    sprintf (dummy, "%d", *answer);
+    query = string_process (question, dummy);
+    if (query == NORMAL)
     {
-      sprintf (dummy, "%d", *answer);
-      query = string_process (question, dummy);
-      if (query == NORMAL)
-	{
-	  if (sscanf (dummy, "%d", answer) != 1)
-	    {
-	      printf ("Could not convert input (%s) to integer. Try again\n",
-		      dummy);
-	      query = REISSUE;
-	    }
-	  if (rd_rank == 0 && verbose == 1)
-	    printf ("%s	  %d\n", question, *answer);
-	}
+      if (sscanf (dummy, "%d", answer) != 1)
+      {
+        printf ("Could not convert input (%s) to integer. Try again\n", dummy);
+        query = REISSUE;
+      }
+      if (rd_rank == 0 && verbose == 1)
+        printf ("%s	  %d\n", question, *answer);
     }
+  }
   return (query);
 }
 
@@ -977,23 +970,22 @@ rdflo (question, answer)
   char dummy[LINELEN];
   query = REISSUE;
   if (rdpar_stat == 0)
-    rdpar_init ();		/* Set rdin_ptr to stdin, and rdout_ptr to file tmp.rdpar */
+    rdpar_init ();              /* Set rdin_ptr to stdin, and rdout_ptr to file tmp.rdpar */
   while (query == REISSUE)
+  {
+    sprintf (dummy, "%g", *answer);
+    query = string_process (question, dummy);
+    if (query == NORMAL)
     {
-      sprintf (dummy, "%g", *answer);
-      query = string_process (question, dummy);
-      if (query == NORMAL)
-	{
-	  if (sscanf (dummy, "%e", answer) != 1)
-	    {
-	      printf ("Could not convert input (%s) to float. Try again\n",
-		      dummy);
-	      query = REISSUE;
-	    }
-	  if (rd_rank == 0 && verbose == 1)
-	    printf ("%s	  %e\n", question, *answer);
-	}
+      if (sscanf (dummy, "%e", answer) != 1)
+      {
+        printf ("Could not convert input (%s) to float. Try again\n", dummy);
+        query = REISSUE;
+      }
+      if (rd_rank == 0 && verbose == 1)
+        printf ("%s	  %e\n", question, *answer);
     }
+  }
   return (query);
 }
 
@@ -1021,23 +1013,22 @@ rddoub (question, answer)
   char dummy[LINELEN];
   query = REISSUE;
   if (rdpar_stat == 0)
-    rdpar_init ();		/* Set rdin_ptr to stdin, and rdout_ptr to file tmp.rdpar */
+    rdpar_init ();              /* Set rdin_ptr to stdin, and rdout_ptr to file tmp.rdpar */
   while (query == REISSUE)
+  {
+    sprintf (dummy, "%g", *answer);
+    query = string_process (question, dummy);
+    if (query == NORMAL)
     {
-      sprintf (dummy, "%g", *answer);
-      query = string_process (question, dummy);
-      if (query == NORMAL)
-	{
-	  if (sscanf (dummy, "%le", answer) != 1)
-	    {
-	      printf ("Could not convert input (%s) to double. Try again\n",
-		      dummy);
-	      query = REISSUE;
-	    };
-	  if (rd_rank == 0 && verbose == 1)
-	    printf ("%s	  %e\n", question, *answer);
-	}
+      if (sscanf (dummy, "%le", answer) != 1)
+      {
+        printf ("Could not convert input (%s) to double. Try again\n", dummy);
+        query = REISSUE;
+      };
+      if (rd_rank == 0 && verbose == 1)
+        printf ("%s	  %e\n", question, *answer);
     }
+  }
   return (query);
 }
 
@@ -1066,18 +1057,18 @@ rdline (question, answer)
   char dummy[LINELEN];
   query = REISSUE;
   if (rdpar_stat == 0)
-    rdpar_init ();		/* Set rdin_ptr to stdin, and rdout_ptr to file tmp.rdpar */
+    rdpar_init ();              /* Set rdin_ptr to stdin, and rdout_ptr to file tmp.rdpar */
   while (query == REISSUE)
+  {
+    sprintf (dummy, "%s", answer);
+    query = string_process (question, dummy);
+    if (query == NORMAL)
     {
-      sprintf (dummy, "%s", answer);
-      query = string_process (question, dummy);
-      if (query == NORMAL)
-	{
-	  strcpy (answer, dummy);
-	  if (rd_rank == 0 && verbose == 1)
-	    printf ("%s	  %s\n", question, answer);
-	}
+      strcpy (answer, dummy);
+      if (rd_rank == 0 && verbose == 1)
+        printf ("%s	  %s\n", question, answer);
     }
+  }
   return (query);
 }
 
@@ -1122,10 +1113,10 @@ get_root (root, total)
 
   j = strcspn (total, "\n");
   if (j == 0)
-    {
-      strcpy (root, "rdpar");
-      return (0);
-    }
+  {
+    strcpy (root, "rdpar");
+    return (0);
+  }
 
   /* Check for .pf at the end of the string 
    * Note that there is no easy way to actually
@@ -1135,13 +1126,13 @@ get_root (root, total)
 
   pf = strstr (total, ".pf");
   if (pf != NULL)
-    {
-      position = pf - total;
-      strncpy (root, total, position);
-      root[position] = '\0';
-      printf ("xxx %s\n", root);
-      return (0);
-    }
+  {
+    position = pf - total;
+    strncpy (root, total, position);
+    root[position] = '\0';
+    printf ("xxx %s\n", root);
+    return (0);
+  }
 
   strncpy (root, total, j);
   root[j] = '\0';

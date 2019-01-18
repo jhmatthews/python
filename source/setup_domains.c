@@ -50,22 +50,19 @@ get_domain_params (ndom)
   int input_int;
 
   if (ndom >= geo.ndomain)
-    {
-      Error ("Trying to get grid params for a non-existent domain!\n");
-      exit (0);
-    }
+  {
+    Error ("Trying to get grid params for a non-existent domain!\n");
+    exit (0);
+  }
 
 
-  rdint
-    ("Wind_type(0=SV,1=Star,3=Hydro,4=corona,5=knigge,6=homologous,7=yso,9=shell,10=imported)",
-     &zdom[ndom].wind_type);
+  rdint ("Wind_type(0=SV,1=Star,3=Hydro,4=corona,5=knigge,6=homologous,7=yso,9=shell,10=imported)", &zdom[ndom].wind_type);
 
   if (zdom[ndom].wind_type == 2)
-    {
-      Error
-	("Wind_type 2, which was used to read in a previous model is no longer allowed! Use System_type instead!\n");
-      exit (0);
-    }
+  {
+    Error ("Wind_type 2, which was used to read in a previous model is no longer allowed! Use System_type instead!\n");
+    exit (0);
+  }
 
 
   strcat (zdom[ndom].name, "Wind");
@@ -74,78 +71,71 @@ get_domain_params (ndom)
   input_int = 1;
 
 
-      /* Define the coordinate system for the grid and allocate memory for the wind structure */
-      rdint
-	("Wind.coord_system(0=spherical,1=cylindrical,2=spherical_polar,3=cyl_var)",
-	 &input_int);
-      switch (input_int)
-	{
-	case 0:
-	  zdom[ndom].coord_type = SPHERICAL;
-	  break;
-	case 1:
-	  zdom[ndom].coord_type = CYLIND;
-	  break;
-	case 2:
-	  zdom[ndom].coord_type = RTHETA;
-	  break;
-	case 3:
-	  zdom[ndom].coord_type = CYLVAR;
-	  break;
-	default:
-	  Error
-	    ("Invalid parameter supplied for 'Coord_system'. Valid coordinate types are: \n\
+  /* Define the coordinate system for the grid and allocate memory for the wind structure */
+  rdint ("Wind.coord_system(0=spherical,1=cylindrical,2=spherical_polar,3=cyl_var)", &input_int);
+  switch (input_int)
+  {
+  case 0:
+    zdom[ndom].coord_type = SPHERICAL;
+    break;
+  case 1:
+    zdom[ndom].coord_type = CYLIND;
+    break;
+  case 2:
+    zdom[ndom].coord_type = RTHETA;
+    break;
+  case 3:
+    zdom[ndom].coord_type = CYLVAR;
+    break;
+  default:
+    Error ("Invalid parameter supplied for 'Coord_system'. Valid coordinate types are: \n\
           0 = Spherical, 1 = Cylindrical, 2 = Spherical polar, 3 = Cylindrical (varying Z)");
-	}
+  }
 
 
   if (zdom[ndom].wind_type == IMPORT)
-    {
-        import_wind(ndom);
-    }
+  {
+    import_wind (ndom);
+  }
   else
-
+  {
+    rdint ("Wind.dim.in.x_or_r.direction", &zdom[ndom].ndim);
+    if (zdom[ndom].coord_type)
     {
-      rdint ("Wind.dim.in.x_or_r.direction", &zdom[ndom].ndim);
-      if (zdom[ndom].coord_type)
-	{
-	  rdint ("Wind.dim.in.z_or_theta.direction", &zdom[ndom].mdim);
-	  if (zdom[ndom].mdim < 4)
-	    {
-	      Error
-		("python: domain mdim must be at least 4 to allow for boundaries\n");
-	      exit (0);
-	    }
-	}
-      else
-	zdom[ndom].mdim = 1;
-
+      rdint ("Wind.dim.in.z_or_theta.direction", &zdom[ndom].mdim);
+      if (zdom[ndom].mdim < 4)
+      {
+        Error ("python: domain mdim must be at least 4 to allow for boundaries\n");
+        exit (0);
+      }
     }
+    else
+      zdom[ndom].mdim = 1;
+
+  }
 
 /* Check that NDIM_MAX is greater than NDIM and MDIM.  */
 
   if ((zdom[ndom].ndim > NDIM_MAX) || (zdom[ndom].mdim > NDIM_MAX))
-    {
-      Error
-	("NDIM_MAX %d is less than NDIM %d or MDIM %d. Fix in python.h and recompile\n",
-	 NDIM_MAX, zdom[ndom].ndim, zdom[ndom].mdim);
-      exit (0);
-    }
+  {
+    Error ("NDIM_MAX %d is less than NDIM %d or MDIM %d. Fix in python.h and recompile\n", NDIM_MAX, zdom[ndom].ndim, zdom[ndom].mdim);
+    exit (0);
+  }
 
 
   /* If we are in advanced then allow the user to modify scale lengths */
   if (modes.iadvanced)
-    {
-      rdint ("@Diag.adjust_grid(0=no,1=yes)", &modes.adjust_grid);
+  {
+    rdint ("@Diag.adjust_grid(0=no,1=yes)", &modes.adjust_grid);
 
-      if (modes.adjust_grid)
-	{
-	  Log ("You have opted to adjust the grid scale lengths\n");
-	  rddoub ("@geo.xlog_scale", &zdom[ndom].xlog_scale);
-	  if (zdom[ndom].coord_type != SPHERICAL)
-	    rddoub ("@geo.zlog_scale", &zdom[ndom].zlog_scale);
-	}
+    if (modes.adjust_grid)
+    {
+      Log ("You have opted to adjust the grid scale lengths\n");
+      rddoub ("@geo.xlog_scale", &zdom[ndom].xlog_scale);
+      if (zdom[ndom].coord_type != SPHERICAL)
+        rddoub ("@geo.zlog_scale", &zdom[ndom].zlog_scale);
     }
+  }
 
   zdom[ndom].ndim2 = zdom[ndom].ndim * zdom[ndom].mdim;
 
@@ -185,9 +175,9 @@ get_wind_params (ndom)
   zdom[ndom].rmax = 1e12;
 
   if (geo.system_type == SYSTEM_TYPE_AGN)
-    {
-      zdom[ndom].rmax = 50. * geo.r_agn;
-    }
+  {
+    zdom[ndom].rmax = 50. * geo.r_agn;
+  }
 
 
 
@@ -197,9 +187,10 @@ get_wind_params (ndom)
 
   rddoub ("Wind.radmax(cm)", &zdom[ndom].rmax);
 
-  if (zdom[ndom].rmax <= zdom[ndom].rmin) {
-      Error("get_wind_parameters: rmax (%10.4e) less than or equal to rmin %10.4e in domain %d\n",zdom[ndom].rmax,zdom[ndom].rmin,ndom);
-      exit(0);
+  if (zdom[ndom].rmax <= zdom[ndom].rmin)
+  {
+    Error ("get_wind_parameters: rmax (%10.4e) less than or equal to rmin %10.4e in domain %d\n", zdom[ndom].rmax, zdom[ndom].rmin, ndom);
+    exit (0);
   }
 
   rddoub ("Wind.t.init", &geo.twind_init);
@@ -210,9 +201,9 @@ get_wind_params (ndom)
    * JM 1710 -- if this is the first domain, then initialise geo.rmax see #305
    */
   if ((ndom == 0) || (zdom[ndom].rmax > geo.rmax))
-    {
-      geo.rmax = zdom[ndom].rmax;
-    }
+  {
+    geo.rmax = zdom[ndom].rmax;
+  }
   geo.rmax_sq = geo.rmax * geo.rmax;
 
 
@@ -224,46 +215,46 @@ get_wind_params (ndom)
    */
 
   if (zdom[ndom].wind_type == STAR)
-    {
-      get_stellar_wind_params (ndom);
-    }
+  {
+    get_stellar_wind_params (ndom);
+  }
   else if (zdom[ndom].wind_type == SV)
-    {
-      get_sv_wind_params (ndom);
-    }
+  {
+    get_sv_wind_params (ndom);
+  }
   else if (zdom[ndom].wind_type == HYDRO)
-    {
-      get_hydro_wind_params (ndom);
-    }
+  {
+    get_hydro_wind_params (ndom);
+  }
   else if (zdom[ndom].wind_type == CORONA)
-    {
-      get_corona_params (ndom);
-    }
+  {
+    get_corona_params (ndom);
+  }
   else if (zdom[ndom].wind_type == KNIGGE)
-    {
-      get_knigge_wind_params (ndom);
-    }
+  {
+    get_knigge_wind_params (ndom);
+  }
   else if (zdom[ndom].wind_type == HOMOLOGOUS)
-    {
-      get_homologous_params (ndom);
-    }
+  {
+    get_homologous_params (ndom);
+  }
   else if (zdom[ndom].wind_type == YSO)
-    {
-      get_yso_wind_params (ndom);
-    }
-  else if (zdom[ndom].wind_type == SHELL)	//NSH 18/2/11 This is a new wind type to produce a thin shell.
-    {
-      get_shell_wind_params (ndom);
-    }
-  else if (zdom[ndom].wind_type == IMPORT)	//Read in the wind model.
-    {
-      get_import_wind_params (ndom);
-    }
+  {
+    get_yso_wind_params (ndom);
+  }
+  else if (zdom[ndom].wind_type == SHELL)       //NSH 18/2/11 This is a new wind type to produce a thin shell.
+  {
+    get_shell_wind_params (ndom);
+  }
+  else if (zdom[ndom].wind_type == IMPORT)      //Read in the wind model.
+  {
+    get_import_wind_params (ndom);
+  }
   else
-    {
-      Error ("get_wind_parameters: Unknown wind type %d\n", zdom[ndom].wind_type);
-      exit (0);
-    }
+  {
+    Error ("get_wind_parameters: Unknown wind type %d\n", zdom[ndom].wind_type);
+    exit (0);
+  }
 
   /* Get the filling factor of the wind */
   // XXX  This may  not in the right place to set the filling factor.  
@@ -319,93 +310,88 @@ get_line_transfer_mode ()
      treatment and treat everything as 2-level simple ions inside the macro atom formalism */
 
   /* Set the default scattering and RT mode */
-  geo.scatter_mode = SCATTER_MODE_ISOTROPIC;	// isotropic
-  geo.rt_mode = RT_MODE_2LEVEL;	              // Not macro atom (SS)
+  geo.scatter_mode = SCATTER_MODE_ISOTROPIC;    // isotropic
+  geo.rt_mode = RT_MODE_2LEVEL; // Not macro atom (SS)
 
   if (user_line_mode == 0)
-    {
-      Log ("Line_transfer mode:  Simple, pure absorption\n");
-      geo.line_mode = user_line_mode;
-    }
+  {
+    Log ("Line_transfer mode:  Simple, pure absorption\n");
+    geo.line_mode = user_line_mode;
+  }
   else if (user_line_mode == 1)
-    {
-      Log ("Line_transfer mode:  Simple, pure scattering\n");
-      geo.line_mode = user_line_mode;
-    }
+  {
+    Log ("Line_transfer mode:  Simple, pure scattering\n");
+    geo.line_mode = user_line_mode;
+  }
   else if (user_line_mode == 2)
-    {
-      Log ("Line_transfer mode:  Simple, single scattering\n");
-      geo.line_mode = user_line_mode;
-    }
+  {
+    Log ("Line_transfer mode:  Simple, single scattering\n");
+    geo.line_mode = user_line_mode;
+  }
   else if (user_line_mode == 3)
-    {
-      Log
-	("Line_transfer mode:  Simple, isotropic scattering, escape probabilities\n");
-     geo.line_mode = user_line_mode;
-    }
+  {
+    Log ("Line_transfer mode:  Simple, isotropic scattering, escape probabilities\n");
+    geo.line_mode = user_line_mode;
+  }
   else if (user_line_mode == 4)
-    {
-      Error("get_line_transfer_mode: Line transfer mode %d is deprecated\n", user_line_mode);
-      line_transfer_help_message();
-      exit(0);
-    }
+  {
+    Error ("get_line_transfer_mode: Line transfer mode %d is deprecated\n", user_line_mode);
+    line_transfer_help_message ();
+    exit (0);
+  }
   else if (user_line_mode == 5)
-    {
-      Log
-	("Line_transfer mode:  Simple, thermal trapping, Single scattering \n");
-      geo.scatter_mode = SCATTER_MODE_THERMAL;	// Thermal trapping model
-      geo.line_mode = 3;	
-      geo.rt_mode = RT_MODE_2LEVEL;	// Not macro atom (SS) 
-    }
+  {
+    Log ("Line_transfer mode:  Simple, thermal trapping, Single scattering \n");
+    geo.scatter_mode = SCATTER_MODE_THERMAL;    // Thermal trapping model
+    geo.line_mode = 3;
+    geo.rt_mode = RT_MODE_2LEVEL;       // Not macro atom (SS) 
+  }
   else if (user_line_mode == 6)
-    {
-      Log ("Line_transfer mode:  macro atoms, isotropic scattering  \n");
-      geo.scatter_mode = SCATTER_MODE_ISOTROPIC;	// isotropic
-      geo.line_mode = 3;	
-      geo.rt_mode = RT_MODE_MACRO;	// Identify macro atom treatment (SS)
-      geo.macro_simple = 0;	// We don't want the all simple case (SS)
-    }
+  {
+    Log ("Line_transfer mode:  macro atoms, isotropic scattering  \n");
+    geo.scatter_mode = SCATTER_MODE_ISOTROPIC;  // isotropic
+    geo.line_mode = 3;
+    geo.rt_mode = RT_MODE_MACRO;        // Identify macro atom treatment (SS)
+    geo.macro_simple = 0;       // We don't want the all simple case (SS)
+  }
   else if (user_line_mode == 7)
-    {
-      Log ("Line_transfer mode:  macro atoms, anisotropic  scattering  \n");
-      geo.scatter_mode = SCATTER_MODE_THERMAL;	// thermal trapping
-      geo.line_mode = 3;	
-      geo.rt_mode = RT_MODE_MACRO;	// Identify macro atom treatment (SS)
-      geo.macro_simple = 0;	// We don't want the all simple case (SS)
-    }
+  {
+    Log ("Line_transfer mode:  macro atoms, anisotropic  scattering  \n");
+    geo.scatter_mode = SCATTER_MODE_THERMAL;    // thermal trapping
+    geo.line_mode = 3;
+    geo.rt_mode = RT_MODE_MACRO;        // Identify macro atom treatment (SS)
+    geo.macro_simple = 0;       // We don't want the all simple case (SS)
+  }
   else if (user_line_mode == 8)
-    {
-      Log
-	("Line_transfer mode: simple macro atoms, isotropic  scattering  \n");
-      geo.scatter_mode = SCATTER_MODE_ISOTROPIC;	// isotropic
-      geo.line_mode = 3;	
-      geo.rt_mode = RT_MODE_MACRO;	// Identify macro atom treatment i.e. indivisible packets
-      geo.macro_simple = 1;	// This is for test runs with all simple ions (SS)
-    }
+  {
+    Log ("Line_transfer mode: simple macro atoms, isotropic  scattering  \n");
+    geo.scatter_mode = SCATTER_MODE_ISOTROPIC;  // isotropic
+    geo.line_mode = 3;
+    geo.rt_mode = RT_MODE_MACRO;        // Identify macro atom treatment i.e. indivisible packets
+    geo.macro_simple = 1;       // This is for test runs with all simple ions (SS)
+  }
   else if (user_line_mode == 9)
-    {
-      Log
-  ("Line_transfer mode: simple macro atoms, anisotropic  scattering  \n");
-      geo.scatter_mode = SCATTER_MODE_THERMAL;  // thermal trapping
-      geo.line_mode = 3;  
-      geo.rt_mode = RT_MODE_MACRO;  // Identify macro atom treatment i.e. indivisible packets
-      geo.macro_simple = 1; // This is for test runs with all simple ions (SS)
-    }
+  {
+    Log ("Line_transfer mode: simple macro atoms, anisotropic  scattering  \n");
+    geo.scatter_mode = SCATTER_MODE_THERMAL;    // thermal trapping
+    geo.line_mode = 3;
+    geo.rt_mode = RT_MODE_MACRO;        // Identify macro atom treatment i.e. indivisible packets
+    geo.macro_simple = 1;       // This is for test runs with all simple ions (SS)
+  }
   else
-    {
-      Error ("Unknown line_transfer mode %d\n");
-      line_transfer_help_message();
-      exit (0);
-    }
+  {
+    Error ("Unknown line_transfer mode %d\n");
+    line_transfer_help_message ();
+    exit (0);
+  }
 
   /* With the macro atom approach we won't want to generate photon 
-       bundles in the wind so switch it off here. (SS) */
-    if (geo.rt_mode == RT_MODE_MACRO)
-      {
-        Log
-    ("python: Using Macro Atom method so switching off wind radiation.\n");
-        geo.wind_radiation = 0;
-      }
+     bundles in the wind so switch it off here. (SS) */
+  if (geo.rt_mode == RT_MODE_MACRO)
+  {
+    Log ("python: Using Macro Atom method so switching off wind radiation.\n");
+    geo.wind_radiation = 0;
+  }
 
 
   /* read in the atomic data */
@@ -415,12 +401,12 @@ get_line_transfer_mode ()
      this is defined in atomic.h, rather than the modes structure */
 
   if (modes.iadvanced)
-    {
+  {
 
-      rdint ("@Diag.write_atomicdata(0=no,anything_else=yes)", &write_atomicdata);
-      if (write_atomicdata)
-	Log ("You have opted to save a summary of the atomic data\n");
-    }
+    rdint ("@Diag.write_atomicdata(0=no,anything_else=yes)", &write_atomicdata);
+    if (write_atomicdata)
+      Log ("You have opted to save a summary of the atomic data\n");
+  }
 
   get_atomic_data (geo.atomic_filename);
   return (0);
@@ -474,33 +460,31 @@ setup_windcone ()
   int ndom;
 
   for (ndom = 0; ndom < geo.ndomain; ndom++)
+  {
+
+    if (zdom[ndom].wind_thetamin > 0.0)
     {
-
-      if (zdom[ndom].wind_thetamin > 0.0)
-	{
-	  zdom[ndom].windcone[0].dzdr = 1. / tan (zdom[ndom].wind_thetamin);
-	  zdom[ndom].windcone[0].z =
-	    (-zdom[ndom].wind_rho_min / tan (zdom[ndom].wind_thetamin));
-	}
-      else
-	{
-	  zdom[ndom].windcone[0].dzdr = VERY_BIG;
-	  zdom[ndom].windcone[0].z = -VERY_BIG;;
-	}
-
-
-      if (zdom[ndom].wind_thetamax > 0.0)
-	{
-	  zdom[ndom].windcone[1].dzdr = 1. / tan (zdom[ndom].wind_thetamax);
-	  zdom[ndom].windcone[1].z =
-	    (-zdom[ndom].wind_rho_max / tan (zdom[ndom].wind_thetamax));
-	}
-      else
-	{
-	  zdom[ndom].windcone[1].dzdr = VERY_BIG;
-	  zdom[ndom].windcone[1].z = -VERY_BIG;;
-	}
+      zdom[ndom].windcone[0].dzdr = 1. / tan (zdom[ndom].wind_thetamin);
+      zdom[ndom].windcone[0].z = (-zdom[ndom].wind_rho_min / tan (zdom[ndom].wind_thetamin));
     }
+    else
+    {
+      zdom[ndom].windcone[0].dzdr = VERY_BIG;
+      zdom[ndom].windcone[0].z = -VERY_BIG;;
+    }
+
+
+    if (zdom[ndom].wind_thetamax > 0.0)
+    {
+      zdom[ndom].windcone[1].dzdr = 1. / tan (zdom[ndom].wind_thetamax);
+      zdom[ndom].windcone[1].z = (-zdom[ndom].wind_rho_max / tan (zdom[ndom].wind_thetamax));
+    }
+    else
+    {
+      zdom[ndom].windcone[1].dzdr = VERY_BIG;
+      zdom[ndom].windcone[1].z = -VERY_BIG;;
+    }
+  }
   return (0);
 }
 
@@ -512,7 +496,8 @@ setup_windcone ()
  * @return     Always returns 0
  **********************************************************/
 
-int line_transfer_help_message()
+int
+line_transfer_help_message ()
 {
   char *some_help;
 
@@ -536,11 +521,9 @@ Available line transfer modes and descriptions are: \n\
 See this web address for more information: https://github.com/agnwinds/python/wiki/Line-Transfer-and-Scattering\n\
 \n\
 \n\
-";  // End of string to provide one with help
+";                              // End of string to provide one with help
 
   Log ("%s\n", some_help);
 
   return (0);
 }
-
-

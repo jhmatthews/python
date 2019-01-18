@@ -50,95 +50,95 @@
 int
 nebular_concentrations (xplasma, mode)
      PlasmaPtr xplasma;
-     int mode;			
+     int mode;
 {
   double get_ne ();
   int lucy_mazzali1 ();
   int m;
 
   if (mode == NEBULARMODE_TR)
-    {				// LTE all the way -- uses tr
+  {                             // LTE all the way -- uses tr
 
-      partition_functions (xplasma, mode);
+    partition_functions (xplasma, mode);
 
-      m = concentrations (xplasma, mode);
+    m = concentrations (xplasma, mode);
 
-    }
+  }
   else if (mode == NEBULARMODE_TE)
-    {				//LTE but uses temperature te
+  {                             //LTE but uses temperature te
 
-      partition_functions (xplasma, mode);
+    partition_functions (xplasma, mode);
 
-      m = concentrations (xplasma, mode);
+    m = concentrations (xplasma, mode);
 
-    }
-  else if (mode == NEBULARMODE_ML93)	// This is the standard LM method
-    {
+  }
+  else if (mode == NEBULARMODE_ML93)    // This is the standard LM method
+  {
 
 
-      partition_functions (xplasma, mode);	// calculate partition functions, using t_r with weights
+    partition_functions (xplasma, mode);        // calculate partition functions, using t_r with weights
 
-      /* JM 1308 -- concentrations then populates xplasma with saha abundances. 
-         in macro atom mode it also call macro_pops, which is done incorrectly, 
-         the escape probabilities are calculated with saha ion densities each time,
-         because saha() repopulates xplasma in each cycle. */
+    /* JM 1308 -- concentrations then populates xplasma with saha abundances. 
+       in macro atom mode it also call macro_pops, which is done incorrectly, 
+       the escape probabilities are calculated with saha ion densities each time,
+       because saha() repopulates xplasma in each cycle. */
 
-      m = concentrations (xplasma, NEBULARMODE_TR);	// Saha equation using t_r
+    m = concentrations (xplasma, NEBULARMODE_TR);       // Saha equation using t_r
 
-      /* JM 1308 -- lucy then applies the lucy mazzali correction factors to the saha abundances. 
-         in macro atom mode it also call macro_pops which is done correctly in this case, as lucy_mazzali, 
-         which is called in lucy, does repopulate xplasma like saha does. This means that in this mode,
-         it doesn't actually matter that concentrations does macro level populations wrong, as that is 
-         corrected here. It should be sorted very soon, however. */
+    /* JM 1308 -- lucy then applies the lucy mazzali correction factors to the saha abundances. 
+       in macro atom mode it also call macro_pops which is done correctly in this case, as lucy_mazzali, 
+       which is called in lucy, does repopulate xplasma like saha does. This means that in this mode,
+       it doesn't actually matter that concentrations does macro level populations wrong, as that is 
+       corrected here. It should be sorted very soon, however. */
 
-      m = lucy (xplasma);	// Main routine for running LucyMazzali
+    m = lucy (xplasma);         // Main routine for running LucyMazzali
 
-    }
+  }
 
   else if (mode == NEBULARMODE_PAIRWISE_ML93)
-    {
-      /* Pairwise calculation of abundances, using a 
-         temperature computed to ensure a reasonable
-         ratio between the two, and then corrected for
-         a dilute blackbody radiation field. */
-      m = variable_temperature (xplasma, mode);
-    }
+  {
+    /* Pairwise calculation of abundances, using a 
+       temperature computed to ensure a reasonable
+       ratio between the two, and then corrected for
+       a dilute blackbody radiation field. */
+    m = variable_temperature (xplasma, mode);
+  }
 
   else if (mode == NEBULARMODE_PAIRWISE_SPECTRALMODEL)
-    {
-      /* Pairwise calculation of abundances, using a 
-         temperature computed to ensure a reasonable
-         ratio between the two, and then corrected for
-         a radiation field modelled by a power law */
-      m = variable_temperature (xplasma, mode);
-    }
+  {
+    /* Pairwise calculation of abundances, using a 
+       temperature computed to ensure a reasonable
+       ratio between the two, and then corrected for
+       a radiation field modelled by a power law */
+    m = variable_temperature (xplasma, mode);
+  }
 
 
   else if (mode == NEBULARMODE_MATRIX_BB)
-    {
+  {
 
-      /* Use rate matrices based on pairiwise bb approxmaitions
-       * to the spectra
-       */
-      m = matrix_ion_populations (xplasma, mode);
-    }
+    /* Use rate matrices based on pairiwise bb approxmaitions
+     * to the spectra
+     */
+    m = matrix_ion_populations (xplasma, mode);
+  }
 
   else if (mode == NEBULARMODE_MATRIX_SPECTRALMODEL)
-    {
+  {
 
-      /* Use rate natrices based on powr law approximations to
-       * the spectra
-       */
+    /* Use rate natrices based on powr law approximations to
+     * the spectra
+     */
 
-      m = matrix_ion_populations (xplasma, mode);
-    }
+    m = matrix_ion_populations (xplasma, mode);
+  }
 
   else
-    {
-      Error ("nebular_concentrations: Unknown mode %d\n", mode);
-      exit (0);
+  {
+    Error ("nebular_concentrations: Unknown mode %d\n", mode);
+    exit (0);
 
-    }
+  }
 
 
   return (m);
@@ -200,7 +200,7 @@ nebular_concentrations (xplasma, mode)
 int
 concentrations (xplasma, mode)
      PlasmaPtr xplasma;
-     int mode;			//   0=saha using tr, 1=saha using te
+     int mode;                  //   0=saha using tr, 1=saha using te
 {
   int nion, niterate;
   double xne, xxne, xnew, xsaha;
@@ -214,24 +214,24 @@ concentrations (xplasma, mode)
   // do not want these routines to do mode shifting.
   //
   if (mode == NEBULARMODE_TR)
-    {
-      t = xplasma->t_r;
-    }
+  {
+    t = xplasma->t_r;
+  }
   else if (mode == NEBULARMODE_TE)
-    {
-      t = xplasma->t_e;
-    }
+  {
+    t = xplasma->t_e;
+  }
   else if (mode == NEBULARMODE_ML93)
-    {
-      t = sqrt (xplasma->t_e * xplasma->t_r);
-    }
+  {
+    t = sqrt (xplasma->t_e * xplasma->t_r);
+  }
   else
-    {
-      Error ("Concentrations: Unknown mode %d\n", mode);
-      exit (0);
-    }
+  {
+    Error ("Concentrations: Unknown mode %d\n", mode);
+    exit (0);
+  }
 
-  nh = xplasma->rho * rho2nh;	//LTE
+  nh = xplasma->rho * rho2nh;   //LTE
 
   /* make an initial estimate of ne based on H alone,  Our guess
      assumes ion[0] is H1.  Note that x below is the fractional
@@ -247,78 +247,77 @@ concentrations (xplasma, mode)
    */
 
   if (t < MIN_TEMP)
-    t = MIN_TEMP;		/* fudge to prevent divide by zeros */
+    t = MIN_TEMP;               /* fudge to prevent divide by zeros */
 
   xsaha = SAHA * pow (t, 1.5);
 
   theta = xsaha * exp (-ion[0].ip / (BOLTZMANN * t)) / nh;
 
   if (theta < THETAMAX)
-    {
-      x = (-theta + sqrt (theta * theta + 4 * theta)) / 2.;
-      xne = xxne = x * nh;
-    }
+  {
+    x = (-theta + sqrt (theta * theta + 4 * theta)) / 2.;
+    xne = xxne = x * nh;
+  }
   else
     xne = xxne = nh;
 
   if (xne < 1.e-6)
-    xne = 1.e-6;		/* fudge to assure we can actually calculate
-				   xne the first time through the loop */
+    xne = 1.e-6;                /* fudge to assure we can actually calculate
+                                   xne the first time through the loop */
 
   /* At this point we have an initial estimate of ne. */
 
 
   niterate = 0;
   while (niterate < MAXITERATIONS)
+  {
+
+    /* Assuming a value of ne calculate the relative densities of each ion for each element */
+    /* JM 1308 -- Here we  actually populate the plasma structure with saha abundances. In Lucy Mazzali mode, 
+       we apply a correction to these abundances. Note that in macro atom mode this call should 
+       really only happen before the first ionization cycle */
+
+    saha (xplasma, xne, t);
+
+
+    /* New (SS Apr 04) call the routine that will replace the macro atoms ionization fractions and
+       level populations with those computed with the Monte Carlo estimators. geo.macro_iniz_mode
+       controls the use of macro_pops. */
+    /* JM 1308 -- At the moment, the escape probabilities in macro_pops are calculated using saha ion 
+       densities which is wrong. Fortunately, macro_pops is called again in lucy() and converges on the 
+       correct value, but this should be fixed. I am not sure if it even needs to be called at all. */
+
+    if (geo.macro_ioniz_mode == 1)
     {
-
-      /* Assuming a value of ne calculate the relative densities of each ion for each element */
-      /* JM 1308 -- Here we  actually populate the plasma structure with saha abundances. In Lucy Mazzali mode, 
-         we apply a correction to these abundances. Note that in macro atom mode this call should 
-         really only happen before the first ionization cycle */
-
-      saha (xplasma, xne, t);
-
-
-      /* New (SS Apr 04) call the routine that will replace the macro atoms ionization fractions and
-         level populations with those computed with the Monte Carlo estimators. geo.macro_iniz_mode
-         controls the use of macro_pops. */
-      /* JM 1308 -- At the moment, the escape probabilities in macro_pops are calculated using saha ion 
-         densities which is wrong. Fortunately, macro_pops is called again in lucy() and converges on the 
-         correct value, but this should be fixed. I am not sure if it even needs to be called at all. */
-
-      if (geo.macro_ioniz_mode == 1)
-	{
-	  macro_pops (xplasma, xne);
-	}
-
-      /*Set some floor so future divisions are sensible */
-      for (nion = 0; nion < nions; nion++)
-	{
-	  if (xplasma->density[nion] < DENSITY_MIN)
-	    xplasma->density[nion] = DENSITY_MIN;
-	}
-
-      /* Now determine the new value of ne from the ion abundances */
-      xnew = get_ne (xplasma->density);	/* determine the electron density for this density distribution */
-
-      if (xnew < DENSITY_MIN)
-	xnew = DENSITY_MIN;	/* fudge to keep a floor on ne */
-
-      if (fabs ((xne - xnew) / (xnew)) < FRACTIONAL_ERROR || xnew < 1.e-6)
-	break;
-
-      xne = (xnew + xne) / 2.;	/* Make a new estimate of xne */
-      niterate++;
+      macro_pops (xplasma, xne);
     }
+
+    /*Set some floor so future divisions are sensible */
+    for (nion = 0; nion < nions; nion++)
+    {
+      if (xplasma->density[nion] < DENSITY_MIN)
+        xplasma->density[nion] = DENSITY_MIN;
+    }
+
+    /* Now determine the new value of ne from the ion abundances */
+    xnew = get_ne (xplasma->density);   /* determine the electron density for this density distribution */
+
+    if (xnew < DENSITY_MIN)
+      xnew = DENSITY_MIN;       /* fudge to keep a floor on ne */
+
+    if (fabs ((xne - xnew) / (xnew)) < FRACTIONAL_ERROR || xnew < 1.e-6)
+      break;
+
+    xne = (xnew + xne) / 2.;    /* Make a new estimate of xne */
+    niterate++;
+  }
 
   if (niterate == MAXITERATIONS)
-    {
-      Error ("concentrations: failed to converge t %.2g nh %.2g xnew %.2g\n",
-	     t, nh, xnew);
-      Error ("concentrations: xxne %e theta %e\n", xxne, theta);
-      return (-1);
-    }
+  {
+    Error ("concentrations: failed to converge t %.2g nh %.2g xnew %.2g\n", t, nh, xnew);
+    Error ("concentrations: xxne %e theta %e\n", xxne, theta);
+    return (-1);
+  }
 
   xplasma->ne = xnew;
   return (0);
@@ -371,23 +370,21 @@ saha (xplasma, ne, t)
   density = xplasma->density;
   partition = xplasma->partition;
 
-  nh = xplasma->rho * rho2nh;	//LTE
+  nh = xplasma->rho * rho2nh;   //LTE
   xsaha = SAHA * pow (t, 1.5);
 
   for (nelem = 0; nelem < nelements; nelem++)
+  {
+    first = ele[nelem].firstion;        /*first and last identify the position in the array */
+
+    last = first + ele[nelem].nions;    /*  So for H which has 2 ions, H1 and H2, first will generally
+                                           be 0 and last will be 2 so the for loop below will just be done once for nion = 1 */
+
+    if (first < 0 || first >= nions || last < 0 || last > nions)
     {
-      first = ele[nelem].firstion;	/*first and last identify the position in the array */
-
-      last = first + ele[nelem].nions;	/*  So for H which has 2 ions, H1 and H2, first will generally
-					   be 0 and last will be 2 so the for loop below will just be done once for nion = 1 */
-
-      if (first < 0 || first >= nions || last < 0 || last > nions)
-	{
-	  Error
-	    ("saha: Confusion for element %d with first ion %d and last ion %d\n",
-	     nelem, first, last);
-	  exit (0);
-	}
+      Error ("saha: Confusion for element %d with first ion %d and last ion %d\n", nelem, first, last);
+      exit (0);
+    }
 
 /*    These lines were put in to make sim work properly, ideally there should be a switch so 
       if we are doing things the old way, we keep the old numbers. But, saha doesnt know the mode....
@@ -395,62 +392,55 @@ saha (xplasma, ne, t)
       big = pow (10., 250. / (last - first));
       big=big*1e6;   */
 
-      sum = density[first] = 1.0;
-      big = pow (10., 250. / (last - first));
+    sum = density[first] = 1.0;
+    big = pow (10., 250. / (last - first));
 
-      for (nion = first + 1; nion < last; nion++)
-	{
+    for (nion = first + 1; nion < last; nion++)
+    {
 
-	  /* JM 1309 -- this next if statement is to ensure that saha densities are only calculated if the 
-	     ion in question is not a macro ion. Otherwise, this will affect the escape 
-	     probabilities that are calculated in macro_pops. The exception to this is prior
-	     to the first ionization cycle when we need to populate saha densities as a first guess */
+      /* JM 1309 -- this next if statement is to ensure that saha densities are only calculated if the 
+         ion in question is not a macro ion. Otherwise, this will affect the escape 
+         probabilities that are calculated in macro_pops. The exception to this is prior
+         to the first ionization cycle when we need to populate saha densities as a first guess */
 
-	  if ((ion[nion].macro_info == 0) || (geo.macro_ioniz_mode == 0))
-	    {
-	      b =
-		xsaha * partition[nion] * exp (-ion[nion - 1].ip /
-					       (BOLTZMANN * t)) / (ne *
-								   partition
-								   [nion -
-								    1]);
-	      if (b > big)
-		b = big;	//limit step so there is no chance of overflow
+      if ((ion[nion].macro_info == 0) || (geo.macro_ioniz_mode == 0))
+      {
+        b = xsaha * partition[nion] * exp (-ion[nion - 1].ip / (BOLTZMANN * t)) / (ne * partition[nion - 1]);
+        if (b > big)
+          b = big;              //limit step so there is no chance of overflow
 
-	      a = density[nion - 1] * b;
+        a = density[nion - 1] * b;
 
-	      sum += density[nion] = a;
+        sum += density[nion] = a;
 
-	      if (density[nion] < 0.0)
-		Error ("saha: ion %i has negative density %8.4e", nion,
-		       density[nion]);
+        if (density[nion] < 0.0)
+          Error ("saha: ion %i has negative density %8.4e", nion, density[nion]);
 
-	      if (sane_check (sum))
-		Error ("saha:sane_check failed for density summation\n");
+        if (sane_check (sum))
+          Error ("saha:sane_check failed for density summation\n");
 
-	    }
-	}
-
-      a = nh * ele[nelem].abun / sum;
-
-      for (nion = first; nion < last; nion++)
-	{
-
-	  /* JM 1309 -- this next if statement is to ensure that saha densities are only calculated if the 
-	     ion in question is not a macro ion. Otherwise, this will affect the escape 
-	     probabilities that are calculated in macro_pops. The exception to this is prior
-	     to the first ionization cycle when we need to populate saha densities as a first guess */
-
-	  if ((ion[nion].macro_info == 0) || (geo.macro_ioniz_mode == 0))
-	    {
-
-	      density[nion] *= a;
-	      if (sane_check (density[nion]))
-		Error ("saha:sane_check failed for density of ion %i\n",
-		       nion);
-	    }
-	}
+      }
     }
+
+    a = nh * ele[nelem].abun / sum;
+
+    for (nion = first; nion < last; nion++)
+    {
+
+      /* JM 1309 -- this next if statement is to ensure that saha densities are only calculated if the 
+         ion in question is not a macro ion. Otherwise, this will affect the escape 
+         probabilities that are calculated in macro_pops. The exception to this is prior
+         to the first ionization cycle when we need to populate saha densities as a first guess */
+
+      if ((ion[nion].macro_info == 0) || (geo.macro_ioniz_mode == 0))
+      {
+
+        density[nion] *= a;
+        if (sane_check (density[nion]))
+          Error ("saha:sane_check failed for density of ion %i\n", nion);
+      }
+    }
+  }
 
 
   return (0);
@@ -507,89 +497,82 @@ lucy (xplasma)
 
   xne = xplasma->ne;
   if (xne < DENSITY_MIN)
-    {
-      Error
-	("nebular_concentrations: Very low ionization: ne initially %8.2e\n",
-	 xne);
-      xne = DENSITY_MIN;
-    }
+  {
+    Error ("nebular_concentrations: Very low ionization: ne initially %8.2e\n", xne);
+    xne = DENSITY_MIN;
+  }
 
-  nh = xplasma->rho * rho2nh;	//LTE -- Not clear needed at this level
+  nh = xplasma->rho * rho2nh;   //LTE -- Not clear needed at this level
 
   /* Begin iteration loop to find ne */
   niterate = 0;
   while (niterate < MAXITERATIONS)
+  {
+    for (nelem = 0; nelem < nelements; nelem++)
     {
-      for (nelem = 0; nelem < nelements; nelem++)
-	{
 
-	  /* JM1308 -- Here we apply the lucy/mazzali correction factors to the saha abundances
-	     which are contained in xplasma. These corrected abundances are copied to newden, which
-	     is transferred over to xplasma when we converge on ne */
+      /* JM1308 -- Here we apply the lucy/mazzali correction factors to the saha abundances
+         which are contained in xplasma. These corrected abundances are copied to newden, which
+         is transferred over to xplasma when we converge on ne */
 
-	  lucy_mazzali1 (nh, t_r, t_e, www, nelem, xplasma->ne,
-			 xplasma->density, xne, newden);
-	}
-
-      /* Re solve for the macro atom populations with the current guess for ne */
-      /* JM1308 -- note that unlike lucy mazzali above, here we actually modify the xplasma
-         structure for those ions which are being treated as macro ions. This means that the
-         the newden array will contain wrong values for these particular macro ions, but due
-         to the if loop at the end of this subroutine they are never passed to xplasma */
-      if (geo.macro_ioniz_mode == 1)
-	{
-	  macro_pops (xplasma, xne);
-	}
-
-
-      for (nion = 0; nion < nions; nion++)
-	{
-
-	  /* if the ion is being treated by macro_pops then use the populations just computed */
-	  if ((ion[nion].macro_info == 1) && (geo.macro_simple == 0)
-	      && (geo.macro_ioniz_mode == 1))
-	    {
-	      newden[nion] = xplasma->density[nion];
-	    }
-
-	  /*Set some floor so future divisions are sensible */
-	  if (newden[nion] < DENSITY_MIN)
-	    newden[nion] = DENSITY_MIN;
-	}
-      xnew = get_ne (newden);
-      if (xnew < DENSITY_MIN)
-	xnew = DENSITY_MIN;
-
-      /* Check to see whether the search for xne has converged and if so exit loop */
-      if (fabs ((xne - xnew) / (xnew)) < FRACTIONAL_ERROR || xnew < 1.e-6)
-	break;
-
-      /* else start another iteration of the main loop */
-      xne = (xnew + xne) / 2.;	/* Make a new estimate of xne */
-      niterate++;
+      lucy_mazzali1 (nh, t_r, t_e, www, nelem, xplasma->ne, xplasma->density, xne, newden);
     }
+
+    /* Re solve for the macro atom populations with the current guess for ne */
+    /* JM1308 -- note that unlike lucy mazzali above, here we actually modify the xplasma
+       structure for those ions which are being treated as macro ions. This means that the
+       the newden array will contain wrong values for these particular macro ions, but due
+       to the if loop at the end of this subroutine they are never passed to xplasma */
+    if (geo.macro_ioniz_mode == 1)
+    {
+      macro_pops (xplasma, xne);
+    }
+
+
+    for (nion = 0; nion < nions; nion++)
+    {
+
+      /* if the ion is being treated by macro_pops then use the populations just computed */
+      if ((ion[nion].macro_info == 1) && (geo.macro_simple == 0) && (geo.macro_ioniz_mode == 1))
+      {
+        newden[nion] = xplasma->density[nion];
+      }
+
+      /*Set some floor so future divisions are sensible */
+      if (newden[nion] < DENSITY_MIN)
+        newden[nion] = DENSITY_MIN;
+    }
+    xnew = get_ne (newden);
+    if (xnew < DENSITY_MIN)
+      xnew = DENSITY_MIN;
+
+    /* Check to see whether the search for xne has converged and if so exit loop */
+    if (fabs ((xne - xnew) / (xnew)) < FRACTIONAL_ERROR || xnew < 1.e-6)
+      break;
+
+    /* else start another iteration of the main loop */
+    xne = (xnew + xne) / 2.;    /* Make a new estimate of xne */
+    niterate++;
+  }
   /* End of main iteration loop */
 
   if (niterate == MAXITERATIONS)
-    {
-      Error
-	("nebular_concentrations: failed to converge:nh %8.2e www %8.2e t_e %8.2e  t_r %8.2e \n",
-	 nh, www, t_e, t_r);
-      return (-1);
-    }
+  {
+    Error ("nebular_concentrations: failed to converge:nh %8.2e www %8.2e t_e %8.2e  t_r %8.2e \n", nh, www, t_e, t_r);
+    return (-1);
+  }
 
 /* Finally transfer the calculated densities to the real density array */
 
   xplasma->ne = xnew;
   for (nion = 0; nion < nions; nion++)
+  {
+    /* If statement added here to suppress interference with macro populations (SS Apr 04) */
+    if (ion[nion].macro_info == 0 || geo.macro_ioniz_mode == 0 || geo.macro_simple == 1)
     {
-      /* If statement added here to suppress interference with macro populations (SS Apr 04) */
-      if (ion[nion].macro_info == 0 || geo.macro_ioniz_mode == 0
-	  || geo.macro_simple == 1)
-	{
-	  xplasma->density[nion] = newden[nion];
-	}
+      xplasma->density[nion] = newden[nion];
     }
+  }
   return (0);
 }
 
@@ -642,35 +625,31 @@ lucy_mazzali1 (nh, t_r, t_e, www, nelem, ne, density, xne, newden)
   double numerator, denominator;
 
   if (ele[nelem].z == 26)
-    {
-      Debug ("Working on Fe\n");
-    }
+  {
+    Debug ("Working on Fe\n");
+  }
 
   if (t_r > MIN_TEMP)
-    {
-      fudge = www * sqrt (t_e / t_r);
-    }
+  {
+    fudge = www * sqrt (t_e / t_r);
+  }
 
   else
-    {
-      Error_silent
-	("lucy_mazzali1: t_r too low www %8.2e t_e %8.2e  t_r %8.2e \n", www,
-	 t_e, t_r);
-      fudge = 0.0;
-    }
+  {
+    Error_silent ("lucy_mazzali1: t_r too low www %8.2e t_e %8.2e  t_r %8.2e \n", www, t_e, t_r);
+    fudge = 0.0;
+  }
 
   if (fudge < MIN_FUDGE || MAX_FUDGE < fudge)
-    {
-      Error_silent
-	("lucy_mazzali1: fudge>10 www %8.2e t_e %8.2e  t_r %8.2e \n", www,
-	 t_e, t_r);
-    }
+  {
+    Error_silent ("lucy_mazzali1: fudge>10 www %8.2e t_e %8.2e  t_r %8.2e \n", www, t_e, t_r);
+  }
 
   /* Initialization of fudges complete */
 
-  first = ele[nelem].firstion;	/*identify the position of the first and last ion in the array */
-  last = first + ele[nelem].nions;	/*  So for H which has 2 ions, H1 and H2, first will generally
-					   be 0 and last will be 2 so the for loop below will just be done once for nion = 1 */
+  first = ele[nelem].firstion;  /*identify the position of the first and last ion in the array */
+  last = first + ele[nelem].nions;      /*  So for H which has 2 ions, H1 and H2, first will generally
+                                           be 0 and last will be 2 so the for loop below will just be done once for nion = 1 */
 
 
   /* JM 1411 -- the next two while loops check if there are ions low down
@@ -681,63 +660,62 @@ lucy_mazzali1 (nh, t_r, t_e, www, nelem, ne, density, xne, newden)
   /* JM 1411 -- we only want to increment first if 
      we don't go off the end of the array, see #93 */
   while (density[first] < 1.1 * DENSITY_MIN && first < last)
-    {
-      newden[first] = DENSITY_MIN;
+  {
+    newden[first] = DENSITY_MIN;
 
-      first++;
+    first++;
 
-      /* if first has been incremented all the way up to last 
-         then this means all ions have negligible densities - 
-         so throw an error */
-      if (first == last)
-	Error ("lucy_mazzali1: elem %i has all ions < %8.4e density\n", nelem,
-	       DENSITY_MIN);
+    /* if first has been incremented all the way up to last 
+       then this means all ions have negligible densities - 
+       so throw an error */
+    if (first == last)
+      Error ("lucy_mazzali1: elem %i has all ions < %8.4e density\n", nelem, DENSITY_MIN);
 
-    }
+  }
 
   /* JM 1411 -- we only want to decrement last if 
      we don't go off the end of the array, see #93 */
   while (density[last - 1] < 1.1 * DENSITY_MIN && last > first)
-    {
-      newden[last - 1] = DENSITY_MIN;
+  {
+    newden[last - 1] = DENSITY_MIN;
 
-      if (last > first)
-	last--;
-    }
+    if (last > first)
+      last--;
+  }
 
 
 
   sum = newden[first] = 1.;
 
   for (nion = first + 1; nion < last; nion++)
-    {
-      numerator = newden[nion - 1] * fudge * (ne) * density[nion];
-      denominator = density[nion - 1] * xne;
-      q = numerator / denominator;
+  {
+    numerator = newden[nion - 1] * fudge * (ne) * density[nion];
+    denominator = density[nion - 1] * xne;
+    q = numerator / denominator;
 
-      /* now apply the Mazzali and  Lucy fudge, i.e. zeta + w (1-zeta)
-         first find fraction of recombinations going directly to
-         the ground state for this temperature and ion */
+    /* now apply the Mazzali and  Lucy fudge, i.e. zeta + w (1-zeta)
+       first find fraction of recombinations going directly to
+       the ground state for this temperature and ion */
 
-      /* NSH 1207 - call external function, mode 2 uses chianti and badnell 
-         data to try to take account of DR in zeta - if atomic data is not read in, 
-         then the old interpolated zeta will be returned */
+    /* NSH 1207 - call external function, mode 2 uses chianti and badnell 
+       data to try to take account of DR in zeta - if atomic data is not read in, 
+       then the old interpolated zeta will be returned */
 
-      fudge2 = compute_zeta (t_e, nion - 1, 2);
+    fudge2 = compute_zeta (t_e, nion - 1, 2);
 
-      /* Since nion-1 points at state i-1 (saha: n_i/n_i-1) we want ground_frac[nion-1].
-         Note that we NEVER access the last ion for any element in that way
-         which is just as well since you can't have recombinations INTO
-         a fully ionized state -- The corresponding lines in recombination.out 
-         are just dummies to make reading the data easier */
+    /* Since nion-1 points at state i-1 (saha: n_i/n_i-1) we want ground_frac[nion-1].
+       Note that we NEVER access the last ion for any element in that way
+       which is just as well since you can't have recombinations INTO
+       a fully ionized state -- The corresponding lines in recombination.out 
+       are just dummies to make reading the data easier */
 
-      fudge2 = fudge2 + www * (1.0 - fudge2);
-      newden[nion] = fudge2 * q;
-      sum += newden[nion];
+    fudge2 = fudge2 + www * (1.0 - fudge2);
+    newden[nion] = fudge2 * q;
+    sum += newden[nion];
 
-      // This is the equation being calculated
-      // sum+=newden[nion]=newden[nion-1]*fudge*(*ne)*density[nion]/density[nion-1]/xne;
-    }
+    // This is the equation being calculated
+    // sum+=newden[nion]=newden[nion-1]*fudge*(*ne)*density[nion]/density[nion-1]/xne;
+  }
 
   a = nh * ele[nelem].abun / sum;
 
@@ -803,7 +781,7 @@ int nforce;
 int
 fix_concentrations (xplasma, mode)
      PlasmaPtr xplasma;
-     int mode;			// 0=saha using tr, 1=saha using te, 2= Lucy & Mazzali
+     int mode;                  // 0=saha using tr, 1=saha using te, 2= Lucy & Mazzali
 
 {
   int nelem, nion;
@@ -821,34 +799,27 @@ fix_concentrations (xplasma, mode)
 
 
   if (fix_con_start == 0)
+  {
+    if ((cptr = fopen (geo.fixed_con_file, "r")) == NULL)
     {
-      if ((cptr = fopen (geo.fixed_con_file, "r")) == NULL)
-	{
-	  Error
-	    ("fix_concentrations: Could not open %s to read concentrations\n",
-	     geo.fixed_con_file);
-	  exit (0);
-	}
-
-      nforce = 0;
-      while (fgets (line, LINELENGTH, cptr) != NULL && nforce < 1000)
-	{
-	  if ((n =
-	       sscanf (line, "%d %d %f", &con_force[nforce].z,
-		       &con_force[nforce].istate,
-		       &con_force[nforce].frac)) != 3)
-	    {
-	      Error ("fix_concentrations: Read %d items from %s\n", n, line);
-	    }
-	  Log ("Fixing element %d istate %d to fraction %f\n",
-	       con_force[nforce].z, con_force[nforce].istate,
-	       con_force[nforce].frac);
-	  nforce++;
-	}
-
-      fix_con_start = 1;
-      fclose (cptr);
+      Error ("fix_concentrations: Could not open %s to read concentrations\n", geo.fixed_con_file);
+      exit (0);
     }
+
+    nforce = 0;
+    while (fgets (line, LINELENGTH, cptr) != NULL && nforce < 1000)
+    {
+      if ((n = sscanf (line, "%d %d %f", &con_force[nforce].z, &con_force[nforce].istate, &con_force[nforce].frac)) != 3)
+      {
+        Error ("fix_concentrations: Read %d items from %s\n", n, line);
+      }
+      Log ("Fixing element %d istate %d to fraction %f\n", con_force[nforce].z, con_force[nforce].istate, con_force[nforce].frac);
+      nforce++;
+    }
+
+    fix_con_start = 1;
+    fclose (cptr);
+  }
 
   /* Set all the ion abundances to 0 and *ne to 0 */
   for (nion = 0; nion < nions; nion++)
@@ -857,22 +828,20 @@ fix_concentrations (xplasma, mode)
   /* Search for matches and if one is found set the density of that ion to be the density of that
      atom */
   for (n = 0; n < nforce; n++)
-    {
-      nion = 0;
-      while (nion < nions
-	     && !(ion[nion].z == con_force[n].z
-		  && ion[nion].istate == con_force[n].istate))
-	nion++;
-      if (nion < nions)
-	{			/* There was a match */
-	  /* Find the element associated with the ion */
-	  nelem = 0;
-	  while (nelem < nelements && ele[nelem].z != con_force[n].z)
-	    nelem++;
-	  /* Increment the ion density and the electron density */
-	  xplasma->density[nion] = nh * ele[nelem].abun * con_force[n].frac;
-	}
+  {
+    nion = 0;
+    while (nion < nions && !(ion[nion].z == con_force[n].z && ion[nion].istate == con_force[n].istate))
+      nion++;
+    if (nion < nions)
+    {                           /* There was a match */
+      /* Find the element associated with the ion */
+      nelem = 0;
+      while (nelem < nelements && ele[nelem].z != con_force[n].z)
+        nelem++;
+      /* Increment the ion density and the electron density */
+      xplasma->density[nion] = nh * ele[nelem].abun * con_force[n].frac;
     }
+  }
 
   xplasma->ne = get_ne (xplasma->density);
 
@@ -910,8 +879,8 @@ get_ne (density)
   double ne;
   ne = 0;
   for (n = 0; n < nions; n++)
-    {
-      ne += density[n] * (ion[n].istate - 1);
-    }
+  {
+    ne += density[n] * (ion[n].istate - 1);
+  }
   return (ne);
 }

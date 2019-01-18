@@ -206,22 +206,22 @@ shell_make_grid (w, ndom)
   int nstart;
 
   ndim = zdom[ndom].ndim;
-  nstart=zdom[ndom].nstart;
+  nstart = zdom[ndom].nstart;
 
 
 //OLD  w[0].r = zdom[ndom].rmin - (zdom[ndom].rmax - zdom[ndom].rmin);
-  w[nstart+0].r = 0.95*zdom[ndom].rmin ;
-  w[nstart+1].r = zdom[ndom].rmin;
-  w[nstart+2].r = zdom[ndom].rmax;
-  w[nstart+3].r = 1.05*zdom[ndom].rmax; 
+  w[nstart + 0].r = 0.95 * zdom[ndom].rmin;
+  w[nstart + 1].r = zdom[ndom].rmin;
+  w[nstart + 2].r = zdom[ndom].rmax;
+  w[nstart + 3].r = 1.05 * zdom[ndom].rmax;
 //OLD  w[3].r = zdom[ndom].rmax + (zdom[ndom].rmax - zdom[ndom].rmin);
 
 
 
-  w[nstart+0].rcen = (w[nstart+0].r + w[nstart+1].r) / 2;
-  w[nstart+1].rcen = (w[nstart+1].r + w[nstart+2].r) / 2;
-  w[nstart+2].rcen = (w[nstart+2].r + w[nstart+3].r) / 2;
-  w[nstart+3].rcen = w[nstart+2].rcen + (zdom[ndom].rmax - zdom[ndom].rmin);
+  w[nstart + 0].rcen = (w[nstart + 0].r + w[nstart + 1].r) / 2;
+  w[nstart + 1].rcen = (w[nstart + 1].r + w[nstart + 2].r) / 2;
+  w[nstart + 2].rcen = (w[nstart + 2].r + w[nstart + 3].r) / 2;
+  w[nstart + 3].rcen = w[nstart + 2].rcen + (zdom[ndom].rmax - zdom[ndom].rmin);
 
   /* Now calculate the positions of these points in the xz plane.
      There is a choice about how one does this.   I have elected
@@ -231,14 +231,14 @@ shell_make_grid (w, ndom)
    */
   for (n = 0; n < ndim; n++)
   {
-    Log ("Shell_wind: cell %i:  inner edge = %2.20e, centre = %2.20e\n", n, w[nstart+n].r, w[nstart+n].rcen);
-    w[nstart+n].x[1] = w[nstart+n].xcen[1] = 0.0;
+    Log ("Shell_wind: cell %i:  inner edge = %2.20e, centre = %2.20e\n", n, w[nstart + n].r, w[nstart + n].rcen);
+    w[nstart + n].x[1] = w[nstart + n].xcen[1] = 0.0;
 
     //NSH Slight change here, using 1/root2 give more accurate results than sin45.
 
 
-    w[nstart+n].x[0] = w[nstart+n].x[2] = w[nstart+n].r / pow (2.0, 0.5);
-    w[nstart+n].xcen[0] = w[nstart+n].xcen[2] = w[nstart+n].rcen / pow (2.0, 0.5);
+    w[nstart + n].x[0] = w[nstart + n].x[2] = w[nstart + n].r / pow (2.0, 0.5);
+    w[nstart + n].xcen[0] = w[nstart + n].xcen[2] = w[nstart + n].rcen / pow (2.0, 0.5);
   }
 
 

@@ -35,28 +35,28 @@
 //OLD 
 //OLD   Description:
 //OLD 
-//OLD   Arguments:		
-//OLD   	choice		0-> don't write array 
-//OLD 			1--> write without interpolation
-//OLD 			2-> interpolate to linear array
+//OLD   Arguments:              
+//OLD           choice          0-> don't write array 
+//OLD                   1--> write without interpolation
+//OLD                   2-> interpolate to linear array
 //OLD 
 //OLD   Returns:
 //OLD 
 //OLD   Notes:
 //OLD 
 //OLD   History:
-//OLD 	02feb	ksl	Fixed to allow different values of NDIM and MDIM.  This
-//OLD 			is tricky, but I believe that ain is defined such that
-//OLD 			the second axis is in the z direction so that the proper
-//OLD 			dimension is ain {NDIM] [MDIM]
-//OLD 	05apr	ksl	56 -- Completely rewritten to enable a variety of 
-//OLD 			coordinate systems and to produce tecplot type 
-//OLD 			output files.
-//OLD 	1111	ksl	71 -- Modified format of files to ease ability
-//OLD 			to plot the data in a variety of formats
-//OLD 	1111	ksl	71 - Tecplot dependencies removed
+//OLD   02feb   ksl     Fixed to allow different values of NDIM and MDIM.  This
+//OLD                   is tricky, but I believe that ain is defined such that
+//OLD                   the second axis is in the z direction so that the proper
+//OLD                   dimension is ain {NDIM] [MDIM]
+//OLD   05apr   ksl     56 -- Completely rewritten to enable a variety of 
+//OLD                   coordinate systems and to produce tecplot type 
+//OLD                   output files.
+//OLD   1111    ksl     71 -- Modified format of files to ease ability
+//OLD                   to plot the data in a variety of formats
+//OLD   1111    ksl     71 - Tecplot dependencies removed
 //OLD 
-//OLD 	
+//OLD   
 //OLD 
 //OLD  ************************************************************************/
 #define ODIM 256
@@ -257,42 +257,42 @@ are linear, and x otherwise.  This is not particularly transparent ?? ksl */
 //OLD   Synopsis:
 //OLD 
 //OLD   Description:
-//OLD 	This is a generalized display routine, intended to allow various
-//OLD  	simplifications of py_wind
+//OLD   This is a generalized display routine, intended to allow various
+//OLD   simplifications of py_wind
 //OLD 
-//OLD   Arguments:		
+//OLD   Arguments:              
 //OLD 
 //OLD   Returns:
 //OLD 
 //OLD   Notes:
 //OLD 
-//OLD 	For cylindrical coordinates, one goes up in z, and over in x. To cylindrical coordinates
-//OLD 	we want to display so that each colum represents a constant line on the axis
-//OLD 	w[mdim][ndim].  So for a system with mdim=20 and ndim=25.  There are 25 elements
-//OLD 	in the z axis and 20 elements in the xaxis
+//OLD   For cylindrical coordinates, one goes up in z, and over in x. To cylindrical coordinates
+//OLD   we want to display so that each colum represents a constant line on the axis
+//OLD   w[mdim][ndim].  So for a system with mdim=20 and ndim=25.  There are 25 elements
+//OLD   in the z axis and 20 elements in the xaxis
 //OLD 
-//OLD 	Therefore a row, constant z, is displayed by by incrementing by 20 or mdim
+//OLD   Therefore a row, constant z, is displayed by by incrementing by 20 or mdim
 //OLD 
-//OLD 	For rtheta coordinates, one goes around in theta, up in r.  The fasted moving
-//OLD 	coordinate is r (when thinking of 1-d versions of the array.  Unless we
-//OLD 	are going to write a separate routine, the simplest thing to do
-//OLD 	is to make each column represent a constant r
+//OLD   For rtheta coordinates, one goes around in theta, up in r.  The fasted moving
+//OLD   coordinate is r (when thinking of 1-d versions of the array.  Unless we
+//OLD   are going to write a separate routine, the simplest thing to do
+//OLD   is to make each column represent a constant r
 //OLD 
-//OLD 	w[mdim][ndim]  So, in spherical polar coorcinates, a system with mdim 20 has
-//OLD 	20 angles, and 25 radii.  
+//OLD   w[mdim][ndim]  So, in spherical polar coorcinates, a system with mdim 20 has
+//OLD   20 angles, and 25 radii.  
 //OLD 
-//OLD 	So for spherical polar, constant r is displayed by incrementing by 1.  As a result
-//OLD 	it is unclear that one can easily use the same routine for the two situations
-//OLD 	since you seem to be incrementing the opposite axes, since in the one case one 
-//OLD 	wants MDIM rows and other case one wants NDIM rows.  
+//OLD   So for spherical polar, constant r is displayed by incrementing by 1.  As a result
+//OLD   it is unclear that one can easily use the same routine for the two situations
+//OLD   since you seem to be incrementing the opposite axes, since in the one case one 
+//OLD   wants MDIM rows and other case one wants NDIM rows.  
 //OLD 
-//OLD 	It would be possible if you plot theta lines in each row, but what this means
-//OLD 	is that the first row is closest to the z axis
+//OLD   It would be possible if you plot theta lines in each row, but what this means
+//OLD   is that the first row is closest to the z axis
 //OLD 
 //OLD 
 //OLD   History:
-//OLD   	111125	ksl	Put standard headers before routine prior to updating slightly
-//OLD 	
+//OLD           111125  ksl     Put standard headers before routine prior to updating slightly
+//OLD   
 //OLD 
 //OLD  ************************************************************************/
 

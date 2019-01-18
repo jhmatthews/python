@@ -83,7 +83,7 @@ double
 teff (t, x)
      double t, x;
 {
-  double q=0;
+  double q = 0;
   double theat, r;
   double pow ();
   double disk_heating_factor;
@@ -93,73 +93,67 @@ teff (t, x)
 
 
   if (x < 1)
-    {
-      Error ("teff: x %f less than 1.0\n", x);
-      return (0.0);
-    }
+  {
+    Error ("teff: x %f less than 1.0\n", x);
+    return (0.0);
+  }
 
 
-  if ((geo.disk_tprofile == DISK_TPROFILE_READIN)
-      && ((x * geo.rstar) < blmod.r[blmod.n_blpts - 1]))
+  if ((geo.disk_tprofile == DISK_TPROFILE_READIN) && ((x * geo.rstar) < blmod.r[blmod.n_blpts - 1]))
+  {
+    /* This is the case where the temperature profile is read in as an array */
+    if ((r = (x * geo.rstar)) < blmod.r[0])
     {
-      /* This is the case where the temperature profile is read in as an array */
-      if ((r = (x * geo.rstar)) < blmod.r[0])
-	{
-	  return (blmod.t[0]);
-	}
-      else
-	{
-	  for (n = 1; n < blmod.n_blpts; n++)
-	    {
-	      if ((r < blmod.r[n]) && (r > blmod.r[n - 1]))
-		{
-		  return (blmod.t[n]);
-		}
-	    }
-	  Error
-	    ("tdisk: inside BL profile region but failed to identify temp.\n");
-	}
+      return (blmod.t[0]);
     }
+    else
+    {
+      for (n = 1; n < blmod.n_blpts; n++)
+      {
+        if ((r < blmod.r[n]) && (r > blmod.r[n - 1]))
+        {
+          return (blmod.t[n]);
+        }
+      }
+      Error ("tdisk: inside BL profile region but failed to identify temp.\n");
+    }
+  }
   else
+  {
+    /* This is a standard accretion disk */
+
+    q = (1.e0 - pow (x, -0.5e0)) / (x * x * x);
+    q = t * pow (q, 0.25e0);
+
+    if (geo.absorb_reflect == BACK_RAD_ABSORB_AND_HEAT && geo.wcycle > 0)       /* Absorb photons and increase t so that heat is radiated
+                                                                                   but only do this if there has been at least one
+                                                                                   ionization cycle */
     {
-      /* This is a standard accretion disk */
+      r = x * geo.rstar;        // 04aug -- Requires fix if disk does not extend to rstar
+      kkk = 1;                  // photon cannot hit the disk at r<qdisk.r[0]
+      while (r > qdisk.r[kkk] && kkk < NRINGS - 1)
+        kkk++;
 
-      q = (1.e0 - pow (x, -0.5e0)) / (x * x * x);
-      q = t * pow (q, 0.25e0);
+      /* Note that disk has 2 sides */
+      theat = qdisk.heat[kkk - 1] / (2. * PI * (qdisk.r[kkk] * qdisk.r[kkk] - qdisk.r[kkk - 1] * qdisk.r[kkk - 1]));
 
-      if (geo.absorb_reflect == BACK_RAD_ABSORB_AND_HEAT && geo.wcycle > 0)	/* Absorb photons and increase t so that heat is radiated
-										   but only do this if there has been at least one
-										   ionization cycle */
-	{
-	  r = x * geo.rstar;	// 04aug -- Requires fix if disk does not extend to rstar
-	  kkk = 1;		// photon cannot hit the disk at r<qdisk.r[0]
-	  while (r > qdisk.r[kkk] && kkk < NRINGS - 1)
-	    kkk++;
+      /* T_eff is given by T_eff**4= T_disk**4+Heating/area/STEFAN_BOLTZMANN */
+      q = pow (q * q * q * q + (theat / STEFAN_BOLTZMANN), 0.25);
 
-	  /* Note that disk has 2 sides */
-	  theat =
-	    qdisk.heat[kkk -
-		       1] / (2. * PI * (qdisk.r[kkk] * qdisk.r[kkk] -
-					qdisk.r[kkk - 1] * qdisk.r[kkk - 1]));
-
-	  /* T_eff is given by T_eff**4= T_disk**4+Heating/area/STEFAN_BOLTZMANN */
-	  q = pow (q * q * q * q + (theat / STEFAN_BOLTZMANN), 0.25);
-
-	}
-      else if (geo.disk_tprofile == DISK_TPROFILE_YSO)	// Analytic approximation for disk heating by star; implemented for YSOs
-	{
-	  disk_heating_factor = pow (geo.tstar / t, 4.0);
-	  disk_heating_factor *=
-	    (asin (1. / x) - (pow ((1. - (1. / (x * x))), 0.5) / x));
-	  disk_heating_factor /= PI;
-	  disk_heating_factor *= x * x * x;
-	  disk_heating_factor /= (1 - sqrt (1. / x));
-	  disk_heating_factor += 1;
-
-	  q *= pow (disk_heating_factor, (1. / 4.));
-
-	}
     }
+    else if (geo.disk_tprofile == DISK_TPROFILE_YSO)    // Analytic approximation for disk heating by star; implemented for YSOs
+    {
+      disk_heating_factor = pow (geo.tstar / t, 4.0);
+      disk_heating_factor *= (asin (1. / x) - (pow ((1. - (1. / (x * x))), 0.5) / x));
+      disk_heating_factor /= PI;
+      disk_heating_factor *= x * x * x;
+      disk_heating_factor /= (1 - sqrt (1. / x));
+      disk_heating_factor += 1;
+
+      q *= pow (disk_heating_factor, (1. / 4.));
+
+    }
+  }
   return (q);
 }
 
@@ -190,9 +184,7 @@ gdisk (mass, mdot, rmin)
      double mass, rmin, mdot;
 {
   double g0;
-  g0 =
-    0.625 * log10 (mass / MSOL) - 1.875 * log10 (rmin / 1.e9) +
-    0.125 * log10 (mdot / 1.e16);
+  g0 = 0.625 * log10 (mass / MSOL) - 1.875 * log10 (rmin / 1.e9) + 0.125 * log10 (mdot / 1.e16);
   g0 = 5.96e5 * pow (10., g0);
   return (g0);
 }
@@ -273,8 +265,8 @@ vdisk (x, v)
   stuff_v (x, xhold);
   xhold[2] = 0.0;
   r = length (xhold);
-  linterp (r, disk.r, disk.v, NRINGS, &speed, 0);	//interpolate in linear space
-  cross (north, xhold, v);	/* The velocity vector direction is given by north x r */
+  linterp (r, disk.r, disk.v, NRINGS, &speed, 0);       //interpolate in linear space
+  cross (north, xhold, v);      /* The velocity vector direction is given by north x r */
   renorm (v, speed);
   return (speed);
 }
@@ -382,32 +374,32 @@ ds_to_disk (p, allow_negative)
 
 
   if (geo.disk_type == DISK_NONE)
-    return (VERY_BIG);		/* There is no disk! */
+    return (VERY_BIG);          /* There is no disk! */
 
   /* Initialize 3 structures that define
      the plane of the disk, and two other
      planes that encompass the disk */
 
   if (ds_to_disk_init == 0)
-    {
-      diskplane.x[0] = diskplane.x[1] = diskplane.x[2] = 0.0;
-      diskplane.lmn[0] = diskplane.lmn[1] = 0.0;
-      diskplane.lmn[2] = 1.0;
+  {
+    diskplane.x[0] = diskplane.x[1] = diskplane.x[2] = 0.0;
+    diskplane.lmn[0] = diskplane.lmn[1] = 0.0;
+    diskplane.lmn[2] = 1.0;
 
 
-      disktop.x[0] = disktop.x[1] = 0.0;
-      disktop.x[2] = geo.diskrad * geo.disk_z0;
-      disktop.lmn[0] = disktop.lmn[1] = 0.0;
-      disktop.lmn[2] = 1.0;
+    disktop.x[0] = disktop.x[1] = 0.0;
+    disktop.x[2] = geo.diskrad * geo.disk_z0;
+    disktop.lmn[0] = disktop.lmn[1] = 0.0;
+    disktop.lmn[2] = 1.0;
 
-      diskbottom.x[0] = diskbottom.x[1] = 0.0;
-      diskbottom.x[2] = (-geo.diskrad * geo.disk_z0);
-      diskbottom.lmn[0] = diskbottom.lmn[1] = 0.0;
-      diskbottom.lmn[2] = 1.0;
+    diskbottom.x[0] = diskbottom.x[1] = 0.0;
+    diskbottom.x[2] = (-geo.diskrad * geo.disk_z0);
+    diskbottom.lmn[0] = diskbottom.lmn[1] = 0.0;
+    diskbottom.lmn[2] = 1.0;
 
-      ds_to_disk_init++;	// Only initialize once
+    ds_to_disk_init++;          // Only initialize once
 
-    }
+  }
 
   /* Now calculate the place where the photon hits the diskplane */
 
@@ -420,19 +412,19 @@ ds_to_disk (p, allow_negative)
   s = VERY_BIG;
 
   if (geo.disk_type == DISK_FLAT)
+  {
+    if (r > geo.diskrad)
+      return (VERY_BIG);
+    else if (allow_negative)
     {
-      if (r > geo.diskrad)
-	return (VERY_BIG);
-      else if (allow_negative)
-	{
-	  return (s_plane);
-	}
-      else if (s_plane > 0)
-	{
-	  return (s_plane);
-	  return (VERY_BIG);
-	}
+      return (s_plane);
     }
+    else if (s_plane > 0)
+    {
+      return (s_plane);
+      return (VERY_BIG);
+    }
+  }
 
   /* At this point, we have completed the simple case.  It is simple
    * because there is only one possible intersection with the disk
@@ -457,16 +449,16 @@ ds_to_disk (p, allow_negative)
   r = r_top = sqrt (phit.x[0] * phit.x[0] + phit.x[1] * phit.x[1]);
 
   if (r < geo.diskrad)
+  {
+    if (s_test >= 0)
     {
-      if (s_test >= 0)
-	{
-	  s = s_top;
-	}
-      else
-	{
-	  s_negative = s_top;
-	}
+      s = s_top;
     }
+    else
+    {
+      s_negative = s_top;
+    }
+  }
 
 
 
@@ -476,16 +468,16 @@ ds_to_disk (p, allow_negative)
   r = r_bottom = sqrt (phit.x[0] * phit.x[0] + phit.x[1] * phit.x[1]);
 
   if (r < geo.diskrad)
+  {
+    if (s_test >= 0 && s_test < s)
     {
-      if (s_test >= 0 && s_test < s)
-	{
-	  s = s_test;
-	}
-      else if (s_test < 0 && s_test > s_negative)
-	{
-	  s_negative = s_test;
-	}
+      s = s_test;
     }
+    else if (s_test < 0 && s_test > s_negative)
+    {
+      s_negative = s_test;
+    }
+  }
 
   s_test = s_sphere = ds_to_sphere (geo.diskrad, p);
   stuff_phot (p, &phit);
@@ -495,34 +487,34 @@ ds_to_disk (p, allow_negative)
    */
 
   if (fabs (phit.x[2]) < geo.disk_z0 * geo.diskrad)
+  {
+    if (s_test >= 0 && s_test < s)
     {
-      if (s_test >= 0 && s_test < s)
-	{
-	  s = s_test;
-	}
-      else if (s_test < 0 && s_test > s_negative)
-	{
-	  s_negative = s_test;
-	}
-
+      s = s_test;
     }
+    else if (s_test < 0 && s_test > s_negative)
+    {
+      s_negative = s_test;
+    }
+
+  }
 
   /* So at this point we have the smallest positive and smallest negative values.  If we
    * have missed the boundary, we have s as VERY_BIG and s_negative as -VERY_BIG */
 
 
   if (s == VERY_BIG)
+  {
+    if (s_negative == -VERY_BIG || allow_negative == 0)
     {
-      if (s_negative == -VERY_BIG || allow_negative == 0)
-	{
-	  return (VERY_BIG);
-	}
-      else
-	{
-	  // This is the case where we allow s to be negative, and there was no positive intercept
-	  s_negative = s;
-	}
+      return (VERY_BIG);
     }
+    else
+    {
+      // This is the case where we allow s to be negative, and there was no positive intercept
+      s_negative = s;
+    }
+  }
 
 
 /* At this point we must find the intercept with the disk */
@@ -533,9 +525,9 @@ ds_to_disk (p, allow_negative)
    *  */
 
   if (s == s_sphere)
-    {
-      return (s);
-    }
+  {
+    return (s);
+  }
 
   /*  Now we need to find exactly where we have hit the disk.  This
    *  is not trivial.  Basically we need to bracket the possibilites
@@ -558,38 +550,38 @@ ds_to_disk (p, allow_negative)
 
   x1 = s_plane;
   if (p->x[2] > 0.0)
+  {
+    if (r_top < geo.diskrad)
     {
-      if (r_top < geo.diskrad)
-	{
-	  x2 = s_top;
-	}
-      else
-	{
-	  x2 = s_bottom;
-	}
+      x2 = s_top;
     }
+    else
+    {
+      x2 = s_bottom;
+    }
+  }
   else
+  {
+    if (r_bottom < geo.diskrad)
     {
-      if (r_bottom < geo.diskrad)
-	{
-	  x2 = s_bottom;
-	}
-      else
-	{
-	  x2 = s_top;
-	}
+      x2 = s_bottom;
     }
+    else
+    {
+      x2 = s_top;
+    }
+  }
 
   if (fabs (x2) > fabs (x1))
-    {
-      smin = x1;
-      smax = x2;
-    }
+  {
+    smin = x1;
+    smax = x2;
+  }
   else
-    {
-      smin = x2;
-      smax = x1;
-    }
+  {
+    smin = x2;
+    smax = x1;
+  }
 
 
   stuff_phot (p, &ds_to_disk_photon);
@@ -637,15 +629,15 @@ disk_deriv (s, value, derivative)
   stuff_phot (&ds_to_disk_photon, &phit);
   move_phot (&phit, s);
   r1 = sqrt (phit.x[0] * phit.x[0] + phit.x[1] * phit.x[1]);
-  z1 = zdisk (r1) - fabs (phit.x[2]);	// this is the function
+  z1 = zdisk (r1) - fabs (phit.x[2]);   // this is the function
 
   /* OK now calculate the derivative */
 
   ds = (z1) / 100.;
-  ds += 1;			// We must move it a little bit (in case z1 = 0) SS Aug 2004
-  move_phot (&phit, ds);	// Move the photon a bit more
+  ds += 1;                      // We must move it a little bit (in case z1 = 0) SS Aug 2004
+  move_phot (&phit, ds);        // Move the photon a bit more
   r2 = sqrt (phit.x[0] * phit.x[0] + phit.x[1] * phit.x[1]);
-  z2 = zdisk (r2) - fabs (phit.x[2]);	// this is the function
+  z2 = zdisk (r2) - fabs (phit.x[2]);   // this is the function
 
   *value = z1;
   *derivative = (z2 - z1) / ds;
@@ -682,18 +674,18 @@ qdisk_init ()
 {
   int n;
   for (n = 0; n < NRINGS; n++)
-    {
-      qdisk.r[n] = disk.r[n];
-      qdisk.t[n] = disk.t[n];
-      qdisk.g[n] = disk.g[n];
-      qdisk.v[n] = disk.v[n];
-      qdisk.heat[n] = 0.0;
-      qdisk.nphot[n] = 0;
-      qdisk.nhit[n] = 0;
-      qdisk.w[n] = 0;
-      qdisk.ave_freq[n] = 0;
-      qdisk.t_hit[0] = 0;
-    }
+  {
+    qdisk.r[n] = disk.r[n];
+    qdisk.t[n] = disk.t[n];
+    qdisk.g[n] = disk.g[n];
+    qdisk.v[n] = disk.v[n];
+    qdisk.heat[n] = 0.0;
+    qdisk.nphot[n] = 0;
+    qdisk.nhit[n] = 0;
+    qdisk.w[n] = 0;
+    qdisk.ave_freq[n] = 0;
+    qdisk.t_hit[0] = 0;
+  }
   return (0);
 }
 
@@ -729,35 +721,28 @@ qdisk_save (diskfile, ztot)
   int n;
   double area, theat, ttot;
   qptr = fopen (diskfile, "w");
-  fprintf (qptr,
-	   "r         zdisk     t_disk   heat       nhit nhit/nemit  t_heat    t_irrad  W_irrad  t_tot\n");
+  fprintf (qptr, "r         zdisk     t_disk   heat       nhit nhit/nemit  t_heat    t_irrad  W_irrad  t_tot\n");
 
   for (n = 0; n < NRINGS; n++)
+  {
+    area = (2. * PI * (qdisk.r[n + 1] * qdisk.r[n + 1] - qdisk.r[n] * qdisk.r[n]));
+    theat = qdisk.heat[n] / area;
+    theat = pow (theat / STEFAN_BOLTZMANN, 0.25);       // theat is temperature if no internal energy production
+    if (qdisk.nhit[n] > 0)
     {
-      area =
-	(2. * PI *
-	 (qdisk.r[n + 1] * qdisk.r[n + 1] - qdisk.r[n] * qdisk.r[n]));
-      theat = qdisk.heat[n] / area;
-      theat = pow (theat / STEFAN_BOLTZMANN, 0.25);	// theat is temperature if no internal energy production
-      if (qdisk.nhit[n] > 0)
-	{
 
-	  qdisk.ave_freq[n] /= qdisk.heat[n];
-	  qdisk.t_hit[n] = H * qdisk.ave_freq[n] / (BOLTZMANN * 3.832);	// Basic conversion from freq to T
-	  qdisk.w[n] =
-	    qdisk.heat[n] / (4. * PI * STEFAN_BOLTZMANN * area *
-			     qdisk.t_hit[n] * qdisk.t_hit[n] *
-			     qdisk.t_hit[n] * qdisk.t_hit[n]);
-	}
-
-      ttot = pow (qdisk.t[n], 4) + pow (theat, 4);
-      ttot = pow (ttot, 0.25);
-      fprintf (qptr,
-	       "%8.3e %8.3e %8.3e %8.3e %5d %8.3e %8.3e %8.3e %8.3e %8.3e\n",
-	       qdisk.r[n], zdisk (qdisk.r[n]), qdisk.t[n],
-	       qdisk.heat[n], qdisk.nhit[n], qdisk.heat[n] * NRINGS / ztot,
-	       theat, qdisk.t_hit[n], qdisk.w[n], ttot);
+      qdisk.ave_freq[n] /= qdisk.heat[n];
+      qdisk.t_hit[n] = H * qdisk.ave_freq[n] / (BOLTZMANN * 3.832);     // Basic conversion from freq to T
+      qdisk.w[n] = qdisk.heat[n] / (4. * PI * STEFAN_BOLTZMANN * area * qdisk.t_hit[n] * qdisk.t_hit[n] * qdisk.t_hit[n] * qdisk.t_hit[n]);
     }
+
+    ttot = pow (qdisk.t[n], 4) + pow (theat, 4);
+    ttot = pow (ttot, 0.25);
+    fprintf (qptr,
+             "%8.3e %8.3e %8.3e %8.3e %5d %8.3e %8.3e %8.3e %8.3e %8.3e\n",
+             qdisk.r[n], zdisk (qdisk.r[n]), qdisk.t[n],
+             qdisk.heat[n], qdisk.nhit[n], qdisk.heat[n] * NRINGS / ztot, theat, qdisk.t_hit[n], qdisk.w[n], ttot);
+  }
 
   fclose (qptr);
   return (0);
@@ -802,19 +787,19 @@ read_non_standard_disk_profile (tprofile)
   int dumint;
 
   if ((fptr = fopen (tprofile, "r")) == NULL)
-    {
-      Error ("Could not open filename %s\n", tprofile);
-      exit (0);
-    }
+  {
+    Error ("Could not open filename %s\n", tprofile);
+    exit (0);
+  }
 
   fscanf (fptr, "%d\n", &dumint);
   blmod.n_blpts = dumint;
   for (n = 0; n < blmod.n_blpts; n++)
-    {
-      fscanf (fptr, "%g %g", &dumflt1, &dumflt2);
-      blmod.r[n] = dumflt1 * 1.e11;
-      blmod.t[n] = dumflt2 * 1.e3;
-    }
+  {
+    fscanf (fptr, "%g %g", &dumflt1, &dumflt2);
+    blmod.r[n] = dumflt1 * 1.e11;
+    blmod.t[n] = dumflt2 * 1.e3;
+  }
 
   fclose (fptr);
 

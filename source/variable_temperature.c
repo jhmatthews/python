@@ -43,26 +43,26 @@ int niterate;
 //OLD
 //OLD int
 //OLD variable_temperature (xplasama, mode)  modifies the densities of ions, levels, and
-//OLD 	partition functions of ions within a cell of the wind based upon the mode,
-//OLD 	and other data contained within the WindPtr itself, such as t_r, t_e, w,
-//OLD 	based on the "mode".
+//OLD   partition functions of ions within a cell of the wind based upon the mode,
+//OLD   and other data contained within the WindPtr itself, such as t_r, t_e, w,
+//OLD   based on the "mode".
 //OLD
 //OLD         Unlike nebular_concentrations, this code works on pairs of ions at a time,
-//OLD 	and uses a temperature calculated to be suitable for that particular pair
-//OLD 	to have a ratio of abundances about equal to 1.
+//OLD   and uses a temperature calculated to be suitable for that particular pair
+//OLD   to have a ratio of abundances about equal to 1.
 //OLD
 //OLD   Arguments:
 //OLD      PlasmaPtr ww;
-//OLD      int mode;			// 6=correct using a dilute blackbody
-//OLD      				   7=correct using a broken power law spectrum
+//OLD      int mode;                    // 6=correct using a dilute blackbody
+//OLD                                      7=correct using a broken power law spectrum
 //OLD
 //OLD
 //OLD   Returns:
-//OLD  	variable temperature alters portions of the wind ptr.  Exactly how things
-//OLD 	are changed depends on the mode.
+//OLD   variable temperature alters portions of the wind ptr.  Exactly how things
+//OLD   are changed depends on the mode.
 //OLD
-//OLD  	variable_temperature returns 0 if it converged to an answer, -1 otherwise.  On an
-//OLD  	abnormal return the density array and ne are left unchanged.
+//OLD   variable_temperature returns 0 if it converged to an answer, -1 otherwise.  On an
+//OLD   abnormal return the density array and ne are left unchanged.
 //OLD
 //OLD   Description:
 //OLD
@@ -77,14 +77,14 @@ int niterate;
 //OLD
 //OLD
 //OLD   History:
-//OLD 	2012Feb	nsh	Coded and debugged as part of QSO effort.
-//OLD         1212Dec nsh	Recoded so that the densities are computed in a
-//OLD 			temporary array, and only
-//OLD 			committted to the real density structure once
-//OLD 			we are sure the code converges.
-//OLD 	2013Sep nsh	ground state fudge computed at the start, and
-//OLD 			stored in an array rather
-//OLD 			than contiunually recomputing it - sometimes it is expensive.
+//OLD   2012Feb nsh     Coded and debugged as part of QSO effort.
+//OLD         1212Dec nsh       Recoded so that the densities are computed in a
+//OLD                   temporary array, and only
+//OLD                   committted to the real density structure once
+//OLD                   we are sure the code converges.
+//OLD   2013Sep nsh     ground state fudge computed at the start, and
+//OLD                   stored in an array rather
+//OLD                   than contiunually recomputing it - sometimes it is expensive.
 //OLD
 //OLD
 //OLD **************************************************************/
@@ -134,7 +134,7 @@ double xxxne, xip;
 int
 variable_temperature (xplasma, mode)
      PlasmaPtr xplasma;
-     int mode;                  
+     int mode;
 {
   int nion;
   double xnew, xsaha;
@@ -150,7 +150,7 @@ variable_temperature (xplasma, mode)
   double gs_fudge[NIONS];       /*It can be expensive to calculate this, and it only depends on t_e - which is fixed for a run. So
                                    //                 calculate it once, and store it in a temporary array */
 
-  nh = xplasma->rho * rho2nh;   
+  nh = xplasma->rho * rho2nh;
   t_e = xplasma->t_e;
   t_r = xplasma->t_r;
 
@@ -260,7 +260,7 @@ variable_temperature (xplasma, mode)
 
         t_e_part_correct = xplasma->partition[nion - 1] / xplasma->partition[nion];
         partition_functions_2 (xplasma, nion, t_e, 0);  /* Get the partition functions assuming all ions
-															are in the ground state (hanve the zero)*/
+                                                           are in the ground state (hanve the zero) */
 
         t_e_part_correct *= (xplasma->partition[nion] / xplasma->partition[nion - 1]);
 
@@ -404,9 +404,9 @@ variable_temperature (xplasma, mode)
   partition_functions (xplasma, NEBULARMODE_LTE_GROUND);
 
   /* This sets all ions to the ground state.
-  We really need a better implementation of partition functions and levels
- for a power law illuminating spectrum. We found that if we didnt make this call,
- we would end up with undefined levels - which did really crazy things */
+     We really need a better implementation of partition functions and levels
+     for a power law illuminating spectrum. We found that if we didnt make this call,
+     we would end up with undefined levels - which did really crazy things */
 
   return (0);
 }
@@ -461,9 +461,9 @@ pi_correct (xtemp, nion, xplasma, mode)
   {
     if (mode == IONMODE_PAIRWISE_ML93)
     {
-      numerator = calc_pi_rate (ion_lower, xplasma, 2, 1);    /*Call calc_pi_rate with mode 2 (dilute BB), which returns the PI rate coeficient */
+      numerator = calc_pi_rate (ion_lower, xplasma, 2, 1);      /*Call calc_pi_rate with mode 2 (dilute BB), which returns the PI rate coeficient */
     }
-    else if (mode == IONMODE_PAIRWISE_SPECTRALMODEL)         /*Call calc_pi using a seriews a series of power laws and/or exponentials to represent the spectrum */
+    else if (mode == IONMODE_PAIRWISE_SPECTRALMODEL)    /*Call calc_pi using a seriews a series of power laws and/or exponentials to represent the spectrum */
     {
       numerator = calc_pi_rate (ion_lower, xplasma, 1, 1);
     }

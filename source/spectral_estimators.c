@@ -60,7 +60,7 @@ spectral_estimators (xplasma)
   int plflag, expflag;          /* Two flags to say if we have a reasonable PL or EXP model,
                                    set to 1 initially, -1 means there has been some failure that means
                                    we must not use this model, +1 means it is OK */
-  double genmin, genmax;       /*The min and max frequencies over which we have made photons originally (actually band ends)*/
+  double genmin, genmax;        /*The min and max frequencies over which we have made photons originally (actually band ends) */
   double dfreq;                 /* A number to help work out if we have fully filled a band */
 
   /* This call is after a photon flight, so we *should* have access to j and ave_freq,
@@ -145,7 +145,7 @@ spectral_estimators (xplasma)
     }
 
 
-    else //All is well, lets move on to try and model the photon distribution
+    else                        //All is well, lets move on to try and model the photon distribution
     {
 
       /* The next lines check and assign band limits.
@@ -153,18 +153,18 @@ spectral_estimators (xplasma)
          a band, we say that the photons fill the band to that end - i.e. the fact we didnt
          see the minimum frequency is just because of photon numbers. If on the other hand, one
          end of the band is 'surprisingly' empty then we wasume this is because absolutely
-         no photons are here - its probably an edge so we should modify the model bands.*/
+         no photons are here - its probably an edge so we should modify the model bands. */
 
       dfreq = (geo.xfreq[n + 1] - geo.xfreq[n]) / sqrt (xplasma->nxtot[n]);     //This is a measure of the spacing between photons on average
-      if ((xplasma->fmin[n] - geo.xfreq[n]) < dfreq)   //If true, this check suggests that there are no edges
+      if ((xplasma->fmin[n] - geo.xfreq[n]) < dfreq)    //If true, this check suggests that there are no edges
       {
-        spec_numin = geo.xfreq[n];  //Use the photon generation band edge to set the lower frequency band for the model
+        spec_numin = geo.xfreq[n];      //Use the photon generation band edge to set the lower frequency band for the model
       }
       else
       {
         spec_numin = xplasma->fmin[n];  //There may be an edge, use the lowest observed photon frequency for the lower nu band in the model
       }
-      if ((geo.xfreq[n + 1] - xplasma->fmax[n]) < dfreq)  //Repeat above but for upper band edge
+      if ((geo.xfreq[n + 1] - xplasma->fmax[n]) < dfreq)        //Repeat above but for upper band edge
       {
         spec_numax = geo.xfreq[n + 1];
       }
@@ -180,7 +180,7 @@ spectral_estimators (xplasma)
       spec_numean = xplasma->xave_freq[n];
       j = xplasma->xj[n];
 
-	  /* Try to find the exponent of a power law model that fits the cell spectrum */
+      /* Try to find the exponent of a power law model that fits the cell spectrum */
 
       pl_alpha_min = -0.1;      /*Lets just start the search around zero */
       pl_alpha_max = +0.1;
@@ -193,29 +193,32 @@ spectral_estimators (xplasma)
 
       if (isfinite (pl_alpha_func_log (pl_alpha_min)) == 0 || isfinite (pl_alpha_func_log (pl_alpha_max)) == 0) //We can't backet alpha!!!!
       {
-        Error ("spectral_estimators: Alpha cannot be bracketed (%e %e)in band %i cell %i- setting w to zero\n", pl_alpha_min, pl_alpha_max, n, xplasma->nplasma);
+        Error ("spectral_estimators: Alpha cannot be bracketed (%e %e)in band %i cell %i- setting w to zero\n", pl_alpha_min, pl_alpha_max,
+               n, xplasma->nplasma);
         xplasma->pl_log_w[n] = -999.0;
         xplasma->pl_alpha[n] = -999.0;  //Set this to a value that might let us diagnose the problem
-        plflag = -1;  //Discount a PL model
+        plflag = -1;            //Discount a PL model
       }
 
-      else //We have bracketed alpha
+      else                      //We have bracketed alpha
       {
-        pl_alpha_temp = zbrent (pl_alpha_func_log, pl_alpha_min, pl_alpha_max, 0.00001); //find the actual value of alpha that matches our mean frequency
+        pl_alpha_temp = zbrent (pl_alpha_func_log, pl_alpha_min, pl_alpha_max, 0.00001);        //find the actual value of alpha that matches our mean frequency
 
         /* This next line computes the PL weight using an external function. */
 
         pl_w_temp = pl_log_w (j, pl_alpha_temp, lspec_numin, lspec_numax);
 
-        if ((isfinite (pl_w_temp)) == 0) //Catch problems
+        if ((isfinite (pl_w_temp)) == 0)        //Catch problems
         {
-          Error ("spectral_estimators: New PL parameters (%e) unreasonable, using existing parameters. Check number of photons in this cell\n", pl_w_temp);
+          Error
+            ("spectral_estimators: New PL parameters (%e) unreasonable, using existing parameters. Check number of photons in this cell\n",
+             pl_w_temp);
 
           plflag = -1;          // Dont use this model
           xplasma->pl_log_w[n] = -999.0;
           xplasma->pl_alpha[n] = -999.0;
         }
-        else  //All is well, assign model parameters to the plasma structure - we still need to work out if this is the *best* model
+        else                    //All is well, assign model parameters to the plasma structure - we still need to work out if this is the *best* model
         {
           xplasma->pl_alpha[n] = pl_alpha_temp;
           xplasma->pl_log_w[n] = pl_w_temp;
@@ -226,7 +229,7 @@ spectral_estimators (xplasma)
       exp_temp_min = ((H * spec_numax) / (BOLTZMANN)) * 0.9;
       exp_temp_max = ((H * spec_numax) / (BOLTZMANN)) / 0.9;    /* NSH 131107 - and the same for the maximum temp */
 
-	  /* Bracket the temperature of an exponential model */
+      /* Bracket the temperature of an exponential model */
 
       while ((exp_temp_func (exp_temp_min) * exp_temp_func (exp_temp_max) > 0.0) &&
              ((exp_temp_func (-1.0 * exp_temp_min) * exp_temp_func (-1.0 * exp_temp_max) > 0.0)))
@@ -243,7 +246,8 @@ spectral_estimators (xplasma)
 
       if (isfinite (exp_temp_func (exp_temp_min)) == 0 || isfinite (exp_temp_func (exp_temp_max)) == 0)
       {
-        Error ("spectral_estimators: Exponential temperature cannot be bracketed (%e %e) in band %i - setting w to zero\n", exp_temp_min, exp_temp_max, n);
+        Error ("spectral_estimators: Exponential temperature cannot be bracketed (%e %e) in band %i - setting w to zero\n", exp_temp_min,
+               exp_temp_max, n);
         xplasma->exp_w[n] = 0.0;
         xplasma->exp_temp[n] = -1e99;
         expflag = -1;           //Discount an exponential model
@@ -272,7 +276,7 @@ spectral_estimators (xplasma)
           xplasma->exp_w[n] = 0.0;
           xplasma->exp_temp[n] = -1e99;
         }
-        else  //We have a reasonable exponential function model
+        else                    //We have a reasonable exponential function model
         {
           xplasma->exp_temp[n] = exp_temp_temp;
           xplasma->exp_w[n] = exp_w_temp;
@@ -297,7 +301,7 @@ spectral_estimators (xplasma)
 
       /* These commands decide upon the best model,
          based upon how well the models predict the standard deviation */
-      if (expflag > 0 && plflag > 0) //Both models are in the running - see which has the lowest error in stdev
+      if (expflag > 0 && plflag > 0)    //Both models are in the running - see which has the lowest error in stdev
       {
         if (exp_sd < pl_sd)
           xplasma->spec_mod_type[n] = SPEC_MOD_EXP;
@@ -305,12 +309,12 @@ spectral_estimators (xplasma)
           xplasma->spec_mod_type[n] = SPEC_MOD_PL;
       }
 
-      else if (plflag > 0)   //Only PL model in running, no point in testing for STDEV
+      else if (plflag > 0)      //Only PL model in running, no point in testing for STDEV
       {
         xplasma->spec_mod_type[n] = SPEC_MOD_PL;
       }
 
-      else if (expflag > 0)   //Only EXP model in running, no point in testing for STDEV
+      else if (expflag > 0)     //Only EXP model in running, no point in testing for STDEV
       {
         xplasma->spec_mod_type[n] = SPEC_MOD_EXP;
       }
@@ -400,8 +404,8 @@ pl_logmean (alpha, lnumin, lnumax)
   c = pow (10.0, (k + (lnumax * (alpha + 1.0))));
   d = pow (10.0, (k + (lnumin * (alpha + 1.0))));
 
-  numerator = (a - b) / (alpha + 2.0);   //The integral of nu J_nu
-  denominator = (c - d) / (alpha + 1.0);  //The integral of J_nu
+  numerator = (a - b) / (alpha + 2.0);  //The integral of nu J_nu
+  denominator = (c - d) / (alpha + 1.0);        //The integral of J_nu
   answer = numerator / denominator;
 
 
@@ -438,7 +442,7 @@ pl_log_w (j, alpha, lnumin, lnumax)
   double logk;                  //scaling prefactor to permit huge numbers to be dealt with
   double log_integral;          /*This will hold the unscaled integral of jnu from numin to numax */
 
-  logk = -1.0 * lnumax * (alpha + 1.0);  //Compute a temporary scaling factor to avoid numerical problems
+  logk = -1.0 * lnumax * (alpha + 1.0); //Compute a temporary scaling factor to avoid numerical problems
 
   log_integral = log10 ((pow (10, (logk + (alpha + 1.0) * lnumax)) - pow (10, (logk + (alpha + 1.0) * lnumin))) / (alpha + 1.0));
 
@@ -480,9 +484,9 @@ pl_log_stddev (alpha, lnumin, lnumax)
 
   k = -1.0 * (lnumax * (alpha + 3.0));  //This is a prefector that scales everything to sensible numbers.
 
-  a = pow (10.0, (k + (lnumax * (alpha + 3.0)))); //Integral of nu^2 jnu
+  a = pow (10.0, (k + (lnumax * (alpha + 3.0))));       //Integral of nu^2 jnu
   b = pow (10.0, (k + (lnumin * (alpha + 3.0))));
-  c = pow (10.0, (k + (lnumax * (alpha + 1.0)))); //Integral of jnu
+  c = pow (10.0, (k + (lnumax * (alpha + 1.0))));       //Integral of jnu
   d = pow (10.0, (k + (lnumin * (alpha + 1.0))));
 
 //printf ("a=%e,b=%e,c=%e,d=%e\n",a,b,c,d);
@@ -492,7 +496,7 @@ pl_log_stddev (alpha, lnumin, lnumax)
 
   answer = numerator / denominator;
 
-  mean = pl_logmean (alpha, lnumin, lnumax);  //Get the mean
+  mean = pl_logmean (alpha, lnumin, lnumax);    //Get the mean
   answer = sqrt ((numerator / denominator) - (mean * mean));
 
 

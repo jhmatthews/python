@@ -157,7 +157,7 @@ macro_gov (p, nres, matom_or_kpkt, which_out)
       }
       else
       {
-        kpkt (p, nres, &escape, KPKT_MODE_ALL);  // 1 implies include the possibility of deactivation due to non-thermal processes
+        kpkt (p, nres, &escape, KPKT_MODE_ALL); // 1 implies include the possibility of deactivation due to non-thermal processes
 
       }
 

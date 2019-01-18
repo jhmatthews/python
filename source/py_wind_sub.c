@@ -418,7 +418,7 @@ shock_heating_summary (w, rootname, ochoice)
     aaa[n] = 0;
     if (w[n].vol > 0.0)
     {
-      tot += aaa[n] = shock_heating(&w[n]);
+      tot += aaa[n] = shock_heating (&w[n]);
     }
   }
 
@@ -1592,8 +1592,8 @@ a:printf ("There are %i wind elements in this model\n", NDIM2);
 
 
 
-  Log ("Recombination cooling   HII>HI %8.2e HeII>HeI %8.2e HeIII>HeII %8.2e Metals %8.2e\n", xplasma->cool_rr_ion[0], xplasma->cool_rr_ion[2],
-       xplasma->cool_rr_ion[3], xplasma->cool_rr_metals);
+  Log ("Recombination cooling   HII>HI %8.2e HeII>HeI %8.2e HeIII>HeII %8.2e Metals %8.2e\n", xplasma->cool_rr_ion[0],
+       xplasma->cool_rr_ion[2], xplasma->cool_rr_ion[3], xplasma->cool_rr_metals);
   Log ("Photoionization heating HI>HII %8.2e HeI>HeII %8.2e HeII>HeIII %8.2e Metals %8.2e\n", xplasma->heat_ion[0], xplasma->heat_ion[2],
        xplasma->heat_ion[3], xplasma->heat_z);
 
@@ -3361,17 +3361,7 @@ ionH1\tionH2\tionHe1\tionHe2\tionHe3\tionC3\tionC4\tionC5\tionN5\tionO6\tionSi4\
             %8.4e %8.4e %8.4e %i %8.4e %8.4e %8.4e %8.4e %i %8.4e %8.4e %8.4e %8.4e \
             %8.4e %8.4e %8.4e %8.4e %8.4e %8.4e %8.4e %8.4e %8.4e %8.4e %8.4e\
             %8.4e %8.4e %8.4e %8.4e %8.4e %8.4e %8.4e \
-            %8.4e %8.4e %8.4e %8.4e %8.4e %8.4e %8.4e %8.4e %8.4e %8.4e\n", n, np, w[n].inwind, ii, jj, w[n].x[0], w[n].x[2], w[n].rcen, 
-	  w[n].thetacen / RADIAN, vtot, w[n].v[0], w[n].v[1], w[n].v[2], w[n].dvds_ave, w[n].vol, plasmamain[np].rho, plasmamain[np].ne, 
-	  plasmamain[np].t_e, plasmamain[np].t_r, plasmamain[np].ntot, plasmamain[np].w, plasmamain[np].ave_freq, plasmamain[np].ip, plasmamain[np].xi, 
-	  plasmamain[np].converge_whole, plasmamain[np].converge_t_r, plasmamain[np].converge_t_e, plasmamain[np].converge_hc, 
-	  plasmamain[np].cool_tot_ioniz+ plasmamain[np].cool_comp_ioniz + plasmamain[np].cool_adiabatic_ioniz + plasmamain[np].cool_dr_ioniz, 
-	  plasmamain[np].lum_tot_ioniz, plasmamain[np].lum_rr_ioniz,plasmamain[np].cool_rr_ioniz, plasmamain[np].lum_ff_ioniz, plasmamain[np].lum_lines_ioniz, 
-	  plasmamain[np].cool_adiabatic_ioniz, plasmamain[np].cool_comp_ioniz, plasmamain[np].cool_dr_ioniz, plasmamain[np].cool_di_ioniz, 
-	  plasmamain[np].heat_tot, plasmamain[np].heat_photo,
-	  plasmamain[np].heat_auger, plasmamain[np].heat_lines, plasmamain[np].heat_ff, plasmamain[np].heat_comp, plasmamain[np].heat_ind_comp,
-	  plasmamain[np].heat_shock, h1den, h2den, he1den, 
-	  he2den, he3den, c3den, c4den, c5den, n5den, o6den, si4den);
+            %8.4e %8.4e %8.4e %8.4e %8.4e %8.4e %8.4e %8.4e %8.4e %8.4e\n", n, np, w[n].inwind, ii, jj, w[n].x[0], w[n].x[2], w[n].rcen, w[n].thetacen / RADIAN, vtot, w[n].v[0], w[n].v[1], w[n].v[2], w[n].dvds_ave, w[n].vol, plasmamain[np].rho, plasmamain[np].ne, plasmamain[np].t_e, plasmamain[np].t_r, plasmamain[np].ntot, plasmamain[np].w, plasmamain[np].ave_freq, plasmamain[np].ip, plasmamain[np].xi, plasmamain[np].converge_whole, plasmamain[np].converge_t_r, plasmamain[np].converge_t_e, plasmamain[np].converge_hc, plasmamain[np].cool_tot_ioniz + plasmamain[np].cool_comp_ioniz + plasmamain[np].cool_adiabatic_ioniz + plasmamain[np].cool_dr_ioniz, plasmamain[np].lum_tot_ioniz, plasmamain[np].lum_rr_ioniz, plasmamain[np].cool_rr_ioniz, plasmamain[np].lum_ff_ioniz, plasmamain[np].lum_lines_ioniz, plasmamain[np].cool_adiabatic_ioniz, plasmamain[np].cool_comp_ioniz, plasmamain[np].cool_dr_ioniz, plasmamain[np].cool_di_ioniz, plasmamain[np].heat_tot, plasmamain[np].heat_photo, plasmamain[np].heat_auger, plasmamain[np].heat_lines, plasmamain[np].heat_ff, plasmamain[np].heat_comp, plasmamain[np].heat_ind_comp, plasmamain[np].heat_shock, h1den, h2den, he1den, he2den, he3den, c3den, c4den, c5den, n5den, o6den, si4den);
     }
     else
     {

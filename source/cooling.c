@@ -45,26 +45,25 @@ cooling (xxxplasma, t)
      double t;
 {
 
-	xxxplasma->t_e = t;
+  xxxplasma->t_e = t;
 
 
   if (geo.adiabatic)
+  {
+    if (wmain[xxxplasma->nwind].div_v >= 0.0)
     {
-      if (wmain[xxxplasma->nwind].div_v >= 0.0)
-	{
-	  /* This is the case where we have adiabatic cooling - we want to retain the old behaviour,
-	     so we use the 'test' temperature to compute it. If div_v is less than zero, we don't do
-	     anything here, and so the existing value of adiabatic cooling is used - this was computed
-	     in wind_updates2d before the call to ion_abundances. */
-	  xxxplasma->cool_adiabatic =
-	    adiabatic_cooling (&wmain[xxxplasma->nwind], t);
-	}
+      /* This is the case where we have adiabatic cooling - we want to retain the old behaviour,
+         so we use the 'test' temperature to compute it. If div_v is less than zero, we don't do
+         anything here, and so the existing value of adiabatic cooling is used - this was computed
+         in wind_updates2d before the call to ion_abundances. */
+      xxxplasma->cool_adiabatic = adiabatic_cooling (&wmain[xxxplasma->nwind], t);
     }
+  }
 
   else
-    {
-      xxxplasma->cool_adiabatic = 0.0;
-    }
+  {
+    xxxplasma->cool_adiabatic = 0.0;
+  }
 
 
   /*81c - nsh - we now treat DR cooling as a recombinational process - still unsure as to how to treat emission, so at the moment
@@ -84,8 +83,7 @@ cooling (xxxplasma, t)
 
   xxxplasma->cool_tot =
     xxxplasma->cool_adiabatic + xxxplasma->cool_dr + xxxplasma->cool_di +
-    xxxplasma->cool_comp + xtotal_emission (&wmain[xxxplasma->nwind], 0.,
-					  VERY_BIG);
+    xxxplasma->cool_comp + xtotal_emission (&wmain[xxxplasma->nwind], 0., VERY_BIG);
 
   return (xxxplasma->cool_tot);
 }
@@ -97,7 +95,7 @@ cooling (xxxplasma, t)
 //OLD              Space Telescope Science Institute
 //OLD
 //OLD Synopsis:  xtotal_emission (one, f1, f2) Calculate the total cooling of a single cell
-//OLD 			due to free free - line and recombination processes.
+//OLD                   due to free free - line and recombination processes.
 //OLD
 //OLD Arguments:
 //OLD
@@ -108,21 +106,21 @@ cooling (xxxplasma, t)
 //OLD
 //OLD
 //OLD Notes:
-//OLD 	xtotal_emission gives the total enery loss due to photons.  It does
-//OLD 	not include other coooling sources, e. g. adiabatic expansion.
+//OLD   xtotal_emission gives the total enery loss due to photons.  It does
+//OLD   not include other coooling sources, e. g. adiabatic expansion.
 //OLD
-//OLD 	It returns the total cooling, but also stores the luminosity due
-//OLD 	to various types of emssion, e.g ff and  lines into the
-//OLD 	Plasms cells. The fb cooling calculated here is *not* equal to
-//OLD 	the fb lumniosity and so this value is stored in cool_rr.
+//OLD   It returns the total cooling, but also stores the luminosity due
+//OLD   to various types of emssion, e.g ff and  lines into the
+//OLD   Plasms cells. The fb cooling calculated here is *not* equal to
+//OLD   the fb lumniosity and so this value is stored in cool_rr.
 //OLD
-//OLD 	Comment: The call to this routine was changed when PlasmaPtrs
-//OLD 	were introduced, but it appears that the various routines
-//OLD 	that were called were not changed.
+//OLD   Comment: The call to this routine was changed when PlasmaPtrs
+//OLD   were introduced, but it appears that the various routines
+//OLD   that were called were not changed.
 //OLD
 //OLD History:
-//OLD 	2017 - copied from total_emission and modified for use in calculatingh
-//OLD 			cooling alone.
+//OLD   2017 - copied from total_emission and modified for use in calculatingh
+//OLD                   cooling alone.
 //OLD
 //OLD
 //OLD **************************************************************/
@@ -169,7 +167,7 @@ xtotal_emission (one, f1, f2)
   double cooling;
   PlasmaPtr xplasma;
 
-  cooling=0.0;
+  cooling = 0.0;
   nplasma = one->nplasma;
   xplasma = &plasmamain[nplasma];
 
@@ -177,13 +175,13 @@ xtotal_emission (one, f1, f2)
 
   if (f2 < f1)
   {
-    xplasma->cool_tot = xplasma->lum_lines = xplasma->lum_ff = xplasma->cool_rr = 0;      //NSH 1108 Zero the new cool_comp variable NSH 1101 - removed
+    xplasma->cool_tot = xplasma->lum_lines = xplasma->lum_ff = xplasma->cool_rr = 0;    //NSH 1108 Zero the new cool_comp variable NSH 1101 - removed
   }
   else
   {
-    if (geo.rt_mode == RT_MODE_MACRO)       //Switch for macro atoms (SS)
+    if (geo.rt_mode == RT_MODE_MACRO)   //Switch for macro atoms (SS)
     {
-      xplasma->cool_rr = total_fb_matoms (xplasma, t_e, f1, f2) + total_fb (one, t_e, f1, f2, FB_REDUCED, OUTER_SHELL);        //outer shellrecombinations
+      xplasma->cool_rr = total_fb_matoms (xplasma, t_e, f1, f2) + total_fb (one, t_e, f1, f2, FB_REDUCED, OUTER_SHELL); //outer shellrecombinations
       //The first term here is the fb cooling due to macro ions and the second gives
       //the fb cooling due to simple ions.
       //total_fb has been modified to exclude recombinations treated using macro atoms.
@@ -203,13 +201,13 @@ xtotal_emission (one, f1, f2)
     }
     else                        //default (non-macro atoms) (SS)
     {
-		/*The line cooling is equal to the line emission */
+      /*The line cooling is equal to the line emission */
       cooling = xplasma->lum_lines = total_line_emission (one, f1, f2);
-	  /* The free free cooling is equal to the free free emission */
+      /* The free free cooling is equal to the free free emission */
       cooling += xplasma->lum_ff = total_free (one, t_e, f1, f2);
-	  /*The free bound cooling is equal to the recomb rate x the electron energy - the boinding energy - this is computed
-	  with the FB_REDUCED switch */
-      cooling += xplasma->cool_rr = total_fb (one, t_e, f1, f2, FB_REDUCED, OUTER_SHELL);     //outer shell recombinations
+      /*The free bound cooling is equal to the recomb rate x the electron energy - the boinding energy - this is computed
+         with the FB_REDUCED switch */
+      cooling += xplasma->cool_rr = total_fb (one, t_e, f1, f2, FB_REDUCED, OUTER_SHELL);       //outer shell recombinations
 
 
     }
@@ -281,7 +279,7 @@ adiabatic_cooling (one, t)
 
   nparticles = xplasma->ne;
 
-    /* loop over all ions as they all contribute to the pressure */
+  /* loop over all ions as they all contribute to the pressure */
   for (nion = 0; nion < nions; nion++)
   {
     nparticles += xplasma->density[nion];
@@ -338,19 +336,20 @@ adiabatic_cooling (one, t)
  **********************************************************/
 
 
-double shock_heating(one)
-    WindPtr one;
+double
+shock_heating (one)
+     WindPtr one;
 {
   int nplasma;
-  double x,r;
+  double x, r;
   PlasmaPtr xplasma;
 
   nplasma = one->nplasma;
   xplasma = &plasmamain[nplasma];
 
-  r = length(one->xcen)/geo.rstar;
+  r = length (one->xcen) / geo.rstar;
 
-  x = geo.shock_factor/(r*r*r*r);
+  x = geo.shock_factor / (r * r * r * r);
 
   x *= xplasma->vol;
 
@@ -389,7 +388,7 @@ double shock_heating(one)
 double
 wind_cooling ()
 {
-  double cool, lum_lines, cool_rr, lum_ff, cool_comp, cool_dr, cool_di, cool_adiab, heat_adiab;       
+  double cool, lum_lines, cool_rr, lum_ff, cool_comp, cool_dr, cool_di, cool_adiab, heat_adiab;
   double nonthermal;
   int n;
   double x;
@@ -397,8 +396,8 @@ wind_cooling ()
 
 
   cool = lum_lines = cool_rr = lum_ff = cool_comp = 0;
-  cool_dr = cool_di = cool_adiab = heat_adiab = 0;  //1108 NSH Zero the new counter 1109 including DR counter 1408 and the DI counter
-  nonthermal=0;
+  cool_dr = cool_di = cool_adiab = heat_adiab = 0;      //1108 NSH Zero the new counter 1109 including DR counter 1408 and the DI counter
+  nonthermal = 0;
 
   for (n = 0; n < NDIM2; n++)
   {
@@ -406,13 +405,13 @@ wind_cooling ()
     if (wmain[n].vol > 0.0)
     {
       nplasma = wmain[n].nplasma;
-      cool += x = cooling (&plasmamain[nplasma],plasmamain[nplasma].t_e); 
+      cool += x = cooling (&plasmamain[nplasma], plasmamain[nplasma].t_e);
       lum_lines += plasmamain[nplasma].lum_lines;
       cool_rr += plasmamain[nplasma].cool_rr;
       lum_ff += plasmamain[nplasma].lum_ff;
-      cool_comp += plasmamain[nplasma].cool_comp; //1108 NSH Increment the compton luminosity for that cell.
-      cool_dr += plasmamain[nplasma].cool_dr;     //1109 NSH Increment the DR luminosity for the cell.
-      cool_di += plasmamain[nplasma].cool_di;     //1408 NSH Increment the DI luminosity for the cell.
+      cool_comp += plasmamain[nplasma].cool_comp;       //1108 NSH Increment the compton luminosity for that cell.
+      cool_dr += plasmamain[nplasma].cool_dr;   //1109 NSH Increment the DR luminosity for the cell.
+      cool_di += plasmamain[nplasma].cool_di;   //1408 NSH Increment the DI luminosity for the cell.
 
       if (geo.adiabatic)        //Caculate the total adiatbaic heating/cooling separating these into two variables
       {
@@ -433,9 +432,9 @@ wind_cooling ()
       }
 
       /* Caculate the non-thermal heating (for FU Ori models with extra wind heating */
-      if (geo.nonthermal) 
+      if (geo.nonthermal)
       {
-          nonthermal+=plasmamain[nplasma].heat_shock;
+        nonthermal += plasmamain[nplasma].heat_shock;
       }
 
 
@@ -455,12 +454,12 @@ wind_cooling ()
   geo.lum_lines = lum_lines;
   geo.cool_rr = cool_rr;
   geo.lum_ff = lum_ff;
-  geo.cool_comp = cool_comp;      //The compton luminosity
-  geo.cool_dr = cool_dr;          //the DR luminosity
-  geo.cool_di = cool_di;          //the DI luminosity 
+  geo.cool_comp = cool_comp;    //The compton luminosity
+  geo.cool_dr = cool_dr;        //the DR luminosity
+  geo.cool_di = cool_di;        //the DI luminosity 
   geo.cool_adiabatic = cool_adiab;
   geo.heat_adiabatic = heat_adiab;
-  geo.heat_shock=nonthermal;
+  geo.heat_shock = nonthermal;
 
 
   return (cool);

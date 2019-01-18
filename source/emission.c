@@ -59,7 +59,7 @@
 
 double
 wind_luminosity (f1, f2)
-     double f1, f2;		/* freqmin and freqmax */
+     double f1, f2;             /* freqmin and freqmax */
 {
   double lum, lum_lines, lum_rr, lum_ff;
   int n;
@@ -69,17 +69,17 @@ wind_luminosity (f1, f2)
 
   lum = lum_lines = lum_rr = lum_ff = 0.0;
   for (n = 0; n < NDIM2; n++)
-    {
+  {
 
-      if (wmain[n].vol > 0.0)
-	{
-	  nplasma = wmain[n].nplasma;
-	  lum += x = total_emission (&wmain[n], f1, f2);
-	  lum_lines += plasmamain[nplasma].lum_lines;
-	  lum_rr += plasmamain[nplasma].lum_rr;
-	  lum_ff += plasmamain[nplasma].lum_ff;
-	}
+    if (wmain[n].vol > 0.0)
+    {
+      nplasma = wmain[n].nplasma;
+      lum += x = total_emission (&wmain[n], f1, f2);
+      lum_lines += plasmamain[nplasma].lum_lines;
+      lum_rr += plasmamain[nplasma].lum_rr;
+      lum_ff += plasmamain[nplasma].lum_ff;
     }
+  }
 
 
   geo.lum_lines = lum_lines;
@@ -126,8 +126,8 @@ wind_luminosity (f1, f2)
 
 double
 total_emission (one, f1, f2)
-     WindPtr one;		
-     double f1, f2;		
+     WindPtr one;
+     double f1, f2;
 {
   double t_e;
   int nplasma;
@@ -136,53 +136,51 @@ total_emission (one, f1, f2)
   nplasma = one->nplasma;
   xplasma = &plasmamain[nplasma];
 
-  t_e = xplasma->t_e;		
+  t_e = xplasma->t_e;
 
 
   if (f2 < f1)
-    {
-      xplasma->lum_tot = xplasma->lum_lines = xplasma->lum_ff =
-	xplasma->lum_rr = 0;
-    }
+  {
+    xplasma->lum_tot = xplasma->lum_lines = xplasma->lum_ff = xplasma->lum_rr = 0;
+  }
   else
+  {
+    if (geo.rt_mode == RT_MODE_MACRO)   //Switch for macro atoms (SS)
     {
-      if (geo.rt_mode == RT_MODE_MACRO)	//Switch for macro atoms (SS)
-	{
-	  xplasma->lum_rr = total_fb_matoms (xplasma, t_e, f1, f2) + total_fb (one, t_e, f1, f2, FB_FULL, OUTER_SHELL);	//outer shellrecombinations
+      xplasma->lum_rr = total_fb_matoms (xplasma, t_e, f1, f2) + total_fb (one, t_e, f1, f2, FB_FULL, OUTER_SHELL);     //outer shellrecombinations
 
-	  /*
-	   *The first term here is the fb cooling due to macro ions and the second gives
-	   *the fb cooling due to simple ions.
-	   *total_fb has been modified to exclude recombinations treated using macro atoms.
-	   */
-	  xplasma->lum_tot = xplasma->cool_rr;
-	  /* Note: This the fb_matom call makes no use of f1 or f2. They are passed for
-	   * now in case they should be used in the future. But they could
-	   * also be removed.
-	   * (SS)
-	   */
-	  xplasma->lum_lines = total_bb_cooling (xplasma, t_e);
-	  xplasma->lum_tot += xplasma->lum_lines;
-	  /* total_bb_cooling gives the total cooling rate due to bb transisions whether they
-	     are macro atoms or simple ions. */
-	  xplasma->lum_ff = total_free (one, t_e, f1, f2);
-	  xplasma->lum_tot += xplasma->lum_ff;
+      /*
+       *The first term here is the fb cooling due to macro ions and the second gives
+       *the fb cooling due to simple ions.
+       *total_fb has been modified to exclude recombinations treated using macro atoms.
+       */
+      xplasma->lum_tot = xplasma->cool_rr;
+      /* Note: This the fb_matom call makes no use of f1 or f2. They are passed for
+       * now in case they should be used in the future. But they could
+       * also be removed.
+       * (SS)
+       */
+      xplasma->lum_lines = total_bb_cooling (xplasma, t_e);
+      xplasma->lum_tot += xplasma->lum_lines;
+      /* total_bb_cooling gives the total cooling rate due to bb transisions whether they
+         are macro atoms or simple ions. */
+      xplasma->lum_ff = total_free (one, t_e, f1, f2);
+      xplasma->lum_tot += xplasma->lum_ff;
 
 
-	}
-      else			//default (non-macro atoms) (SS)
-	{
-	  xplasma->lum_tot = xplasma->lum_lines =
-	    total_line_emission (one, f1, f2);
-	  xplasma->lum_tot += xplasma->lum_ff = total_free (one, t_e, f1, f2);
-	  /* We compute the radiative recombination luminosirty - this is not the same as the rr cooling rate and
-	     so is stored in a seperate variable */
-	  xplasma->lum_tot += xplasma->lum_rr = total_fb (one, t_e, f1, f2, FB_FULL, OUTER_SHELL);	//outer shell recombinations
-
-
-
-	}
     }
+    else                        //default (non-macro atoms) (SS)
+    {
+      xplasma->lum_tot = xplasma->lum_lines = total_line_emission (one, f1, f2);
+      xplasma->lum_tot += xplasma->lum_ff = total_free (one, t_e, f1, f2);
+      /* We compute the radiative recombination luminosirty - this is not the same as the rr cooling rate and
+         so is stored in a seperate variable */
+      xplasma->lum_tot += xplasma->lum_rr = total_fb (one, t_e, f1, f2, FB_FULL, OUTER_SHELL);  //outer shell recombinations
+
+
+
+    }
+  }
 
 
   return (xplasma->lum_tot);
@@ -242,78 +240,77 @@ photo_gen_wind (p, weight, freqmin, freqmax, photstart, nphot)
   int nplasma;
   int nnscat;
   int ndom;
-  int ptype[NPLASMA][3];	//Store for the types of photons we want, ff first, fb next, line third
+  int ptype[NPLASMA][3];        //Store for the types of photons we want, ff first, fb next, line third
 
   for (n = 0; n < NPLASMA; n++)
-    {
-      for (nn = 0; nn < 3; nn++)
-	ptype[n][nn] = 0;
-    }
+  {
+    for (nn = 0; nn < 3; nn++)
+      ptype[n][nn] = 0;
+  }
 
   /* Limit the lines to consider */
   limit_lines (freqmin, freqmax);
 
 
   photstop = photstart + nphot;
-  Log_silent ("photo_gen_wind creates nphot %5d photons from %5d to %5d \n",
-	      nphot, photstart, photstop);
+  Log_silent ("photo_gen_wind creates nphot %5d photons from %5d to %5d \n", nphot, photstart, photstop);
 
   for (n = photstart; n < photstop; n++)
+  {
+    /* locate the wind_cell in which the photon bundle originates.
+       Note: In photo_gen, both geo.f_wind and geo.lum_wind will have been determined.
+       geo.f_wind refers to the specific flux between freqmin and freqmax.  Note that
+       we make sure that xlum is not == 0 or to geo.f_wind. */
+
+    xlum = random_number (0.0, 1.0) * geo.f_wind;
+
+
+    xlumsum = 0;
+    icell = 0;
+    while (xlumsum < xlum)
     {
-      /* locate the wind_cell in which the photon bundle originates.
-         Note: In photo_gen, both geo.f_wind and geo.lum_wind will have been determined.
-         geo.f_wind refers to the specific flux between freqmin and freqmax.  Note that
-         we make sure that xlum is not == 0 or to geo.f_wind. */
-
-      xlum = random_number (0.0, 1.0) * geo.f_wind;
 
 
-      xlumsum = 0;
-      icell = 0;
-      while (xlumsum < xlum)
-	{
-
-
-	  if (wmain[icell].vol > 0.0)
-	    {
-	      nplasma = wmain[icell].nplasma;
-	      /*increment the xlumsum by the lum_tot (the band limited luminosity in this cell */
-	      xlumsum += plasmamain[nplasma].lum_tot;
-	    }
-	  icell++;
-	}
-      icell--;
-
-      /* At this point we know the cell in which the photon will be generated */
-
-      nplasma = wmain[icell].nplasma;
-      ndom = wmain[icell].ndom;
-      plasmamain[nplasma].nrad += 1;	/* Increment the counter for the number of photons generatd in the cell */
-
-
-
-      /*Determine the type of photon this photon will be and increment ptype, which stores the total number of
-       * each photon type to be made in each cell */
-
-      lum = plasmamain[nplasma].lum_tot;
-      xlum = lum * random_number (0.0, 1.0);
-      xlumsum = 0;
-
-      p[n].nres = -1;
-      p[n].nnscat = 1;
-      if ((xlumsum += plasmamain[nplasma].lum_ff) > xlum)
-	{
-	  ptype[nplasma][0]++;	/* a ff photon  */
-	}
-      else if ((xlumsum += plasmamain[nplasma].lum_rr) > xlum)
-	{
-	  ptype[nplasma][1]++;	/* a fb photon */
-	}
-      else
-	{
-	  ptype[nplasma][2]++;	/* a line photon */
-	}
+      if (wmain[icell].vol > 0.0)
+      {
+        nplasma = wmain[icell].nplasma;
+        /*increment the xlumsum by the lum_tot (the band limited luminosity in this cell */
+        xlumsum += plasmamain[nplasma].lum_tot;
+      }
+      icell++;
     }
+    icell--;
+
+    /* At this point we know the cell in which the photon will be generated */
+
+    nplasma = wmain[icell].nplasma;
+    ndom = wmain[icell].ndom;
+    plasmamain[nplasma].nrad += 1;      /* Increment the counter for the number of photons generatd in the cell */
+
+
+
+    /*Determine the type of photon this photon will be and increment ptype, which stores the total number of
+     * each photon type to be made in each cell */
+
+    lum = plasmamain[nplasma].lum_tot;
+    xlum = lum * random_number (0.0, 1.0);
+    xlumsum = 0;
+
+    p[n].nres = -1;
+    p[n].nnscat = 1;
+    if ((xlumsum += plasmamain[nplasma].lum_ff) > xlum)
+    {
+      ptype[nplasma][0]++;      /* a ff photon  */
+    }
+    else if ((xlumsum += plasmamain[nplasma].lum_rr) > xlum)
+    {
+      ptype[nplasma][1]++;      /* a fb photon */
+    }
+    else
+    {
+      ptype[nplasma][2]++;      /* a line photon */
+    }
+  }
 
 
 /* Now actually generate the photons looping over the Plasma cells */
@@ -322,115 +319,112 @@ photo_gen_wind (p, weight, freqmin, freqmax, photstart, nphot)
 
   icell_old = (-1);
   for (n = 0; n < NPLASMA; n++)
+  {
+
+    photstart = photstop;       //initially set to photstart, afterwards we start the photon number from the end of the last cell
+    photstop = photstart + ptype[n][0] + ptype[n][1] + ptype[n][2];     //This is the number of photons in this cell
+
+    icell = plasmamain[n].nwind;
+    ndom = wmain[icell].ndom;
+
+    for (np = photstart; np < photstop; np++)
     {
 
-      photstart = photstop;	//initially set to photstart, afterwards we start the photon number from the end of the last cell
-      photstop = photstart + ptype[n][0] + ptype[n][1] + ptype[n][2];	//This is the number of photons in this cell
+      if (np < photstart + ptype[n][0])
+      {
+        p[np].freq = one_ff (&wmain[icell], freqmin, freqmax);  /*Get the frequency of one ff photon */
+        if (p[np].freq <= 0.0)
+        {
+          Error_silent
+            ("photo_gen_wind: On return from one_ff: icell %d vol %g t_e %g\n", icell, wmain[icell].vol, plasmamain[nplasma].t_e);
+          p[np].freq = 0.0;
+        }
+      }
+      else if (np < photstart + ptype[n][0] + ptype[n][1])
+      {
+        p[np].freq = one_fb (&wmain[icell], freqmin, freqmax);
+      }
+      else
+      {
 
-      icell = plasmamain[n].nwind;
-      ndom = wmain[icell].ndom;
+        if (icell != icell_old)
+        {
+          lum_lines (&wmain[icell], nline_min, nline_max);      /* fill the lin_ptr->pow array. This must be done because it is not stored
+                                                                   for all cells.  The if statement is intended to prevent recalculating the power if more than
+                                                                   one line photon is generated from this cell in this cycle. */
+          icell_old = icell;
+        }
+        p[np].freq = one_line (&wmain[icell], &p[np].nres);     /*And fill all the rest of the luminosity up with line photons */
+        if (p[np].freq == 0)
+        {
+          Error ("photo_gen_wind: one_line returned 0 for freq %g %g\n", freqmin, freqmax);
+        }
+      }
 
-      for (np = photstart; np < photstop; np++)
-	{
+      p[np].w = weight;
+      get_random_location (icell, p[np].x);
+      p[np].grid = icell;
+      /*
+         Determine the direction of the photon
+         Need to allow for anisotropic emission here
 
-	  if (np < photstart + ptype[n][0])
-	    {
-	      p[np].freq = one_ff (&wmain[icell], freqmin, freqmax);	/*Get the frequency of one ff photon */
-	      if (p[np].freq <= 0.0)
-		{
-		  Error_silent
-		    ("photo_gen_wind: On return from one_ff: icell %d vol %g t_e %g\n",
-		     icell, wmain[icell].vol, plasmamain[nplasma].t_e);
-		  p[np].freq = 0.0;
-		}
-	    }
-	  else if (np < photstart + ptype[n][0] + ptype[n][1])
-	    {
-	      p[np].freq = one_fb (&wmain[icell], freqmin, freqmax);
-	    }
-	  else
-	    {
+         CK20180801: in non-macro-atom mode, the only continuum process that is treated
+         as a scatter is electron scattering; but in any case, all continuum processes in non-macro-atom
+         mode correspond to nres < 0.
 
-	      if (icell != icell_old)
-		{
-		  lum_lines (&wmain[icell], nline_min, nline_max);	/* fill the lin_ptr->pow array. This must be done because it is not stored
-									   for all cells.  The if statement is intended to prevent recalculating the power if more than
-                                       one line photon is generated from this cell in this cycle. */
-		  icell_old = icell;
-		}
-	      p[np].freq = one_line (&wmain[icell], &p[np].nres);	/*And fill all the rest of the luminosity up with line photons */
-	      if (p[np].freq == 0)
-		{
-		  Error
-		    ("photo_gen_wind: one_line returned 0 for freq %g %g\n",
-		     freqmin, freqmax);
-		}
-	    }
+         in macro-atom mode, bf and ff continuum processes are also treated as scattering processes, 
+         and then they, too, are treated isotropically. however, in macro atom mode, nres = -1 specifically
+         indicates electron scattering, nres = -2 specifically indicates ff, and nres > NLINES indicates
+         bound-free. 
+         [nres == NLINES is never used. Note also that NLINES is the *max* number of lines, whereas nlines
+         is the *actual* number of lines. So, actually, it's not just nres = NLINES that's never used, but 
+         the entire range of nlines <= nres <= NLINES]
 
-	  p[np].w = weight;
-	  get_random_location (icell, p[np].x);
-	  p[np].grid = icell;
-	  /*
-	     Determine the direction of the photon
-	     Need to allow for anisotropic emission here
+         in both macro-atom and non-macro-atom modes, 
+         line processes are treated isotropically only if geo.scatter_mode == SCATTER_MODE_ISOTROPIC;
+         note that, confusingly, geo.scatter_mode == SCATTER_MODE_ANISOTROPIC is *not*
+         the only anisotropic mode -- SCATTER_MODE_THERMAL is *also* anisotropic.
 
-	     CK20180801: in non-macro-atom mode, the only continuum process that is treated
-	     as a scatter is electron scattering; but in any case, all continuum processes in non-macro-atom
-	     mode correspond to nres < 0.
+       */
+      nnscat = 1;
 
-	     in macro-atom mode, bf and ff continuum processes are also treated as scattering processes, 
-	     and then they, too, are treated isotropically. however, in macro atom mode, nres = -1 specifically
-	     indicates electron scattering, nres = -2 specifically indicates ff, and nres > NLINES indicates
-	     bound-free. 
-	     [nres == NLINES is never used. Note also that NLINES is the *max* number of lines, whereas nlines
-	     is the *actual* number of lines. So, actually, it's not just nres = NLINES that's never used, but 
-	     the entire range of nlines <= nres <= NLINES]
-
-	     in both macro-atom and non-macro-atom modes, 
-	     line processes are treated isotropically only if geo.scatter_mode == SCATTER_MODE_ISOTROPIC;
-	     note that, confusingly, geo.scatter_mode == SCATTER_MODE_ANISOTROPIC is *not*
-	     the only anisotropic mode -- SCATTER_MODE_THERMAL is *also* anisotropic.
-
-	   */
-	  nnscat = 1;
-
-	  if (p[np].nres < 0 || geo.scatter_mode == SCATTER_MODE_ISOTROPIC)
-	    {
+      if (p[np].nres < 0 || geo.scatter_mode == SCATTER_MODE_ISOTROPIC)
+      {
 /*  It was either an electron scatter so the  distribution is isotropic, or it
 was a resonant scatter but we want isotropic scattering anyway.  */
-	      randvec (p[np].lmn, 1.0);	/* The photon is emitted isotropically */
-	    }
-	  else if (geo.scatter_mode == SCATTER_MODE_THERMAL)
-	    {			// It was a line photon and we want anisotropic scattering
-	      randwind_thermal_trapping (&p[np], &nnscat);
-	    }
-	  p[np].nnscat = nnscat;
-	  /* The next two lines correct the frequency to first order, but do not result in
-	     forward scattering of the distribution */
-	  vwind_xyz (ndom, &p[np], v);
-	  p[np].freq *= (1. + dot (v, p[np].lmn) / C);
-	  p[np].istat = 0;
-	  p[np].tau = p[np].nscat = p[np].nrscat = 0;
-	  p[np].origin = PTYPE_WIND;	// A wind photon
-	  switch (geo.reverb)
-	    {			// SWM 26-3-15: Added wind paths
-	    case REV_WIND:
-	    case REV_MATOM:
-	      wind_paths_gen_phot (&wmain[icell], &p[np]);
-	      break;
-	    case REV_PHOTON:
-	      simple_paths_gen_phot (&p[np]);
-	      break;
-	    case REV_NONE:
-	    default:
-	      break;
-	    }
-	}
-
+        randvec (p[np].lmn, 1.0);       /* The photon is emitted isotropically */
+      }
+      else if (geo.scatter_mode == SCATTER_MODE_THERMAL)
+      {                         // It was a line photon and we want anisotropic scattering
+        randwind_thermal_trapping (&p[np], &nnscat);
+      }
+      p[np].nnscat = nnscat;
+      /* The next two lines correct the frequency to first order, but do not result in
+         forward scattering of the distribution */
+      vwind_xyz (ndom, &p[np], v);
+      p[np].freq *= (1. + dot (v, p[np].lmn) / C);
+      p[np].istat = 0;
+      p[np].tau = p[np].nscat = p[np].nrscat = 0;
+      p[np].origin = PTYPE_WIND;        // A wind photon
+      switch (geo.reverb)
+      {                         // SWM 26-3-15: Added wind paths
+      case REV_WIND:
+      case REV_MATOM:
+        wind_paths_gen_phot (&wmain[icell], &p[np]);
+        break;
+      case REV_PHOTON:
+        simple_paths_gen_phot (&p[np]);
+        break;
+      case REV_NONE:
+      default:
+        break;
+      }
     }
 
+  }
 
-  return (nphot);		/* Return the number of photons generated */
+
+  return (nphot);               /* Return the number of photons generated */
 }
 
 
@@ -467,25 +461,25 @@ one_line (one, nres)
   xplasma = &plasmamain[nplasma];
   /* Put in a bunch of checks */
   if (xplasma->lum_lines <= 0)
-    {
-      Error ("one_line: requesting a line when line lum is 0\n");
-      return (0);
-    }
+  {
+    Error ("one_line: requesting a line when line lum is 0\n");
+    return (0);
+  }
   if (nline_min == nline_max)
-    {
-      Error ("one_line: no lines %d %d\n", nline_min, nline_max);
-      return (0);
-    }
+  {
+    Error ("one_line: no lines %d %d\n", nline_min, nline_max);
+    return (0);
+  }
 
   xlum = xplasma->lum_lines * random_number (0.0, 1.0);
 
   xlumsum = 0;
   m = nline_min;
   while (xlumsum < xlum && m < nline_max)
-    {
-      xlumsum += lin_ptr[m]->pow;
-      m++;
-    }
+  {
+    xlumsum += lin_ptr[m]->pow;
+    m++;
+  }
   m--;
   *nres = m;
   return (lin_ptr[m]->freq);
@@ -535,59 +529,49 @@ total_free (one, t_e, f1, f2)
   double g_ff_h, g_ff_he;
   double gaunt;
   double x, sum;
-  double gsqrd;			/*The scaled inverse temperature experienced by an ion - used to compute the gaunt factor */
+  double gsqrd;                 /*The scaled inverse temperature experienced by an ion - used to compute the gaunt factor */
   int nplasma, nion;
   PlasmaPtr xplasma;
   nplasma = one->nplasma;
   xplasma = &plasmamain[nplasma];
   if (f2 < f1)
+  {
+    return (0.0);
+  }
+
+
+
+
+  if (gaunt_n_gsqrd == 0)       //Maintain old behaviour
+  {
+    g_ff_h = g_ff_he = 1.0;
+    if (nelements > 1)
     {
-      return (0.0);
+      x = BREMS_CONSTANT * xplasma->ne * (xplasma->density[1] * g_ff_h + 4. * xplasma->density[4] * g_ff_he) / H_OVER_K;
     }
-
-
-
-
-  if (gaunt_n_gsqrd == 0)	//Maintain old behaviour
+    else
     {
-      g_ff_h = g_ff_he = 1.0;
-      if (nelements > 1)
-	{
-	  x =
-	    BREMS_CONSTANT * xplasma->ne * (xplasma->density[1] *
-					    g_ff_h +
-					    4. * xplasma->density[4] *
-					    g_ff_he) / H_OVER_K;
-	}
-      else
-	{
-	  x =
-	    BREMS_CONSTANT * xplasma->ne * (xplasma->density[1] *
-					    g_ff_h) / H_OVER_K;
-	}
+      x = BREMS_CONSTANT * xplasma->ne * (xplasma->density[1] * g_ff_h) / H_OVER_K;
     }
+  }
   else
+  {
+    sum = 0.0;
+    for (nion = 0; nion < nions; nion++)
     {
-      sum = 0.0;
-      for (nion = 0; nion < nions; nion++)
-	{
-	  if (ion[nion].istate != 1)	//The neutral ion does not contribute
-	    {
-	      gsqrd =
-		((ion[nion].istate - 1) * (ion[nion].istate -
-					   1) * RYD2ERGS) / (BOLTZMANN * t_e);
-	      gaunt = gaunt_ff (gsqrd);
-	      sum +=
-		xplasma->density[nion] * (ion[nion].istate -
-					  1) * (ion[nion].istate - 1) * gaunt;
-	    }
-	  else
-	    {
-	      sum += 0.0;
-	    }
-	}
-      x = BREMS_CONSTANT * xplasma->ne * (sum) / H_OVER_K;
+      if (ion[nion].istate != 1)        //The neutral ion does not contribute
+      {
+        gsqrd = ((ion[nion].istate - 1) * (ion[nion].istate - 1) * RYD2ERGS) / (BOLTZMANN * t_e);
+        gaunt = gaunt_ff (gsqrd);
+        sum += xplasma->density[nion] * (ion[nion].istate - 1) * (ion[nion].istate - 1) * gaunt;
+      }
+      else
+      {
+        sum += 0.0;
+      }
     }
+    x = BREMS_CONSTANT * xplasma->ne * (sum) / H_OVER_K;
+  }
 
   /* JM 1604 -- The reason why this is proportional to t_e**1/2,
      rather than t_e**(-1/2) as in equation 40 of LK02 is because
@@ -637,44 +621,36 @@ ff (one, t_e, freq)
   xplasma = &plasmamain[nplasma];
   if (t_e < 100.)
     return (0.0);
-  if (gaunt_n_gsqrd == 0)	//Maintain old behaviour
+  if (gaunt_n_gsqrd == 0)       //Maintain old behaviour
+  {
+    g_ff_h = g_ff_he = 1.0;
+    if (nelements > 1)
     {
-      g_ff_h = g_ff_he = 1.0;
-      if (nelements > 1)
-	{
-	  fnu =
-	    BREMS_CONSTANT * xplasma->ne * (xplasma->density[1] *
-					    g_ff_h +
-					    4. * xplasma->density[4] *
-					    g_ff_he);
-	}
-      else
-	{
-	  fnu = BREMS_CONSTANT * xplasma->ne * (xplasma->density[1] * g_ff_h);
-	}
+      fnu = BREMS_CONSTANT * xplasma->ne * (xplasma->density[1] * g_ff_h + 4. * xplasma->density[4] * g_ff_he);
     }
+    else
+    {
+      fnu = BREMS_CONSTANT * xplasma->ne * (xplasma->density[1] * g_ff_h);
+    }
+  }
   else
+  {
+    sum = 0.0;
+    for (nion = 0; nion < nions; nion++)
     {
-      sum = 0.0;
-      for (nion = 0; nion < nions; nion++)
-	{
-	  if (ion[nion].istate != 1)	//The neutral ion does not contribute
-	    {
-	      gsqrd =
-		((ion[nion].istate - 1) * (ion[nion].istate -
-					   1) * RYD2ERGS) / (BOLTZMANN * t_e);
-	      gaunt = gaunt_ff (gsqrd);
-	      sum +=
-		xplasma->density[nion] * (ion[nion].istate -
-					  1) * (ion[nion].istate - 1) * gaunt;
-	    }
-	  else
-	    {
-	      sum += 0.0;
-	    }
-	}
-      fnu = BREMS_CONSTANT * xplasma->ne * (sum);
+      if (ion[nion].istate != 1)        //The neutral ion does not contribute
+      {
+        gsqrd = ((ion[nion].istate - 1) * (ion[nion].istate - 1) * RYD2ERGS) / (BOLTZMANN * t_e);
+        gaunt = gaunt_ff (gsqrd);
+        sum += xplasma->density[nion] * (ion[nion].istate - 1) * (ion[nion].istate - 1) * gaunt;
+      }
+      else
+      {
+        sum += 0.0;
+      }
     }
+    fnu = BREMS_CONSTANT * xplasma->ne * (sum);
+  }
 
 
   fnu *= exp (-H_OVER_K * freq / t_e) / sqrt (t_e) * xplasma->vol;
@@ -717,8 +693,8 @@ double one_ff_f1, one_ff_f2, one_ff_te;
 
 double
 one_ff (one, f1, f2)
-     WindPtr one;		/* a single cell */
-     double f1, f2;		/* freqmin and freqmax */
+     WindPtr one;               /* a single cell */
+     double f1, f2;             /* freqmin and freqmax */
 {
   double freq, dfreq;
   int n;
@@ -728,39 +704,35 @@ one_ff (one, f1, f2)
   nplasma = one->nplasma;
   xplasma = &plasmamain[nplasma];
   if (f2 < f1)
-    {
-      Error
-	("one_ff: Bad inputs f2 %g < f1 %g returning 0.0  t_e %g\n",
-	 f2, f1, xplasma->t_e);
-      return (-1.0);
-    }
+  {
+    Error ("one_ff: Bad inputs f2 %g < f1 %g returning 0.0  t_e %g\n", f2, f1, xplasma->t_e);
+    return (-1.0);
+  }
 
   /* Check to see if we have already generated a pdf */
 
   if (xplasma->t_e != one_ff_te || f1 != one_ff_f1 || f2 != one_ff_f2)
-    {				/* Generate a new pdf */
-      dfreq = (f2 - f1) / (ARRAY_PDF - 1);
-      for (n = 0; n < ARRAY_PDF - 1; n++)
-	{
-	  ff_x[n] = f1 + dfreq * n;
-	  ff_y[n] = ff (one, xplasma->t_e, ff_x[n]);
-	}
-
-      ff_x[ARRAY_PDF - 1] = f2;
-      ff_y[ARRAY_PDF - 1] = ff (one, xplasma->t_e, ff_x[ARRAY_PDF - 1]);
-      if ((echeck =
-	   cdf_gen_from_array (&cdf_ff, ff_x, ff_y, ARRAY_PDF, f1, f2)) != 0)
-	{
-	  Error
-	    ("one_ff: cdf_gen_from_array error %d : f1 %g f2 %g te %g ne %g nh %g vol %g\n",
-	     echeck, f1, f2, xplasma->t_e, xplasma->ne,
-	     xplasma->density[1], one->vol);
-	  exit (0);
-	}
-      one_ff_te = xplasma->t_e;
-      one_ff_f1 = f1;
-      one_ff_f2 = f2;		/* Note that this may not be the best way to check for a previous pdf */
+  {                             /* Generate a new pdf */
+    dfreq = (f2 - f1) / (ARRAY_PDF - 1);
+    for (n = 0; n < ARRAY_PDF - 1; n++)
+    {
+      ff_x[n] = f1 + dfreq * n;
+      ff_y[n] = ff (one, xplasma->t_e, ff_x[n]);
     }
+
+    ff_x[ARRAY_PDF - 1] = f2;
+    ff_y[ARRAY_PDF - 1] = ff (one, xplasma->t_e, ff_x[ARRAY_PDF - 1]);
+    if ((echeck = cdf_gen_from_array (&cdf_ff, ff_x, ff_y, ARRAY_PDF, f1, f2)) != 0)
+    {
+      Error
+        ("one_ff: cdf_gen_from_array error %d : f1 %g f2 %g te %g ne %g nh %g vol %g\n",
+         echeck, f1, f2, xplasma->t_e, xplasma->ne, xplasma->density[1], one->vol);
+      exit (0);
+    }
+    one_ff_te = xplasma->t_e;
+    one_ff_f1 = f1;
+    one_ff_f2 = f2;             /* Note that this may not be the best way to check for a previous pdf */
+  }
   freq = cdf_get_rand (&cdf_ff);
   return (freq);
 }
@@ -791,34 +763,28 @@ one_ff (one, f1, f2)
 
 double
 gaunt_ff (gsquared)
-     double gsquared;		/* the gamma squared variable */
+     double gsquared;           /* the gamma squared variable */
 {
   int i, index;
   double gaunt;
   double log_g2;
-  double delta;			//The log difference between our G2 and the one in the table
-  delta = 0.0;			/* NSH 130605 to remove o3 compile error */
-  index = 0;			/* NSH 130605 to remove o3 compile error */
-  log_g2 = log10 (gsquared);	//The data is in log format
-  if (log_g2 < gaunt_total[0].log_gsqrd
-      || log_g2 > gaunt_total[gaunt_n_gsqrd - 1].log_gsqrd)
+  double delta;                 //The log difference between our G2 and the one in the table
+  delta = 0.0;                  /* NSH 130605 to remove o3 compile error */
+  index = 0;                    /* NSH 130605 to remove o3 compile error */
+  log_g2 = log10 (gsquared);    //The data is in log format
+  if (log_g2 < gaunt_total[0].log_gsqrd || log_g2 > gaunt_total[gaunt_n_gsqrd - 1].log_gsqrd)
+  {
+    return (1.0);
+  }
+  for (i = 0; i < gaunt_n_gsqrd; i++)   /*first find the pair of parameter arrays that bracket our temperature */
+  {
+    if (gaunt_total[i].log_gsqrd <= log_g2 && gaunt_total[i + 1].log_gsqrd > log_g2)
     {
-      return (1.0);
+      index = i;                /* the array to use */
+      delta = log_g2 - gaunt_total[index].log_gsqrd;
     }
-  for (i = 0; i < gaunt_n_gsqrd; i++)	/*first find the pair of parameter arrays that bracket our temperature */
-    {
-      if (gaunt_total[i].log_gsqrd <= log_g2
-	  && gaunt_total[i + 1].log_gsqrd > log_g2)
-	{
-	  index = i;		/* the array to use */
-	  delta = log_g2 - gaunt_total[index].log_gsqrd;
-	}
-    }
+  }
 
-  gaunt =
-    gaunt_total[index].gff + delta * (gaunt_total[index].s1 +
-				      delta *
-				      (gaunt_total[index].s2 +
-				       gaunt_total[index].s3));
+  gaunt = gaunt_total[index].gff + delta * (gaunt_total[index].s1 + delta * (gaunt_total[index].s2 + gaunt_total[index].s3));
   return (gaunt);
 }

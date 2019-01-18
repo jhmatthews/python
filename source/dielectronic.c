@@ -40,7 +40,7 @@
 //OLD
 //OLD
 //OLD   History:
-//OLD 	11aug	nsh	Began work
+//OLD   11aug   nsh     Began work
 //OLD
 //OLD
 //OLD  ************************************************************************/
@@ -63,24 +63,24 @@
 //OLD
 //OLD
 //OLD   Synopsis: compute_dr_coeffs returns the volumetric dielectronic rate
-//OLD  	coefficients for a given temperature.
+//OLD   coefficients for a given temperature.
 //OLD
 //OLD   Description:
 //OLD
 //OLD   Arguments:
-//OLD 	temperature
+//OLD   temperature
 //OLD
 //OLD
 //OLD   Returns:
-//OLD 	nothing, but populates the array dr_coeffs
+//OLD   nothing, but populates the array dr_coeffs
 //OLD
 //OLD   Notes:
-//OLD  	the rates are associated with the ion being recombined into.
+//OLD   the rates are associated with the ion being recombined into.
 //OLD
 //OLD
 //OLD
 //OLD   History:
-//OLD 	11sep	nsh	Written as part of python70 effort to incorporate DR.
+//OLD   11sep   nsh     Written as part of python70 effort to incorporate DR.
 //OLD
 //OLD  ************************************************************************/
 
@@ -110,23 +110,23 @@ compute_dr_coeffs (temp)
   double Adi, Bdi, T0, T1;
   for (n = 1; n < nions + 1; n++)
   {
-    if (ion[n].drflag == 0)  //There are no dielectronic coefficients relating to this ion
+    if (ion[n].drflag == 0)     //There are no dielectronic coefficients relating to this ion
     {
-      dr_coeffs[n] = 0.0;  //So set the coefficients to zero
+      dr_coeffs[n] = 0.0;       //So set the coefficients to zero
     }
     else
     {
-      n1 = ion[n].nxdrecomb;  //Obtain an index into the drecomb structure for this ion's data
-      dr_coeffs[n] = 0.0;   //Zero the coefficient
+      n1 = ion[n].nxdrecomb;    //Obtain an index into the drecomb structure for this ion's data
+      dr_coeffs[n] = 0.0;       //Zero the coefficient
       if (drecomb[n1].type == DRTYPE_BADNELL)   //It is a badnell type coeefficient
       {
-        for (n2 = 0; n2 < drecomb[n1].nparam; n2++)  //Loop over the parameters
+        for (n2 = 0; n2 < drecomb[n1].nparam; n2++)     //Loop over the parameters
         {
           dr_coeffs[n] += (drecomb[n1].c[n2] * exp (-1 * (drecomb[n1].e[n2] / temp)));
         }
         dr_coeffs[n] *= pow (temp, -1.5);
       }
-      else if (drecomb[n1].type == DRTYPE_SHULL)  //A schiull type parameter
+      else if (drecomb[n1].type == DRTYPE_SHULL)        //A schiull type parameter
       {
         Adi = drecomb[n1].shull[0];
         Bdi = drecomb[n1].shull[1];
@@ -155,13 +155,13 @@ compute_dr_coeffs (temp)
 //OLD   Description:
 //OLD
 //OLD   Arguments:
-//OLD 	pointer to grid cell we are interested in
-//OLD 	temperature
+//OLD   pointer to grid cell we are interested in
+//OLD   temperature
 //OLD
 //OLD
 //OLD
 //OLD   Returns:
-//OLD   	the total luminosity of this cell due to dielectronic recombinaions
+//OLD           the total luminosity of this cell due to dielectronic recombinaions
 //OLD
 //OLD   Notes:
 //OLD
@@ -169,8 +169,8 @@ compute_dr_coeffs (temp)
 //OLD
 //OLD
 //OLD   History:
-//OLD 	11sep	nsh	Written as part of python70 effort to incorporate DR. Initally we are just doing a ROM calculation by multiplying the volumetric rate be the ion density, the electron density and mean eelectron energy.
-//OLD         12jul 	nsh	Changed to take account of the fact tha we are now assiciating a rate with the ion being recombined into, this means that for rate[nion] we need density [nion+1].
+//OLD   11sep   nsh     Written as part of python70 effort to incorporate DR. Initally we are just doing a ROM calculation by multiplying the volumetric rate be the ion density, the electron density and mean eelectron energy.
+//OLD         12jul     nsh     Changed to take account of the fact tha we are now assiciating a rate with the ion being recombined into, this means that for rate[nion] we need density [nion+1].
 //OLD
 //OLD  ************************************************************************/
 
@@ -228,7 +228,7 @@ total_dr (one, t_e)
     {
       x += 0.0;                 //Add nothing to the sum of coefficients
     }
-    else   //This is the place where one would put code to compute the DR luminosity for a given ion
+    else                        //This is the place where one would put code to compute the DR luminosity for a given ion
     {
 /* One possibility is to use the mean k.e. of electrons this is based on the idea that an eleectron
 		is absorbed, so a guess would be to just say its energy is re-radiated. This is clearly an over estimate

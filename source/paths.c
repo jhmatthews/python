@@ -350,7 +350,7 @@ r_draw_from_path_histogram (Wind_Paths_Ptr PathPtr)
 
   r_total = 0.0;
 //  r_rand = PathPtr->d_flux * rand () / MAXRAND; DONE
-  r_rand = PathPtr->d_flux * random_number(0.0,1.0);
+  r_rand = PathPtr->d_flux * random_number (0.0, 1.0);
   i_path = -1;
 
   //printf("DEBUG: r_rand %g out of total %g\n",r_rand, PathPtr->d_flux);
@@ -363,7 +363,7 @@ r_draw_from_path_histogram (Wind_Paths_Ptr PathPtr)
   r_bin_min = reverb_path_bin[i_path - 1];
   r_bin_max = reverb_path_bin[i_path];
 //  r_bin_rand = (rand () / MAXRAND) * (r_bin_max - r_bin_min); DONE
-  r_bin_rand = random_number(0.0,1.0) * (r_bin_max - r_bin_min);
+  r_bin_rand = random_number (0.0, 1.0) * (r_bin_max - r_bin_min);
   r_path = r_bin_min + r_bin_rand;
   return (r_path);
 }

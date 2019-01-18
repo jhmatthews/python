@@ -103,7 +103,7 @@ main (argc, argv)
   char windsavefile[LINELENGTH];
   char parameter_file[LINELENGTH];
   int create_master_table (), create_ion_table ();
-  int do_windsave2table();
+  int do_windsave2table ();
 
 
 
@@ -151,8 +151,7 @@ main (argc, argv)
 
   printf ("Read Atomic data from %s\n", geo.atomic_filename);
 
-  do_windsave2table(root);
+  do_windsave2table (root);
 
-  return(0);
+  return (0);
 }
-

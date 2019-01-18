@@ -77,7 +77,7 @@
 
 int
 translate (w, pp, tau_scat, tau, nres)
-     WindPtr w;			//w here refers to entire wind, not a single element
+     WindPtr w;                 //w here refers to entire wind, not a single element
      PhotPtr pp;
      double tau_scat;
      double *tau;
@@ -87,20 +87,18 @@ translate (w, pp, tau_scat, tau, nres)
   int ndomain;
 
   if (where_in_wind (pp->x, &ndomain) < 0)
-    {
-      istat = translate_in_space (pp);
-    }
+  {
+    istat = translate_in_space (pp);
+  }
   else if ((pp->grid = where_in_grid (ndomain, pp->x)) >= 0)
-    {
-      istat = translate_in_wind (w, pp, tau_scat, tau, nres);
-    }
+  {
+    istat = translate_in_wind (w, pp, tau_scat, tau, nres);
+  }
   else
-    {
-      istat = pp->istat = -1;	/* It's not in the wind and it's not in the grid.  Bummer! */
-      Error
-	("translate: Found photon that was not in wind or grid, istat %i\n",
-	 where_in_wind (pp->x, &ndomain));
-    }
+  {
+    istat = pp->istat = -1;     /* It's not in the wind and it's not in the grid.  Bummer! */
+    Error ("translate: Found photon that was not in wind or grid, istat %i\n", where_in_wind (pp->x, &ndomain));
+  }
 
   return (istat);
 }
@@ -148,56 +146,56 @@ translate_in_space (pp)
    * we have though is that we do not know hat domain we are in.*/
 
   if (ndom >= 0 && zdom[ndom].wind_type == IMPORT)
+  {
+    stuff_phot (pp, &ptest);
+    move_phot (&ptest, ds + DFUDGE);    /* So now ptest is at the edge of the wind as defined by the boundary
+                                           From here on we should be in the grid  */
+
+
+    if ((ifail = where_in_grid (ndom, ptest.x)) < 0)
     {
-      stuff_phot (pp, &ptest);
-      move_phot (&ptest, ds + DFUDGE);	/* So now ptest is at the edge of the wind as defined by the boundary
-					   From here on we should be in the grid  */
-
-
-      if ((ifail = where_in_grid (ndom, ptest.x)) < 0)
-	{
-	}
+    }
 
 
 
 
-      /* Note there is a possiblity that we reach the other side 
-       * of the grid without actually encoutering a
-       * wind cell
+    /* Note there is a possiblity that we reach the other side 
+     * of the grid without actually encoutering a
+     * wind cell
+     */
+
+
+    if (where_in_wind (ptest.x, &ndom_next) < 0)
+    {
+
+      smax = ds_to_wind (&ptest, &ndom_next);   // This is the maximum distance can go in this domain
+
+      s = 0;
+      while (s < smax && where_in_wind (ptest.x, &ndom_next) < 0)
+      {
+        if ((delta = ds_in_cell (ndom, &ptest)) > 0)
+        {
+          move_phot (&ptest, delta + DFUDGE);
+          s += delta + DFUDGE;  // The distance the photon has moved
+        }
+        else
+        {
+          break;
+        }
+      }
+
+      /* So at this point we have either gotten out of the domain or we have found a cell that
+       * is actually in the wind or we encoutered the error above
        */
 
+      if (s > 0)
+      {
 
-      if (where_in_wind (ptest.x, &ndom_next) < 0)
-	{
-
-	  smax = ds_to_wind (&ptest, &ndom_next);	// This is the maximum distance can go in this domain
-
-	  s = 0;
-	  while (s < smax && where_in_wind (ptest.x, &ndom_next) < 0)
-	    {
-	      if ((delta = ds_in_cell (ndom, &ptest)) > 0)
-		{
-		  move_phot (&ptest, delta + DFUDGE);
-		  s += delta + DFUDGE;	// The distance the photon has moved
-		}
-	      else
-		{
-		  break;
-		}
-	    }
-
-	  /* So at this point we have either gotten out of the domain or we have found a cell that
-	   * is actually in the wind or we encoutered the error above
-	   */
-
-	  if (s > 0)
-	    {
-
-	      ds += s - DFUDGE;	/* We are going to add DFUDGE back later */
-	    }
-	}
-
+        ds += s - DFUDGE;       /* We are going to add DFUDGE back later */
+      }
     }
+
+  }
 
 
   move_phot (pp, ds + DFUDGE);
@@ -272,123 +270,118 @@ ds_to_wind (pp, ndom_current)
   xxxbound = BOUND_NONE;
 
   for (ndom = 0; ndom < geo.ndomain; ndom++)
+  {
+    if (zdom[ndom].wind_type != IMPORT)
     {
-      if (zdom[ndom].wind_type != IMPORT)
-	{
-	  /* Check if the photon hits the inner or outer radius of the wind */
-	  if ((x = ds_to_sphere (zdom[ndom].rmax, &ptest)) < ds)
-	    {
-	      ds = x;
-	      *ndom_current = ndom;
-	      xxxbound = BOUND_RMIN;
-	    }
+      /* Check if the photon hits the inner or outer radius of the wind */
+      if ((x = ds_to_sphere (zdom[ndom].rmax, &ptest)) < ds)
+      {
+        ds = x;
+        *ndom_current = ndom;
+        xxxbound = BOUND_RMIN;
+      }
 
-	  if ((x = ds_to_sphere (zdom[ndom].rmin, &ptest)) < ds)
-	    {
-	      ds = x;
-	      *ndom_current = ndom;
-	      xxxbound = BOUND_RMAX;
-	    }
+      if ((x = ds_to_sphere (zdom[ndom].rmin, &ptest)) < ds)
+      {
+        ds = x;
+        *ndom_current = ndom;
+        xxxbound = BOUND_RMAX;
+      }
 
-	  /* Check if the photon hits the inner or outer windcone */
+      /* Check if the photon hits the inner or outer windcone */
 
-	  if ((x = ds_to_cone (&zdom[ndom].windcone[0], &ptest)) < ds)
-	    {
-	      ds = x;
-	      *ndom_current = ndom;
-	      xxxbound = BOUND_INNER_CONE;
-	    }
-	  if ((x = ds_to_cone (&zdom[ndom].windcone[1], &ptest)) < ds)
-	    {
-	      ds = x;
-	      *ndom_current = ndom;
-	      xxxbound = BOUND_OUTER_CONE;
-	    }
-	}
+      if ((x = ds_to_cone (&zdom[ndom].windcone[0], &ptest)) < ds)
+      {
+        ds = x;
+        *ndom_current = ndom;
+        xxxbound = BOUND_INNER_CONE;
+      }
+      if ((x = ds_to_cone (&zdom[ndom].windcone[1], &ptest)) < ds)
+      {
+        ds = x;
+        *ndom_current = ndom;
+        xxxbound = BOUND_OUTER_CONE;
+      }
+    }
 
-      /* For this rectangular region we check whether we are in side the grid,
-       * which should effectively.  For * an imported region file we may not be
-       * inside the wind, since some cells may be empty
-       */
+    /* For this rectangular region we check whether we are in side the grid,
+     * which should effectively.  For * an imported region file we may not be
+     * inside the wind, since some cells may be empty
+     */
 
-      else if (zdom[ndom].wind_type == CORONA
-	       || (zdom[ndom].wind_type == IMPORT
-		   && zdom[ndom].coord_type == CYLIND))
-	{
+    else if (zdom[ndom].wind_type == CORONA || (zdom[ndom].wind_type == IMPORT && zdom[ndom].coord_type == CYLIND))
+    {
 
 
-	  x = ds_to_plane (&zdom[ndom].windplane[0], &ptest);
-	  if (x > 0 && x < ds)
-	    {
-	      stuff_phot (pp, &qtest);
-	      move_phot (&qtest, x);
-	      rho = sqrt (qtest.x[0] * qtest.x[0] + qtest.x[1] * qtest.x[1]);
-	      if (zdom[ndom].wind_rho_min <= rho
-		  && rho <= zdom[ndom].wind_rho_min)
-		{
+      x = ds_to_plane (&zdom[ndom].windplane[0], &ptest);
+      if (x > 0 && x < ds)
+      {
+        stuff_phot (pp, &qtest);
+        move_phot (&qtest, x);
+        rho = sqrt (qtest.x[0] * qtest.x[0] + qtest.x[1] * qtest.x[1]);
+        if (zdom[ndom].wind_rho_min <= rho && rho <= zdom[ndom].wind_rho_min)
+        {
 
-		  ds = x;
-		  *ndom_current = ndom;
-		  xxxbound = BOUND_ZMIN;
-		}
-	    }
-	  x = ds_to_plane (&zdom[ndom].windplane[1], &ptest);
-	  if (x > 0 && x < ds)
-	    {
-	      stuff_phot (pp, &qtest);
-	      move_phot (&qtest, x);
-	      rho = sqrt (qtest.x[0] * qtest.x[0] + qtest.x[1] * qtest.x[1]);
-	      if (zdom[ndom].wind_rho_min <= rho
-		  && rho <= zdom[ndom].wind_rho_min)
-		{
+          ds = x;
+          *ndom_current = ndom;
+          xxxbound = BOUND_ZMIN;
+        }
+      }
+      x = ds_to_plane (&zdom[ndom].windplane[1], &ptest);
+      if (x > 0 && x < ds)
+      {
+        stuff_phot (pp, &qtest);
+        move_phot (&qtest, x);
+        rho = sqrt (qtest.x[0] * qtest.x[0] + qtest.x[1] * qtest.x[1]);
+        if (zdom[ndom].wind_rho_min <= rho && rho <= zdom[ndom].wind_rho_min)
+        {
 
-		  ds = x;
-		  *ndom_current = ndom;
-		  xxxbound = BOUND_ZMAX;
-		}
-	    }
+          ds = x;
+          *ndom_current = ndom;
+          xxxbound = BOUND_ZMAX;
+        }
+      }
 
-	  x = ds_to_cylinder (zdom[ndom].wind_rho_min, &ptest);
-	  if (x > 0 && x < ds)
-	    {
-	      stuff_phot (pp, &qtest);
-	      move_phot (&qtest, x);
-	      z = fabs (qtest.x[2]);
-	      if (zdom[ndom].zmin <= z && z <= zdom[ndom].zmax)
+      x = ds_to_cylinder (zdom[ndom].wind_rho_min, &ptest);
+      if (x > 0 && x < ds)
+      {
+        stuff_phot (pp, &qtest);
+        move_phot (&qtest, x);
+        z = fabs (qtest.x[2]);
+        if (zdom[ndom].zmin <= z && z <= zdom[ndom].zmax)
 
-		{
+        {
 
-		  ds = x;
-		  *ndom_current = ndom;
-		  xxxbound = BOUND_INNER_RHO;
-		}
-	    }
+          ds = x;
+          *ndom_current = ndom;
+          xxxbound = BOUND_INNER_RHO;
+        }
+      }
 
-	  x = ds_to_cylinder (zdom[ndom].wind_rho_max, &ptest);
-	  if (x > 0 && x < ds)
-	    {
-	      stuff_phot (pp, &qtest);
-	      move_phot (&qtest, x);
-	      z = fabs (qtest.x[2]);
-	      if (zdom[ndom].zmin <= z && z <= zdom[ndom].zmax)
-		{
+      x = ds_to_cylinder (zdom[ndom].wind_rho_max, &ptest);
+      if (x > 0 && x < ds)
+      {
+        stuff_phot (pp, &qtest);
+        move_phot (&qtest, x);
+        z = fabs (qtest.x[2]);
+        if (zdom[ndom].zmin <= z && z <= zdom[ndom].zmax)
+        {
 
-		  ds = x;
-		  *ndom_current = ndom;
-		  xxxbound = BOUND_OUTER_RHO;
-		}
-	    }
-
-	}
-      else if (zdom[ndom].wind_type == IMPORT)
-	{
-	  Error
-	    ("ds_to_wind:Do not know how to deal with this coordinate type\n");
-	  exit (0);
-
-	}
+          ds = x;
+          *ndom_current = ndom;
+          xxxbound = BOUND_OUTER_RHO;
+        }
+      }
 
     }
+    else if (zdom[ndom].wind_type == IMPORT)
+    {
+      Error ("ds_to_wind:Do not know how to deal with this coordinate type\n");
+      exit (0);
+
+    }
+
+  }
 
 
   return (ds);
@@ -434,7 +427,7 @@ int translate_in_wind_failure = 0;
  **********************************************************/
 int
 translate_in_wind (w, p, tau_scat, tau, nres)
-     WindPtr w;			//w here refers to entire wind, not a single element
+     WindPtr w;                 //w here refers to entire wind, not a single element
      PhotPtr p;
      double tau_scat, *tau;
      int *nres;
@@ -457,20 +450,20 @@ translate_in_wind (w, p, tau_scat, tau, nres)
 return and record an error */
 
   if ((p->grid = n = where_in_grid (wmain[p->grid].ndom, p->x)) < 0)
+  {
+    if (translate_in_wind_failure < 1000)
     {
-      if (translate_in_wind_failure < 1000)
-	{
-//OLD	  if (modes.save_photons)
-//OLD	    {
-//OLD	      save_photons (p, "NotInGrid_translate_in_wind");
-//OLD	    }
-	}
-      return (n);		/* Photon was not in grid */
+//OLD     if (modes.save_photons)
+//OLD       {
+//OLD         save_photons (p, "NotInGrid_translate_in_wind");
+//OLD       }
     }
+    return (n);                 /* Photon was not in grid */
+  }
 
 /* Assign the pointers for the cell containing the photon */
 
-  one = &wmain[n];		/* one is the grid cell where the photon is */
+  one = &wmain[n];              /* one is the grid cell where the photon is */
   nplasma = one->nplasma;
   xplasma = &plasmamain[nplasma];
   ndom = one->ndom;
@@ -480,44 +473,41 @@ return and record an error */
 /* Calculate the maximum distance the photon can travel in the cell */
 
   if ((smax = ds_in_cell (ndom, p)) < 0)
-    {
-      return ((int) smax);
-    }
+  {
+    return ((int) smax);
+  }
 
 
   if (one->inwind == W_PART_INWIND)
-    {				/* The cell is partially in the wind */
-      s = ds_to_wind (p, &ndom_current);	/* smax is set to be the distance to edge of the wind */
-      if (s < smax)
-	smax = s;
-      s = ds_to_disk (p, 0);	/* ds_to_disk can return a negative distance */
-      if (s > 0 && s < smax)
-	smax = s;
-    }
+  {                             /* The cell is partially in the wind */
+    s = ds_to_wind (p, &ndom_current);  /* smax is set to be the distance to edge of the wind */
+    if (s < smax)
+      smax = s;
+    s = ds_to_disk (p, 0);      /* ds_to_disk can return a negative distance */
+    if (s > 0 && s < smax)
+      smax = s;
+  }
   else if (one->inwind == W_IGNORE)
-    {
-      smax += one->dfudge;
-      move_phot (p, smax);
-      return (p->istat);
+  {
+    smax += one->dfudge;
+    move_phot (p, smax);
+    return (p->istat);
 
-    }
+  }
   else if (one->inwind == W_NOT_INWIND)
-    {				/* The cell is not in the wind at all */
+  {                             /* The cell is not in the wind at all */
 
-      Error
-	("translate_in_wind: Grid cell %d of photon is not in wind, moving photon %.2e\n",
-	 n, smax);
-      Error ("translate_in_wind: photon %d position: x %g y %g z %g\n",
-	     p->np, p->x[0], p->x[1], p->x[2]);
-      move_phot (p, smax);
-      return (p->istat);
+    Error ("translate_in_wind: Grid cell %d of photon is not in wind, moving photon %.2e\n", n, smax);
+    Error ("translate_in_wind: photon %d position: x %g y %g z %g\n", p->np, p->x[0], p->x[1], p->x[2]);
+    move_phot (p, smax);
+    return (p->istat);
 
-    }
+  }
 
 
 /* At this point we now know how far the photon can travel in it's current grid cell */
 
-  smax += one->dfudge;		/* dfudge is to force the photon through the cell boundaries. */
+  smax += one->dfudge;          /* dfudge is to force the photon through the cell boundaries. */
 
 /* Set limits the distance a photon can travel.  There are
 a good many photons which travel more than this distance without this
@@ -526,9 +516,9 @@ make small differences in the structure of lines in some cases.
 The choice of SMAX_FRAC can affect execution time.*/
 
   if (smax > SMAX_FRAC * length (p->x))
-    {
-      smax = SMAX_FRAC * length (p->x);
-    }
+  {
+    smax = SMAX_FRAC * length (p->x);
+  }
 
   /* We now determine whether scattering prevents the photon from reaching the far edge of
      the cell.  calculate_ds calculates whether there are scatterings and makes use of the
@@ -551,37 +541,37 @@ The choice of SMAX_FRAC can affect execution time.*/
    the weight of the photon due to continuum absorption, e.g. free free */
 
   if (geo.rt_mode == RT_MODE_MACRO)
-    {				// Macro-method
-      /* In the macro-method, b-f and other continuum processes do not reduce the photon
-         weight, but are treated as as scattering processes.  Therfore most of what was in
-         subroutine radiation can be avoided.
-       */
+  {                             // Macro-method
+    /* In the macro-method, b-f and other continuum processes do not reduce the photon
+       weight, but are treated as as scattering processes.  Therfore most of what was in
+       subroutine radiation can be avoided.
+     */
 
 
-      one = &w[p->grid];
-      nplasma = one->nplasma;
-      xplasma = &plasmamain[nplasma];
-      xplasma->ntot++;
+    one = &w[p->grid];
+    nplasma = one->nplasma;
+    xplasma = &plasmamain[nplasma];
+    xplasma->ntot++;
 
 
-      if (geo.ioniz_or_extract == 1)
-	{
-	  /* For an ionization cycle */
-	  bf_estimators_increment (one, p, ds_current);
-
-	  /*photon weight times distance in the shell is proportional to the mean intensity */
-	  xplasma->j += p->w * ds_current;
-
-	  /* frequency weighted by the weights and distance in the shell.  See eqn 2 ML93 */
-	  xplasma->ave_freq += p->freq * p->w * ds_current;
-
-	}
-
-    }
-  else
+    if (geo.ioniz_or_extract == 1)
     {
-      radiation (p, ds_current);
+      /* For an ionization cycle */
+      bf_estimators_increment (one, p, ds_current);
+
+      /*photon weight times distance in the shell is proportional to the mean intensity */
+      xplasma->j += p->w * ds_current;
+
+      /* frequency weighted by the weights and distance in the shell.  See eqn 2 ML93 */
+      xplasma->ave_freq += p->freq * p->w * ds_current;
+
     }
+
+  }
+  else
+  {
+    radiation (p, ds_current);
+  }
 
 
   move_phot (p, ds_current);
@@ -633,44 +623,42 @@ ds_in_cell (ndom, p)
 return and record an error */
 
   if ((p->grid = n = where_in_grid (ndom, p->x)) < 0)
-    {
+  {
 //OLD      if (modes.save_photons)
-//OLD	{
-//OLD	  save_photons (p, "NotInGrid_ds_in_cell");
-//OLD	}
-      return (n);
-    }
+//OLD   {
+//OLD     save_photons (p, "NotInGrid_ds_in_cell");
+//OLD   }
+    return (n);
+  }
 
 /* Assign the pointers for the cell containing the photon */
 
-  one = &wmain[n];		/* one is the grid cell where the photon is */
+  one = &wmain[n];              /* one is the grid cell where the photon is */
 
 
 /* Calculate the maximum distance the photon can travel in the cell */
 
   if (zdom[ndom].coord_type == CYLIND)
-    {
-      smax = cylind_ds_in_cell (ndom, p);	// maximum distance the photon can travel in a cell
-    }
+  {
+    smax = cylind_ds_in_cell (ndom, p); // maximum distance the photon can travel in a cell
+  }
   else if (zdom[ndom].coord_type == RTHETA)
-    {
-      smax = rtheta_ds_in_cell (ndom, p);
-    }
+  {
+    smax = rtheta_ds_in_cell (ndom, p);
+  }
   else if (zdom[ndom].coord_type == SPHERICAL)
-    {
-      smax = spherical_ds_in_cell (ndom, p);
-    }
+  {
+    smax = spherical_ds_in_cell (ndom, p);
+  }
   else if (zdom[ndom].coord_type == CYLVAR)
-    {
-      smax = cylvar_ds_in_cell (ndom, p);
-    }
+  {
+    smax = cylvar_ds_in_cell (ndom, p);
+  }
   else
-    {
-      Error
-	("ds_in_cell: Don't know how to find ds_in_cell in this coord system %d\n",
-	 zdom[ndom].coord_type);
-      exit (0);
-    }
+  {
+    Error ("ds_in_cell: Don't know how to find ds_in_cell in this coord system %d\n", zdom[ndom].coord_type);
+    exit (0);
+  }
 
   return (smax);
 }
@@ -750,13 +738,13 @@ walls (p, pold, normal)
    */
 
   if ((r = dot (p->x, p->x)) < geo.rstar_sq)
-    {
-      s = ds_to_sphere (geo.rstar, pold);
-      stuff_phot (pold, p);
-      move_phot (p, s);
-      stuff_v (p->x, normal);
-      return (p->istat = P_HIT_STAR);
-    }
+  {
+    s = ds_to_sphere (geo.rstar, pold);
+    stuff_phot (pold, p);
+    move_phot (p, s);
+    stuff_v (p->x, normal);
+    return (p->istat = P_HIT_STAR);
+  }
 
   /* Check to see if it has hit the disk.
    *
@@ -766,80 +754,75 @@ walls (p, pold, normal)
    * that point*/
 
   if (geo.disk_type == DISK_VERTICALLY_EXTENDED)
+  {
+    rho = sqrt (p->x[0] * p->x[0] + p->x[1] * p->x[1]);
+    if ((rho) < geo.diskrad && fabs (p->x[2]) <= (z = zdisk (rho)))
     {
-      rho = sqrt (p->x[0] * p->x[0] + p->x[1] * p->x[1]);
-      if ((rho) < geo.diskrad && fabs (p->x[2]) <= (z = zdisk (rho)))
-	{
-	  /* 0 here means to return VERY_BIG if one has missed the disk, something
-	   * that should not happen
-	   */
+      /* 0 here means to return VERY_BIG if one has missed the disk, something
+       * that should not happen
+       */
 
-	  s = ds_to_disk (pold, 0);
-	  if (s <= 0)
-	    {
-	      Error
-		("walls: The previous position %e %e %e was inside the disk, correcting by  %e \n",
-		 pold->x[0], pold->x[1], pold->x[2], s);
-	      s = ds_to_disk (pold, 0);
-	    }
-	  else if (s == VERY_BIG)
-	    {
-	      Error
-		("walls: Should not miss disk at this position %e %e %e\n",
-		 pold->x[0], pold->x[1], pold->x[2]);
-	      s = ds_to_disk (pold, 0);
-	    }
-	  stuff_phot (pold, p);
-	  move_phot (p, s - DFUDGE);
+      s = ds_to_disk (pold, 0);
+      if (s <= 0)
+      {
+        Error ("walls: The previous position %e %e %e was inside the disk, correcting by  %e \n", pold->x[0], pold->x[1], pold->x[2], s);
+        s = ds_to_disk (pold, 0);
+      }
+      else if (s == VERY_BIG)
+      {
+        Error ("walls: Should not miss disk at this position %e %e %e\n", pold->x[0], pold->x[1], pold->x[2]);
+        s = ds_to_disk (pold, 0);
+      }
+      stuff_phot (pold, p);
+      move_phot (p, s - DFUDGE);
 
-	  /* Finally, we must calculate the normal to the disk at this point */
+      /* Finally, we must calculate the normal to the disk at this point */
 
-	  theta = atan ((zdisk (r * (1. + EPSILON)) - z) / (EPSILON * r));
-	  phi = atan2 (p->x[0], p->x[1]);
+      theta = atan ((zdisk (r * (1. + EPSILON)) - z) / (EPSILON * r));
+      phi = atan2 (p->x[0], p->x[1]);
 
-	  normal[0] = (-cos (phi) * sin (theta));
-	  normal[1] = (-sin (phi) * sin (theta));
-	  normal[2] = cos (theta);
+      normal[0] = (-cos (phi) * sin (theta));
+      normal[1] = (-sin (phi) * sin (theta));
+      normal[2] = cos (theta);
 
-	  if (p->x[2] < 0)
-	    {
-	      normal[2] *= -1;
-	    }
+      if (p->x[2] < 0)
+      {
+        normal[2] *= -1;
+      }
 
 
-	  return (p->istat = P_HIT_DISK);
-	}
+      return (p->istat = P_HIT_DISK);
     }
+  }
   else if (geo.disk_type == DISK_FLAT && p->x[2] * pold->x[2] < 0.0)
-    {				/* Then the photon crossed the xy plane and probably hit the disk */
-      s = (-(pold->x[2])) / (pold->lmn[2]);
-      if (s < 0)
-	{
-	  Error ("walls: distance %g<0. Position %g %g %g \n", s, p->x[0],
-		 p->x[1], p->x[2]);
-	  return (-1);
-	}
-      /* Check whether it hit the disk plane beyond the geo.diskrad**2 */
-      vmove (pold->x, pold->lmn, s, xxx);
-
-      if (dot (xxx, xxx) < geo.diskrad_sq)
-	{			/* The photon has hit the disk */
-	  stuff_phot (pold, p);	/* Move the photon to the point where it hits the disk */
-	  move_phot (p, s - DFUDGE);
-
-	  /* Now fill in the direction for the normal to the surface */
-	  if (pold->x[2] > 0)
-	    {
-	      stuff_v (xnorth, normal);
-	    }
-	  else
-	    {
-	      stuff_v (xsouth, normal);
-	    }
-	  return (p->istat = P_HIT_DISK);
-	}
-
+  {                             /* Then the photon crossed the xy plane and probably hit the disk */
+    s = (-(pold->x[2])) / (pold->lmn[2]);
+    if (s < 0)
+    {
+      Error ("walls: distance %g<0. Position %g %g %g \n", s, p->x[0], p->x[1], p->x[2]);
+      return (-1);
     }
+    /* Check whether it hit the disk plane beyond the geo.diskrad**2 */
+    vmove (pold->x, pold->lmn, s, xxx);
+
+    if (dot (xxx, xxx) < geo.diskrad_sq)
+    {                           /* The photon has hit the disk */
+      stuff_phot (pold, p);     /* Move the photon to the point where it hits the disk */
+      move_phot (p, s - DFUDGE);
+
+      /* Now fill in the direction for the normal to the surface */
+      if (pold->x[2] > 0)
+      {
+        stuff_v (xnorth, normal);
+      }
+      else
+      {
+        stuff_v (xsouth, normal);
+      }
+      return (p->istat = P_HIT_DISK);
+    }
+
+  }
 
   /* At this point we know the photon has not hit the disk or the star, so we now
    * need to check if it has escaped the grid.  See note above regarding whether
@@ -849,8 +832,8 @@ walls (p, pold, normal)
 
   rho_sq = (p->x[0] * p->x[0] + p->x[1] * p->x[1]);
   if (rho_sq > geo.rmax_sq)
-    return (p->istat = P_ESCAPE);	/* The photon is coursing through the universe */
+    return (p->istat = P_ESCAPE);       /* The photon is coursing through the universe */
   if (fabs (p->x[2]) > geo.rmax)
     return (p->istat = P_ESCAPE);
-  return (p->istat);		/* The photon is still in the wind */
+  return (p->istat);            /* The photon is still in the wind */
 }

@@ -46,7 +46,8 @@ reposition (p)
 {
   int n;
 
-  if (p->nres < 0) return (0);  /* Do nothing for non-resonant scatters */
+  if (p->nres < 0)
+    return (0);                 /* Do nothing for non-resonant scatters */
 
   if ((p->grid = n = where_in_grid (wmain[p->grid].ndom, p->x)) < 0)
   {

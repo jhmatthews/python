@@ -252,7 +252,7 @@ xquadratic (a, b, c, r)
       return (-1);              /* The roots are extremely imaginary, since both a a b were 0 */
     }
 
-    r[0] = r[1] = (-c / b);     
+    r[0] = r[1] = (-c / b);
 
     if (r[0] < 0.0)
       return (-2);              /* Generally speaking we are not interested in

@@ -84,7 +84,7 @@ calc_pi_rate (nion, xplasma, mode, type)
     if (-1 < nion && nion < nions)      //Get cross section for this specific ion_number
     {
       ntmin = ion[nion].ntop_ground;    /*We only ever use the ground state cross sections. This is for topbase */
-      nvmin = ion[nion].nxphot;			/* this gets any verner cross section */
+      nvmin = ion[nion].nxphot; /* this gets any verner cross section */
     }
     else
     {
@@ -98,7 +98,7 @@ calc_pi_rate (nion, xplasma, mode, type)
     }
     else if (ion[nion].phot_info == 0)  // verner
     {
-      xtop = &phot_top[nvmin];    //If we don't have a topbase or hybrid cross section we fall back to VFKY
+      xtop = &phot_top[nvmin];  //If we don't have a topbase or hybrid cross section we fall back to VFKY
     }
     else
     {
@@ -204,22 +204,22 @@ calc_pi_rate (nion, xplasma, mode, type)
   }
   else if (mode == 2)           //blackbody mode
   {
-    fmaxtemp = xtop->freq[xtop->np - 1]; //Set the maximum frequency temporarily to the maximum cross section frequency
-    fmax = check_fmax(fmaxtemp, xplasma->t_r);  /*Check that the requested maximum frequency is sensible - if it is way
-		 off the end of the wien tail then the integration can fail - reset if necessary.*/
+    fmaxtemp = xtop->freq[xtop->np - 1];        //Set the maximum frequency temporarily to the maximum cross section frequency
+    fmax = check_fmax (fmaxtemp, xplasma->t_r); /*Check that the requested maximum frequency is sensible - if it is way
+                                                   off the end of the wien tail then the integration can fail - reset if necessary. */
 
-    if (fthresh > fmax)  //The threshold for PI is above the maximum frequency of the radiation
+    if (fthresh > fmax)         //The threshold for PI is above the maximum frequency of the radiation
     {
       pi_rate = 0.0;
     }
-    else  //We are OK - do the integral
+    else                        //We are OK - do the integral
     {
       qromb_temp = xplasma->t_r;
       pi_rate = xplasma->w * qromb (tb_planck1, fthresh, fmax, 1.e-4);
     }
   }
 
-  pi_rate = (4 * PI * pi_rate) / H;  //We multiply by 4pi and divide by photon energy - the division by nu is done in the integrands
+  pi_rate = (4 * PI * pi_rate) / H;     //We multiply by 4pi and divide by photon energy - the division by nu is done in the integrands
 
 
 
@@ -280,7 +280,7 @@ tb_logpow1 (freq)
      double freq;
 {
   double answer;
-  answer = pow (10, xpl_logw + (xpl_alpha - 1.0) * log10 (freq)); //NB - the alpha-1.0 appears because we divide by nu
+  answer = pow (10, xpl_logw + (xpl_alpha - 1.0) * log10 (freq));       //NB - the alpha-1.0 appears because we divide by nu
   answer *= sigma_phot (xtop, freq);    // and finally multiply by the cross section.
 
   return (answer);
@@ -310,6 +310,6 @@ tb_exp1 (freq)
 
   answer = xexp_w * exp ((-1.0 * H * freq) / (BOLTZMANN * xexp_temp));
   answer *= sigma_phot (xtop, freq);    // and finally multiply by the cross section.
-  answer /= freq;   //then finally finally divide by the frequency
+  answer /= freq;               //then finally finally divide by the frequency
   return (answer);
 }

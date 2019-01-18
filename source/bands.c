@@ -153,7 +153,7 @@ bands_init (imode, band)
 
   freqmin = C / 12000e-8;       /*20000 A */
 
-  tmax = 30000.;  /* This sets a floor on freqmax */
+  tmax = 30000.;                /* This sets a floor on freqmax */
 
   if (geo.twind_init > tmax)
     tmax = geo.twind_init;
@@ -172,7 +172,7 @@ bands_init (imode, band)
   else
     Log ("Maximum frequency %8.2e determined by T %8.2e\n", freqmax, tmax);
   geo.tmax = tmax;              /*this a global variable so it is available to the code to make informed guesses as to the possible 
-                                  location of any BB driven exponential dropoff in the spectrum */
+                                   location of any BB driven exponential dropoff in the spectrum */
   t = tmax;
   f1 = freqmin;
   f2 = freqmax;
@@ -704,7 +704,8 @@ freqs_init (freqmin, freqmax)
   Log_silent ("freqs_init: There were %d final intervals\n", geo.nxfreq);
   for (n = 0; n < geo.nxfreq; n++)
   {
-    Log_silent ("freqs_init: %8.2f (%8.2e)    %8.2f (%8.2e)  \n", geo.xfreq[n] * HEV, geo.xfreq[n], geo.xfreq[n + 1] * HEV, geo.xfreq[n + 1]);
+    Log_silent ("freqs_init: %8.2f (%8.2e)    %8.2f (%8.2e)  \n", geo.xfreq[n] * HEV, geo.xfreq[n], geo.xfreq[n + 1] * HEV,
+                geo.xfreq[n + 1]);
   }
 
 

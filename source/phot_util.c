@@ -166,8 +166,8 @@ comp_phot (p1, p2)
 //OLD   Notes:
 //OLD
 //OLD   History:
-//OLD 	090125	ksl	68b -Created to better understand where photon bundles were
-//OLD 			being absorbed or losing energy in the grid
+//OLD   090125  ksl     68b -Created to better understand where photon bundles were
+//OLD                   being absorbed or losing energy in the grid
 //OLD
 //OLD  ************************************************************************/
 
@@ -234,8 +234,8 @@ phot_hist (p, iswitch)
 //OLD
 //OLD
 //OLD   Synopsis:
-//OLD 	The next routine is destigned to update a portion of the PlasmaPtr to reflect where
-//OLD  	photons along the line of sight to the observer were absorbed in the wind
+//OLD   The next routine is destigned to update a portion of the PlasmaPtr to reflect where
+//OLD   photons along the line of sight to the observer were absorbed in the wind
 //OLD
 //OLD   Description:
 //OLD
@@ -244,14 +244,14 @@ phot_hist (p, iswitch)
 //OLD   Returns:
 //OLD
 //OLD   Notes:
-//OLD 	As photon is extracted from the wind, tau changes due to scatters and w changes due
-//OLD 	to absorption.  We are just recording how much energy is absorbed by scatterng processes
-//OLD 	here, and so the energy absorbed is the current weight (exp(-tau_before) - exp (-tau_after))
+//OLD   As photon is extracted from the wind, tau changes due to scatters and w changes due
+//OLD   to absorption.  We are just recording how much energy is absorbed by scatterng processes
+//OLD   here, and so the energy absorbed is the current weight (exp(-tau_before) - exp (-tau_after))
 //OLD
 //OLD   History:
-//OLD 	090211	ksl	Created to store the energy removed photons headed toward the observer
-//OLD 			by an ion in a particular cell of the wind.
-//OLD 	0904	ksl	68c - Fixed problem concerning where energy was being stored
+//OLD   090211  ksl     Created to store the energy removed photons headed toward the observer
+//OLD                   by an ion in a particular cell of the wind.
+//OLD   0904    ksl     68c - Fixed problem concerning where energy was being stored
 //OLD
 //OLD  ************************************************************************/
 
@@ -336,47 +336,47 @@ phot_history_summarize ()
 //OLD
 //OLD
 //OLD
-//OLD 	56d -- Cones have become more prominent in python with time.  Originally
-//OLD 	they were used simply to define the inner and outer edges of the
-//OLD 	wind, that is   to determine when a photon entered the wind.  The wind was/is
-//OLD 	assumed to be a biconical flow, and therefore the most naturally was defined in
-//OLD 	terms of a footpoint in the disk for the innermost/outermost stream line
-//OLD 	and a slope.
+//OLD   56d -- Cones have become more prominent in python with time.  Originally
+//OLD   they were used simply to define the inner and outer edges of the
+//OLD   wind, that is   to determine when a photon entered the wind.  The wind was/is
+//OLD   assumed to be a biconical flow, and therefore the most naturally was defined in
+//OLD   terms of a footpoint in the disk for the innermost/outermost stream line
+//OLD   and a slope.
 //OLD
-//OLD 	It was expanced when rtheta coordanates were introduced
-//OLD 	to handle find when one had hit the theta coordinate boundaries.  And in
-//OLD 	56d we also want it to handle the case where the grid cells have variable
-//OLD 	z coordinates.  Therefore one needs to be quite careful, Since ds_to_cone
-//OLD 	is the ultimate name of the routine I would like to use, the first step
-//OLD 	I took was to change the name of the old routine to ds_to_windcone.  This
-//OLD 	should allow me to replace the old routine incrementally.
+//OLD   It was expanced when rtheta coordanates were introduced
+//OLD   to handle find when one had hit the theta coordinate boundaries.  And in
+//OLD   56d we also want it to handle the case where the grid cells have variable
+//OLD   z coordinates.  Therefore one needs to be quite careful, Since ds_to_cone
+//OLD   is the ultimate name of the routine I would like to use, the first step
+//OLD   I took was to change the name of the old routine to ds_to_windcone.  This
+//OLD   should allow me to replace the old routine incrementally.
 //OLD
-//OLD 	56d -- With python 56d the variable defining a cone were changed to be
-//OLD 	the point on the z axis intercepted by the cone (extended) through
-//OLD 	the disk, and the slope.
+//OLD   56d -- With python 56d the variable defining a cone were changed to be
+//OLD   the point on the z axis intercepted by the cone (extended) through
+//OLD   the disk, and the slope.
 //OLD
-//OLD 	Our approach is as follows:
+//OLD   Our approach is as follows:
 //OLD
-//OLD 	The cone is defined by  z=z_o + dz/drho *drho
-//OLD 	The photon is defined by X=X_o + LMN s
+//OLD   The cone is defined by  z=z_o + dz/drho *drho
+//OLD   The photon is defined by X=X_o + LMN s
 //OLD
-//OLD 	Unless dz/drho = 0, this turns into a simple quadratic equation that must
-//OLD 	be solved.  We work in the northen hemisphere only.
+//OLD   Unless dz/drho = 0, this turns into a simple quadratic equation that must
+//OLD   be solved.  We work in the northen hemisphere only.
 //OLD
-//OLD 	There are issues concerning what to do so one crosses the disk plane.  For
+//OLD   There are issues concerning what to do so one crosses the disk plane.  For
 //OLD         finding how far a photon can travel in a cell, we are *not* interested
-//OLD 	in the possibility that the photon hits the cone on the other side of
-//OLD 	the disk plane, but for a photon travelling out of the wind we are
-//OLD 	very interested in this possibility.
+//OLD   in the possibility that the photon hits the cone on the other side of
+//OLD   the disk plane, but for a photon travelling out of the wind we are
+//OLD   very interested in this possibility.
 //OLD
 //OLD History:
-//OLD 	05jul	ksl	Created so that cylvar coordinates could be incorporated
-//OLD 			into python.
-//OLD 	06sep	ksl	57h -- Corrected an error discovered by SS in the setup of the
-//OLD 			quadratic for a cone.  Note that if this routing ever became
-//OLD 			a "heavy hitter" in terms of efficiency, there are a few
-//OLD 			changes that could speed it up a bit since the magnitude
-//OLD 			of lmn is always 1.
+//OLD   05jul   ksl     Created so that cylvar coordinates could be incorporated
+//OLD                   into python.
+//OLD   06sep   ksl     57h -- Corrected an error discovered by SS in the setup of the
+//OLD                   quadratic for a cone.  Note that if this routing ever became
+//OLD                   a "heavy hitter" in terms of efficiency, there are a few
+//OLD                   changes that could speed it up a bit since the magnitude
+//OLD                   of lmn is always 1.
 //OLD */
 
 
@@ -491,9 +491,9 @@ ds_to_cone (cc, p)
 //OLD
 //OLD   Synopsis:
 //OLD
-//OLD 	Calculate the pathlenth along a line of sight defined by
-//OLD 	a photon p to a sphere or radius r centered on the origin.  If
-//OLD 	the photon does not hit the sphere return a large number VERY_BIG
+//OLD   Calculate the pathlenth along a line of sight defined by
+//OLD   a photon p to a sphere or radius r centered on the origin.  If
+//OLD   the photon does not hit the sphere return a large number VERY_BIG
 //OLD
 //OLD   Description:
 //OLD
@@ -560,8 +560,8 @@ both roots were imaginary */
 //OLD
 //OLD
 //OLD   Synopsis:
-//OLD 	This is more generalized routine to find the positive distance to
-//OLD    	a sphere centered at x with radius r
+//OLD   This is more generalized routine to find the positive distance to
+//OLD           a sphere centered at x with radius r
 //OLD
 //OLD   Description:
 //OLD
@@ -634,11 +634,11 @@ ds_to_sphere2 (x, r, p)
 //OLD
 //OLD   Synopsis:
 //OLD
-//OLD 	This solves a simple quadratic (or if a is zero linear equation).  The return is set up
+//OLD   This solves a simple quadratic (or if a is zero linear equation).  The return is set up
 //OLD    to make it easy to identify the smallest positive root if one exists.  The routine returns
 //OLD    a negative number if both roots are negative or imaginary.
 //OLD    More specifically
-//OLD 	 -1 -> both roots are imaginary
+//OLD    -1 -> both roots are imaginary
 //OLD          -2 -> both roots are negative or 0
 //OLD           0 -> the first root is the smallest positive  root
 //OLD           1 -> the second root is the smallest positive root
@@ -653,11 +653,11 @@ ds_to_sphere2 (x, r, p)
 //OLD   Notes:
 //OLD
 //OLD   History:
-//OLD 	05jul	ksl	56d -- Heretofore roots of 0 were on no insterest, but now that
-//OLD 			quadratic is called by bilin, we would like to know about values
-//OLD 			of zero, specifically.  Since the simplest thing to do was to
-//OLD 			check both roots in this case, I added a little code to make
-//OLD 			sure root was defined in all cases.
+//OLD   05jul   ksl     56d -- Heretofore roots of 0 were on no insterest, but now that
+//OLD                   quadratic is called by bilin, we would like to know about values
+//OLD                   of zero, specifically.  Since the simplest thing to do was to
+//OLD                   check both roots in this case, I added a little code to make
+//OLD                   sure root was defined in all cases.
 //OLD
 //OLD  ************************************************************************/
 
@@ -736,18 +736,18 @@ quadratic (a, b, c, r)
 //OLD
 //OLD   Synopsis:
 //OLD
-//OLD 	ds_to_plane calculates the distance of a photon must travel to hit the plane.
+//OLD   ds_to_plane calculates the distance of a photon must travel to hit the plane.
 //OLD
 //OLD
 //OLD   Description:
 //OLD
-//OLD 	Calcululate the distance a photon must travel to hit a plane.  The plane, just for simplicity,
-//OLD 	is defined as a photon structure since you need both a point and a direction to define it.
-//OLD 	A plane can be defined by a position x_p and a normal lmn_p.  If the photon ray is then
-//OLD 	defined by x=x_v+s lmn_v and the allowed values of s are determined by the equation
+//OLD   Calcululate the distance a photon must travel to hit a plane.  The plane, just for simplicity,
+//OLD   is defined as a photon structure since you need both a point and a direction to define it.
+//OLD   A plane can be defined by a position x_p and a normal lmn_p.  If the photon ray is then
+//OLD   defined by x=x_v+s lmn_v and the allowed values of s are determined by the equation
 //OLD
-//OLD 	(x_v+s lmn_v - x_p)  .  lmn_p=0 where . implies the dot-product.   The routine returns
-//OLD 	VERY_BIG if the photon ray does not intersect the plane .
+//OLD   (x_v+s lmn_v - x_p)  .  lmn_p=0 where . implies the dot-product.   The routine returns
+//OLD   VERY_BIG if the photon ray does not intersect the plane .
 //OLD
 //OLD
 //OLD   Arguments:
@@ -761,8 +761,8 @@ quadratic (a, b, c, r)
 //OLD
 //OLD
 //OLD   History:
-//OLD    04aug	ksl	Changed return to +VERY_BIG if the photon cannot every hit the
-//OLD    			plane.
+//OLD    04aug  ksl     Changed return to +VERY_BIG if the photon cannot every hit the
+//OLD                           plane.
 //OLD
 //OLD
 //OLD
@@ -819,9 +819,9 @@ ds_to_plane (pl, p)
 //OLD
 //OLD
 //OLD   Synopsis:
-//OLD 	This routine calculates the distance a photon has to be moved to
-//OLD 	reach the point of closest approach to a point described by x and also
-//OLD 	calculates the distance of closest approach (i.e. the impact parameter).
+//OLD   This routine calculates the distance a photon has to be moved to
+//OLD   reach the point of closest approach to a point described by x and also
+//OLD   calculates the distance of closest approach (i.e. the impact parameter).
 //OLD
 //OLD
 //OLD   Description:
@@ -909,7 +909,7 @@ ds_to_closest_approach (x, p, impact_parameter)
 //OLD
 //OLD
 //OLD   History:
-//OLD 11aug	ksl	Coding began
+//OLD 11aug     ksl     Coding began
 //OLD
 //OLD  ************************************************************************/
 

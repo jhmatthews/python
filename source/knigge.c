@@ -81,7 +81,7 @@ get_knigge_wind_params (ndom)
                                                                            approximate */
   zdom[ndom].kn_v_zero = 1.0;   /* Parameter which
                                    can use to muliply the initial velocity of wind so that it
-                                   is greater or less than the sound speed. This is not part of the standard KWD model*/
+                                   is greater or less than the sound speed. This is not part of the standard KWD model */
   zdom[ndom].wind_rho_min = 1;  /* Innner and outer edges of the wind in stellar radii. These
                                    parameters were added to allow one to duplicate the YSO
                                    paper */
@@ -101,15 +101,15 @@ To repeat, kn_dratio is the distance to the focus point in stellar radii!
   Log_silent ("dmin = %f so the ratio d/dmin here is %f  (%.2e %.2e) \n", dmin, zdom[ndom].kn_dratio / dmin, geo.diskrad, geo.rstar);
 
 
-  rddoub ("KWD.mdot_r_exponent", &zdom[ndom].kn_lambda); /* Mass loss rate exponent */
-  rddoub ("KWD.v_infinity(in_units_of_vescape)", &zdom[ndom].kn_v_infinity);     /* Final speed of wind in units of escape velocity */
+  rddoub ("KWD.mdot_r_exponent", &zdom[ndom].kn_lambda);        /* Mass loss rate exponent */
+  rddoub ("KWD.v_infinity(in_units_of_vescape)", &zdom[ndom].kn_v_infinity);    /* Final speed of wind in units of escape velocity */
   if (zdom[ndom].kn_v_infinity < 0)
   {
     Log ("Since kn_v_infinity is less than zero, will use SV prescription for velocity law.\n Velocity at base remains the sound speed\n");
   }
 
-  rddoub ("KWD.acceleration_length(cm)", &zdom[ndom].kn_r_scale);        /*Accleration length scale for wind */
-  rddoub ("KWD.acceleration_exponent", &zdom[ndom].kn_alpha);    /* Accleration scale exponent */
+  rddoub ("KWD.acceleration_length(cm)", &zdom[ndom].kn_r_scale);       /*Accleration length scale for wind */
+  rddoub ("KWD.acceleration_exponent", &zdom[ndom].kn_alpha);   /* Accleration scale exponent */
   rddoub ("KWD.v_zero(multiple_of_sound_speed_at_base)", &zdom[ndom].kn_v_zero);
 
   rddoub ("KWD.rmin(in_units_of_rstar)", &zdom[ndom].wind_rho_min);
@@ -281,13 +281,13 @@ is an input to the code. */
 /* 578 -- 06oct -- ksl -- The next lines are modified to allow one to create a SV style
 velocity law if kn_v_infinity is less than 0 */
 
-  if (one_dom->kn_v_infinity > 0.0)  // The normal case
+  if (one_dom->kn_v_infinity > 0.0)     // The normal case
   {
     zzz = ldist / (ldist + one_dom->kn_r_scale);
     zzz = pow (zzz, one_dom->kn_alpha); // In Knigge's notation this is actually beta
     vl = vzero + (one_dom->kn_v_infinity * v_escape - vzero) * zzz;
   }
-  else  // the SV options
+  else                          // the SV options
   {
     zzz = pow (ldist / one_dom->kn_r_scale, one_dom->kn_alpha);
     vl = vzero + ((-one_dom->kn_v_infinity) * v_escape - vzero) * zzz / (1. + zzz);

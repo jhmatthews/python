@@ -66,7 +66,7 @@ get_kpkt_f ()
 
 double
 get_kpkt_heating_f (fraction)
-  double fraction;
+     double fraction;
 {
   int n, nwind;
   double lum, shock_kpkt_luminosity;
@@ -81,9 +81,9 @@ get_kpkt_heating_f (fraction)
 
     /* what we do depends on how the "net heating mode" is defined */
     if (KPKT_NET_HEAT_MODE)
-      shock_kpkt_luminosity = fraction * (shock_heating(one) - plasmamain[n].cool_adiabatic);
+      shock_kpkt_luminosity = fraction * (shock_heating (one) - plasmamain[n].cool_adiabatic);
     else
-      shock_kpkt_luminosity = fraction * shock_heating(one);
+      shock_kpkt_luminosity = fraction * shock_heating (one);
 
     if (shock_kpkt_luminosity > 0)
     {
@@ -94,7 +94,7 @@ get_kpkt_heating_f (fraction)
 
       lum += shock_kpkt_luminosity;
     }
-    else 
+    else
       plasmamain[n].kpkt_emiss = 0.0;
   }
 
@@ -337,7 +337,7 @@ get_matom_f (mode)
                 ppp.w = 0;
                 /* this needs to be initialised because we set to istat to P_ADIABATIC
                    for adiabatic destruction */
-                ppp.istat = P_INWIND; 
+                ppp.istat = P_INWIND;
 
                 macro_gov (&ppp, &nres, 1, &which_out);
 
@@ -578,7 +578,7 @@ photo_gen_kpkt (p, weight, photstart, nphot)
   {
     /* locate the wind_cell in which the photon bundle originates. */
 
-    xlum = random_number(0.0,1.0) * geo.f_kpkt;
+    xlum = random_number (0.0, 1.0) * geo.f_kpkt;
 
     xlumsum = 0;
     icell = 0;
@@ -606,7 +606,7 @@ photo_gen_kpkt (p, weight, photstart, nphot)
 
     while (test > fmax || test < fmin)
     {
-      kpkt (&pp, &nres, &esc_ptr, kpkt_mode); 
+      kpkt (&pp, &nres, &esc_ptr, kpkt_mode);
       if (esc_ptr == 0 && kpkt_mode == KPKT_MODE_CONTINUUM)
       {
         test = 0.0;
@@ -615,7 +615,7 @@ photo_gen_kpkt (p, weight, photstart, nphot)
       {
         if (esc_ptr == 0)
         {
-          macro_gov(&pp, &nres, 1, &which_out);
+          macro_gov (&pp, &nres, 1, &which_out);
         }
         test = pp.freq;
       }
@@ -738,8 +738,8 @@ photo_gen_matom (p, weight, photstart, nphot)
   {
     /* locate the wind_cell in which the photon bundle originates. And also decide which of the macro
        atom levels will be sampled (identify that level as "upper"). */
-    xlum = random_number(0.0,1.0) * geo.f_matom;
-	
+    xlum = random_number (0.0, 1.0) * geo.f_matom;
+
 
     xlumsum = 0;
     icell = 0;

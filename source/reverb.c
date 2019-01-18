@@ -246,12 +246,11 @@ delay_dump (PhotPtr p, int np)
       if (delay < 0)
         subzero++;
 
-        fprintf (fptr,
-                 "%10.5g %12.7g %10.5g %+10.5g %+10.5g %+10.5g %3d     %3d     %10.5g %5d %5d %5d\n",
-                 p[nphot].freq, C * 1e8 / p[nphot].freq, p[nphot].w,
-                 p[nphot].x[0], p[nphot].x[1], p[nphot].x[2],
-                 p[nphot].nscat, p[nphot].nrscat, delay,
-                 i - MSPEC, p[nphot].origin, p[nphot].nres);
+      fprintf (fptr,
+               "%10.5g %12.7g %10.5g %+10.5g %+10.5g %+10.5g %3d     %3d     %10.5g %5d %5d %5d\n",
+               p[nphot].freq, C * 1e8 / p[nphot].freq, p[nphot].w,
+               p[nphot].x[0], p[nphot].x[1], p[nphot].x[2],
+               p[nphot].nscat, p[nphot].nrscat, delay, i - MSPEC, p[nphot].origin, p[nphot].nres);
     }
   }
 

@@ -51,7 +51,7 @@ kappa_comp (xplasma, freq)
   double sigma;                 /*The cross section, thompson, or KN if hnu/mec2 > 0.01 */
   int ndom;
 
-  ndom = wmain[xplasma->nwind].ndom; //work out the domain we are looking at
+  ndom = wmain[xplasma->nwind].ndom;    //work out the domain we are looking at
 
   sigma = alpha (freq) * THOMPSON;      //obtain the energy exchange cross section
 
@@ -172,7 +172,7 @@ total_comp (one, t_e)
 
   x = 0.0;
 
-  if (xplasma->comp_nujnu < 0.0)  //Since J_nu is constant for a given cycle - we only need to compute the integral once when searching for a thermal balance
+  if (xplasma->comp_nujnu < 0.0)        //Since J_nu is constant for a given cycle - we only need to compute the integral once when searching for a thermal balance
   {
     if (geo.spec_mod == 1)      //Check to see if we have generated a spectral model
     {
@@ -190,16 +190,16 @@ total_comp (one, t_e)
       }
     }
 
-    else      //If no spectral model - we do the best we can, and multply the mean intensity by the thompson cross section.
+    else                        //If no spectral model - we do the best we can, and multply the mean intensity by the thompson cross section.
     {
       x = THOMPSON * xplasma->j;
     }
-    xplasma->comp_nujnu = x;  //Store the result of the integral
+    xplasma->comp_nujnu = x;    //Store the result of the integral
   }
   else
-    x = xplasma->comp_nujnu;  //We already have an integral, retrieve it
+    x = xplasma->comp_nujnu;    //We already have an integral, retrieve it
 
-  x *= (16. * PI * BOLTZMANN * t_e * xplasma->ne) / (MELEC * C * C) * xplasma->vol; //Multply by the other terms - including temperature - this gives the temperature dependance of this cooling term.
+  x *= (16. * PI * BOLTZMANN * t_e * xplasma->ne) / (MELEC * C * C) * xplasma->vol;     //Multply by the other terms - including temperature - this gives the temperature dependance of this cooling term.
 
 
   return (x);
@@ -236,8 +236,8 @@ klein_nishina (nu)
 
   kn = THOMPSON;                /* NSH 130605 to remove o3 compile error */
   x1 = x2 = x3 = x4 = 0.0;      /* NSH 130605 to remove o3 compile error */
-  x = (H * nu) / (MELEC * C * C);  //The photon energy relative to the rest mass energy of an electron
-  if (x > 0.0001)   //If the photon energy is high enough - then we need to compute the cross section - otherwise it is just the Thmopson cross section
+  x = (H * nu) / (MELEC * C * C);       //The photon energy relative to the rest mass energy of an electron
+  if (x > 0.0001)               //If the photon energy is high enough - then we need to compute the cross section - otherwise it is just the Thmopson cross section
   {
     x1 = 1. + x;
     x2 = 1. + (2. * x);
@@ -254,9 +254,9 @@ klein_nishina (nu)
 
 //External variables to allow zfunc to search for the correct fractional energy change
 
-double sigma_rand;      //The randomised cross section that our photon will see
-double sigma_max;   //The cross section for the maxmimum energy loss
-double x1;          //The ratio of photon eneergy to electron energy
+double sigma_rand;              //The randomised cross section that our photon will see
+double sigma_max;               //The cross section for the maxmimum energy loss
+double x1;                      //The ratio of photon eneergy to electron energy
 
 /**********************************************************/
 /** 
@@ -311,7 +311,7 @@ compton_dir (p, xplasma)
   }
   else
   {
-    sigma_rand=random_number(0.0,1.0);//Generate a random number between 0 and 1 - this represents a randomised cross section (normalised to the maximum which out photon packet sees
+    sigma_rand = random_number (0.0, 1.0);      //Generate a random number between 0 and 1 - this represents a randomised cross section (normalised to the maximum which out photon packet sees
     f_min = 1.;                 //The minimum energy change - i.e. no energy loss - the scattering angle is zero - the photon does not chage direction
     f_max = 1. + (2. * x1);     //The maximum energy change - this occurs if the scattering angle is 180 degrees (i.e. the photon bounces straight back.) f=e_old/e_new
     sigma_max = sigma_compton_partial (f_max, x1);      //Communicated externally to the integrand function in the zbrent call below, this is the maximum cross section, used to scale the K_N function to lie between 0 and 1. This is essentually the chance of a photon scattering through 180 degrees - or the angle giving the maximum energy loss
@@ -322,7 +322,7 @@ compton_dir (p, xplasma)
     n = (1. - ((f - 1.) / x1)); //This is the angle cosine of the new direction in the frame of reference of the photon - this gives a 2D scattering angle
 
     if (isfinite (len = sqrt (1. - (n * n))) == 0)      //Compute the length of the other angle cosines - the isfinite is to take care of the very rare occasion where n=1!
-      len = 0.0;  // If n=1, then the photon has either been undeflected or bounced straight back. Both are vanishingly unlikely but need to be treated.
+      len = 0.0;                // If n=1, then the photon has either been undeflected or bounced straight back. Both are vanishingly unlikely but need to be treated.
     phi = 0.0;                  //no need to randomise phi, the random rotation of the vector generating the basis function takes care of this
 
     l = len * cos (phi);        //compute the angle cosines of the other two dimensions.
@@ -337,8 +337,8 @@ compton_dir (p, xplasma)
     x[2] = m;
 
     project_from (&nbasis, x, lmn);     /* Project the vector from the FOR of the original photon into the observer frame */
-    renorm (lmn, 1.0);  //Make sure the length of the direction vector is equal to 1
-    stuff_v (lmn, p->lmn);  //Put the new photon direction into the photon structure
+    renorm (lmn, 1.0);          //Make sure the length of the direction vector is equal to 1
+    stuff_v (lmn, p->lmn);      //Put the new photon direction into the photon structure
   }
 
   p->freq = p->freq / f;        //reduce the photon frequency by the fractional energy change

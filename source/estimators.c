@@ -22,11 +22,11 @@
 
 
 /* A couple of external things for use in the routines for computing gamma's below. */
-struct topbase_phot *cont_ext_ptr2; //continuum pointer passed externally
-double temp_ext2;                   //temperature passed externally
-double temp_ext_rad;                //radiation temperature passed externally 
+struct topbase_phot *cont_ext_ptr2;     //continuum pointer passed externally
+double temp_ext2;               //temperature passed externally
+double temp_ext_rad;            //radiation temperature passed externally 
 
-#define ALPHA_SP_CONSTANT 5.79618e-36 //
+#define ALPHA_SP_CONSTANT 5.79618e-36   //
 
 /**********************************************************/
 /**
@@ -390,7 +390,7 @@ bb_estimators_increment (one, p, tau_sobolev, dvds, nn)
 
   mplasma->matom_abs[line_ptr->nconfigu] += weight_of_packet * (1. - exp (-tau_sobolev));
 
-  return (0); 
+  return (0);
 }
 
 /**********************************************************/
@@ -1017,11 +1017,11 @@ get_gamma (cont_ptr, xplasma)
   cont_ext_ptr2 = cont_ptr;     //external cont pointer
   fthresh = cont_ptr->freq[0];  //first frequency in list
   flast = cont_ptr->freq[cont_ptr->np - 1];     //last frequency in list
-  if ((H_OVER_K * (flast-fthresh) / temp_ext2) > ALPHA_MATOM_NUMAX_LIMIT)
-    {
-      //flast is currently very far into the exponential tail: so reduce flast to limit value of h nu / k T.
-      flast = fthresh + temp_ext2 * ALPHA_MATOM_NUMAX_LIMIT / H_OVER_K;
-    }
+  if ((H_OVER_K * (flast - fthresh) / temp_ext2) > ALPHA_MATOM_NUMAX_LIMIT)
+  {
+    //flast is currently very far into the exponential tail: so reduce flast to limit value of h nu / k T.
+    flast = fthresh + temp_ext2 * ALPHA_MATOM_NUMAX_LIMIT / H_OVER_K;
+  }
 
 
   gamma_value = qromb (gamma_integrand, fthresh, flast, 1e-4);
@@ -1096,11 +1096,11 @@ get_gamma_e (cont_ptr, xplasma)
   cont_ext_ptr2 = cont_ptr;     //external cont pointer
   fthresh = cont_ptr->freq[0];  //first frequency in list
   flast = cont_ptr->freq[cont_ptr->np - 1];     //last frequency in list
-  if ((H_OVER_K * (flast-fthresh) / temp_ext2) > ALPHA_MATOM_NUMAX_LIMIT)
-    {
-      //flast is currently very far into the exponential tail: so reduce flast to limit value of h nu / k T.
-      flast = fthresh + temp_ext2 * ALPHA_MATOM_NUMAX_LIMIT / H_OVER_K;
-    }
+  if ((H_OVER_K * (flast - fthresh) / temp_ext2) > ALPHA_MATOM_NUMAX_LIMIT)
+  {
+    //flast is currently very far into the exponential tail: so reduce flast to limit value of h nu / k T.
+    flast = fthresh + temp_ext2 * ALPHA_MATOM_NUMAX_LIMIT / H_OVER_K;
+  }
 
 
   gamma_e_value = qromb (gamma_e_integrand, fthresh, flast, 1e-4);
@@ -1177,13 +1177,13 @@ get_alpha_st (cont_ptr, xplasma)
   fthresh = cont_ptr->freq[0];  //first frequency in list
   flast = cont_ptr->freq[cont_ptr->np - 1];     //last frequency in list
 
-  if ((H_OVER_K * (flast-fthresh) / temp_ext2) > ALPHA_MATOM_NUMAX_LIMIT)
-    {
-      //flast is currently very far into the exponential tail: so reduce flast to limit value of h nu / k T.
-      flast = fthresh + temp_ext2 * ALPHA_MATOM_NUMAX_LIMIT / H_OVER_K;
-    }
+  if ((H_OVER_K * (flast - fthresh) / temp_ext2) > ALPHA_MATOM_NUMAX_LIMIT)
+  {
+    //flast is currently very far into the exponential tail: so reduce flast to limit value of h nu / k T.
+    flast = fthresh + temp_ext2 * ALPHA_MATOM_NUMAX_LIMIT / H_OVER_K;
+  }
 
-  
+
   alpha_st_value = qromb (alpha_st_integrand, fthresh, flast, 1e-4);
 
 
@@ -1273,13 +1273,13 @@ get_alpha_st_e (cont_ptr, xplasma)
   fthresh = cont_ptr->freq[0];  //first frequency in list
   flast = cont_ptr->freq[cont_ptr->np - 1];     //last frequency in list
 
-  if ((H_OVER_K * (flast-fthresh) / temp_ext2) > ALPHA_MATOM_NUMAX_LIMIT)
-    {
-      //flast is currently very far into the exponential tail: so reduce flast to limit value of h nu / k T.
-      flast = fthresh + temp_ext2 * ALPHA_MATOM_NUMAX_LIMIT / H_OVER_K;
-    }
+  if ((H_OVER_K * (flast - fthresh) / temp_ext2) > ALPHA_MATOM_NUMAX_LIMIT)
+  {
+    //flast is currently very far into the exponential tail: so reduce flast to limit value of h nu / k T.
+    flast = fthresh + temp_ext2 * ALPHA_MATOM_NUMAX_LIMIT / H_OVER_K;
+  }
 
-  
+
   alpha_st_e_value = qromb (alpha_st_e_integrand, fthresh, flast, 1e-4);
 
   /* The lines above evaluate the integral in alpha_sp. Now we just want to multiply 
@@ -1335,5 +1335,3 @@ alpha_st_e_integrand (freq)
 
   return (integrand);
 }
-
-

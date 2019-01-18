@@ -344,7 +344,7 @@ matom (p, nres, escape)
        now select what happens next. Start by choosing the random threshold value at which the
        event will occur. */
 
-    threshold = random_number(0.0,1.0);
+    threshold = random_number (0.0, 1.0);
 
     if ((pjnorm_known[uplvl] + penorm_known[uplvl]) <= 0.0)
     {
@@ -363,8 +363,8 @@ matom (p, nres, escape)
     run_tot = 0;
 
     n = 0;
-    threshold = random_number(0.0,1.0);
-	
+    threshold = random_number (0.0, 1.0);
+
     threshold = threshold * pjnorm_known[uplvl_old];
     while (run_tot < threshold)
     {
@@ -424,8 +424,8 @@ matom (p, nres, escape)
 
   run_tot = 0;
   n = 0;
-  threshold = random_number(0.0,1.0);
-  
+  threshold = random_number (0.0, 1.0);
+
   threshold = threshold * penorm_known[uplvl];  //normalise to total emission prob.
   while (run_tot < threshold)
   {
@@ -440,8 +440,8 @@ matom (p, nres, escape)
        or collisional (k-packet). Get a random number and then use the ratio of the collisional
        emission probability to the (already known) collisional+radiative probability to decide whether
        collisional or radiative deactivation occurs. */
-    choice = random_number(0.0,1.0);
-	
+    choice = random_number (0.0, 1.0);
+
 
     line_ptr = &line[config[uplvl].bbd_jump[n]];        //pointer for the bb transition
 
@@ -482,17 +482,17 @@ matom (p, nres, escape)
     rad_rate = mplasma->recomb_sp[config[uplvl].bfd_indx_first + n - nbbd];     //again using recomb_sp rather than alpha_sp (SS July 04)
     coll_rate = q_recomb (cont_ptr, t_e) * ne;
 
-    choice = random_number(0.0,1.0);
-	
+    choice = random_number (0.0, 1.0);
+
 
     if (choice > (coll_rate / (rad_rate + coll_rate)))
     {                           //radiative deactivation
       *escape = 1;
       *nres = config[uplvl].bfd_jump[n - nbbd] + NLINES + 1;
       /* continuua are indicated by nres > NLINES */
-      p->freq = phot_top[config[uplvl].bfd_jump[n - nbbd]].freq[0] - (log (1. -  random_number(0.0,1.0)) * xplasma->t_e / H_OVER_K);
+      p->freq = phot_top[config[uplvl].bfd_jump[n - nbbd]].freq[0] - (log (1. - random_number (0.0, 1.0)) * xplasma->t_e / H_OVER_K);
 
-      
+
       /* Co-moving frequency - changed to rest frequency by doppler */
       /*Currently this assumed hydrogenic shape cross-section - Improve */
     }
@@ -528,7 +528,7 @@ matom (p, nres, escape)
 * later.
 * Define B12_CONSTANT
 ***********************************/
- 
+
 #define B12_CONSTANT 5.01983e25
 
 struct lines *b12_line_ptr;
@@ -556,8 +556,8 @@ b12 (line_ptr)
 /* This relates to the alpha_sp routines at the end of this file */
 
 struct topbase_phot *cont_ext_ptr;      //continuum pointer passed externally
-double temp_ext;                        //temperature passed externally
-int temp_choice;                        //choice of type of calcualation for alpha_sp
+double temp_ext;                //temperature passed externally
+int temp_choice;                //choice of type of calcualation for alpha_sp
 
 /*****************************************************************************/
 
@@ -604,11 +604,11 @@ alpha_sp (cont_ptr, xplasma, ichoice)
   cont_ext_ptr = cont_ptr;      //"
   fthresh = cont_ptr->freq[0];  //first frequency in list
   flast = cont_ptr->freq[cont_ptr->np - 1];     //last frequency in list
-  if ((H_OVER_K * (flast-fthresh) / temp_ext) > ALPHA_MATOM_NUMAX_LIMIT)
-    {
-      //flast is currently very far into the exponential tail: so reduce flast to limit value of h nu / k T.
-      flast = fthresh + temp_ext * ALPHA_MATOM_NUMAX_LIMIT / H_OVER_K;
-    }
+  if ((H_OVER_K * (flast - fthresh) / temp_ext) > ALPHA_MATOM_NUMAX_LIMIT)
+  {
+    //flast is currently very far into the exponential tail: so reduce flast to limit value of h nu / k T.
+    flast = fthresh + temp_ext * ALPHA_MATOM_NUMAX_LIMIT / H_OVER_K;
+  }
   alpha_sp_value = qromb (alpha_sp_integrand, fthresh, flast, 1e-4);
 
   /* The lines above evaluate the integral in alpha_sp. Now we just want to multiply 
@@ -652,7 +652,7 @@ alpha_sp_integrand (freq)
   x = sigma_phot (cont_ext_ptr, freq);  //this is the cross-section
   integrand = x * freq * freq * exp (H_OVER_K * (fthresh - freq) / tt);
 
-  
+
   if (temp_choice == 1)
     return (integrand * freq / fthresh);        //energy weighed case
   if (temp_choice == 2)
@@ -699,7 +699,7 @@ alpha_sp_integrand (freq)
  *	
  *	* 180616  Updated so that one could force kpkt to deactivate via radiation
 ************************************************************/
-#define ALPHA_FF 100.     // maximum h nu / kT to create the free free CDF 
+#define ALPHA_FF 100.           // maximum h nu / kT to create the free free CDF
 
 int
 kpkt (p, nres, escape, mode)
@@ -933,7 +933,7 @@ kpkt (p, nres, escape, mode)
     /* note the units here- we divide the total luminosity of the cell by volume and ne to give cooling rate */
 
 
-    cooling_adiabatic = xplasma->cool_adiabatic / xplasma->vol / xplasma->ne;    // JM 1411 - changed to use filled volume
+    cooling_adiabatic = xplasma->cool_adiabatic / xplasma->vol / xplasma->ne;   // JM 1411 - changed to use filled volume
 
     if (geo.adiabatic == 0 && cooling_adiabatic > 0.0)
     {
@@ -974,21 +974,23 @@ kpkt (p, nres, escape, mode)
   /* only include adiabatic cooling if we're in the right mode. First set a default 
      where adiabatic cooling is zero. This will be true if the mode isn't KPKT_MODE_ALL,
      and also if we are in KPKT_NET_HEAT_MODE and shock heating beats adiabatic cooling. 
-     */
+   */
   /* first subtract off the "true" adiabatic cooling */
   cooling_normalisation = mplasma->cooling_normalisation - mplasma->cooling_adiabatic;
-  cooling_adiabatic = 0.0; // this variable decides the probability of destruction and is altered below.
+  cooling_adiabatic = 0.0;      // this variable decides the probability of destruction and is altered below.
 
   if (mode == KPKT_MODE_ALL)
   {
     /* if we are in KPKT_NET_HEAT_MODE and cooling beats shock heating then include
        the net cooling channel */
-    if (KPKT_NET_HEAT_MODE && geo.nonthermal) {
-      if (xplasma->cool_adiabatic > xplasma->heat_shock) {
+    if (KPKT_NET_HEAT_MODE && geo.nonthermal)
+    {
+      if (xplasma->cool_adiabatic > xplasma->heat_shock)
+      {
         cooling_adiabatic = (xplasma->cool_adiabatic - xplasma->heat_shock) / xplasma->vol / xplasma->ne;
       }
     }
-    else 
+    else
     {
       /* this is the only situation where we genuinely want the destruction channel
          to be exactly equal to the adiabatic cooling */
@@ -1005,7 +1007,7 @@ kpkt (p, nres, escape, mode)
   /* The cooling rates for the recombination and collisional processes are now known. 
      Choose which process destroys the k-packet with a random number. */
 
-  destruction_choice = random_number(0.0,1.0) * cooling_normalisation;
+  destruction_choice = random_number (0.0, 1.0) * cooling_normalisation;
 
   if (destruction_choice < mplasma->cooling_bftot)
   {                             //destruction by bf
@@ -1034,8 +1036,8 @@ kpkt (p, nres, escape, mode)
 
         /* Now (as in matom) choose a frequency for the new packet. */
 
-        p->freq = phot_top[i].freq[0] - (log (1. - random_number(0.0,1.0)) * xplasma->t_e / H_OVER_K);
-		
+        p->freq = phot_top[i].freq[0] - (log (1. - random_number (0.0, 1.0)) * xplasma->t_e / H_OVER_K);
+
         /* Co-moving frequency - changed to rest frequency by doppler */
         /* Currently this assumed hydrogenic shape cross-section - Improve */
 
@@ -1125,8 +1127,7 @@ kpkt (p, nres, escape, mode)
   else
   {
     /* We want destruction by collisional ionization in a macro atom. */
-    destruction_choice =
-      destruction_choice - mplasma->cooling_bftot - mplasma->cooling_bbtot - mplasma->cooling_ff - cooling_adiabatic;
+    destruction_choice = destruction_choice - mplasma->cooling_bftot - mplasma->cooling_bbtot - mplasma->cooling_ff - cooling_adiabatic;
 
     for (i = 0; i < nphot_total; i++)
     {
@@ -1253,7 +1254,7 @@ fake_matom_bb (p, nres, escape)
   /* Now just use a random number to decide what happens. */
 
 //  choice = ((rand () + 0.5) / MAXRAND); //DONE
-  choice = random_number(0.0,1.0);
+  choice = random_number (0.0, 1.0);
 
 
   /* If "choice" is less than rprb then we have chosen a radiative decay - for this fake macro atom there 
@@ -1339,8 +1340,8 @@ fake_matom_bf (p, nres, escape)
 
   *escape = 1;                  //always an r-packet here
 
-  p->freq = phot_top[*nres - NLINES - 1].freq[0] - (log (1. - random_number(0.0,1.0)) * xplasma->t_e / H_OVER_K);
-  
+  p->freq = phot_top[*nres - NLINES - 1].freq[0] - (log (1. - random_number (0.0, 1.0)) * xplasma->t_e / H_OVER_K);
+
 
   /* Currently this assumes hydrogenic shape cross-section - Improve */
 
@@ -1481,8 +1482,8 @@ emit_matom (w, p, nres, upper)
      now select what happens next. Start by choosing the random threshold value at which the
      event will occur. */
 
-  threshold = random_number(0.0,1.0);
-  
+  threshold = random_number (0.0, 1.0);
+
 
   run_tot = 0;
   n = 0;
@@ -1505,9 +1506,9 @@ emit_matom (w, p, nres, upper)
   {                             /* bf downwards jump */
     *nres = config[uplvl].bfd_jump[n - nbbd] + NLINES + 1;
     /* continuua are indicated by nres > NLINES */
-    p->freq = phot_top[config[uplvl].bfd_jump[n - nbbd]].freq[0] - (log (1. - random_number(0.0,1.0)) * t_e / H_OVER_K);
+    p->freq = phot_top[config[uplvl].bfd_jump[n - nbbd]].freq[0] - (log (1. - random_number (0.0, 1.0)) * t_e / H_OVER_K);
 
-	
+
     /* Co-moving frequency - changed to rest frequency by doppler */
     /*Currently this assumed hydrogenic shape cross-section - Improve */
   }
@@ -1623,4 +1624,3 @@ matom_emit_in_line_prob (WindPtr one, struct lines *line_ptr_emit)
   //Return probability that the matom in this cell de-excites into this line
   return (eprbs_line / penorm);
 }
-

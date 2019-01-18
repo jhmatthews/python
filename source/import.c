@@ -29,8 +29,8 @@
 
 
 
-# define LINELEN 512
-# define NCELLS  512
+#define LINELEN 512
+#define NCELLS  512
 
 /* Read in a model of in various coordiante systems, using the coord_type
  * to specify the type of model */
@@ -63,24 +63,22 @@ import_wind (ndom)
   rdstr ("Wind.model2import", filename);
 
   if (zdom[ndom].coord_type == SPHERICAL)
-    {
-      import_1d (ndom, filename);
-    }
+  {
+    import_1d (ndom, filename);
+  }
   else if (zdom[ndom].coord_type == CYLIND)
-    {
-      import_cylindrical (ndom, filename);
-    }
+  {
+    import_cylindrical (ndom, filename);
+  }
   else if (zdom[ndom].coord_type == RTHETA)
-    {
-      import_rtheta (ndom, filename);
-    }
+  {
+    import_rtheta (ndom, filename);
+  }
   else
-    {
-      Error
-	("import_wind: Do not know how to import a model of coor_type %d\n",
-	 zdom[ndom].coord_type);
-      exit (0);
-    }
+  {
+    Error ("import_wind: Do not know how to import a model of coor_type %d\n", zdom[ndom].coord_type);
+    exit (0);
+  }
   return (0);
 }
 
@@ -114,24 +112,22 @@ import_make_grid (w, ndom)
      int ndom;
 {
   if (zdom[ndom].coord_type == SPHERICAL)
-    {
-      spherical_make_grid_import (w, ndom);
-    }
+  {
+    spherical_make_grid_import (w, ndom);
+  }
   else if (zdom[ndom].coord_type == CYLIND)
-    {
-      cylindrical_make_grid_import (w, ndom);
-    }
+  {
+    cylindrical_make_grid_import (w, ndom);
+  }
   else if (zdom[ndom].coord_type == RTHETA)
-    {
-      rtheta_make_grid_import (w, ndom);
-    }
+  {
+    rtheta_make_grid_import (w, ndom);
+  }
   else
-    {
-      Error
-	("import_wind: Do not know how to import a model of coor_type %d\n",
-	 zdom[ndom].coord_type);
-      exit (0);
-    }
+  {
+    Error ("import_wind: Do not know how to import a model of coor_type %d\n", zdom[ndom].coord_type);
+    exit (0);
+  }
   return (0);
 }
 
@@ -169,24 +165,22 @@ import_velocity (ndom, x, v)
 {
   double speed;
   if (zdom[ndom].coord_type == SPHERICAL)
-    {
-      speed = velocity_1d (ndom, x, v);
-    }
+  {
+    speed = velocity_1d (ndom, x, v);
+  }
   else if (zdom[ndom].coord_type == CYLIND)
-    {
-      speed = velocity_cylindrical (ndom, x, v);
-    }
+  {
+    speed = velocity_cylindrical (ndom, x, v);
+  }
   else if (zdom[ndom].coord_type == RTHETA)
-    {
-      speed = velocity_rtheta (ndom, x, v);
-    }
+  {
+    speed = velocity_rtheta (ndom, x, v);
+  }
   else
-    {
-      Error
-	("import_velocity: Do not know how to create velocities from model of coor_type %d\n",
-	 zdom[ndom].coord_type);
-      exit (0);
-    }
+  {
+    Error ("import_velocity: Do not know how to create velocities from model of coor_type %d\n", zdom[ndom].coord_type);
+    exit (0);
+  }
   return (speed);
 }
 
@@ -246,23 +240,21 @@ import_rho (ndom, x)
 {
   double rho;
   if (zdom[ndom].coord_type == SPHERICAL)
-    {
-      rho = rho_1d (ndom, x);
-    }
+  {
+    rho = rho_1d (ndom, x);
+  }
   else if (zdom[ndom].coord_type == CYLIND)
-    {
-      rho = rho_cylindrical (ndom, x);
-    }
+  {
+    rho = rho_cylindrical (ndom, x);
+  }
   else if (zdom[ndom].coord_type == RTHETA)
-    {
-      rho = rho_rtheta (ndom, x);
-    }
+  {
+    rho = rho_rtheta (ndom, x);
+  }
   else
-    {
-      Error
-	("import_rho:  Do not know how to create velocities from model of coor_type %d\n",
-	 zdom[ndom].coord_type);
-      exit (0);
-    }
+  {
+    Error ("import_rho:  Do not know how to create velocities from model of coor_type %d\n", zdom[ndom].coord_type);
+    exit (0);
+  }
   return (rho);
 }

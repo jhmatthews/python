@@ -62,7 +62,7 @@ get_homologous_params (ndom)
   Log ("Creating a homolgous wind model in domain %d\n", ndom);
 
 
- /* Initialize some of the relevant parameters */
+  /* Initialize some of the relevant parameters */
 
 
   one_dom->stellar_wind_mdot = 100.;
