@@ -482,189 +482,48 @@ xmake_phot (p, f1, f2, ioniz_or_final, iwind, weight, iphot_start, nphotons)
   int nphot, nn;
   int nstar, nbl, nwind, ndisk, nmatom, nagn, nkpkt;
   double agn_f1;
+  int nsource[NRAD_SOURCES];
 
   nstar = nbl = nwind = ndisk = 0;
   nagn = nkpkt = nmatom = 0;
 
-  if (geo.star_radiation)
+  /* loop over each radiation source and split photons up */
+  for (i == 0; i < NRAD_SOURCES; i++)
   {
-    nstar = geo.f_star / geo.f_tot * nphotons;
+    nsource[i] = geo.flux[i] / geo.f_tot * nphotons * geo.radiation[i];
+    nphot += nsource[i];
   }
-  if (geo.bl_radiation)
-  {
-    nbl = geo.f_bl / geo.f_tot * nphotons;
-  }
-  if (iwind >= 0)
-  {
-    nwind = geo.f_wind / geo.f_tot * nphotons;
-  }
-  if (geo.disk_radiation)
-  {
-    ndisk = geo.f_disk / geo.f_tot * nphotons;  /* Ensure that nphot photons are created */
-  }
-  if (geo.agn_radiation)
-  {
-    nagn = geo.f_agn / geo.f_tot * nphotons;    /* Ensure that nphot photons are created */
-  }
-  if (geo.matom_radiation || geo.nonthermal)
-  {
-    nkpkt = geo.f_kpkt / geo.f_tot * nphotons;
-    
-    if (geo.matom_radiation)
-      nmatom = geo.f_matom / geo.f_tot * nphotons;
-  }
-
-
-  nphot = ndisk + nwind + nbl + nstar + nagn + nkpkt + nmatom;
 
   if (nphot < nphotons)
   {
-    if (ndisk > 0)
-      ndisk += (nphotons - nphot);
-    else if (nwind > 0)
-      nwind += (nphotons - nphot);
-    else if (nbl > 0)
-      nbl += (nphotons - nphot);
-    else if (nagn > 0)
-      nagn += (nphotons - nphot);
+    if (nsource[DISK] > 0)
+      nsource[DISK] += (nphotons - nphot);
+    else if (nsource[WIND] > 0)
+      nsource[WIND] += (nphotons - nphot);
+    else if (nsource[BL] > 0)
+      nsource[BL] += (nphotons - nphot);
+    else if (nsource[AGN] > 0)
+      nsource[AGN] += (nphotons - nphot);
     else
-      nstar += (nphotons - nphot);
+      nsource[STAR] += (nphotons - nphot);
   }
 
 
   Log
     ("photon_gen: band %6.2e to %6.2e weight %6.2e nphotons %8d ndisk %7d nwind %7d nstar %7d npow %d \n",
-     f1, f2, weight, nphotons, ndisk, nwind, nstar, nagn);
+     f1, f2, weight, nphotons, nsource[DISK], nsource[WIND], nsource[STAR], nsource[AGN]);
 
   /* Generate photons from the star, the bl, the wind and then from the disk */
   /* Now adding generation from kpkts and macro atoms too (SS June 04) */
 
-
-  if (geo.star_radiation)
+  for (i == 0; i < NRAD_SOURCES; i++)
   {
-    nphot = nstar;
-    if (nphot > 0)
+    if (geo.radiation[isource])
     {
-      if (ioniz_or_final == 1)
-        photo_gen_star (p, geo.rstar, geo.tstar, weight, f1, f2, geo.star_spectype, iphot_start, nphot);
-      else
-        photo_gen_star (p, geo.rstar, geo.tstar, weight, f1, f2, geo.star_ion_spectype, iphot_start, nphot);
+      photo_gen_source (p, isource, weight, f1, f2, geo.spectype[isource][ioniz_or_final], iphot_start, nsource[isource]);
+      iphot_start += nsource[isource];
     }
-    iphot_start += nphot;
   }
-  if (geo.bl_radiation)
-  {
-    nphot = nbl;
-
-    if (nphot > 0)
-    {
-      if (ioniz_or_final == 1)
-        photo_gen_star (p, geo.rstar, geo.t_bl, weight, f1, f2, geo.bl_spectype, iphot_start, nphot);
-      else
-        photo_gen_star (p, geo.rstar, geo.t_bl, weight, f1, f2, geo.bl_ion_spectype, iphot_start, nphot);
-/* Reassign the photon type since we are actually using the same routine as for generating
-stellar photons */
-      nn = 0;
-      while (nn < nphot)
-      {
-        p[iphot_start + nn].origin = PTYPE_BL;
-        nn++;
-      }
-    }
-    iphot_start += nphot;
-  }
-
-/* Generate the wind photons */
-
-  if (iwind >= 0)
-  {
-    nphot = nwind;
-    if (nphot > 0)
-      photo_gen_wind (p, weight, f1, f2, iphot_start, nphot);
-    iphot_start += nphot;
-  }
-
-/* Generate the disk photons */
-
-  if (geo.disk_radiation)
-  {
-    nphot = ndisk;
-    if (nphot > 0)
-    {
-      if (ioniz_or_final == 1)
-        photo_gen_disk (p, weight, f1, f2, geo.disk_spectype, iphot_start, nphot);
-      else
-        photo_gen_disk (p, weight, f1, f2, geo.disk_ion_spectype, iphot_start, nphot);
-    }
-    iphot_start += nphot;
-  }
-
-/* Generate the agn photons */
-
-  if (geo.agn_radiation)
-  {
-    nphot = nagn;
-    if (nphot > 0)
-    {
-      /* JM 1502 -- lines to add a low frequency power law cutoff. accessible
-         only in advanced mode */
-      if (geo.pl_low_cutoff != 0.0 && geo.pl_low_cutoff > f1)
-        agn_f1 = geo.pl_low_cutoff;
-
-      /* error condition if user specifies power law cutoff below that hardwired in
-         ionization cycles */
-      else if (geo.pl_low_cutoff > f1 && ioniz_or_final == 0)
-      {
-        Error ("photo_gen_agn: power_law low f cutoff (%8.4e) is lower than hardwired minimum frequency (%8.4e)\n", geo.pl_low_cutoff, f1);
-        agn_f1 = f1;
-      }
-      else
-        agn_f1 = f1;
-
-
-      if (ioniz_or_final == 1)
-        photo_gen_agn (p, geo.r_agn, geo.alpha_agn, weight, agn_f1, f2, geo.agn_spectype, iphot_start, nphot);
-      else
-        photo_gen_agn (p, geo.r_agn, geo.alpha_agn, weight, agn_f1, f2, geo.agn_ion_spectype, iphot_start, nphot);
-    }
-    iphot_start += nphot;
-  }
-
-  /* Now do macro atoms and k-packets. SS June 04 */
-
-  if (geo.matom_radiation || (geo.nonthermal && geo.rt_mode == RT_MODE_MACRO))
-  {
-    nphot = nkpkt;
-    if (nphot > 0)
-    {
-      if (ioniz_or_final == 0 && (geo.nonthermal ==  0))
-      {
-        Error ("xmake_phot: generating photons by k-packets when performing ionization cycle without shock heating. Abort.\n");
-        exit (0);               //The code shouldn't be doing this - something has gone wrong somewhere. (SS June 04)
-      }
-      else
-      {
-        photo_gen_kpkt (p, weight, iphot_start, nphot);
-      }
-    }
-    iphot_start += nphot;
-
-    nphot = nmatom;
-    if (nphot > 0)
-    {
-      if (ioniz_or_final == 0)
-      {
-        Error ("xmake_phot: generating photons by macro atoms when performing ionization cycle. Abort.\n");
-        Exit (0);               //The code shouldn't be doing this - something has gone wrong somewhere. (SS June 04)
-      }
-      else
-      {
-        photo_gen_matom (p, weight, iphot_start, nphot);
-      }
-    }
-    iphot_start += nphot;
-  }
-
 
   return (0);
 }
