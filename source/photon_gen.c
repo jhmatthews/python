@@ -95,7 +95,7 @@ define_phot (p, f1, f2, nphot_tot, ioniz_or_final, iwind, freq_sampling)
 
     if (f1 != f1_old || f2 != f2_old || iwind != iwind_old)
     {                           // The reinitialization is required
-      xdefine_phot (f1, f2, ioniz_or_final, iwind, PRINT_ON, 1.0);
+      xdefine_phot (f1, f2, ioniz_or_final, iwind, PRINT_ON, NORMAL_PHOTONS);
     }
     /* The weight of each photon is designed so that all of the photons add up to the
        luminosity of the photosphere.  This implies that photons must be generated in such
@@ -142,7 +142,7 @@ define_phot (p, f1, f2, nphot_tot, ioniz_or_final, iwind, freq_sampling)
 
         Log ("Defining photons for band %d...\n", n);
 
-        xdefine_phot (xband.f1[n], xband.f2[n], ioniz_or_final, iwind, PRINT_ON, kpkt_fraction);
+        xdefine_phot (xband.f1[n], xband.f2[n], ioniz_or_final, iwind, PRINT_ON, NORMAL_PHOTONS);
 
         /* The weight of each photon is designed so that all of the photons add up to the
            luminosity of the photosphere.  This implies that photons must be generated in such
@@ -156,6 +156,17 @@ define_phot (p, f1, f2, nphot_tot, ioniz_or_final, iwind, freq_sampling)
       }
     }
   }
+
+  if (geo.nonthermal && geo.rt_mode == RT_MODE_MACRO) 
+  {
+    Log ("Making %d extra kpacket photons...\n", NPHOT_KPKT);
+    xdefine_phot (f1, f2, ioniz_or_final, iwind, PRINT_ON, KPKTS_ONLY);
+
+    weight = (geo.f_kpacket) / (NPHOT_KPKT); 
+    xmake_phot (p, f1, f2, ioniz_or_final, iwind, weight, iphot_start, NPHOT_KPKT);
+  }
+
+
 
 
   for (n = 0; n < NPHOT; n++)
@@ -301,12 +312,12 @@ one photon for each band.*/
  **********************************************************/
 
 int
-xdefine_phot (f1, f2, ioniz_or_final, iwind, print_mode, kpkt_fraction)
+xdefine_phot (f1, f2, ioniz_or_final, iwind, print_mode, kpkts_only)
      double f1, f2;
      int ioniz_or_final;
      int iwind;
      int print_mode;
-     double kpkt_fraction;
+     int kpkts_only;
 
 {
 
@@ -317,101 +328,105 @@ xdefine_phot (f1, f2, ioniz_or_final, iwind, print_mode, kpkt_fraction)
   geo.f_star = geo.f_disk = geo.f_bl = 0;
   geo.f_kpkt = geo.f_matom = 0; //SS - kpkt and macro atom luminosities set to zero
 
-  if (geo.star_radiation)
+  if (kpkts_only)
   {
-    star_init (f1, f2, ioniz_or_final, &geo.f_star);
+    geo.f_kpkt = get_kpkt_heating_f ();  
   }
-  if (geo.disk_radiation)
+  else
   {
-
-/* Note  -- disk_init not only calculates fluxes and luminosity for the disk.  It
-calculates the boundaries of the various disk annulae depending on f1 and f2 */
-
-    disk_init (geo.rstar, geo.diskrad, geo.mstar, geo.disk_mdot, f1, f2, ioniz_or_final, &geo.f_disk);
-  }
-  if (geo.bl_radiation)
-  {
-    bl_init (geo.lum_bl, geo.t_bl, f1, f2, ioniz_or_final, &geo.f_bl);
-  }
-  if (geo.agn_radiation)
-  {
-    agn_init (geo.r_agn, geo.lum_agn, geo.alpha_agn, f1, f2, ioniz_or_final, &geo.f_agn);
-  }
-
-/* The choices associated with iwind are
-iwind = -1 	Don't generate any wind photons at all
-         1      Create wind photons and force a reinitialization of the wind
-         0      Create wind photons but remain open to the question of whether
-		the wind needs to be reinitialized.  Initialization is forced
-		in that case by init
-*/
-
-  if (iwind == -1)
-    geo.f_wind = geo.lum_wind = 0.0;
-
-  if (iwind == 1 || (iwind == 0))
-  {                             /* Then find the luminosity and flux of the wind */
-    geo.lum_wind = wind_luminosity (0.0, VERY_BIG);
-    xxxpdfwind = 1;             // Turn on the portion of the line luminosity routine which creates pdfs
-    geo.f_wind = wind_luminosity (f1, f2);
-    xxxpdfwind = 0;             // Turn off the portion of the line luminosity routine which creates pdfs
-  }
-
-  /* Handle the initialization of emission via k-packets and macro atoms. SS */
-
-  if (geo.matom_radiation)
-  {
-    /* JM 1408 -- only calculate macro atom emissivity if first cycle.
-       Otherwise have restarted run and can use saved emissivities */
-    /* This returns the specific luminosity
-       in the spectral band of interest */
-    if (geo.pcycle == 0)
+    if (geo.star_radiation)
     {
-      geo.f_matom = get_matom_f (CALCULATE_MATOM_EMISSIVITIES);
+      star_init (f1, f2, ioniz_or_final, &geo.f_star);
     }
-    else
-      geo.f_matom = get_matom_f (USE_STORED_MATOM_EMISSIVITIES);
+    if (geo.disk_radiation)
+    {
+
+  /* Note  -- disk_init not only calculates fluxes and luminosity for the disk.  It
+  calculates the boundaries of the various disk annulae depending on f1 and f2 */
+
+      disk_init (geo.rstar, geo.diskrad, geo.mstar, geo.disk_mdot, f1, f2, ioniz_or_final, &geo.f_disk);
+    }
+    if (geo.bl_radiation)
+    {
+      bl_init (geo.lum_bl, geo.t_bl, f1, f2, ioniz_or_final, &geo.f_bl);
+    }
+    if (geo.agn_radiation)
+    {
+      agn_init (geo.r_agn, geo.lum_agn, geo.alpha_agn, f1, f2, ioniz_or_final, &geo.f_agn);
+    }
+
+    /* The choices associated with iwind are
+    iwind = -1 	Don't generate any wind photons at all
+             1      Create wind photons and force a reinitialization of the wind
+             0      Create wind photons but remain open to the question of whether
+    		the wind needs to be reinitialized.  Initialization is forced
+    		in that case by init
+    */
+
+    if (iwind == -1)
+      geo.f_wind = geo.lum_wind = 0.0;
+
+    if (iwind == 1 || (iwind == 0))
+    {                             /* Then find the luminosity and flux of the wind */
+      geo.lum_wind = wind_luminosity (0.0, VERY_BIG);
+      xxxpdfwind = 1;             // Turn on the portion of the line luminosity routine which creates pdfs
+      geo.f_wind = wind_luminosity (f1, f2);
+      xxxpdfwind = 0;             // Turn off the portion of the line luminosity routine which creates pdfs
+    }
+
+    /* Handle the initialization of emission via k-packets and macro atoms. SS */
+
+    if (geo.matom_radiation)
+    {
+      /* JM 1408 -- only calculate macro atom emissivity if first cycle.
+         Otherwise have restarted run and can use saved emissivities */
+      /* This returns the specific luminosity
+         in the spectral band of interest */
+      if (geo.pcycle == 0)
+      {
+        geo.f_matom = get_matom_f (CALCULATE_MATOM_EMISSIVITIES);
+      }
+      else
+        geo.f_matom = get_matom_f (USE_STORED_MATOM_EMISSIVITIES);
 
 
-    geo.f_kpkt = get_kpkt_f (); /* This returns the specific luminosity
-                                   in the spectral band of interest */
+      geo.f_kpkt = get_kpkt_f (); /* This returns the specific luminosity
+                                     in the spectral band of interest */
 
-    matom_emiss_report ();      // function which logs the macro atom level emissivites
-  }
-  else if (geo.nonthermal && geo.rt_mode == RT_MODE_MACRO)
-  {
-    /* calculate the non-radiative kpkt luminosity throughout the wind */
-    geo.f_kpkt = get_kpkt_heating_f (kpkt_fraction);  
-  }
-
+      matom_emiss_report ();      // function which logs the macro atom level emissivites
+    }
 
   geo.f_tot = geo.f_star + geo.f_disk + geo.f_bl + geo.f_wind + geo.f_kpkt + geo.f_matom + geo.f_agn;
   geo.lum_tot = geo.lum_star + geo.lum_disk + geo.lum_bl + geo.lum_agn + geo.lum_wind;
 
   if (print_mode == PRINT_ON)
   {
-    if (geo.nonthermal && geo.rt_mode == RT_MODE_MACRO && geo.matom_radiation == 0)
-      Log ("!! xdefine_phot: total & banded kpkt luminosity due to non-radiative heating:  %8.2e %8.2e \n", geo.heat_shock, geo.f_kpkt);
     if (geo.adiabatic)
       Log ("!! xdefine_phot: heating & cooling  due to adiabatic processes:         %8.2e %8.2e \n", geo.heat_adiabatic, geo.cool_adiabatic);
+    if (kpkts_only)
+    {
+      Log ("\n!! xdefine_phot: total kpkt luminosity due to non-radiative heating: heat_shock %8.2e f_kpkt %8.2e \n", geo.heat_shock, geo.f_kpkt);
+    }
+    else
+    {
+      Log
+        ("!! xdefine_phot: lum_tot %8.2e lum_star %8.2e lum_disk %8.2e lum_bl %8.2e lum_agn %8.2e lum_wind %8.2e\n",
+         geo.lum_tot, geo.lum_star, geo.lum_disk, geo.lum_bl, geo.lum_agn, geo.lum_wind);
 
-    Log
-      ("!! xdefine_phot: lum_tot %8.2e lum_star %8.2e lum_disk %8.2e lum_bl %8.2e lum_agn %8.2e lum_wind %8.2e\n",
-       geo.lum_tot, geo.lum_star, geo.lum_disk, geo.lum_bl, geo.lum_agn, geo.lum_wind);
+      Log
+        ("!! xdefine_phot:   f_tot %8.2e   f_star %8.2e   f_disk %8.2e   f_bl %8.2e   f_agn %8.2e   f_wind %8.2e   f_matom %8.2e   f_kpkt %8.2e \n",
+         geo.f_tot, geo.f_star, geo.f_disk, geo.f_bl, geo.f_agn, geo.f_wind, geo.f_matom, geo.f_kpkt);
 
-    Log
-      ("!! xdefine_phot:   f_tot %8.2e   f_star %8.2e   f_disk %8.2e   f_bl %8.2e   f_agn %8.2e   f_wind %8.2e   f_matom %8.2e   f_kpkt %8.2e \n",
-       geo.f_tot, geo.f_star, geo.f_disk, geo.f_bl, geo.f_agn, geo.f_wind, geo.f_matom, geo.f_kpkt);
-
-    Log
-      ("!! xdefine_phot: wind ff %8.2e       fb %8.2e   lines  %8.2e  for freq %8.2e %8.2e\n",
-       geo.lum_ff, geo.lum_rr, geo.lum_lines, f1, f2);
-    Log
-      ("!! xdefine_phot: star  tstar  %8.2e   %8.2e   lum_star %8.2e %8.2e  %8.2e \n",
-       geo.tstar, geo.tstar_init, geo.lum_star, geo.lum_star_init, geo.lum_star_back);
-    Log
-      ("!! xdefine_phot: disk                               lum_disk %8.2e %8.2e  %8.2e \n",
-       geo.lum_disk, geo.lum_disk_init, geo.lum_disk_back);
+      Log
+        ("!! xdefine_phot: wind ff %8.2e       fb %8.2e   lines  %8.2e  for freq %8.2e %8.2e\n",
+         geo.lum_ff, geo.lum_rr, geo.lum_lines, f1, f2);
+      Log
+        ("!! xdefine_phot: star  tstar  %8.2e   %8.2e   lum_star %8.2e %8.2e  %8.2e \n",
+         geo.tstar, geo.tstar_init, geo.lum_star, geo.lum_star_init, geo.lum_star_back);
+      Log
+        ("!! xdefine_phot: disk                               lum_disk %8.2e %8.2e  %8.2e \n",
+         geo.lum_disk, geo.lum_disk_init, geo.lum_disk_back);
+    }
   }
 
   /* Store the 3 variables that have to remain the same to avoid reinitialization */

@@ -670,7 +670,12 @@ init_ionization ()
       geo.shock_factor=0.001*4*PI*pow(geo.rstar,2)*STEFAN_BOLTZMANN*pow(geo.tstar,4.);
       rddoub ("Thermal_balance_options.extra_heating", &geo.shock_factor);
       geo.shock_factor /= (4*PI*pow(geo.rstar,3));
-      Log("The non_thermal emissivity at the base is %.2e\n", geo.shock_factor);
+      Log ("The non_thermal emissivity at the base is %.2e\n", geo.shock_factor);
+
+      if (geo.rt_mode == RT_MODE_MACRO)
+      {
+        rdint ("Thermal_balance_options.number_of_kpackets", &geo.number_of_kpackets);
+      }
     }
 
 
