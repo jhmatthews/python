@@ -1,8 +1,0 @@
-<map id="reposition" name="reposition">
-<area shape="rect" id="node2" href="$templates_8h.html#a1aaecc045729b48d2ede700108567dcd" title="(w,pp,itype,nspec) " alt="" coords="119,5,193,32"/>
-<area shape="rect" id="node7" href="$trans__phot_8c.html#a2f7b8208c76fe2718f45f46c9dc3a813" title="Transport a single photon photon through the wind. " alt="" coords="341,56,443,83"/>
-<area shape="rect" id="node3" href="$templates_8h.html#a280fcbb3dddfaf58a73b2a8d6fd61c76" title="A supervisory routine called to builds detailed spectra in the normal (extract) mode. " alt="" coords="241,5,293,32"/>
-<area shape="rect" id="node4" href="$trans__phot_8c.html#a620388e1c4a8e38f192c5a0ce42af389" title="int (w,p,iextract) oversees the propagation of a &quot;flight&quot; of photons " alt="" coords="491,31,560,57"/>
-<area shape="rect" id="node5" href="$templates_8h.html#a28fc174aa63a5eeef6de99ef392e1616" title="run the ionization cycles for a python model " alt="" coords="608,5,717,32"/>
-<area shape="rect" id="node6" href="$templates_8h.html#abc2ad803345c801984f4dc64d4d4a9e0" title="generates the detailed spectra " alt="" coords="620,56,705,83"/>
-</map>

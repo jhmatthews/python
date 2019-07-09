@@ -1,9 +1,0 @@
-<map id="Debug" name="Debug">
-<area shape="rect" id="node2" href="$get__atomicdata_8c.html#ae8afa865c507915363062a5abd9c32b7" title="generalized subroutine for reading atomic data into a set of structures defined in &quot;atomic..." alt="" coords="249,7,345,34"/>
-<area shape="rect" id="node3" href="$templates_8h.html#afa8b5c03286c90c5365b874967e81b33" title="Perform sanity checks on xsection data. " alt="" coords="105,33,201,59"/>
-<area shape="rect" id="node4" href="$templates_8h.html#a663f46d36d6962c7993e4c002442c23b" title="Perform some simple checks on the photon distribution just produced. " alt="" coords="109,83,198,110"/>
-<area shape="rect" id="node5" href="$python_8c.html#afced8478b91af5c169926dfa4426333d" title="The main routine for Python, which supervises the ingest of data defining a model, the initializtion of the model, and actual run of the model, and writing the data to the disk. " alt="" coords="131,134,175,161"/>
-<area shape="rect" id="node6" href="$saha_8c.html#a389fdf4d9e9d542a78a25229ce259927" title="calculates ion densities of a single element (defined by nelem) according to a modified on the spot a..." alt="" coords="111,185,196,211"/>
-<area shape="rect" id="node7" href="$templates_8h.html#a63d5795e0b9978d33ed61a63917004e2" title="modifies the densities of ions, levels, and partition functions of ions within a cell of the wind bas..." alt="" coords="393,185,519,211"/>
-<area shape="rect" id="node8" href="$templates_8h.html#aa8ede21a14cf7e763909094555c5240d" title="Calculates ion abundances allowing for the Lucy Mazzali correction factors to the saha abundances con..." alt="" coords="277,210,317,237"/>
-</map>

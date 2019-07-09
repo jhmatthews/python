@@ -1,5 +1,0 @@
-<map id="get_rand_brem" name="get_rand_brem">
-<area shape="rect" id="node2" href="$templates_8h.html#a82dbda6e94577f3ecd6e55c085f2aa10" title="Generate a photon from an AGN object. " alt="" coords="143,5,235,32"/>
-<area shape="rect" id="node3" href="$templates_8h.html#ab7f1c9362f29a0b44f41cff21494b6df" title="just makes photons " alt="" coords="283,5,359,32"/>
-<area shape="rect" id="node4" href="$templates_8h.html#aa943bd857500a1f2937d8b97d84ff633" title="the controlling routine for creating the underlying photon distribution. " alt="" coords="407,5,481,32"/>
-</map>

@@ -1,7 +1,0 @@
-<map id="spherical_wind_complete" name="spherical_wind_complete">
-<area shape="rect" id="node2" href="$templates_8h.html#a635decc081c41b8ab55d8b547408970a" title="Use the imported data to initialize various portions of the Wind and Domain structures. " alt="" coords="188,5,303,47"/>
-<area shape="rect" id="node3" href="$windsave_8c.html#ad5c30455dbf640e7a5d68132a8e4a5c5" title="A driver routine that calls coordinate&#45;system specific routines that complete the descirption of the ..." alt="" coords="201,71,290,98"/>
-<area shape="rect" id="node4" href="$wind2d_8c.html#a41ee5cb999f1d4258673b6134394b4cc" title="initializes the structures which characterize the wind, including wmain and plasmamain. " alt="" coords="351,46,427,73"/>
-<area shape="rect" id="node6" href="$windsave_8c.html#a1bf368d85f72b220cc4cba091a5e0702" title="Read back the windsavefile. " alt="" coords="355,97,423,123"/>
-<area shape="rect" id="node5" href="$python_8c.html#afced8478b91af5c169926dfa4426333d" title="The main routine for Python, which supervises the ingest of data defining a model, the initializtion of the model, and actual run of the model, and writing the data to the disk. " alt="" coords="475,46,519,73"/>
-</map>

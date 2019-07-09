@@ -1,6 +1,0 @@
-<map id="bilin" name="bilin">
-<area shape="rect" id="node2" href="$templates_8h.html#a95334daf522cc6a4ac43e85e759f4a31" title="w) calculates the wind volume of a cylindrical cell allowing for the fact that some cells ..." alt="" coords="95,5,186,32"/>
-<area shape="rect" id="node5" href="$util_8c.html#ad7e07bac9d1bcabdcca0c8f77e164309" title="calculates the fractional location of a position in any 2d grid. " alt="" coords="93,56,188,83"/>
-<area shape="rect" id="node3" href="$wind2d_8c.html#a41ee5cb999f1d4258673b6134394b4cc" title="initializes the structures which characterize the wind, including wmain and plasmamain. " alt="" coords="236,5,312,32"/>
-<area shape="rect" id="node4" href="$python_8c.html#afced8478b91af5c169926dfa4426333d" title="The main routine for Python, which supervises the ingest of data defining a model, the initializtion of the model, and actual run of the model, and writing the data to the disk. " alt="" coords="360,5,404,32"/>
-</map>

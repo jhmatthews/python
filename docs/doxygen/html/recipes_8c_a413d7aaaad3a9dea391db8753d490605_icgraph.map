@@ -1,6 +1,0 @@
-<map id="golden" name="golden">
-<area shape="rect" id="node2" href="$templates_8h.html#aff5a3156ec26863e37ff61073bb97ca4" title="Calculate the distance to the Roche surface for a photon. " alt="" coords="114,5,202,32"/>
-<area shape="rect" id="node3" href="$templates_8h.html#ad4ca36cf5f0eaaa3fb044a982d922fb3" title="Find out whether a photon will hit the secondary, but don&#39;t actually calculate the point where it hit..." alt="" coords="116,56,200,83"/>
-<area shape="rect" id="node4" href="$templates_8h.html#ad958df4fd3f6dd7f4ff01882d407c6c6" title="Find the half width of the secondary Roche lobe. " alt="" coords="105,107,211,133"/>
-<area shape="rect" id="node5" href="$templates_8h.html#a22069934602644cf4f894c0b48967d49" title="From the masses and period, setup the information one needs to calculate the position of the Roche lo..." alt="" coords="259,107,341,133"/>
-</map>

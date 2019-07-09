@@ -1,7 +1,0 @@
-<map id="planck" name="planck">
-<area shape="rect" id="node2" href="$templates_8h.html#a82dbda6e94577f3ecd6e55c085f2aa10" title="Generate a photon from an AGN object. " alt="" coords="104,5,196,32"/>
-<area shape="rect" id="node5" href="$templates_8h.html#a19e1b27b1fe040ccadcd39a5783c4d60" title="Generate nphot photons from the star in the frequency interval f1 to f2. " alt="" coords="104,56,196,83"/>
-<area shape="rect" id="node6" href="$templates_8h.html#ac6e59fd8ed9979322e86a14ed34c2851" title="Generate disk photons. " alt="" coords="104,107,196,133"/>
-<area shape="rect" id="node3" href="$templates_8h.html#ab7f1c9362f29a0b44f41cff21494b6df" title="just makes photons " alt="" coords="244,56,320,83"/>
-<area shape="rect" id="node4" href="$templates_8h.html#aa943bd857500a1f2937d8b97d84ff633" title="the controlling routine for creating the underlying photon distribution. " alt="" coords="368,56,443,83"/>
-</map>

@@ -1,6 +1,0 @@
-<map id="xsaha" name="xsaha">
-<area shape="rect" id="node2" href="$templates_8h.html#a96f3f44cc5cf473ca91ca268747dfba1" title="A routine to calculate concentrations in a plasma cell using the Saha equation with various assumptio..." alt="" coords="209,20,296,46"/>
-<area shape="rect" id="node4" href="$templates_8h.html#a16363b5cd764e733bd84a0d991cb6568" title="Calculate the densities for all of the ions in a single cell given ne and t. " alt="" coords="103,20,147,46"/>
-<area shape="rect" id="node5" href="$variable__temperature_8c.html#a72d9769510683e30aeef87c2a255ebe4" title="modifies the densities of ions, levels, and partition functions of ions within a cell of the wind bas..." alt="" coords="195,70,311,97"/>
-<area shape="rect" id="node3" href="$templates_8h.html#a63d5795e0b9978d33ed61a63917004e2" title="modifies the densities of ions, levels, and partition functions of ions within a cell of the wind bas..." alt="" coords="359,45,484,72"/>
-</map>

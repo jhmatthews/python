@@ -1,6 +1,0 @@
-<map id="get_ne" name="get_ne">
-<area shape="rect" id="node2" href="$templates_8h.html#a044bda6029c9b8057f77a920a61ce525" title="Allows a previous windsave to be used in a new hydro simulation. " alt="" coords="127,5,209,32"/>
-<area shape="rect" id="node3" href="$templates_8h.html#a1e569c92136f73f8643f20d8fb43f544" title="A matrix solver for the ionization state in a cell. " alt="" coords="105,56,231,83"/>
-<area shape="rect" id="node4" href="$variable__temperature_8c.html#a72d9769510683e30aeef87c2a255ebe4" title="modifies the densities of ions, levels, and partition functions of ions within a cell of the wind bas..." alt="" coords="110,107,226,133"/>
-<area shape="rect" id="node5" href="$templates_8h.html#a63d5795e0b9978d33ed61a63917004e2" title="modifies the densities of ions, levels, and partition functions of ions within a cell of the wind bas..." alt="" coords="279,107,404,133"/>
-</map>

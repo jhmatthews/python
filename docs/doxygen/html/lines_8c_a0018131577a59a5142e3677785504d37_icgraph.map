@@ -1,9 +1,0 @@
-<map id="lum_lines" name="lum_lines">
-<area shape="rect" id="node2" href="$templates_8h.html#a2a31b4c75dc8f482609abe7b1618a97b" title="calculate the cooling rate of the entire wind between freqencies f1 and f2 (including non&#45;radiative p..." alt="" coords="131,5,211,32"/>
-<area shape="rect" id="node3" href="$templates_8h.html#ae1d27b840ad2ff21462921fc2aab975c" title="calculate the luminosity of the entire wind between freqencies f1 and f2 " alt="" coords="125,56,217,83"/>
-<area shape="rect" id="node8" href="$templates_8h.html#a0abc40a64ed911b152833da9a675d1b4" title="Calculate the total line emission from a wind cell. " alt="" coords="117,107,224,133"/>
-<area shape="rect" id="node4" href="$templates_8h.html#a9a0acf2d461c665dc0302defa95ded65" title="calculates the band limited fluxes &amp; luminosities, and prepares for the producting of photons (by rei..." alt="" coords="286,31,365,57"/>
-<area shape="rect" id="node7" href="$py__wind__sub_8c.html#a5fbfbb635a9e9fcadb5f07319131e4a6" title="heatcool_summary" alt="" coords="272,81,379,108"/>
-<area shape="rect" id="node5" href="$templates_8h.html#aa943bd857500a1f2937d8b97d84ff633" title="the controlling routine for creating the underlying photon distribution. " alt="" coords="568,31,643,57"/>
-<area shape="rect" id="node6" href="$templates_8h.html#addfbba966a4d69bdc71b771e0d7f3cdf" title="Determine how many photons to allocate to each band. " alt="" coords="427,56,520,83"/>
-</map>

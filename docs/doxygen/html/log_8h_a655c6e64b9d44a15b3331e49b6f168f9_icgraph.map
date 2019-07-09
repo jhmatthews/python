@@ -1,7 +1,0 @@
-<map id="Log_parallel" name="Log_parallel">
-<area shape="rect" id="node2" href="$templates_8h.html#a311f414c070511a6e17313830d4d3c36" title="communicates the MC estimators between tasks " alt="" coords="147,5,306,32"/>
-<area shape="rect" id="node3" href="$templates_8h.html#a426a0602a269a1d9738c39c8098ffaae" title="communicate_matom_estimators_para" alt="" coords="129,56,324,83"/>
-<area shape="rect" id="node4" href="$templates_8h.html#ac8797bce5a5f3411f4162dff928b7920" title="returns the specific band&#45;limited luminosity in macro&#45;atoms " alt="" coords="187,107,267,133"/>
-<area shape="rect" id="node5" href="$python_8c.html#afced8478b91af5c169926dfa4426333d" title="The main routine for Python, which supervises the ingest of data defining a model, the initializtion of the model, and actual run of the model, and writing the data to the disk. " alt="" coords="205,157,249,184"/>
-<area shape="rect" id="node6" href="$templates_8h.html#abc2ad803345c801984f4dc64d4d4a9e0" title="generates the detailed spectra " alt="" coords="184,208,269,235"/>
-</map>

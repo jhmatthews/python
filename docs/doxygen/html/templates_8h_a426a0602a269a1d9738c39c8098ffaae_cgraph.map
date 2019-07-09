@@ -1,5 +1,0 @@
-<map id="communicate_matom_estimators_para" name="communicate_matom_estimators_para">
-<area shape="rect" id="node2" href="$log_8h.html#a9a25be4f0d7d13fccc8457774d74167f" title="Print/write an informational message. " alt="" coords="267,5,305,32"/>
-<area shape="rect" id="node4" href="$log_8h.html#a655c6e64b9d44a15b3331e49b6f168f9" title="In addition to writing to the diag file, print a message to the screen from all threads. " alt="" coords="248,56,324,83"/>
-<area shape="rect" id="node3" href="$xlog_8c.html#aeb93dfd882dd6a658b86662e6e219a09" title="Open a log file. " alt="" coords="372,5,429,32"/>
-</map>

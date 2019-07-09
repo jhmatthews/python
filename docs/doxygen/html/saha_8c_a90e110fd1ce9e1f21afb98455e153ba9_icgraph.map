@@ -1,6 +1,0 @@
-<map id="get_ne" name="get_ne">
-<area shape="rect" id="node2" href="$templates_8h.html#a63d5795e0b9978d33ed61a63917004e2" title="modifies the densities of ions, levels, and partition functions of ions within a cell of the wind bas..." alt="" coords="256,26,381,53"/>
-<area shape="rect" id="node3" href="$templates_8h.html#a96f3f44cc5cf473ca91ca268747dfba1" title="A routine to calculate concentrations in a plasma cell using the Saha equation with various assumptio..." alt="" coords="113,26,200,53"/>
-<area shape="rect" id="node4" href="$templates_8h.html#aa8ede21a14cf7e763909094555c5240d" title="Calculates ion abundances allowing for the Lucy Mazzali correction factors to the saha abundances con..." alt="" coords="137,77,177,103"/>
-<area shape="rect" id="node5" href="$templates_8h.html#ad350a11e70a4518fb86b842942575e26" title="sets the concentrations of individual ions assuming hard coded ionization fractions that are read fro..." alt="" coords="105,127,208,154"/>
-</map>

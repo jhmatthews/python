@@ -1,5 +1,0 @@
-<map id="rtheta_make_cones" name="rtheta_make_cones">
-<area shape="rect" id="node2" href="$templates_8h.html#a38134c43cdc9afb2ef078514b06b4f88" title="Defines an r&#45;theta grid to accept a hydro model. " alt="" coords="164,5,295,32"/>
-<area shape="rect" id="node3" href="$templates_8h.html#a044bda6029c9b8057f77a920a61ce525" title="Allows a previous windsave to be used in a new hydro simulation. " alt="" coords="189,56,270,83"/>
-<area shape="rect" id="node4" href="$templates_8h.html#a8b3c1f6c4930f2daf2e4b20af1956787" title="Use the imported data to initialize various portions of the Wind and Domain structures. " alt="" coords="163,107,296,133"/>
-</map>

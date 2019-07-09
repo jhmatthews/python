@@ -1,4 +1,0 @@
-<map id="rdpar_set_mpi_rank" name="rdpar_set_mpi_rank">
-<area shape="rect" id="node2" href="$xlog_8c.html#ac8c2622fe84047acf2894bcf91fcef73" title="Store the rank of this particular thread. " alt="" coords="164,5,268,32"/>
-<area shape="rect" id="node3" href="$python_8c.html#afced8478b91af5c169926dfa4426333d" title="The main routine for Python, which supervises the ingest of data defining a model, the initializtion of the model, and actual run of the model, and writing the data to the disk. " alt="" coords="316,5,360,32"/>
-</map>

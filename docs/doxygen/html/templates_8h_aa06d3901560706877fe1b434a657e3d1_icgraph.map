@@ -1,5 +1,0 @@
-<map id="cylind_is_cell_in_wind" name="cylind_is_cell_in_wind">
-<area shape="rect" id="node2" href="$templates_8h.html#a13144d35b1d57cfa570b6e59d225f474" title="Calculates the wind volume for cells in a cylindrical domain allowing for the fact that some cells ar..." alt="" coords="173,5,264,32"/>
-<area shape="rect" id="node3" href="$wind2d_8c.html#a41ee5cb999f1d4258673b6134394b4cc" title="initializes the structures which characterize the wind, including wmain and plasmamain. " alt="" coords="312,5,388,32"/>
-<area shape="rect" id="node4" href="$python_8c.html#afced8478b91af5c169926dfa4426333d" title="The main routine for Python, which supervises the ingest of data defining a model, the initializtion of the model, and actual run of the model, and writing the data to the disk. " alt="" coords="436,5,480,32"/>
-</map>

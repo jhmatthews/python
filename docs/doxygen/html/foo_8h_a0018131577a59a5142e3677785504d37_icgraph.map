@@ -1,8 +1,0 @@
-<map id="lum_lines" name="lum_lines">
-<area shape="rect" id="node2" href="$templates_8h.html#a2a31b4c75dc8f482609abe7b1618a97b" title="calculate the cooling rate of the entire wind between freqencies f1 and f2 (including non&#45;radiative p..." alt="" coords="123,5,203,32"/>
-<area shape="rect" id="node3" href="$templates_8h.html#ae1d27b840ad2ff21462921fc2aab975c" title="calculate the luminosity of the entire wind between freqencies f1 and f2 " alt="" coords="117,56,209,83"/>
-<area shape="rect" id="node4" href="$templates_8h.html#a9a0acf2d461c665dc0302defa95ded65" title="calculates the band limited fluxes &amp; luminosities, and prepares for the producting of photons (by rei..." alt="" coords="271,31,350,57"/>
-<area shape="rect" id="node7" href="$py__wind__sub_8c.html#a5fbfbb635a9e9fcadb5f07319131e4a6" title="heatcool_summary" alt="" coords="257,81,364,108"/>
-<area shape="rect" id="node5" href="$templates_8h.html#aa943bd857500a1f2937d8b97d84ff633" title="the controlling routine for creating the underlying photon distribution. " alt="" coords="553,31,628,57"/>
-<area shape="rect" id="node6" href="$templates_8h.html#addfbba966a4d69bdc71b771e0d7f3cdf" title="Determine how many photons to allocate to each band. " alt="" coords="412,56,505,83"/>
-</map>

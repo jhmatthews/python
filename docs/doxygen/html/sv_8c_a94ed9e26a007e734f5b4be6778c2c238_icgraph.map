@@ -1,5 +1,0 @@
-<map id="sv_zero_init" name="sv_zero_init">
-<area shape="rect" id="node2" href="$sv_8c.html#a46a164e1a1a8d16ad77f99b8a766f38a" title="Locates the radial position in the disk from which the stream line arises. " alt="" coords="129,31,237,57"/>
-<area shape="rect" id="node3" href="$sv_8c.html#a2e62e3c36e76963e8e9f69b82329d447" title="Calulate the v of a Schlossman Vitello wind at a position x. " alt="" coords="285,5,356,32"/>
-<area shape="rect" id="node4" href="$sv_8c.html#abde80034508a0a977d22a060696a8b7e" title="Calculate the density of an sv_wind at a position x. " alt="" coords="404,31,456,57"/>
-</map>

@@ -1,8 +1,0 @@
-<map id="timer" name="timer">
-<area shape="rect" id="node2" href="$python_8c.html#afced8478b91af5c169926dfa4426333d" title="The main routine for Python, which supervises the ingest of data defining a model, the initializtion of the model, and actual run of the model, and writing the data to the disk. " alt="" coords="130,5,174,32"/>
-<area shape="rect" id="node3" href="$templates_8h.html#a28fc174aa63a5eeef6de99ef392e1616" title="run the ionization cycles for a python model " alt="" coords="97,56,207,83"/>
-<area shape="rect" id="node4" href="$templates_8h.html#abc2ad803345c801984f4dc64d4d4a9e0" title="generates the detailed spectra " alt="" coords="109,107,195,133"/>
-<area shape="rect" id="node5" href="$templates_8h.html#ab1f63fcb955cb5c77dcb2d35b5da2cd4" title="xsignal generates a single line message to a file names root.sig " alt="" coords="125,157,179,184"/>
-<area shape="rect" id="node7" href="$templates_8h.html#aa067770b0286b11ebb3282166d941c85" title="check whether the elapsed time is greater than the max_time and terminate the program if that is the ..." alt="" coords="261,208,333,235"/>
-<area shape="rect" id="node6" href="$templates_8h.html#a53d75807008c96f7053e25e029ed8a95" title="Set the maximum time the program should run. " alt="" coords="255,157,339,184"/>
-</map>

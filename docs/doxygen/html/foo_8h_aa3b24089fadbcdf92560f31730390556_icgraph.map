@@ -1,7 +1,0 @@
-<map id="get_time" name="get_time">
-<area shape="rect" id="node2" href="$templates_8h.html#aed071173676fa884b0045139793c85d7" title="Prepares delay dump output file. " alt="" coords="117,5,219,32"/>
-<area shape="rect" id="node3" href="$templates_8h.html#ab1f63fcb955cb5c77dcb2d35b5da2cd4" title="xsignal generates a single line message to a file names root.sig " alt="" coords="141,56,195,83"/>
-<area shape="rect" id="node6" href="$spectra_8c.html#a9e26bf475d028c01075ff128c8c80d57" title="(writes out the spectrum to a file " alt="" coords="113,107,223,133"/>
-<area shape="rect" id="node4" href="$templates_8h.html#a53d75807008c96f7053e25e029ed8a95" title="Set the maximum time the program should run. " alt="" coords="271,31,355,57"/>
-<area shape="rect" id="node5" href="$templates_8h.html#aa067770b0286b11ebb3282166d941c85" title="check whether the elapsed time is greater than the max_time and terminate the program if that is the ..." alt="" coords="277,81,349,108"/>
-</map>

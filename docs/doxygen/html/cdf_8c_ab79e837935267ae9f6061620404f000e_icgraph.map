@@ -1,9 +1,0 @@
-<map id="cdf_get_rand_limit" name="cdf_get_rand_limit">
-<area shape="rect" id="node2" href="$templates_8h.html#a5f832b1ef434fdb41eaa62feb7edd710" title="returns the frequency for a photon which follows a Placnk distribution within defined frequncy limits..." alt="" coords="177,56,227,83"/>
-<area shape="rect" id="node8" href="$templates_8h.html#aea33eee38cf4a6c25978443404ddaf2c" title="Obtain a random frequency photon from a bremstrahlung spectrum. " alt="" coords="157,5,247,32"/>
-<area shape="rect" id="node3" href="$templates_8h.html#a82dbda6e94577f3ecd6e55c085f2aa10" title="Generate a photon from an AGN object. " alt="" coords="295,5,387,32"/>
-<area shape="rect" id="node6" href="$templates_8h.html#a19e1b27b1fe040ccadcd39a5783c4d60" title="Generate nphot photons from the star in the frequency interval f1 to f2. " alt="" coords="295,56,387,83"/>
-<area shape="rect" id="node7" href="$templates_8h.html#ac6e59fd8ed9979322e86a14ed34c2851" title="Generate disk photons. " alt="" coords="295,107,387,133"/>
-<area shape="rect" id="node4" href="$templates_8h.html#ab7f1c9362f29a0b44f41cff21494b6df" title="just makes photons " alt="" coords="435,56,511,83"/>
-<area shape="rect" id="node5" href="$templates_8h.html#aa943bd857500a1f2937d8b97d84ff633" title="the controlling routine for creating the underlying photon distribution. " alt="" coords="559,56,633,83"/>
-</map>

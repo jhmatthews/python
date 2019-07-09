@@ -1,4 +1,0 @@
-<map id="freqs_init" name="freqs_init">
-<area shape="rect" id="node2" href="$templates_8h.html#a3513a64162c15d3d3d101c3d5ea2367f" title="This is the routine that initializes the bands. " alt="" coords="116,5,184,32"/>
-<area shape="rect" id="node3" href="$python_8c.html#afced8478b91af5c169926dfa4426333d" title="The main routine for Python, which supervises the ingest of data defining a model, the initializtion of the model, and actual run of the model, and writing the data to the disk. " alt="" coords="232,5,276,32"/>
-</map>

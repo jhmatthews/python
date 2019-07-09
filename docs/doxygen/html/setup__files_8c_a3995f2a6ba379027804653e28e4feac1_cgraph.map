@@ -1,6 +1,0 @@
-<map id="init_log_and_windsave" name="init_log_and_windsave">
-<area shape="rect" id="node2" href="$foo_8h.html#adb0062a13c369fa8c13a5a02c3ffec86" title="Remove the old signal file so that one can begin again. " alt="" coords="179,5,250,32"/>
-<area shape="rect" id="node3" href="$foo_8h.html#ab1f63fcb955cb5c77dcb2d35b5da2cd4" title="xsignal generates a single line message to a file names root.sig " alt="" coords="188,56,241,83"/>
-<area shape="rect" id="node4" href="$log_8h.html#aeb93dfd882dd6a658b86662e6e219a09" title="Open a log file. " alt="" coords="186,107,243,133"/>
-<area shape="rect" id="node5" href="$log_8h.html#a178b76a4a9db5eff98e1b57e4188b40b" title="Opens an existing log file so that diagnostic message can be added to it. " alt="" coords="176,157,253,184"/>
-</map>

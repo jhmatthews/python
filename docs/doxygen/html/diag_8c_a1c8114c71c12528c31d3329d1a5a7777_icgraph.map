@@ -1,6 +1,0 @@
-<map id="save_photon_stats" name="save_photon_stats">
-<area shape="rect" id="node2" href="$templates_8h.html#a141c8c8db4119b46cba7dcff5de861b3" title="increment the matom bound&#45;free estimators " alt="" coords="159,5,291,32"/>
-<area shape="rect" id="node5" href="$templates_8h.html#adb025e0891ad334d41481551bf785170" title="updates the field parameters in the wind and reduces the weight of the photon as a result of the effe..." alt="" coords="195,56,255,83"/>
-<area shape="rect" id="node3" href="$templates_8h.html#a0118547dede9b08b5ac6609b4313e3e8" title="translates the photon within a single cell in the wind. " alt="" coords="339,5,439,32"/>
-<area shape="rect" id="node4" href="$templates_8h.html#ae77272897af1eb8f6ebd0f7cfe2932e8" title="a steering routine that either calls _in_space or _in_wind depending upon the current location of the..." alt="" coords="487,5,547,32"/>
-</map>

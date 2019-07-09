@@ -1,8 +1,0 @@
-<map id="roche_deriv" name="roche_deriv">
-<area shape="rect" id="node2" href="$roche_8c.html#aa85d6bb7bef49e7e4b18d238eb2e6430" title="Calculate the gradient of the Roche potential as the photon travels. " alt="" coords="133,31,191,57"/>
-<area shape="rect" id="node7" href="$roche_8c.html#a7b0bed5d82ce2310bbd039704b3567cd" title="Calculate the second derivative of the Roche potential of the secondary. " alt="" coords="128,81,196,108"/>
-<area shape="rect" id="node3" href="$roche_8c.html#a4a0210aea098f52ca60dfbc90de4ecee" title="Calculate the Roche potential at position indicated by the photon p_roche and the length s..." alt="" coords="244,56,283,83"/>
-<area shape="rect" id="node4" href="$foo_8h.html#a779ccebed86e21a9d217673baf5da757" title="length" alt="" coords="342,5,391,32"/>
-<area shape="rect" id="node5" href="$foo_8h.html#a1c6dc9c24a43e2bc6319b23faba4a041" title="Simply copy one photon bundle into another. " alt="" coords="334,56,399,83"/>
-<area shape="rect" id="node6" href="$foo_8h.html#a8f17a1e86112f24760862d998129d91c" title="move a photon by a distance ds " alt="" coords="331,107,403,133"/>
-</map>

@@ -1,4 +1,0 @@
-<map id="set_max_time" name="set_max_time">
-<area shape="rect" id="node2" href="$parse_8c.html#ac55d931d6bb5bc546561ccf10b1d7fd6" title="parses the command line options " alt="" coords="137,5,255,32"/>
-<area shape="rect" id="node3" href="$python_8c.html#afced8478b91af5c169926dfa4426333d" title="The main routine for Python, which supervises the ingest of data defining a model, the initializtion of the model, and actual run of the model, and writing the data to the disk. " alt="" coords="174,56,218,83"/>
-</map>

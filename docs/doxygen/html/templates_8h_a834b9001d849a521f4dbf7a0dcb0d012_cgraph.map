@@ -1,5 +1,0 @@
-<map id="check_convergence" name="check_convergence">
-<area shape="rect" id="node2" href="$log_8h.html#a9a25be4f0d7d13fccc8457774d74167f" title="Print/write an informational message. " alt="" coords="177,5,216,32"/>
-<area shape="rect" id="node4" href="$log_8h.html#a762beaa59cb344fbb45e3458b86c95ce" title="Flush the diagnostic file to assure that one has an up&#45;to&#45;date version of the log file..." alt="" coords="164,56,229,83"/>
-<area shape="rect" id="node3" href="$xlog_8c.html#aeb93dfd882dd6a658b86662e6e219a09" title="Open a log file. " alt="" coords="277,31,335,57"/>
-</map>

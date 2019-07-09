@@ -1,4 +1,0 @@
-<map id="wind_paths_evaluate" name="wind_paths_evaluate">
-<area shape="rect" id="node2" href="$python_8c.html#afced8478b91af5c169926dfa4426333d" title="The main routine for Python, which supervises the ingest of data defining a model, the initializtion of the model, and actual run of the model, and writing the data to the disk. " alt="" coords="202,5,246,32"/>
-<area shape="rect" id="node3" href="$templates_8h.html#a28fc174aa63a5eeef6de99ef392e1616" title="run the ionization cycles for a python model " alt="" coords="169,56,279,83"/>
-</map>

@@ -1,4 +1,0 @@
-<map id="pillbox" name="pillbox">
-<area shape="rect" id="node2" href="$templates_8h.html#aff5a3156ec26863e37ff61073bb97ca4" title="Calculate the distance to the Roche surface for a photon. " alt="" coords="104,5,192,32"/>
-<area shape="rect" id="node3" href="$templates_8h.html#ad4ca36cf5f0eaaa3fb044a982d922fb3" title="Find out whether a photon will hit the secondary, but don&#39;t actually calculate the point where it hit..." alt="" coords="106,56,190,83"/>
-</map>

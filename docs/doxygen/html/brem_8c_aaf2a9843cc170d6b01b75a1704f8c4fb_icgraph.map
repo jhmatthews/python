@@ -1,7 +1,0 @@
-<map id="integ_brem" name="integ_brem">
-<area shape="rect" id="node2" href="$templates_8h.html#ab6c8e4e9577a9edb71a9a5900d43964c" title="Calculates the total luminosity of an AGN type source. " alt="" coords="163,5,220,32"/>
-<area shape="rect" id="node6" href="$templates_8h.html#a897e0ae97c32a481075df9fc45f6e745" title="sets up the boundary layer and agn power law parameters based on user input and system type ..." alt="" coords="125,56,257,83"/>
-<area shape="rect" id="node3" href="$templates_8h.html#a9a0acf2d461c665dc0302defa95ded65" title="calculates the band limited fluxes &amp; luminosities, and prepares for the producting of photons (by rei..." alt="" coords="305,5,384,32"/>
-<area shape="rect" id="node4" href="$templates_8h.html#aa943bd857500a1f2937d8b97d84ff633" title="the controlling routine for creating the underlying photon distribution. " alt="" coords="573,5,648,32"/>
-<area shape="rect" id="node5" href="$templates_8h.html#addfbba966a4d69bdc71b771e0d7f3cdf" title="Determine how many photons to allocate to each band. " alt="" coords="432,31,525,57"/>
-</map>

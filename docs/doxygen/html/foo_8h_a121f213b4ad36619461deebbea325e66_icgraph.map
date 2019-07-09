@@ -1,4 +1,0 @@
-<map id="vmove" name="vmove">
-<area shape="rect" id="node2" href="$phot__util_8c.html#a8b9698b536acf2ec47097c93fb6c81f0" title="This routine calculates the distance a photon has to be moved to reach the point of closest approach ..." alt="" coords="105,5,236,32"/>
-<area shape="rect" id="node3" href="$templates_8h.html#acb71ca3a7e18d652d5eb0df69766c022" title="determines whether the photon has encountered the star of disk or reached the edges of the grid and r..." alt="" coords="149,56,193,83"/>
-</map>

@@ -1,8 +1,0 @@
-<map id="sv_theta_wind" name="sv_theta_wind">
-<area shape="rect" id="node2" href="$sv_8c.html#a2e62e3c36e76963e8e9f69b82329d447" title="Calulate the v of a Schlossman Vitello wind at a position x. " alt="" coords="475,20,545,47"/>
-<area shape="rect" id="node3" href="$sv_8c.html#abde80034508a0a977d22a060696a8b7e" title="Calculate the density of an sv_wind at a position x. " alt="" coords="593,20,645,47"/>
-<area shape="rect" id="node4" href="$templates_8h.html#a3e9f63d90b25108ed917dbd91583ab8f" title="Routine used by zbrent to find a footpoint of a streamline in an SV model. " alt="" coords="168,71,233,98"/>
-<area shape="rect" id="node6" href="$templates_8h.html#af9d14b750645265f8bcb32d68f9a3832" title="The integrand required to calculate the normalization factor between the global mass loss rate and th..." alt="" coords="139,122,263,148"/>
-<area shape="rect" id="node5" href="$sv_8c.html#a46a164e1a1a8d16ad77f99b8a766f38a" title="Locates the radial position in the disk from which the stream line arises. " alt="" coords="315,71,423,98"/>
-<area shape="rect" id="node7" href="$templates_8h.html#acc6d4ccf49e7781a11424e723e25f812" title="gets input data which is necessary for a Shlossman &amp; Vitello description of the wind ..." alt="" coords="311,122,427,148"/>
-</map>

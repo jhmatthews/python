@@ -1,5 +1,0 @@
-<map id="scattering_fraction" name="scattering_fraction">
-<area shape="rect" id="node2" href="$templates_8h.html#a0018131577a59a5142e3677785504d37" title="Calculate the line lumiosity of lines between nmin and nmax of the frequency ordered list of lines..." alt="" coords="157,5,221,32"/>
-<area shape="rect" id="node4" href="$templates_8h.html#a08e6e02acfd4d2fb6b31cf9bfdc7b258" title="calculates the amount of line heating that during a resonance. " alt="" coords="158,56,221,83"/>
-<area shape="rect" id="node3" href="$templates_8h.html#a0abc40a64ed911b152833da9a675d1b4" title="Calculate the total line emission from a wind cell. " alt="" coords="269,5,376,32"/>
-</map>

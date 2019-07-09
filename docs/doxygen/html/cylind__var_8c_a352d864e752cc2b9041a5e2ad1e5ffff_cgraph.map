@@ -1,7 +1,0 @@
-<map id="cylvar_get_random_location" name="cylvar_get_random_location">
-<area shape="rect" id="node2" href="$foo_8h.html#a4a0210aea098f52ca60dfbc90de4ecee" title="Calculate the Roche potential at position indicated by the photon p_roche and the length s..." alt="" coords="229,5,267,32"/>
-<area shape="rect" id="node3" href="$foo_8h.html#aed64e9379499a741e8a7c42376e20530" title="Translate a cell number in the wind to the two&#45;d grid position in a specific domain. " alt="" coords="209,56,287,83"/>
-<area shape="rect" id="node4" href="$foo_8h.html#a451b4740f3d1e12cb07885b0d3e5ef1b" title="Gets a random number from the generator set up in init_rand. " alt="" coords="200,107,296,133"/>
-<area shape="rect" id="node5" href="$foo_8h.html#a2c852998cd074100b68f8750a8d8ca99" title="where_in_wind" alt="" coords="203,157,293,184"/>
-<area shape="rect" id="node6" href="$foo_8h.html#a829a331b30311e6768f4cc16a70fdab5" title="where_in_2dcell" alt="" coords="201,208,295,235"/>
-</map>

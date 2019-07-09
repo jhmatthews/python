@@ -1,5 +1,0 @@
-<map id="compute_di_coeffs" name="compute_di_coeffs">
-<area shape="rect" id="node2" href="$direct__ion_8c.html#a6a22ee2c1e95eae27423b95ce1283f71" title="Returns the collisional ionization rate coefficient for a given ion/temperature. " alt="" coords="159,5,237,32"/>
-<area shape="rect" id="node3" href="$log_8h.html#aed844368416d95992f0bbeb9f7fec55b" title="Write a message to the diagnostic file. " alt="" coords="285,5,353,32"/>
-<area shape="rect" id="node4" href="$xlog_8c.html#aeb93dfd882dd6a658b86662e6e219a09" title="Open a log file. " alt="" coords="401,5,459,32"/>
-</map>

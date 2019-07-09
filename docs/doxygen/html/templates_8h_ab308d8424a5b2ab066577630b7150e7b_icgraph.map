@@ -1,6 +1,0 @@
-<map id="brem_d" name="brem_d">
-<area shape="rect" id="node2" href="$templates_8h.html#aea33eee38cf4a6c25978443404ddaf2c" title="Obtain a random frequency photon from a bremstrahlung spectrum. " alt="" coords="109,5,199,32"/>
-<area shape="rect" id="node3" href="$templates_8h.html#a82dbda6e94577f3ecd6e55c085f2aa10" title="Generate a photon from an AGN object. " alt="" coords="247,5,339,32"/>
-<area shape="rect" id="node4" href="$templates_8h.html#ab7f1c9362f29a0b44f41cff21494b6df" title="just makes photons " alt="" coords="387,5,463,32"/>
-<area shape="rect" id="node5" href="$templates_8h.html#aa943bd857500a1f2937d8b97d84ff633" title="the controlling routine for creating the underlying photon distribution. " alt="" coords="511,5,585,32"/>
-</map>

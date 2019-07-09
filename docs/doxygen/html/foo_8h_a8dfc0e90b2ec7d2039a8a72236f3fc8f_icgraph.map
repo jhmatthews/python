@@ -1,6 +1,0 @@
-<map id="stellar_velocity" name="stellar_velocity">
-<area shape="rect" id="node2" href="$templates_8h.html#ae964ba7da192ec86c6765f75ab1bcd76" title="Get the inputs needed to specigy the shell_wind modelen radius. " alt="" coords="141,5,268,32"/>
-<area shape="rect" id="node3" href="$wind_8c.html#ae04150c3a36a71098fa438ec9401e40d" title="Calculate the wind velocity at a specific point in space from the original usually analytic expressio..." alt="" coords="161,56,249,83"/>
-<area shape="rect" id="node5" href="$yso_8c.html#ae77428c4a1f130eb96c641c2f78e78f9" title="double (x,v) calculates the v in cartesian coordinates of a yso wind from a position x in cartesian c..." alt="" coords="167,107,243,133"/>
-<area shape="rect" id="node4" href="$wind_8c.html#aecc0364b3155b294b0590e9900867bfb" title="calculate the velocity gradient at positions in the flow based on the analytic wind models and import..." alt="" coords="316,56,396,83"/>
-</map>

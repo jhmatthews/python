@@ -1,9 +1,0 @@
-<map id="model_velocity" name="model_velocity">
-<area shape="rect" id="node2" href="$templates_8h.html#a96c552f69871659978a481c47617fc6c" title="find the gradient velocity vector v, dv_ds for a photon at a certain postion travelling in a certain ..." alt="" coords="147,5,217,32"/>
-<area shape="rect" id="node3" href="$templates_8h.html#a044bda6029c9b8057f77a920a61ce525" title="Allows a previous windsave to be used in a new hydro simulation. " alt="" coords="141,56,223,83"/>
-<area shape="rect" id="node4" href="$py__wind__sub_8c.html#a55b115ab89dcad8e8f00bfc49dd4a158" title="get_los_dvds" alt="" coords="141,107,223,133"/>
-<area shape="rect" id="node6" href="$wind2d_8c.html#a41ee5cb999f1d4258673b6134394b4cc" title="initializes the structures which characterize the wind, including wmain and plasmamain. " alt="" coords="144,157,220,184"/>
-<area shape="rect" id="node8" href="$wind2d_8c.html#a980ea04ae2c501a6df12080eb698a851" title="check whether some quantities in a grid cell are changing so rapidly in the grid cell that one might ..." alt="" coords="147,208,217,235"/>
-<area shape="rect" id="node5" href="$py__wind__sub_8c.html#a758f8ee1d31c6812ffa74189ccb23e36" title="dvds_summary" alt="" coords="271,107,360,133"/>
-<area shape="rect" id="node7" href="$python_8c.html#afced8478b91af5c169926dfa4426333d" title="The main routine for Python, which supervises the ingest of data defining a model, the initializtion of the model, and actual run of the model, and writing the data to the disk. " alt="" coords="293,183,337,209"/>
-</map>

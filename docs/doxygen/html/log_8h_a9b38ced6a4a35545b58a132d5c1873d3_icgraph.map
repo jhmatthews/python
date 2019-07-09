@@ -1,5 +1,0 @@
-<map id="rdpar_set_verbose" name="rdpar_set_verbose">
-<area shape="rect" id="node2" href="$xlog_8c.html#a6568a4df00f76870b9e36f94c573a4ad" title="Control the range of messages which are logged to the command line. " alt="" coords="159,31,261,57"/>
-<area shape="rect" id="node3" href="$parse_8c.html#ac55d931d6bb5bc546561ccf10b1d7fd6" title="parses the command line options " alt="" coords="309,5,427,32"/>
-<area shape="rect" id="node4" href="$py__wind_8c.html#afced8478b91af5c169926dfa4426333d" title="py_wind is a program which can be used to display various parameters of a wind as calculated by pytho..." alt="" coords="346,56,390,83"/>
-</map>

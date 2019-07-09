@@ -1,5 +1,0 @@
-<map id="cylvar_where_in_grid" name="cylvar_where_in_grid">
-<area shape="rect" id="node2" href="$cylind__var_8c.html#a3185dc024d7c8bf77fe0be0dc128a272" title="calculate the fractional position of a position in the 2d grid in a coordinate for modified cylindric..." alt="" coords="169,5,287,32"/>
-<area shape="rect" id="node4" href="$wind2d_8c.html#ad4b676b9911462eec0740df5f8f0da55" title="locates the element in wmain associated with a postion " alt="" coords="185,56,271,83"/>
-<area shape="rect" id="node3" href="$util_8c.html#a58278ee8209899477833e9415625667b" title="calculate the fractional contributions in interpolations of values of quantities, such as electron de..." alt="" coords="335,5,420,32"/>
-</map>

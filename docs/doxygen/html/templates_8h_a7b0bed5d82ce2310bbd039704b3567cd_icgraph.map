@@ -1,5 +1,0 @@
-<map id="d2phi_ds2" name="d2phi_ds2">
-<area shape="rect" id="node2" href="$templates_8h.html#a22069934602644cf4f894c0b48967d49" title="From the masses and period, setup the information one needs to calculate the position of the Roche lo..." alt="" coords="257,22,340,48"/>
-<area shape="rect" id="node3" href="$templates_8h.html#aff5a3156ec26863e37ff61073bb97ca4" title="Calculate the distance to the Roche surface for a photon. " alt="" coords="121,22,209,48"/>
-<area shape="rect" id="node4" href="$templates_8h.html#aa72cfd7beaead2acdb08bb12eafa3197" title="Calculate the first and second derivative of the roche potential along a specific line of sight..." alt="" coords="128,72,203,99"/>
-</map>

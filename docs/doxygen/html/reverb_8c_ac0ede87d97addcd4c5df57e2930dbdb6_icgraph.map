@@ -1,4 +1,0 @@
-<map id="delay_dump" name="delay_dump">
-<area shape="rect" id="node2" href="$templates_8h.html#a835e66c48118aa52e1903512ed676f20" title="Finishes dumping tracked photons to file. " alt="" coords="131,5,236,32"/>
-<area shape="rect" id="node3" href="$templates_8h.html#a30c0a9051caebba27b5ef5583d38ad0c" title="Preps a single photon to be dumped. " alt="" coords="129,56,237,83"/>
-</map>

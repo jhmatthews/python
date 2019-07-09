@@ -1,8 +1,0 @@
-<map id="rdpar_comment" name="rdpar_comment">
-<area shape="rect" id="node2" href="$python_8c.html#afced8478b91af5c169926dfa4426333d" title="The main routine for Python, which supervises the ingest of data defining a model, the initializtion of the model, and actual run of the model, and writing the data to the disk. " alt="" coords="189,5,233,32"/>
-<area shape="rect" id="node3" href="$templates_8h.html#afc4ebd7d545f29d6e3a9505cf462c62c" title="get inputs that describe the detailed spectra that one intends to extract. " alt="" coords="169,56,253,83"/>
-<area shape="rect" id="node4" href="$templates_8h.html#a611c7cc190ffb8c6494e75ec549191f3" title="get the parameters need to define a disk " alt="" coords="162,107,261,133"/>
-<area shape="rect" id="node5" href="$templates_8h.html#a4017af15d8bd072936049dafc4250a1b" title="Gets parameters from input file for reverb and visualisation settings. " alt="" coords="160,157,263,184"/>
-<area shape="rect" id="node6" href="$templates_8h.html#a5e18aeda5d11190333c93b952b562b04" title="sets rstar, mstar, tstar as well as secondary parameters based on user inputs " alt="" coords="158,208,265,235"/>
-<area shape="rect" id="node7" href="$templates_8h.html#a897e0ae97c32a481075df9fc45f6e745" title="sets up the boundary layer and agn power law parameters based on user input and system type ..." alt="" coords="145,259,277,285"/>
-</map>

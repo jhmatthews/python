@@ -1,6 +1,0 @@
-<map id="quadratic" name="quadratic">
-<area shape="rect" id="node2" href="$templates_8h.html#a4a0398c1230c6d21c5c51f4750ca2ea1" title="(cc, p) This is a new version of introduced in order to allow cylvar coordinates Eventually it is int..." alt="" coords="123,5,197,32"/>
-<area shape="rect" id="node3" href="$templates_8h.html#a67e3cb7a7d0cd3d55277fc4f3373fe2e" title="Calculate the pathlenth along a line of sight defined by a photon p to a sphere centered on the origi..." alt="" coords="119,56,201,83"/>
-<area shape="rect" id="node4" href="$phot__util_8c.html#a8656562abff4020df988426338e79eca" title="Find the positive distance to a sphere centered at x with radius r. " alt="" coords="116,107,204,133"/>
-<area shape="rect" id="node5" href="$templates_8h.html#abca5dd4cfb2140628e2a8f8be27aa2ee" title="calculate the distance a photon must travel to encouter a cylinder that is centered on the z axis..." alt="" coords="117,157,203,184"/>
-</map>

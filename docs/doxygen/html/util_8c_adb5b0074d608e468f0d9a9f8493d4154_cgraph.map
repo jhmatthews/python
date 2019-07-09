@@ -1,9 +1,0 @@
-<map id="fraction" name="fraction">
-<area shape="rect" id="node2" href="$log_8h.html#a4f4caa375f1c3a9def422000f305cce5" title="Print/write out an error message. " alt="" coords="108,25,152,52"/>
-<area shape="rect" id="node3" href="$xlog_8c.html#aeb93dfd882dd6a658b86662e6e219a09" title="Open a log file. " alt="" coords="569,25,627,52"/>
-<area shape="rect" id="node4" href="$xlog_8c.html#aeaba9fb5d129e3ab9d5efa760206deff" title="track the number of errors of each type " alt="" coords="200,51,273,77"/>
-<area shape="rect" id="node5" href="$xlog_8c.html#a3d395705c83c0bda5aeee6a271fdfd47" title="Summarize the errors that have occurred. " alt="" coords="321,37,411,64"/>
-<area shape="rect" id="node8" href="$xlog_8c.html#a4f4caa375f1c3a9def422000f305cce5" title="Print/write out an error message. " alt="" coords="344,88,388,115"/>
-<area shape="rect" id="node6" href="$xlog_8c.html#a9a25be4f0d7d13fccc8457774d74167f" title="Print/write an informational message. " alt="" coords="471,25,509,52"/>
-<area shape="rect" id="node7" href="$log_8h.html#a488c6292e324fa9bd3793694c3d29826" title="message" alt="" coords="459,76,521,103"/>
-</map>

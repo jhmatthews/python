@@ -1,5 +1,0 @@
-<map id="pl_logmean" name="pl_logmean">
-<area shape="rect" id="node2" href="$templates_8h.html#a5c555bf81b13fcd5357bda01781ea3bc" title="Function used in zbrent to work out best value of alpha for a power law model. " alt="" coords="127,5,229,32"/>
-<area shape="rect" id="node4" href="$templates_8h.html#a29985eb821f4ce1d32c191926b84fe59" title="Work out the standard deviation of a power law spectral model. " alt="" coords="136,56,220,83"/>
-<area shape="rect" id="node3" href="$templates_8h.html#abe28dc93125bf28e9c3dcef85428b16a" title="Calculate the parameters of a model for J_nu in a cell. " alt="" coords="277,31,387,57"/>
-</map>

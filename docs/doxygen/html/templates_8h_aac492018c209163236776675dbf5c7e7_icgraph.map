@@ -1,5 +1,0 @@
-<map id="get_nrecomb" name="get_nrecomb">
-<area shape="rect" id="node2" href="$templates_8h.html#a7ef12badd64f5bb47d6fccbb217ba805" title="calculates the integrated emissivity of the plasma, or the number of recombinations per second of a p..." alt="" coords="133,5,191,32"/>
-<area shape="rect" id="node3" href="$templates_8h.html#a9d0d69b33092d06a7174d71c3082d2a6" title="returns the energy lost from the plasma due to fb emission in a single wind cell at a temperature t b..." alt="" coords="367,5,421,32"/>
-<area shape="rect" id="node4" href="$templates_8h.html#a7c21266df7327fbc81b2c5cf6b5e067f" title="calculates the total number of recombinations for all of the ions in a cell " alt="" coords="239,31,319,57"/>
-</map>

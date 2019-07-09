@@ -1,5 +1,0 @@
-<map id="sigma_compton_partial" name="sigma_compton_partial">
-<area shape="rect" id="node2" href="$templates_8h.html#a9300319cf99a4a66db3876befda54050" title="computes a random direction for a photon undergoing compton scattering. " alt="" coords="312,5,389,32"/>
-<area shape="rect" id="node4" href="$templates_8h.html#a9891de810e686fa36209796ff1704fa3" title="Function used to find the fractional energy change for a given cross&#45;section in the compton scatterin..." alt="" coords="179,31,264,57"/>
-<area shape="rect" id="node3" href="$templates_8h.html#adaa6a9c682ca16156e768a39033e55c0" title="determine a new direction and frequency for a photon that is in the wind " alt="" coords="437,5,489,32"/>
-</map>

@@ -1,7 +1,0 @@
-<map id="Error" name="Error">
-<area shape="rect" id="node2" href="$xlog_8c.html#aeb93dfd882dd6a658b86662e6e219a09" title="Open a log file. " alt="" coords="467,6,524,33"/>
-<area shape="rect" id="node3" href="$xlog_8c.html#aeaba9fb5d129e3ab9d5efa760206deff" title="track the number of errors of each type " alt="" coords="97,31,171,58"/>
-<area shape="rect" id="node4" href="$xlog_8c.html#a3d395705c83c0bda5aeee6a271fdfd47" title="Summarize the errors that have occurred. " alt="" coords="219,31,308,58"/>
-<area shape="rect" id="node5" href="$xlog_8c.html#a9a25be4f0d7d13fccc8457774d74167f" title="Print/write an informational message. " alt="" coords="368,31,407,58"/>
-<area shape="rect" id="node6" href="$log_8h.html#a488c6292e324fa9bd3793694c3d29826" title="message" alt="" coords="356,82,419,109"/>
-</map>

@@ -1,8 +1,0 @@
-<map id="check_corners_inwind" name="check_corners_inwind">
-<area shape="rect" id="node2" href="$templates_8h.html#aa06d3901560706877fe1b434a657e3d1" title="Check whether this cell is in the wind or not. " alt="" coords="175,5,295,32"/>
-<area shape="rect" id="node4" href="$wind2d_8c.html#a41ee5cb999f1d4258673b6134394b4cc" title="initializes the structures which characterize the wind, including wmain and plasmamain. " alt="" coords="481,31,557,57"/>
-<area shape="rect" id="node6" href="$templates_8h.html#a6a70fbae6e163ad01aec40a2354ed674" title="Check whether a cell in an rtheta coordiante system is in the wind. " alt="" coords="175,107,295,133"/>
-<area shape="rect" id="node3" href="$templates_8h.html#a13144d35b1d57cfa570b6e59d225f474" title="Calculates the wind volume for cells in a cylindrical domain allowing for the fact that some cells ar..." alt="" coords="343,5,433,32"/>
-<area shape="rect" id="node5" href="$python_8c.html#afced8478b91af5c169926dfa4426333d" title="The main routine for Python, which supervises the ingest of data defining a model, the initializtion of the model, and actual run of the model, and writing the data to the disk. " alt="" coords="605,31,649,57"/>
-<area shape="rect" id="node7" href="$templates_8h.html#a16377719f4171d75f5aa983c79476590" title="rtheta_volume(w) calculates the wind volume of a cell in rtheta coordinate sysem allowing for the fac..." alt="" coords="343,107,433,133"/>
-</map>

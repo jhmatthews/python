@@ -1,6 +1,0 @@
-<map id="line_paths_gen_phot" name="line_paths_gen_phot">
-<area shape="rect" id="node2" href="$paths_8c.html#a7719923b66bf470bc4eeb42c454ebd48" title="Generates path for a &#39;wind&#39; photon in photon mode. " alt="" coords="180,5,308,32"/>
-<area shape="rect" id="node4" href="$paths_8c.html#a43541dacfceb46c42583c31aeb11d496" title="Draws a random path from a path histogram. " alt="" coords="168,56,320,83"/>
-<area shape="rect" id="node3" href="$foo_8h.html#a779ccebed86e21a9d217673baf5da757" title="length" alt="" coords="391,5,441,32"/>
-<area shape="rect" id="node5" href="$foo_8h.html#a451b4740f3d1e12cb07885b0d3e5ef1b" title="Gets a random number from the generator set up in init_rand. " alt="" coords="368,56,464,83"/>
-</map>

@@ -1,6 +1,0 @@
-<map id="xsignal" name="xsignal">
-<area shape="rect" id="node2" href="$python_8c.html#afced8478b91af5c169926dfa4426333d" title="The main routine for Python, which supervises the ingest of data defining a model, the initializtion of the model, and actual run of the model, and writing the data to the disk. " alt="" coords="146,5,190,32"/>
-<area shape="rect" id="node3" href="$templates_8h.html#a28fc174aa63a5eeef6de99ef392e1616" title="run the ionization cycles for a python model " alt="" coords="113,56,223,83"/>
-<area shape="rect" id="node4" href="$templates_8h.html#abc2ad803345c801984f4dc64d4d4a9e0" title="generates the detailed spectra " alt="" coords="125,107,211,133"/>
-<area shape="rect" id="node5" href="$templates_8h.html#a3995f2a6ba379027804653e28e4feac1" title="init_files " alt="" coords="107,157,229,184"/>
-</map>

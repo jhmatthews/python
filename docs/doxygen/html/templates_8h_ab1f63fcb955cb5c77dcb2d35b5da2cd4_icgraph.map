@@ -1,4 +1,0 @@
-<map id="xsignal" name="xsignal">
-<area shape="rect" id="node2" href="$templates_8h.html#a53d75807008c96f7053e25e029ed8a95" title="Set the maximum time the program should run. " alt="" coords="107,5,191,32"/>
-<area shape="rect" id="node3" href="$templates_8h.html#aa067770b0286b11ebb3282166d941c85" title="check whether the elapsed time is greater than the max_time and terminate the program if that is the ..." alt="" coords="113,56,185,83"/>
-</map>

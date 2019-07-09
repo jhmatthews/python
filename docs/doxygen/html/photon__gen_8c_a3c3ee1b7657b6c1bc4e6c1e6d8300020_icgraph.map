@@ -1,6 +1,0 @@
-<map id="disk_init" name="disk_init">
-<area shape="rect" id="node2" href="$templates_8h.html#a9a0acf2d461c665dc0302defa95ded65" title="calculates the band limited fluxes &amp; luminosities, and prepares for the producting of photons (by rei..." alt="" coords="112,5,191,32"/>
-<area shape="rect" id="node5" href="$python_8c.html#afced8478b91af5c169926dfa4426333d" title="The main routine for Python, which supervises the ingest of data defining a model, the initializtion of the model, and actual run of the model, and writing the data to the disk. " alt="" coords="129,56,173,83"/>
-<area shape="rect" id="node3" href="$templates_8h.html#aa943bd857500a1f2937d8b97d84ff633" title="the controlling routine for creating the underlying photon distribution. " alt="" coords="380,5,455,32"/>
-<area shape="rect" id="node4" href="$templates_8h.html#addfbba966a4d69bdc71b771e0d7f3cdf" title="Determine how many photons to allocate to each band. " alt="" coords="239,31,332,57"/>
-</map>

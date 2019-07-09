@@ -1,4 +1,0 @@
-<map id="wind_paths_dump" name="wind_paths_dump">
-<area shape="rect" id="node2" href="$templates_8h.html#abcd463073ed7efc165937715a983b7b7" title="Iterates through the wind, dumping cells of interest. " alt="" coords="156,5,292,32"/>
-<area shape="rect" id="node3" href="$templates_8h.html#a210e77beda2c9c25b9008de9107a17f8" title="Evaluates wind path details for a cycle. " alt="" coords="340,5,456,32"/>
-</map>

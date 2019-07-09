@@ -1,7 +1,0 @@
-<map id="get_yso_wind_params" name="get_yso_wind_params">
-<area shape="rect" id="node2" href="$log_8h.html#a9a25be4f0d7d13fccc8457774d74167f" title="Print/write an informational message. " alt="" coords="225,5,263,32"/>
-<area shape="rect" id="node4" href="$foo_8h.html#a40edef16d314acc2a892cd8b8a5f0eec" title="gets input data which is necessary for a Castor and Larmors&#39; (1979) description of an O star wind..." alt="" coords="177,56,311,83"/>
-<area shape="rect" id="node5" href="$foo_8h.html#abc35742eeeb50cc9cda997c3de567f20" title="get the input data that is necessary to define KWD&#45;type model description of the wind ..." alt="" coords="176,107,312,133"/>
-<area shape="rect" id="node6" href="$disk_8c.html#a4027a82b7c3df9474704080c8b3137cc" title="Calculate the height of the disk at a certain radius. " alt="" coords="221,157,267,184"/>
-<area shape="rect" id="node3" href="$xlog_8c.html#aeb93dfd882dd6a658b86662e6e219a09" title="Open a log file. " alt="" coords="360,5,417,32"/>
-</map>

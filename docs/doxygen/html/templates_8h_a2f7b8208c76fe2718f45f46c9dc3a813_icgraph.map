@@ -1,5 +1,0 @@
-<map id="trans_phot_single" name="trans_phot_single">
-<area shape="rect" id="node2" href="$trans__phot_8c.html#a620388e1c4a8e38f192c5a0ce42af389" title="int (w,p,iextract) oversees the propagation of a &quot;flight&quot; of photons " alt="" coords="155,31,224,57"/>
-<area shape="rect" id="node3" href="$templates_8h.html#a28fc174aa63a5eeef6de99ef392e1616" title="run the ionization cycles for a python model " alt="" coords="272,5,381,32"/>
-<area shape="rect" id="node4" href="$templates_8h.html#abc2ad803345c801984f4dc64d4d4a9e0" title="generates the detailed spectra " alt="" coords="284,56,369,83"/>
-</map>

@@ -1,8 +1,0 @@
-<map id="get_sv_wind_params" name="get_sv_wind_params">
-<area shape="rect" id="node2" href="$log_8h.html#a9a25be4f0d7d13fccc8457774d74167f" title="Print/write an informational message. " alt="" coords="212,5,251,32"/>
-<area shape="rect" id="node4" href="$log_8h.html#a84776d33fbdc65228f584debd72e15e0" title="rddoub" alt="" coords="205,56,258,83"/>
-<area shape="rect" id="node5" href="$foo_8h.html#a3521f91b62531265426401a6c32fa93f" title="Integrate a function between a and b. " alt="" coords="206,107,257,133"/>
-<area shape="rect" id="node6" href="$sv_8c.html#af9d14b750645265f8bcb32d68f9a3832" title="The integrand required to calculate the normalization factor between the global mass loss rate and th..." alt="" coords="169,157,293,184"/>
-<area shape="rect" id="node3" href="$xlog_8c.html#aeb93dfd882dd6a658b86662e6e219a09" title="Open a log file. " alt="" coords="355,5,413,32"/>
-<area shape="rect" id="node7" href="$sv_8c.html#a0b95d81797f46e4870ae03311b4278ab" title="double (r) finds the angle at which the wind emerges from at a specific radius r on surface of the di..." alt="" coords="341,157,427,184"/>
-</map>

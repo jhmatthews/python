@@ -1,8 +1,0 @@
-<map id="rdstr" name="rdstr">
-<area shape="rect" id="node2" href="$rdpar_8c.html#a3024a5eae4767b5fe01bf04372d30cee" title="open a temporary file to store inputs as they are processed. " alt="" coords="264,5,328,32"/>
-<area shape="rect" id="node3" href="$rdpar_8c.html#a741d9f88ed3ba89e210454ab01a14e46" title="process a line of input regardless of whether it comes from a file or the command line ..." alt="" coords="96,56,183,83"/>
-<area shape="rect" id="node4" href="$rdpar_8c.html#a026dad3fd2b246349462542d4c99e22a" title="Ask for and process one input from the command line. " alt="" coords="409,46,521,87"/>
-<area shape="rect" id="node6" href="$rdpar_8c.html#ab0ff4d001b7e562276c0430f9ebd1fa4" title="locate a keyword in the parameter file and retrieve the string associated with it ..." alt="" coords="231,108,361,135"/>
-<area shape="rect" id="node5" href="$rdpar_8c.html#af92431e285176dcd54501d8ce7315ee3" title="store the parsed version of an input line into a structure so that it can be written out to a file ..." alt="" coords="569,83,676,109"/>
-<area shape="rect" id="node7" href="$foo_8h.html#a98a10e927f2b5ba88c7d5b4fc51d477d" title="check_synonyms" alt="" coords="416,163,515,189"/>
-</map>

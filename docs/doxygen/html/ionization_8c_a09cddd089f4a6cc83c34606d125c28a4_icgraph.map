@@ -1,5 +1,0 @@
-<map id="calc_te" name="calc_te">
-<area shape="rect" id="node2" href="$templates_8h.html#a0c0fa3305df1f5c000e0ed0a26d413d8" title="calculates new densities of ions in a single element of the wind after (usually) having found the tem..." alt="" coords="108,5,171,32"/>
-<area shape="rect" id="node4" href="$py__wind__ion_8c.html#afb46861eb63b3501e06b81ac398e1cc4" title="Find the electron temperature where heating matches the cooling. " alt="" coords="107,56,172,83"/>
-<area shape="rect" id="node3" href="$templates_8h.html#a626b1882e2533441cdf2daabd36e8a8b" title="ionization routines for the wind one cell at a time " alt="" coords="220,5,316,32"/>
-</map>

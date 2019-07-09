@@ -1,7 +1,0 @@
-<map id="hydro_temp" name="hydro_temp">
-<area shape="rect" id="node2" href="$foo_8h.html#a779ccebed86e21a9d217673baf5da757" title="length" alt="" coords="157,5,206,32"/>
-<area shape="rect" id="node3" href="$log_8h.html#a9a25be4f0d7d13fccc8457774d74167f" title="Print/write an informational message. " alt="" coords="162,56,201,83"/>
-<area shape="rect" id="node5" href="$hydro__import_8c.html#a70c1a8ce1f76958ff6677b57a1cdc100" title="Helper routine to interpolate on a grid. " alt="" coords="147,107,216,133"/>
-<area shape="rect" id="node6" href="$hydro__import_8c.html#abcde5bf8235e69efe10131584b2c7069" title="Helper routine to interpolate on a grid. " alt="" coords="128,157,235,184"/>
-<area shape="rect" id="node4" href="$xlog_8c.html#aeb93dfd882dd6a658b86662e6e219a09" title="Open a log file. " alt="" coords="283,56,340,83"/>
-</map>

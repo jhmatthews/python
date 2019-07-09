@@ -1,9 +1,0 @@
-<map id="compute_dr_coeffs" name="compute_dr_coeffs">
-<area shape="rect" id="node2" href="$templates_8h.html#abd4b0c8d02397f42187b29be6dcebc87" title="calculates the total luminosity from DR. " alt="" coords="195,5,251,32"/>
-<area shape="rect" id="node3" href="$templates_8h.html#a1e569c92136f73f8643f20d8fb43f544" title="A matrix solver for the ionization state in a cell. " alt="" coords="160,56,285,83"/>
-<area shape="rect" id="node4" href="$zeta_8c.html#a54a60a3cfc21ceae39f7c529519c25ae" title="calculates the correction term used in in the L+M and Sim equations as a modfication to the Saha equa..." alt="" coords="180,107,265,133"/>
-<area shape="rect" id="node5" href="$saha_8c.html#a389fdf4d9e9d542a78a25229ce259927" title="calculates ion densities of a single element (defined by nelem) according to a modified on the spot a..." alt="" coords="333,81,419,108"/>
-<area shape="rect" id="node8" href="$variable__temperature_8c.html#a72d9769510683e30aeef87c2a255ebe4" title="modifies the densities of ions, levels, and partition functions of ions within a cell of the wind bas..." alt="" coords="467,132,583,159"/>
-<area shape="rect" id="node6" href="$templates_8h.html#a63d5795e0b9978d33ed61a63917004e2" title="modifies the densities of ions, levels, and partition functions of ions within a cell of the wind bas..." alt="" coords="631,81,756,108"/>
-<area shape="rect" id="node7" href="$templates_8h.html#aa8ede21a14cf7e763909094555c5240d" title="Calculates ion abundances allowing for the Lucy Mazzali correction factors to the saha abundances con..." alt="" coords="505,81,545,108"/>
-</map>

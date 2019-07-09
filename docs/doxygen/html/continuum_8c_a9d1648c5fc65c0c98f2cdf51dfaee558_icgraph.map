@@ -1,8 +1,0 @@
-<map id="emittance_continuum" name="emittance_continuum">
-<area shape="rect" id="node2" href="$templates_8h.html#ab6c8e4e9577a9edb71a9a5900d43964c" title="Calculates the total luminosity of an AGN type source. " alt="" coords="171,5,229,32"/>
-<area shape="rect" id="node6" href="$templates_8h.html#a0bc15d347d507f21da65e37f659de349" title="(r, tstar, freqmin, freqmax, ioniz_or_final, f) " alt="" coords="171,56,229,83"/>
-<area shape="rect" id="node7" href="$templates_8h.html#a3c3ee1b7657b6c1bc4e6c1e6d8300020" title="calculates the total luminosity and the luminosity between freqqmin and freqmax of the disk..." alt="" coords="171,107,229,133"/>
-<area shape="rect" id="node3" href="$templates_8h.html#a9a0acf2d461c665dc0302defa95ded65" title="calculates the band limited fluxes &amp; luminosities, and prepares for the producting of photons (by rei..." alt="" coords="277,56,356,83"/>
-<area shape="rect" id="node4" href="$templates_8h.html#aa943bd857500a1f2937d8b97d84ff633" title="the controlling routine for creating the underlying photon distribution. " alt="" coords="545,56,620,83"/>
-<area shape="rect" id="node5" href="$templates_8h.html#addfbba966a4d69bdc71b771e0d7f3cdf" title="Determine how many photons to allocate to each band. " alt="" coords="404,81,497,108"/>
-</map>

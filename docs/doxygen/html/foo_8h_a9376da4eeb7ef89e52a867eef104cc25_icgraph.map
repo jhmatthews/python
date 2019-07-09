@@ -1,5 +1,0 @@
-<map id="stellar_rho" name="stellar_rho">
-<area shape="rect" id="node2" href="$templates_8h.html#ae964ba7da192ec86c6765f75ab1bcd76" title="Get the inputs needed to specigy the shell_wind modelen radius. " alt="" coords="123,5,249,32"/>
-<area shape="rect" id="node3" href="$wind_8c.html#a6190258be2516eb521132d5a1ec1886f" title="calculate the density of the wind in from the flow based on the analytic wind models. " alt="" coords="151,56,221,83"/>
-<area shape="rect" id="node4" href="$yso_8c.html#a5b6cfe1fc0b267de4f9fc763e28628ae" title="double (x) calculates the density of an kn_wind at a position x " alt="" coords="157,107,215,133"/>
-</map>

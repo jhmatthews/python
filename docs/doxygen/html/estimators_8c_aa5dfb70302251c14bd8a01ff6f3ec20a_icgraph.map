@@ -1,6 +1,0 @@
-<map id="gamma_e_integrand" name="gamma_e_integrand">
-<area shape="rect" id="node2" href="$templates_8h.html#a1e05a878575b566deae630d01be4c75c" title="the dilute energy weighted photoionization rate estimator " alt="" coords="167,31,252,57"/>
-<area shape="rect" id="node3" href="$templates_8h.html#a0b0bdb47e266cd31f1c381bb2410fa80" title="the routine to normalise the matom bb and bf estimators. " alt="" coords="300,5,431,32"/>
-<area shape="rect" id="node4" href="$templates_8h.html#abd62705b5006847a8dc70b442bf15332" title="compute dilute matom estimators " alt="" coords="307,56,424,83"/>
-<area shape="rect" id="node5" href="$templates_8h.html#a590f1ed026cd692ac6f878ed6f359d5a" title="uses the Monte Carlo estimators to compute a set of level populations for levels of macro atoms..." alt="" coords="479,56,556,83"/>
-</map>

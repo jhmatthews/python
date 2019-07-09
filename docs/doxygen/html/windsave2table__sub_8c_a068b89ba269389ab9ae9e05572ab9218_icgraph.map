@@ -1,8 +1,0 @@
-<map id="get_one" name="get_one">
-<area shape="rect" id="node2" href="$windsave2table__sub_8c.html#afe3772325272c41a36f31deb1e2de602" title="writes a specific variables of a windsaave which are intended to be of general interest to file which..." alt="" coords="112,5,225,32"/>
-<area shape="rect" id="node6" href="$windsave2table__sub_8c.html#a57cbceef71e198c504c6a29b6717cd5a" title="writes a selected variables related to heating and cooling processes to an ascii file which can be re..." alt="" coords="117,56,220,83"/>
-<area shape="rect" id="node7" href="$windsave2table__sub_8c.html#a9f0c3036f941fc90a710ab34d104956b" title="makes an astropy table containing the relative abundances of a given element as a function of the pos..." alt="" coords="121,107,217,133"/>
-<area shape="rect" id="node3" href="$windsave2table__sub_8c.html#a435ccfb2aea5f873c9508368e974eced" title="The main routine associated with windsave2table, this routine calls various other routines which writ..." alt="" coords="273,56,381,83"/>
-<area shape="rect" id="node4" href="$templates_8h.html#a28fc174aa63a5eeef6de99ef392e1616" title="run the ionization cycles for a python model " alt="" coords="429,31,539,57"/>
-<area shape="rect" id="node5" href="$windsave2table_8c.html#afced8478b91af5c169926dfa4426333d" title="windsave2table writes key variables in a windsave file to an astropy table calculated Python..." alt="" coords="462,81,506,108"/>
-</map>

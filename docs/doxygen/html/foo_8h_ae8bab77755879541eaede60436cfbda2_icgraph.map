@@ -1,6 +1,0 @@
-<map id="calc_pi_rate" name="calc_pi_rate">
-<area shape="rect" id="node2" href="$templates_8h.html#a1e569c92136f73f8643f20d8fb43f544" title="A matrix solver for the ionization state in a cell. " alt="" coords="129,5,255,32"/>
-<area shape="rect" id="node3" href="$variable__temperature_8c.html#a7f409d6ca8a15c6c341fdb1853104685" title="calculates the photoionization rate correction factor for the number density of two adjacent ions ..." alt="" coords="159,56,225,83"/>
-<area shape="rect" id="node4" href="$variable__temperature_8c.html#a72d9769510683e30aeef87c2a255ebe4" title="modifies the densities of ions, levels, and partition functions of ions within a cell of the wind bas..." alt="" coords="303,56,419,83"/>
-<area shape="rect" id="node5" href="$templates_8h.html#a63d5795e0b9978d33ed61a63917004e2" title="modifies the densities of ions, levels, and partition functions of ions within a cell of the wind bas..." alt="" coords="467,56,592,83"/>
-</map>

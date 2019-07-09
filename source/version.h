@@ -1,3 +1,0 @@
-#define VERSION  "83"
-#define GIT_COMMIT_HASH "c98f3fd38746bcdfd453e98d652bfa694721cf6b"
-#define GIT_DIFF_STATUS 6 

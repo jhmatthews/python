@@ -1,4 +1,0 @@
-<map id="wind_paths_sphere_point_index" name="wind_paths_sphere_point_index">
-<area shape="rect" id="node2" href="$templates_8h.html#ad7572cd8c842aa9c3ee2476a89888ec4" title="Outputs wind path information to vtk. " alt="" coords="189,13,313,39"/>
-<area shape="rect" id="node3" href="$templates_8h.html#a210e77beda2c9c25b9008de9107a17f8" title="Evaluates wind path details for a cycle. " alt="" coords="361,13,477,39"/>
-</map>

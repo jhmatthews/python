@@ -1,6 +1,0 @@
-<map id="dphi_ds" name="dphi_ds">
-<area shape="rect" id="node2" href="$roche_8c.html#a4a0210aea098f52ca60dfbc90de4ecee" title="Calculate the Roche potential at position indicated by the photon p_roche and the length s..." alt="" coords="111,56,149,83"/>
-<area shape="rect" id="node3" href="$foo_8h.html#a779ccebed86e21a9d217673baf5da757" title="length" alt="" coords="209,5,258,32"/>
-<area shape="rect" id="node4" href="$foo_8h.html#a1c6dc9c24a43e2bc6319b23faba4a041" title="Simply copy one photon bundle into another. " alt="" coords="201,56,266,83"/>
-<area shape="rect" id="node5" href="$foo_8h.html#a8f17a1e86112f24760862d998129d91c" title="move a photon by a distance ds " alt="" coords="197,107,269,133"/>
-</map>

@@ -1,9 +1,0 @@
-<map id="ds_to_cone" name="ds_to_cone">
-<area shape="rect" id="node2" href="$templates_8h.html#a52b5367a4a1a8d1bbe9446a5571a81fd" title="cylin_ds_in_cell calculates the distance to the far boundary of the cell in which the photon bundle r..." alt="" coords="127,5,225,32"/>
-<area shape="rect" id="node7" href="$templates_8h.html#a8bc3604c533b18b872bb155bfd444bb5" title="calculates the photon pathlength to the edge of the wind. " alt="" coords="273,56,345,83"/>
-<area shape="rect" id="node8" href="$templates_8h.html#a68cff92e2a36ec9073dbecabffa5543b" title="calculates the distance to the far boundary of the cell in which the photon bundle resides..." alt="" coords="127,107,225,133"/>
-<area shape="rect" id="node3" href="$templates_8h.html#afee395233fbca5e632fd3ef51106f74c" title="calculates the distance photon can travel within the cell that it is currently in. " alt="" coords="276,5,343,32"/>
-<area shape="rect" id="node4" href="$templates_8h.html#aa1ffd17034054d51819328d892fc57e8" title="translates the photon from its current position to the edge of the wind. " alt="" coords="393,5,499,32"/>
-<area shape="rect" id="node6" href="$templates_8h.html#a0118547dede9b08b5ac6609b4313e3e8" title="translates the photon within a single cell in the wind. " alt="" coords="396,56,496,83"/>
-<area shape="rect" id="node5" href="$templates_8h.html#ae77272897af1eb8f6ebd0f7cfe2932e8" title="a steering routine that either calls _in_space or _in_wind depending upon the current location of the..." alt="" coords="547,31,607,57"/>
-</map>

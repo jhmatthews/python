@@ -1,6 +1,0 @@
-<map id="cylind_ds_in_cell" name="cylind_ds_in_cell">
-<area shape="rect" id="node2" href="$foo_8h.html#a1db4ad38f132371d7fe31fdd998ae53e" title="where_in_grid" alt="" coords="151,5,236,32"/>
-<area shape="rect" id="node3" href="$diag_8c.html#a852eb08f6a48973ca3dfd61567803ee8" title="save_photon " alt="" coords="151,56,235,83"/>
-<area shape="rect" id="node4" href="$foo_8h.html#aed64e9379499a741e8a7c42376e20530" title="Translate a cell number in the wind to the two&#45;d grid position in a specific domain. " alt="" coords="155,107,232,133"/>
-<area shape="rect" id="node5" href="$foo_8h.html#a0940d7c3ced7e511ec385d4de758b436" title="quadratic" alt="" coords="162,157,225,184"/>
-</map>

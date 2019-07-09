@@ -1,6 +1,0 @@
-<map id="check_plasma" name="check_plasma">
-<area shape="rect" id="node2" href="$templates_8h.html#a08e6e02acfd4d2fb6b31cf9bfdc7b258" title="calculates the amount of line heating that during a resonance. " alt="" coords="139,5,201,32"/>
-<area shape="rect" id="node3" href="$templates_8h.html#a9301eba8fb39302ef3da90cdb52aef4d" title="The core of the implementation of Macro Atoms in python. " alt="" coords="144,56,196,83"/>
-<area shape="rect" id="node4" href="$templates_8h.html#a16ae068adf1746f09c432de7e245dfb1" title="kpkt" alt="" coords="150,107,190,133"/>
-<area shape="rect" id="node5" href="$templates_8h.html#adb025e0891ad334d41481551bf785170" title="updates the field parameters in the wind and reduces the weight of the photon as a result of the effe..." alt="" coords="140,157,200,184"/>
-</map>

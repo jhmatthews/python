@@ -1,5 +1,0 @@
-<map id="get_alpha_st_e" name="get_alpha_st_e">
-<area shape="rect" id="node2" href="$templates_8h.html#a0b0bdb47e266cd31f1c381bb2410fa80" title="the routine to normalise the matom bb and bf estimators. " alt="" coords="144,5,275,32"/>
-<area shape="rect" id="node3" href="$templates_8h.html#abd62705b5006847a8dc70b442bf15332" title="compute dilute matom estimators " alt="" coords="151,56,268,83"/>
-<area shape="rect" id="node4" href="$templates_8h.html#a590f1ed026cd692ac6f878ed6f359d5a" title="uses the Monte Carlo estimators to compute a set of level populations for levels of macro atoms..." alt="" coords="323,56,400,83"/>
-</map>

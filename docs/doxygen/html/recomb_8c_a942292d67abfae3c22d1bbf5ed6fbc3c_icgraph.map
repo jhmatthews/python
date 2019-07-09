@@ -1,7 +1,0 @@
-<map id="gs_rrate" name="gs_rrate">
-<area shape="rect" id="node2" href="$zeta_8c.html#a54a60a3cfc21ceae39f7c529519c25ae" title="calculates the correction term used in in the L+M and Sim equations as a modfication to the Saha equa..." alt="" coords="112,48,197,74"/>
-<area shape="rect" id="node3" href="$saha_8c.html#a389fdf4d9e9d542a78a25229ce259927" title="calculates ion densities of a single element (defined by nelem) according to a modified on the spot a..." alt="" coords="245,22,331,49"/>
-<area shape="rect" id="node6" href="$variable__temperature_8c.html#a72d9769510683e30aeef87c2a255ebe4" title="modifies the densities of ions, levels, and partition functions of ions within a cell of the wind bas..." alt="" coords="379,73,495,100"/>
-<area shape="rect" id="node4" href="$templates_8h.html#a63d5795e0b9978d33ed61a63917004e2" title="modifies the densities of ions, levels, and partition functions of ions within a cell of the wind bas..." alt="" coords="543,22,668,49"/>
-<area shape="rect" id="node5" href="$templates_8h.html#aa8ede21a14cf7e763909094555c5240d" title="Calculates ion abundances allowing for the Lucy Mazzali correction factors to the saha abundances con..." alt="" coords="417,22,457,49"/>
-</map>

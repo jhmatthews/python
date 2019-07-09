@@ -1,8 +1,0 @@
-<map id="collision_summary" name="collision_summary">
-<area shape="rect" id="node2" href="$log_8h.html#a84776d33fbdc65228f584debd72e15e0" title="rddoub" alt="" coords="157,5,211,32"/>
-<area shape="rect" id="node3" href="$log_8h.html#a9a25be4f0d7d13fccc8457774d74167f" title="Print/write an informational message. " alt="" coords="165,56,203,83"/>
-<area shape="rect" id="node5" href="$foo_8h.html#a277d190575cbdab99ac77d308dc9dfa1" title="Calculate the collisional excitation coefficient for a line. " alt="" coords="165,107,203,133"/>
-<area shape="rect" id="node6" href="$foo_8h.html#a6daa97078321cf4f668d31b7004fed6c" title="calculates and returns the collisional de&#45;excitation coefficient q21 " alt="" coords="165,157,203,184"/>
-<area shape="rect" id="node7" href="$atomic_8c.html#a8c589bd3089b7851e8da407ad1ce44a5" title="Calculate the Einstein A coefficient for a transition. " alt="" coords="165,208,203,235"/>
-<area shape="rect" id="node4" href="$xlog_8c.html#aeb93dfd882dd6a658b86662e6e219a09" title="Open a log file. " alt="" coords="259,56,316,83"/>
-</map>

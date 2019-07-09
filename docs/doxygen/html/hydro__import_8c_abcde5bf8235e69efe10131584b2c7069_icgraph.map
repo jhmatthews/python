@@ -1,6 +1,0 @@
-<map id="hydro_interp_value" name="hydro_interp_value">
-<area shape="rect" id="node2" href="$hydro__import_8c.html#a5d3b8e38b0f7784da96344dbe44f9b17" title="Interpolates on supplied data file to get velocity at all vertices. " alt="" coords="160,5,245,32"/>
-<area shape="rect" id="node3" href="$hydro__import_8c.html#a4d3e2dd548df3d42595a4731404b0dff" title="Interpolates on supplied data file to get cell densities. " alt="" coords="169,56,236,83"/>
-<area shape="rect" id="node4" href="$hydro__import_8c.html#a73c6924fa352ee5ea001bfcdd7178615" title="Interpolates on supplied data file to get cell tempertaures. " alt="" coords="165,107,240,133"/>
-<area shape="rect" id="node5" href="$templates_8h.html#a044bda6029c9b8057f77a920a61ce525" title="Allows a previous windsave to be used in a new hydro simulation. " alt="" coords="293,107,375,133"/>
-</map>

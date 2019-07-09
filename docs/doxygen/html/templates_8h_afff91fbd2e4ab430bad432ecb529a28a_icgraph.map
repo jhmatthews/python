@@ -1,9 +1,0 @@
-<map id="ds_to_disk" name="ds_to_disk">
-<area shape="rect" id="node2" href="$knigge_8c.html#aff42023accb056ea7ba26ec712605562" title="Calculate the v at a postion in a KWD wind. " alt="" coords="137,5,209,32"/>
-<area shape="rect" id="node3" href="$knigge_8c.html#ab20600703e7e59707c2041ec1aae6f60" title="double (x) calculates the density of an kn_wind at a position x " alt="" coords="275,31,327,57"/>
-<area shape="rect" id="node4" href="$templates_8h.html#a0118547dede9b08b5ac6609b4313e3e8" title="translates the photon within a single cell in the wind. " alt="" coords="123,107,223,133"/>
-<area shape="rect" id="node6" href="$templates_8h.html#acb71ca3a7e18d652d5eb0df69766c022" title="determines whether the photon has encountered the star of disk or reached the edges of the grid and r..." alt="" coords="151,157,195,184"/>
-<area shape="rect" id="node7" href="$sv_8c.html#a2e62e3c36e76963e8e9f69b82329d447" title="Calulate the v of a Schlossman Vitello wind at a position x. " alt="" coords="137,208,208,235"/>
-<area shape="rect" id="node8" href="$sv_8c.html#abde80034508a0a977d22a060696a8b7e" title="Calculate the density of an sv_wind at a position x. " alt="" coords="275,233,327,260"/>
-<area shape="rect" id="node5" href="$templates_8h.html#ae77272897af1eb8f6ebd0f7cfe2932e8" title="a steering routine that either calls _in_space or _in_wind depending upon the current location of the..." alt="" coords="271,107,331,133"/>
-</map>

@@ -1,8 +1,0 @@
-<map id="string_process" name="string_process">
-<area shape="rect" id="node2" href="$rdpar_8c.html#aaf8ec1fa88d16f28684dc0aa60058ae1" title="process a input line where the answer is expected to be string " alt="" coords="145,5,188,32"/>
-<area shape="rect" id="node3" href="$rdpar_8c.html#a0bf609d8d5ceae8a8ac7e07c8426f764" title="process a input line where the answer is expected to be a single character " alt="" coords="141,56,192,83"/>
-<area shape="rect" id="node4" href="$rdpar_8c.html#a09f3ce831979a08c9dbc421b73ff30a4" title="process a input line where the answer is expected to be an integer " alt="" coords="146,107,187,133"/>
-<area shape="rect" id="node5" href="$rdpar_8c.html#a69bf90850357385bebb6711b8afb879c" title="process a input line where the answer is expected to be a float " alt="" coords="146,157,187,184"/>
-<area shape="rect" id="node6" href="$rdpar_8c.html#a84e33a3ca51cc2a4fac7712475ff46a3" title="process a input line where the answer is expected to be double precision number " alt="" coords="140,208,193,235"/>
-<area shape="rect" id="node7" href="$rdpar_8c.html#ac3037d5a7f50e840cdf9ceb846c6d843" title="process a input line where the answer is expected be an entire line with multipe words ..." alt="" coords="143,259,190,285"/>
-</map>

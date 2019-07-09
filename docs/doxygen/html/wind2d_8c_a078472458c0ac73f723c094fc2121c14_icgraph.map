@@ -1,7 +1,0 @@
-<map id="rho" name="rho">
-<area shape="rect" id="node2" href="$wind2d_8c.html#a41ee5cb999f1d4258673b6134394b4cc" title="initializes the structures which characterize the wind, including wmain and plasmamain. " alt="" coords="328,28,404,54"/>
-<area shape="rect" id="node4" href="$wind2d_8c.html#a7ca398a2557e2b63247eac4366bc2e4f" title="finds the velocity vector v for the wind in cartesian coordinates at the position of the photon p..." alt="" coords="92,28,160,54"/>
-<area shape="rect" id="node6" href="$wind2d_8c.html#a558bbf4d12656ab12c2a03f6475b0eee" title="mdot_wind" alt="" coords="209,78,279,105"/>
-<area shape="rect" id="node3" href="$python_8c.html#afced8478b91af5c169926dfa4426333d" title="The main routine for Python, which supervises the ingest of data defining a model, the initializtion of the model, and actual run of the model, and writing the data to the disk. " alt="" coords="452,28,496,54"/>
-<area shape="rect" id="node5" href="$wind2d_8c.html#ad47569135f21d4ce22504b0ad5b0b221" title="wind_div_v" alt="" coords="208,28,280,54"/>
-</map>

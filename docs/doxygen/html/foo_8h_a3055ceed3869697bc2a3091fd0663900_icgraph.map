@@ -1,5 +1,0 @@
-<map id="model_rho" name="model_rho">
-<area shape="rect" id="node2" href="$templates_8h.html#a044bda6029c9b8057f77a920a61ce525" title="Allows a previous windsave to be used in a new hydro simulation. " alt="" coords="123,5,204,32"/>
-<area shape="rect" id="node3" href="$wind2d_8c.html#a41ee5cb999f1d4258673b6134394b4cc" title="initializes the structures which characterize the wind, including wmain and plasmamain. " alt="" coords="125,56,201,83"/>
-<area shape="rect" id="node4" href="$python_8c.html#afced8478b91af5c169926dfa4426333d" title="The main routine for Python, which supervises the ingest of data defining a model, the initializtion of the model, and actual run of the model, and writing the data to the disk. " alt="" coords="252,56,296,83"/>
-</map>

@@ -1,4 +1,0 @@
-<map id="get_one_model" name="get_one_model">
-<area shape="rect" id="node2" href="$get__models_8c.html#a59b857f2f3debe87e91f33a5e01be07c" title="This routine reads in a set of models for use in generation of spectra, e.g. a set of Kurucz stellar ..." alt="" coords="144,5,217,32"/>
-<area shape="rect" id="node3" href="$templates_8h.html#ab358cbada062a9acccdf184b57630305" title="Generalized routine to get the spectrum type for a radiation source and if necessary read a set of pr..." alt="" coords="265,5,347,32"/>
-</map>

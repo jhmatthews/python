@@ -1,7 +1,0 @@
-<map id="macro_bb_heating" name="macro_bb_heating">
-<area shape="rect" id="node2" href="$templates_8h.html#a0b0bdb47e266cd31f1c381bb2410fa80" title="the routine to normalise the matom bb and bf estimators. " alt="" coords="159,5,289,32"/>
-<area shape="rect" id="node3" href="$templates_8h.html#a09cddd089f4a6cc83c34606d125c28a4" title="calc_te determines and returns the electron temperature in the wind such that the energy emitted by t..." alt="" coords="337,56,391,83"/>
-<area shape="rect" id="node6" href="$templates_8h.html#a866bab53f422c2afa889e5e549df76d1" title="Compute the cooling for a cell given a temperature t, and compare it to the heating seen in the cell ..." alt="" coords="191,107,257,133"/>
-<area shape="rect" id="node4" href="$templates_8h.html#a0c0fa3305df1f5c000e0ed0a26d413d8" title="calculates new densities of ions in a single element of the wind after (usually) having found the tem..." alt="" coords="439,81,501,108"/>
-<area shape="rect" id="node5" href="$templates_8h.html#a626b1882e2533441cdf2daabd36e8a8b" title="ionization routines for the wind one cell at a time " alt="" coords="549,81,645,108"/>
-</map>

@@ -1,7 +1,0 @@
-<map id="emittance_bb" name="emittance_bb">
-<area shape="rect" id="node2" href="$bb_8c.html#af5c48487242ab8760a1893e385d3e11b" title="Obtains the integral of the dimensionless blackbody function between alphamin and alphamax..." alt="" coords="136,55,225,81"/>
-<area shape="rect" id="node4" href="$bb_8c.html#ad6196c3c4ec0bdeda06aa797af259d81" title="The value of the dimensioless BB function at alpha. " alt="" coords="429,29,492,56"/>
-<area shape="rect" id="node6" href="$foo_8h.html#a3521f91b62531265426401a6c32fa93f" title="Integrate a function between a and b. " alt="" coords="435,80,486,107"/>
-<area shape="rect" id="node3" href="$bb_8c.html#aa67b840e2ff05fc474799c42178b392e" title="calulates integrals of the dimensionless bb function from 0 to alpha and the stores the reusults in a..." alt="" coords="273,55,381,81"/>
-<area shape="rect" id="node5" href="$compton_8c.html#a89a27f4f3a5c836df75585774ba7a643" title="The &#39;heating&#39; cross section correction to Thompson. " alt="" coords="540,29,587,56"/>
-</map>

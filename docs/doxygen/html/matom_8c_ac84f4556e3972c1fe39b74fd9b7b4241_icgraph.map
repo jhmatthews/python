@@ -1,6 +1,0 @@
-<map id="b12" name="b12">
-<area shape="rect" id="node2" href="$templates_8h.html#a5dcca3c33cb0db12719fcc6a79958119" title="records the heating contribution from lines of simple elements. " alt="" coords="92,5,184,32"/>
-<area shape="rect" id="node4" href="$templates_8h.html#a590f1ed026cd692ac6f878ed6f359d5a" title="uses the Monte Carlo estimators to compute a set of level populations for levels of macro atoms..." alt="" coords="99,56,177,83"/>
-<area shape="rect" id="node5" href="$templates_8h.html#a9301eba8fb39302ef3da90cdb52aef4d" title="The core of the implementation of Macro Atoms in python. " alt="" coords="112,107,164,133"/>
-<area shape="rect" id="node3" href="$templates_8h.html#a9abacb792fc41f73a200f8a725c40189" title="calculate the distance a photon can travel within a single shell without scattering ..." alt="" coords="232,5,309,32"/>
-</map>

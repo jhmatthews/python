@@ -1,5 +1,0 @@
-<map id="create_master_table" name="create_master_table">
-<area shape="rect" id="node2" href="$windsave2table__sub_8c.html#a435ccfb2aea5f873c9508368e974eced" title="The main routine associated with windsave2table, this routine calls various other routines which writ..." alt="" coords="167,31,275,57"/>
-<area shape="rect" id="node3" href="$templates_8h.html#a28fc174aa63a5eeef6de99ef392e1616" title="run the ionization cycles for a python model " alt="" coords="323,5,432,32"/>
-<area shape="rect" id="node4" href="$windsave2table_8c.html#afced8478b91af5c169926dfa4426333d" title="windsave2table writes key variables in a windsave file to an astropy table calculated Python..." alt="" coords="355,56,399,83"/>
-</map>

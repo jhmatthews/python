@@ -1,5 +1,0 @@
-<map id="string_process_from_file" name="string_process_from_file">
-<area shape="rect" id="node2" href="$foo_8h.html#a98a10e927f2b5ba88c7d5b4fc51d477d" title="check_synonyms" alt="" coords="191,5,289,32"/>
-<area shape="rect" id="node3" href="$rdpar_8c.html#a026dad3fd2b246349462542d4c99e22a" title="Ask for and process one input from the command line. " alt="" coords="184,57,296,98"/>
-<area shape="rect" id="node4" href="$rdpar_8c.html#af92431e285176dcd54501d8ce7315ee3" title="store the parsed version of an input line into a structure so that it can be written out to a file ..." alt="" coords="344,93,451,120"/>
-</map>

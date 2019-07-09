@@ -1,9 +1,0 @@
-<map id="simple_paths_gen_phot" name="simple_paths_gen_phot">
-<area shape="rect" id="node2" href="$templates_8h.html#a5b9038968dd801ac73806fcc16fc1f0c" title="generates photons within the wind between two freqencies and stores them in the photon array ..." alt="" coords="193,5,289,32"/>
-<area shape="rect" id="node4" href="$templates_8h.html#aa943bd857500a1f2937d8b97d84ff633" title="the controlling routine for creating the underlying photon distribution. " alt="" coords="473,31,548,57"/>
-<area shape="rect" id="node5" href="$templates_8h.html#a176ee6debad2930212ca97a2d28794c0" title="Generates path for a wind photon. " alt="" coords="181,107,301,133"/>
-<area shape="rect" id="node6" href="$templates_8h.html#a376d6bf65b4a156a45f28b56bc4c017d" title="Generates path for a macro&#45;atom line photon. " alt="" coords="184,157,299,184"/>
-<area shape="rect" id="node7" href="$templates_8h.html#a4541dc581678aaea94bb9bdf0d38dfcf" title="produces photon packets to account for creating of r&#45;packets by k&#45;packets in the spectrum calculation..." alt="" coords="195,208,288,235"/>
-<area shape="rect" id="node8" href="$templates_8h.html#a7248f385000ac034fb3f0e3d5f45298f" title="produces photon packets to account for creation of r&#45;packets by deactivation of macro atoms in the sp..." alt="" coords="189,259,294,285"/>
-<area shape="rect" id="node3" href="$templates_8h.html#ab7f1c9362f29a0b44f41cff21494b6df" title="just makes photons " alt="" coords="349,5,425,32"/>
-</map>

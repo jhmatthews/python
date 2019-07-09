@@ -1,4 +1,0 @@
-<map id="hydro_velocity" name="hydro_velocity">
-<area shape="rect" id="node2" href="$wind_8c.html#ae04150c3a36a71098fa438ec9401e40d" title="Calculate the wind velocity at a specific point in space from the original usually analytic expressio..." alt="" coords="139,5,227,32"/>
-<area shape="rect" id="node3" href="$wind_8c.html#aecc0364b3155b294b0590e9900867bfb" title="calculate the velocity gradient at positions in the flow based on the analytic wind models and import..." alt="" coords="275,5,355,32"/>
-</map>

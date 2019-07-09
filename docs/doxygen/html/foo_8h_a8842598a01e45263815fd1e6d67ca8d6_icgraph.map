@@ -1,6 +1,0 @@
-<map id="get_atomic_data" name="get_atomic_data">
-<area shape="rect" id="node2" href="$py__wind_8c.html#afced8478b91af5c169926dfa4426333d" title="py_wind is a program which can be used to display various parameters of a wind as calculated by pytho..." alt="" coords="324,5,368,32"/>
-<area shape="rect" id="node3" href="$py__wind_8c.html#a683dc9abc1be6f64b9f9c2f56f13c0ab" title="Process a request to display one variable. " alt="" coords="176,31,249,57"/>
-<area shape="rect" id="node4" href="$templates_8h.html#aabd8388700d83b12bace5f01320b7c06" title="Get the line transfer mode for the wind. " alt="" coords="149,81,276,108"/>
-<area shape="rect" id="node5" href="$windsave_8c.html#a1bf368d85f72b220cc4cba091a5e0702" title="Read back the windsavefile. " alt="" coords="179,132,247,159"/>
-</map>

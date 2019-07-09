@@ -1,4 +1,0 @@
-<map id="kn_rho" name="kn_rho">
-<area shape="rect" id="node2" href="$wind_8c.html#a6190258be2516eb521132d5a1ec1886f" title="calculate the density of the wind in from the flow based on the analytic wind models. " alt="" coords="105,5,175,32"/>
-<area shape="rect" id="node3" href="$yso_8c.html#a5b6cfe1fc0b267de4f9fc763e28628ae" title="double (x) calculates the density of an kn_wind at a position x " alt="" coords="111,56,169,83"/>
-</map>

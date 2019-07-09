@@ -1,8 +1,0 @@
-<map id="two_level_atom" name="two_level_atom">
-<area shape="rect" id="node2" href="$templates_8h.html#a0018131577a59a5142e3677785504d37" title="Calculate the line lumiosity of lines between nmin and nmax of the frequency ordered list of lines..." alt="" coords="421,22,485,49"/>
-<area shape="rect" id="node4" href="$templates_8h.html#a8b5f64621f83720e21cb4440830ef473" title="Calculate the total line absorption x&#45;section for a specific transition allowing for stimulated emiss..." alt="" coords="145,22,221,49"/>
-<area shape="rect" id="node5" href="$templates_8h.html#a3579026b8eac7743ef56ad21ff9696ff" title="Estimate the esccapte probability for a line in a plasma cell. " alt="" coords="151,73,216,99"/>
-<area shape="rect" id="node3" href="$templates_8h.html#a0abc40a64ed911b152833da9a675d1b4" title="Calculate the total line emission from a wind cell. " alt="" coords="533,22,640,49"/>
-<area shape="rect" id="node6" href="$templates_8h.html#a4a12de5120dbfd2f67d3ac56645cb4e6" title="calculate the fraction of excited state atoms which correspond to scattered photons, i.e. the portion which are excited by radiation and return to the ground state via spontaneous emission. " alt="" coords="269,73,373,99"/>
-<area shape="rect" id="node7" href="$templates_8h.html#a08e6e02acfd4d2fb6b31cf9bfdc7b258" title="calculates the amount of line heating that during a resonance. " alt="" coords="422,73,485,99"/>
-</map>

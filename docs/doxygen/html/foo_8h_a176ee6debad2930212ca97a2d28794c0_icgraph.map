@@ -1,7 +1,0 @@
-<map id="wind_paths_gen_phot" name="wind_paths_gen_phot">
-<area shape="rect" id="node2" href="$templates_8h.html#a5b9038968dd801ac73806fcc16fc1f0c" title="generates photons within the wind between two freqencies and stores them in the photon array ..." alt="" coords="178,5,274,32"/>
-<area shape="rect" id="node5" href="$templates_8h.html#a4541dc581678aaea94bb9bdf0d38dfcf" title="produces photon packets to account for creating of r&#45;packets by k&#45;packets in the spectrum calculation..." alt="" coords="179,56,273,83"/>
-<area shape="rect" id="node6" href="$templates_8h.html#a7248f385000ac034fb3f0e3d5f45298f" title="produces photon packets to account for creation of r&#45;packets by deactivation of macro atoms in the sp..." alt="" coords="173,107,279,133"/>
-<area shape="rect" id="node3" href="$templates_8h.html#ab7f1c9362f29a0b44f41cff21494b6df" title="just makes photons " alt="" coords="327,5,403,32"/>
-<area shape="rect" id="node4" href="$templates_8h.html#aa943bd857500a1f2937d8b97d84ff633" title="the controlling routine for creating the underlying photon distribution. " alt="" coords="451,5,525,32"/>
-</map>

@@ -1,6 +1,0 @@
-<map id="/Users/mhewitt/python/source/my_linalg.h" name="/Users/mhewitt/python/source/my_linalg.h">
-<area shape="rect" id="node2" href="$macro__gov_8c.html" title="is a file which contains the functions which govern macro&#45;atoms and obtain their level populations..." alt="" coords="5,95,127,136"/>
-<area shape="rect" id="node3" href="$matom_8c.html" title="Macro&#45;atom functions. " alt="" coords="151,95,272,136"/>
-<area shape="rect" id="node4" href="$matrix__ion_8c.html" title="Contains routines which compute the ionization state using a matrix inversion technique. " alt="" coords="296,95,417,136"/>
-<area shape="rect" id="node5" href="$photo__gen__matom_8c.html" title="functions for calculating emissivities and generating photons from macro&#45;atoms and k&#45;packets..." alt="" coords="442,95,591,136"/>
-</map>

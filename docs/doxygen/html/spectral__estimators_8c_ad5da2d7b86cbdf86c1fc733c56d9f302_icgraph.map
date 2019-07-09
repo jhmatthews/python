@@ -1,5 +1,0 @@
-<map id="exp_mean" name="exp_mean">
-<area shape="rect" id="node2" href="$templates_8h.html#a17dff6266e67bdc289c6ac89d1a230b7" title="Function used in zbrent to work out best value of alpha for a power law model. " alt="" coords="123,5,213,32"/>
-<area shape="rect" id="node4" href="$templates_8h.html#a288f4e76f4f5ee38900c0f14b5a4ac21" title="This program works out the standard deviation. " alt="" coords="131,56,205,83"/>
-<area shape="rect" id="node3" href="$templates_8h.html#abe28dc93125bf28e9c3dcef85428b16a" title="Calculate the parameters of a model for J_nu in a cell. " alt="" coords="261,31,371,57"/>
-</map>

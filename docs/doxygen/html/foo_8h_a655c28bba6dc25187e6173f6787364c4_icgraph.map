@@ -1,5 +1,0 @@
-<map id="dvds_ave" name="dvds_ave">
-<area shape="rect" id="node2" href="$py__wind__sub_8c.html#a25fe0a921c950a05a1c8e51ad24b153b" title="complete_physical_summary" alt="" coords="119,5,269,32"/>
-<area shape="rect" id="node3" href="$wind2d_8c.html#a41ee5cb999f1d4258673b6134394b4cc" title="initializes the structures which characterize the wind, including wmain and plasmamain. " alt="" coords="156,56,232,83"/>
-<area shape="rect" id="node4" href="$python_8c.html#afced8478b91af5c169926dfa4426333d" title="The main routine for Python, which supervises the ingest of data defining a model, the initializtion of the model, and actual run of the model, and writing the data to the disk. " alt="" coords="317,56,361,83"/>
-</map>

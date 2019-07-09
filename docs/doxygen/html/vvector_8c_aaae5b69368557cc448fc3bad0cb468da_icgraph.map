@@ -1,6 +1,0 @@
-<map id="dot" name="dot">
-<area shape="rect" id="node2" href="$vvector_8c.html#a8f009c8e40535ce9122cb90112b6e88c" title="renormalize a vector to a length " alt="" coords="111,31,164,57"/>
-<area shape="rect" id="node3" href="$vvector_8c.html#a2ed75a4016fe87b2bd64577cc6ba7342" title="Project a vector b in xyz coords from position a in xyz coords into cylindrical coordinates. " alt="" coords="231,5,347,32"/>
-<area shape="rect" id="node4" href="$vvector_8c.html#ac287ff5bcb67b9f380b753b765c6196e" title="created an orthonomal basis from two vectors " alt="" coords="249,56,328,83"/>
-<area shape="rect" id="node5" href="$vvector_8c.html#a31edafcc6b7725a12105e7404321679d" title="Dot product of a 2d tensor and a vector to produce a vector. " alt="" coords="92,132,183,159"/>
-</map>

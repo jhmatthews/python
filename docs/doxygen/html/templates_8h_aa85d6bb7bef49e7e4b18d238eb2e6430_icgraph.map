@@ -1,8 +1,0 @@
-<map id="dphi_ds" name="dphi_ds">
-<area shape="rect" id="node2" href="$templates_8h.html#a22069934602644cf4f894c0b48967d49" title="From the masses and period, setup the information one needs to calculate the position of the Roche lo..." alt="" coords="495,98,577,125"/>
-<area shape="rect" id="node3" href="$templates_8h.html#aff5a3156ec26863e37ff61073bb97ca4" title="Calculate the distance to the Roche surface for a photon. " alt="" coords="205,22,293,49"/>
-<area shape="rect" id="node4" href="$templates_8h.html#a9c51519f54c26122775ef8eaca1806d8" title="Calculate the value of the Roche potential and its derivative along a particular lien of sight..." alt="" coords="111,73,157,100"/>
-<area shape="rect" id="node7" href="$templates_8h.html#aa72cfd7beaead2acdb08bb12eafa3197" title="Calculate the first and second derivative of the roche potential along a specific line of sight..." alt="" coords="357,174,431,201"/>
-<area shape="rect" id="node5" href="$templates_8h.html#aa6c77132d4fe5cdf4cb3d66186981228" title="Calculate the width of the Roche potentiil at a position x along the x axis. " alt="" coords="211,124,287,150"/>
-<area shape="rect" id="node6" href="$templates_8h.html#ad958df4fd3f6dd7f4ff01882d407c6c6" title="Find the half width of the secondary Roche lobe. " alt="" coords="341,124,447,150"/>
-</map>

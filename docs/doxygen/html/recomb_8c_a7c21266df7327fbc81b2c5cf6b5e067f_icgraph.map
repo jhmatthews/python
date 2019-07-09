@@ -1,5 +1,0 @@
-<map id="num_recomb" name="num_recomb">
-<area shape="rect" id="node2" href="$py__wind__macro_8c.html#a3b9acb4339c1f7cab252c186f431ff38" title="prints the adiabatic cooling in each cell, and the total adiabatic cooling. " alt="" coords="133,5,237,47"/>
-<area shape="rect" id="node3" href="$py__wind__sub_8c.html#afe61bcd47610656c4bc08af99c1c6c0f" title="recomb_summary" alt="" coords="134,71,237,98"/>
-<area shape="rect" id="node4" href="$templates_8h.html#a9d0d69b33092d06a7174d71c3082d2a6" title="returns the energy lost from the plasma due to fb emission in a single wind cell at a temperature t b..." alt="" coords="158,122,213,149"/>
-</map>

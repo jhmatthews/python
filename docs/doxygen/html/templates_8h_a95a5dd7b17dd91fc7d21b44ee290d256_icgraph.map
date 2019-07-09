@@ -1,4 +1,0 @@
-<map id="cylvar_make_grid" name="cylvar_make_grid">
-<area shape="rect" id="node2" href="$wind2d_8c.html#a41ee5cb999f1d4258673b6134394b4cc" title="initializes the structures which characterize the wind, including wmain and plasmamain. " alt="" coords="153,5,229,32"/>
-<area shape="rect" id="node3" href="$python_8c.html#afced8478b91af5c169926dfa4426333d" title="The main routine for Python, which supervises the ingest of data defining a model, the initializtion of the model, and actual run of the model, and writing the data to the disk. " alt="" coords="277,5,321,32"/>
-</map>

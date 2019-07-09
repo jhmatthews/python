@@ -1,5 +1,0 @@
-<map id="/Users/mhewitt/python/source/models.h" name="/Users/mhewitt/python/source/models.h">
-<area shape="rect" id="node2" href="$cdf_8c.html" title="Routines to create a cumulatimve distribution (CDF) from a function or array, and then to sample that..." alt="" coords="5,95,127,136"/>
-<area shape="rect" id="node3" href="$continuum_8c.html" title="Rotines related speciically to generating MC spectra for stellar atmospheres like grids of spectra..." alt="" coords="151,95,272,136"/>
-<area shape="rect" id="node4" href="$get__models_8c.html" title="The routines here provide a way to read grids of models and then to interpolate between them..." alt="" coords="296,95,417,136"/>
-</map>

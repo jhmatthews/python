@@ -1,6 +1,0 @@
-<map id="update_banded_estimators" name="update_banded_estimators">
-<area shape="rect" id="node2" href="$templates_8h.html#a141c8c8db4119b46cba7dcff5de861b3" title="increment the matom bound&#45;free estimators " alt="" coords="196,5,328,32"/>
-<area shape="rect" id="node5" href="$templates_8h.html#adb025e0891ad334d41481551bf785170" title="updates the field parameters in the wind and reduces the weight of the photon as a result of the effe..." alt="" coords="232,56,292,83"/>
-<area shape="rect" id="node3" href="$templates_8h.html#a0118547dede9b08b5ac6609b4313e3e8" title="translates the photon within a single cell in the wind. " alt="" coords="376,5,476,32"/>
-<area shape="rect" id="node4" href="$templates_8h.html#ae77272897af1eb8f6ebd0f7cfe2932e8" title="a steering routine that either calls _in_space or _in_wind depending upon the current location of the..." alt="" coords="524,5,584,32"/>
-</map>

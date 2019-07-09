@@ -1,5 +1,0 @@
-<map id="zero_emit" name="zero_emit">
-<area shape="rect" id="node2" href="$templates_8h.html#a0c0fa3305df1f5c000e0ed0a26d413d8" title="calculates new densities of ions in a single element of the wind after (usually) having found the tem..." alt="" coords="220,5,283,32"/>
-<area shape="rect" id="node4" href="$templates_8h.html#a09cddd089f4a6cc83c34606d125c28a4" title="calc_te determines and returns the electron temperature in the wind such that the energy emitted by t..." alt="" coords="119,31,172,57"/>
-<area shape="rect" id="node3" href="$templates_8h.html#a626b1882e2533441cdf2daabd36e8a8b" title="ionization routines for the wind one cell at a time " alt="" coords="331,5,427,32"/>
-</map>

@@ -1,6 +1,0 @@
-<map id="overview" name="overview">
-<area shape="rect" id="node2" href="$emission_8c.html#ade7eab896d4188a5b8a4ed6845d33150" title="calculate f_nu for ff emisssion " alt="" coords="115,5,153,32"/>
-<area shape="rect" id="node4" href="$log_8h.html#a9a25be4f0d7d13fccc8457774d74167f" title="Print/write an informational message. " alt="" coords="115,56,153,83"/>
-<area shape="rect" id="node3" href="$emission_8c.html#aaad109a8ae79883e98e2dee88d65bd4e" title="computes the frequency averaged gaunt factor for ff emissionat scaled temperature from Sutherland (19..." alt="" coords="201,5,260,32"/>
-<area shape="rect" id="node5" href="$xlog_8c.html#aeb93dfd882dd6a658b86662e6e219a09" title="Open a log file. " alt="" coords="202,56,259,83"/>
-</map>

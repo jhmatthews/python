@@ -1,7 +1,0 @@
-<map id="xinteg_fb" name="xinteg_fb">
-<area shape="rect" id="node2" href="$templates_8h.html#a7ef12badd64f5bb47d6fccbb217ba805" title="calculates the integrated emissivity of the plasma, or the number of recombinations per second of a p..." alt="" coords="121,22,178,48"/>
-<area shape="rect" id="node5" href="$templates_8h.html#a86d223ebd7563467934af71d1d8e4552" title="initializes the structure fb_struc as well as some associated arrays and variables (found in python..." alt="" coords="231,72,316,99"/>
-<area shape="rect" id="node6" href="$templates_8h.html#ab1050097e6dcebb3469479d4fd5ff6c0" title="get the total rediative recombination rate " alt="" coords="116,123,183,150"/>
-<area shape="rect" id="node3" href="$templates_8h.html#a9d0d69b33092d06a7174d71c3082d2a6" title="returns the energy lost from the plasma due to fb emission in a single wind cell at a temperature t b..." alt="" coords="364,22,419,48"/>
-<area shape="rect" id="node4" href="$templates_8h.html#a7c21266df7327fbc81b2c5cf6b5e067f" title="calculates the total number of recombinations for all of the ions in a cell " alt="" coords="233,22,313,48"/>
-</map>

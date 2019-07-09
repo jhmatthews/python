@@ -1,6 +1,0 @@
-<map id="total_di" name="total_di">
-<area shape="rect" id="node2" href="$direct__ion_8c.html#a71e4aa982b912f78d70646462c6a6115" title="computes the rates due to direct (collisional) ionization from Dere data. " alt="" coords="108,5,213,32"/>
-<area shape="rect" id="node3" href="$direct__ion_8c.html#a6a22ee2c1e95eae27423b95ce1283f71" title="Returns the collisional ionization rate coefficient for a given ion/temperature. " alt="" coords="261,5,340,32"/>
-<area shape="rect" id="node4" href="$log_8h.html#aed844368416d95992f0bbeb9f7fec55b" title="Write a message to the diagnostic file. " alt="" coords="388,5,456,32"/>
-<area shape="rect" id="node5" href="$xlog_8c.html#aeb93dfd882dd6a658b86662e6e219a09" title="Open a log file. " alt="" coords="504,5,561,32"/>
-</map>

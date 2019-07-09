@@ -1,6 +1,0 @@
-<map id="get_spectype" name="get_spectype">
-<area shape="rect" id="node2" href="$python_8c.html#afced8478b91af5c169926dfa4426333d" title="The main routine for Python, which supervises the ingest of data defining a model, the initializtion of the model, and actual run of the model, and writing the data to the disk. " alt="" coords="179,5,223,32"/>
-<area shape="rect" id="node3" href="$templates_8h.html#a611c7cc190ffb8c6494e75ec549191f3" title="get the parameters need to define a disk " alt="" coords="151,56,250,83"/>
-<area shape="rect" id="node4" href="$templates_8h.html#a5e18aeda5d11190333c93b952b562b04" title="sets rstar, mstar, tstar as well as secondary parameters based on user inputs " alt="" coords="147,107,254,133"/>
-<area shape="rect" id="node5" href="$templates_8h.html#a897e0ae97c32a481075df9fc45f6e745" title="sets up the boundary layer and agn power law parameters based on user input and system type ..." alt="" coords="135,157,267,184"/>
-</map>

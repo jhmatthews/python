@@ -1,7 +1,0 @@
-<map id="bb_simple_heat" name="bb_simple_heat">
-<area shape="rect" id="node2" href="$foo_8h.html#ac84f4556e3972c1fe39b74fd9b7b4241" title="b12" alt="" coords="172,5,211,32"/>
-<area shape="rect" id="node3" href="$foo_8h.html#a234e98c30b4b66b1f72240a79d9f4d11" title="calculates the ratio n2/n1 and gives the individual densities for the states of a two level atom..." alt="" coords="145,56,237,83"/>
-<area shape="rect" id="node4" href="$atomic_8c.html#a8c589bd3089b7851e8da407ad1ce44a5" title="Calculate the Einstein A coefficient for a transition. " alt="" coords="172,107,211,133"/>
-<area shape="rect" id="node5" href="$foo_8h.html#a3579026b8eac7743ef56ad21ff9696ff" title="Estimate the esccapte probability for a line in a plasma cell. " alt="" coords="159,157,224,184"/>
-<area shape="rect" id="node6" href="$foo_8h.html#a6daa97078321cf4f668d31b7004fed6c" title="calculates and returns the collisional de&#45;excitation coefficient q21 " alt="" coords="172,208,211,235"/>
-</map>

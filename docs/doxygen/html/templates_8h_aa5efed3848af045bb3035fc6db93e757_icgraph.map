@@ -1,5 +1,0 @@
-<map id="delay_to_observer" name="delay_to_observer">
-<area shape="rect" id="node2" href="$templates_8h.html#ac0ede87d97addcd4c5df57e2930dbdb6" title="Dumps tracked photons to file. " alt="" coords="157,31,233,57"/>
-<area shape="rect" id="node3" href="$templates_8h.html#a835e66c48118aa52e1903512ed676f20" title="Finishes dumping tracked photons to file. " alt="" coords="283,5,388,32"/>
-<area shape="rect" id="node4" href="$templates_8h.html#a30c0a9051caebba27b5ef5583d38ad0c" title="Preps a single photon to be dumped. " alt="" coords="281,56,389,83"/>
-</map>

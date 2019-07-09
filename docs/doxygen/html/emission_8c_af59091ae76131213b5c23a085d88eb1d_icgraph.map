@@ -1,6 +1,0 @@
-<map id="one_ff" name="one_ff">
-<area shape="rect" id="node2" href="$templates_8h.html#a5b9038968dd801ac73806fcc16fc1f0c" title="generates photons within the wind between two freqencies and stores them in the photon array ..." alt="" coords="103,5,199,32"/>
-<area shape="rect" id="node5" href="$templates_8h.html#a16ae068adf1746f09c432de7e245dfb1" title="kpkt" alt="" coords="131,56,171,83"/>
-<area shape="rect" id="node3" href="$templates_8h.html#ab7f1c9362f29a0b44f41cff21494b6df" title="just makes photons " alt="" coords="247,5,323,32"/>
-<area shape="rect" id="node4" href="$templates_8h.html#aa943bd857500a1f2937d8b97d84ff633" title="the controlling routine for creating the underlying photon distribution. " alt="" coords="371,5,445,32"/>
-</map>

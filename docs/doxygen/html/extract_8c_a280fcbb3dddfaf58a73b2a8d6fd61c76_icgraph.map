@@ -1,6 +1,0 @@
-<map id="extract" name="extract">
-<area shape="rect" id="node2" href="$trans__phot_8c.html#a620388e1c4a8e38f192c5a0ce42af389" title="int (w,p,iextract) oversees the propagation of a &quot;flight&quot; of photons " alt="" coords="255,31,324,57"/>
-<area shape="rect" id="node5" href="$trans__phot_8c.html#a2f7b8208c76fe2718f45f46c9dc3a813" title="Transport a single photon photon through the wind. " alt="" coords="105,56,207,83"/>
-<area shape="rect" id="node3" href="$templates_8h.html#a28fc174aa63a5eeef6de99ef392e1616" title="run the ionization cycles for a python model " alt="" coords="372,5,481,32"/>
-<area shape="rect" id="node4" href="$templates_8h.html#abc2ad803345c801984f4dc64d4d4a9e0" title="generates the detailed spectra " alt="" coords="384,56,469,83"/>
-</map>

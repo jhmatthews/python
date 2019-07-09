@@ -1,7 +1,0 @@
-<map id="sv_find_wind_rzero" name="sv_find_wind_rzero">
-<area shape="rect" id="node2" href="$sv_8c.html#a94ed9e26a007e734f5b4be6778c2c238" title="A setup routine for finding the footpoint of a stream line in a SV model. " alt="" coords="161,5,237,32"/>
-<area shape="rect" id="node4" href="$foo_8h.html#a8c30fbf58d7a0b5789604f00c96bedb6" title="A routine that finds the rooot of a function f. " alt="" coords="175,56,224,83"/>
-<area shape="rect" id="node5" href="$sv_8c.html#a3e9f63d90b25108ed917dbd91583ab8f" title="Routine used by zbrent to find a footpoint of a streamline in an SV model. " alt="" coords="167,107,232,133"/>
-<area shape="rect" id="node3" href="$foo_8h.html#a917f837a1598fc3307b17cceef5f4340" title="stuff_v" alt="" coords="302,5,354,32"/>
-<area shape="rect" id="node6" href="$sv_8c.html#a0b95d81797f46e4870ae03311b4278ab" title="double (r) finds the angle at which the wind emerges from at a specific radius r on surface of the di..." alt="" coords="285,107,371,133"/>
-</map>

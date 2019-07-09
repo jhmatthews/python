@@ -1,6 +1,0 @@
-<map id="alpha_st_integrand" name="alpha_st_integrand">
-<area shape="rect" id="node2" href="$templates_8h.html#ade8e60c03793f3c9f76d4ddd1c159346" title="the stimulated recombination rate estimator " alt="" coords="160,31,239,57"/>
-<area shape="rect" id="node3" href="$templates_8h.html#a0b0bdb47e266cd31f1c381bb2410fa80" title="the routine to normalise the matom bb and bf estimators. " alt="" coords="287,5,417,32"/>
-<area shape="rect" id="node4" href="$templates_8h.html#abd62705b5006847a8dc70b442bf15332" title="compute dilute matom estimators " alt="" coords="293,56,411,83"/>
-<area shape="rect" id="node5" href="$templates_8h.html#a590f1ed026cd692ac6f878ed6f359d5a" title="uses the Monte Carlo estimators to compute a set of level populations for levels of macro atoms..." alt="" coords="465,56,543,83"/>
-</map>

@@ -1,6 +1,0 @@
-<map id="wind_luminosity" name="wind_luminosity">
-<area shape="rect" id="node2" href="$templates_8h.html#a9a0acf2d461c665dc0302defa95ded65" title="calculates the band limited fluxes &amp; luminosities, and prepares for the producting of photons (by rei..." alt="" coords="159,5,238,32"/>
-<area shape="rect" id="node5" href="$py__wind__sub_8c.html#a5fbfbb635a9e9fcadb5f07319131e4a6" title="heatcool_summary" alt="" coords="145,56,252,83"/>
-<area shape="rect" id="node3" href="$templates_8h.html#aa943bd857500a1f2937d8b97d84ff633" title="the controlling routine for creating the underlying photon distribution. " alt="" coords="441,5,516,32"/>
-<area shape="rect" id="node4" href="$templates_8h.html#addfbba966a4d69bdc71b771e0d7f3cdf" title="Determine how many photons to allocate to each band. " alt="" coords="300,31,393,57"/>
-</map>
