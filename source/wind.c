@@ -466,7 +466,6 @@ wind_check (www, n)
      WindPtr www;
      int n;
 {
-//OLD  Log ("Got to wind_check\n");
   int i, j, k, istart, istop;
   if (n < 0)
   {
@@ -510,6 +509,5 @@ wind_check (www, n)
   }
 
   Log ("Wind_check: Punchthrough distance DFUDGE %e www[1].x[2] %e\n", DFUDGE, www[1].x[2]);
-//OLD  Log ("Finished wind check\n");
   return (0);
 }

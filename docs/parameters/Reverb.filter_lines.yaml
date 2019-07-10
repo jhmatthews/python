@@ -18,9 +18,9 @@ values:
   N: |
     **Filter lines**
 
-    Include N reverb.filter_line entries, each specifying one
-    line to keep in the output file. If reverb.matom_lines is >0, all macro-atom
+    Include N :ref:`reverb.filter_line` entries, each specifying one
+    line to keep in the output file. If :ref:`reverb.matom_lines` is >0, all macro-atom
     lines of interest are automatically included in the filter list.
 parent:
-  reverb.type: Greater than 0
+  Reverb.type: [wind, matom]
 file: setup_reverb.c

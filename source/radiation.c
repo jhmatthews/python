@@ -9,106 +9,6 @@
  *
  ***********************************************************/
 
-//OLD /***********************************************************
-//OLD                                        Space Telescope Science Institute
-//OLD 
-//OLD  Synopsis:
-//OLD    radiation(p,ds) updates the radiation field parameters in the wind and reduces 
-//OLD    the weight of the photon as a result of the effect free free and photoabsorption.
-//OLD    radiation also keeps track of the number of photoionizations of h and he in the
-//OLD    cell. 
-//OLD Arguments:
-//OLD 
-//OLD   PhotPtr p;      the photon
-//OLD   double ds       the distance the photon has travelled in the cell
-//OLD 
-//OLD Returns:
-//OLD   Always returns 0.  The pieces of the wind structure which are updated are
-//OLD   j,ave_freq,ntot, heat_photo, heat_ff, heat_h, heat_he1, heat_he2, heat_z,
-//OLD   nioniz, and ioniz[].
-//OLD  
-//OLD Description:       
-//OLD Notes:
-//OLD   
-//OLD   The # of ionizations of a specific ion = (w(0)-w(s))*n_i sigma_i/ (h nu * kappa_tot).  (The # of ionizations
-//OLD   is just given by the integral of n_i sigma_i w(s) / h nu ds, but if the density is assumed to
-//OLD   be constant and sigma is also constant [therefy ignoring velocity shifts in a grid cell], then
-//OLD   n_i sigma and h nu can be brought outside the integral.  Hence the integral is just over w(s),
-//OLD   but that is just given by (w(0)-w(smax))/kappa_tot.)  The routine calculates the number of ionizations per
-//OLD   unit volume.
-//OLD   
-//OLD   This routine is very time counsuming for our normal file which has a large number of x-sections.  The problem
-//OLD   is going through all the do loops, not insofar as I can determine anything else.  Trying to reduce the calucatiions
-//OLD   by using a density criterion is a amall effect.  One really needs to avoid the calculations, either by avoiding
-//OLD   the do loops altogether or by reducing the number of input levels.  It's possible that if one were clever about
-//OLD   the thresholds (as we are on the lines that one could figure out a wininning strategy as it is all brute force
-//OLD         do loops..  
-//OLD 
-//OLD   57h -- This routine was very time consuming.  The time spent is/was well out of proportion to
-//OLD   the affect free-bound processes have on the overall spectrum, and so signifincant changes have been made
-//OLD   to the earlier versions of the routine.  The fundamental problem before 57h was that every time one
-//OLD   entered the routine (which was every for every movement of a photon) in the code.  Basically there were
-//OLD   3  changes made:
-//OLD           1. During the detailed spectrum cycle, the code avoids the portions of the routine that are
-//OLD   only needed during the ionization cycles.
-//OLD           2. Switches have been installed tha skip the free-bound section altogether if PHOT_DEN_MIN is
-//OLD   less than zero.  It is very reasonable to do this for the detailed spectrum calculation if one is
-//OLD   doing a standard 
-//OLD   were to skip portions of when they were not needed 
-//OLD 
-//OLD   ?? Would it be more natural to include electron scattering here in Radiation as well ??
-//OLD   ?? Radiation needs a major overhaul.  A substantial portion of this routine is not needed in the extract 
-//OLD   ?? portion of the calculation.  In addition the do loops go through all of the ions checking one at a time
-//OLD   ?? whether they are above the frequencey threshold.  
-//OLD   ?? The solution I believe is to include some kind of switch that tells the routine when one is doing
-//OLD   ?? the ionization calculation and to skip the unnecessary sections when extract is being carried out.
-//OLD   ?? In addition, if there were a set of ptrs to the photionization structures that were orded by frequency,
-//OLD   ?? similar to the line list, one could then change to loops so that one only had to check up to the
-//OLD   ?? first x-section that had a threshold up to the photon frequency, and not all of the rest.
-//OLD   ?? At present, I have simply chopped the photoionizations being considered to include only thresholds
-//OLD         ?? shortward of the Lyman limit...e.g. 1 Rydberg, but this makes it impossible to discuss the Balmer jump
-//OLD History:
-//OLD   97jan   ksl     Coded as part of python effort
-//OLD   98jul   ksl     Almost entirely recoded to eliminate arbitrary split between
-//OLD                   the several preexisting routines.
-//OLD   98nov   ksl     Added back tracking of number of h and he ionizations
-//OLD   99jan   ksl     Increased COLMIN from 1.e6 to 1.e10 and added checks so
-//OLD                   that one does not attempt to calculate photoionization
-//OLD                   cross-sections below threshold.  Both of these changes
-//OLD                   are intended to speed this routine.
-//OLD     01oct   ksl     Modifications begun to incorporate Topbase photoionization
-//OLD                         x-sections.
-//OLD     01oct   ksl     Moved fb_cooling to balance_abso.  It's only used by
-//OLD                         balance and probably should not be there either.
-//OLD   02jun   ksl     Improved/fixed treatment of calculation of number of ionizations.
-//OLD   04apr   ksl     SS had modified this routine to allow for macro-atoms in python_47, but his modifications
-//OLD                   left very little for radiation to accomplish.  I have returned to the old version of 
-//OLD                   routine, and moved the little bit that needed to be done in this routine for
-//OLD                   the macro approach to the calling routine.  Once we abandon the old approach this
-//OLD                   routine can be deleted.
-//OLD   04aug   ksl     Fixed an error which had crept into the program between 51 and 51a that caused the
-//OLD                   disk models to be wrong.  The problem was that there are two places where the
-//OLD                   same frequency limit should have been used, but the limits had been set differently.
-//OLD   04dec   ksl     54a -- Miniscule change to eliminate -03 warnings.  Also eliminate some variables
-//OLD                   that were not really being used.
-//OLD   06may   ksl     57+ -- Began modifications to allow for splitting the wind and plasma structures
-//OLD   06jul   ksl     57h -- Made various changes intended to speed up this routine. These include
-//OLD                   skipping sections of the routine in the spectrum generation
-//OLD                   phase that are not used, allowing control over whether fb opacities
-//OLD                   are calculated at all, and using frequency ordered pointer arrays
-//OLD                   to shorten the loops.
-//OLD   11aug   nsh     70 changes made to radiation to allow compton cooling to be computed
-//OLD   11aug   nsh     70 Changed printout of spectra in selected regions so it is always
-//OLD                   the midpoint of the wind
-//OLD   12may   nsh     72 Added induced compton
-//OLD   12jun   nsh     72 Added lines to write out photon stats to a file dirung diagnostics. This is
-//OLD                   to allow us to see how well spectra are being modelled by power law W and alpha
-//OLD   1405    JM corrected error (#73) so that photon frequency is shifted to the rest frame of the 
-//OLD           cell in question. Also added check which checks if a photoionization edge is crossed
-//OLD           along ds.
-//OLD   1508    NSH slight modification to mean that compton scattering no longer reduces the weight of
-//OLD                   the photon in this part of the code. It is now done when the photon scatters.
-//OLD **************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -556,9 +456,10 @@ radiation (p, ds)
       xplasma->heat_auger += z * frac_auger;
       xplasma->heat_tot += z * frac_auger;      //All the inner shell opacities
 
-      /* Calculate the number of photoionizations per unit volume for H and He 
-       */
-      xplasma->nioniz++;
+      /* Calculate the number of H ionizing photons, see #255 */
+      if (freq > (RYD2ERGS / H))
+        xplasma->nioniz++;
+
       q = (z) / (H * freq * xplasma->vol);
       /* So xplasma->ioniz for each species is just 
          (energy_abs)*kappa_h/kappa_tot / H*freq / volume
@@ -611,33 +512,6 @@ radiation (p, ds)
   return (0);
 }
 
-//OLD /***********************************************************
-//OLD                                        Space Telescope Science Institute
-//OLD 
-//OLD  Synopsis: 
-//OLD   double kappa_ff(w,freq) calculates the free-free opacity allowing for stimulated emission
-//OLD   
-//OLD Arguments:
-//OLD 
-//OLD Returns:
-//OLD   
-//OLD Description:       
-//OLD   Formula from Allen
-//OLD   Includes only singly ionized H and doubly ionized he    
-//OLD 
-//OLD Notes:
-//OLD 
-//OLD History:
-//OLD   98aug   ksl     Coded as part of python effort
-//OLD         04Apr   SS      If statement added for cases with hydrogen only.
-//OLD                         Note: this routine assumes that H I is the first ion
-//OLD                         and that He II is the fourth ion.
-//OLD   05may   ksl     57+ -- Modified to eliminate WindPtr in favor
-//OLD                   of PlasmaPtr
-//OLD           12oct   nsh     73 -- Modified to use a prefector summed over all ions, calculated prior
-//OLD                   to the photon flight
-//OLD 
-//OLD **************************************************************/
 
 
 
@@ -701,37 +575,6 @@ kappa_ff (xplasma, freq)
   return (x);
 }
 
-
-
-//OLD /***********************************************************
-//OLD                                  Space Telescope Science Institute
-//OLD 
-//OLD  Synopsis:
-//OLD   double sigma_phot(x_ptr,freq)   calculates the
-//OLD   photionization crossection due to the transition associated with
-//OLD   x_ptr at frequency freq
-//OLD Arguments:
-//OLD      struct topbase_phot *x_ptr;
-//OLD      double freq;
-//OLD 
-//OLD Returns:
-//OLD 
-//OLD Description:
-//OLD   sigma_phot uses the Topbase x-sections to calculate the bound free
-//OLD   (or photoionization) xsection.  The data must have been into the
-//OLD   photoionization structures xphot with get_atomic_data and the
-//OLD   densities of individual ions must have been calculated previously.
-//OLD 
-//OLD Notes:
-//OLD 
-//OLD History:
-//OLD   01Oct   ksl     Coded as part of general move to use Topbase data
-//OLD                   (especially partial xsections, which did not exist 
-//OLD                   in the Verner et al prescriptions
-//OLD   02jul   ksl     Fixed error in the way fraction being applied.
-//OLD                   Sigh! and then modified program to use linterp
-//OLD 
-//OLD **************************************************************/
 
 
 /**********************************************************/
@@ -800,34 +643,16 @@ sigma_phot (x_ptr, freq)
 
 }
 
-//OLD /***********************************************************
-//OLD 
-//OLD   Synopsis: 
-//OLD   double sigma_phot_verner(x_ptr,freq)    calculates the photionization crossection due to the transition 
-//OLD   associated with x_ptr at frequency freq
-//OLD  Arguments:
-//OLD  
-//OLD  Returns:
-//OLD  
-//OLD  Description:      
-//OLD         Same as sigma_phot but using the older compitation from Verner that includes inner shells
-//OLD  
-//OLD  Notes:
-//OLD  
-//OLD  History:
-//OLD   08dec   SS      Coded (actually mostly copied from sigma_phot)
-//OLD  
-//OLD **************************************************************/
 
 
 /**********************************************************/
 /** 
- * @brief      double (x_ptr,freq)	calculates the photionization crossection due to the transition 
+ * @brief      calculates the photionization crossection due to the transition 
  *  	associated with x_ptr at frequency freq (when the data is in the form of the Verner x-sections
  *
  * @param [in] struct innershell *  x_ptr   The stucture that contains information in the format of Verner for 
  * a particular ion level
- * @param [in,out] double  freq   The frequency where the x-section is calculated
+ * @param [in] double  freq   The frequency where the x-section is calculated
  * @return     The photoinization x-section
  *
  * @details
@@ -836,7 +661,7 @@ sigma_phot (x_ptr, freq)
  * ### Notes ###
  * 
  * I (NSH) think this routine has been largely superceeded by the new inner shell formulation of auger ionization.
- * At some poi nt we may wish to expunge the old augerion perts of python.
+ * At some point we may wish to expunge the old augerion perts of python.
  *
  **********************************************************/
 
@@ -867,34 +692,6 @@ sigma_phot_verner (x_ptr, freq)
     return (0.0);
 }
 
-
-//OLD /***********************************************************
-//OLD                                  Space Telescope Science Institute
-//OLD 
-//OLD Synopsis:
-//OLD 
-//OLD double den_config(one,nconf) returns the precalculated density
-//OLD   of a particular "nlte" level.   If levels are not defined for an ion it
-//OLD   assumes that all ions of are in the ground state.
-//OLD 
-//OLD Arguments:
-//OLD 
-//OLD Returns:
-//OLD 
-//OLD Description: The first case is when the density of the particular level
-//OLD is in the wind array The second caseis when the density of the levels
-//OLD for an ion are not tracked, and hence only the total density for the
-//OLD ion is known.  In that case, we assume the ion is in it's ground state.
-//OLD 
-//OLD 
-//OLD Notes:
-//OLD 
-//OLD History:
-//OLD   01oct   ksl     Coded as part of effort to add topbase
-//OLD                   xsections and detailed balance to python
-//OLD   05may   ksl     57+ -- Recoded to use PlasmaPtr
-//OLD 
-//OLD **************************************************************/
 
 
 /**********************************************************/
@@ -951,36 +748,6 @@ in the ground state */
 
 
 }
-
-
-//OLD /***********************************************************
-//OLD                 Southampton University
-//OLD 
-//OLD Synopsis: pop_kappa_ff_array populates the multiplicative         
-//OLD           factor used in the FF calculation. This depends only
-//OLD           on the densities of ions in the cell, and the electron
-//OLD           temperature (which feeds into the gaunt factor) so it
-//OLD           saves time to calculate all this just the once. This
-//OLD           is called in python.c, just before the photons are 
-//OLD           sent thruogh the wind.
-//OLD 
-//OLD Arguments:                
-//OLD 
-//OLD Returns:
-//OLD  
-//OLD Description:      
-//OLD 
-//OLD Notes:
-//OLD 
-//OLD 
-//OLD History:
-//OLD    12oct           nsh     coded 
-//OLD    1212   ksl     Added sane check; note that this routine
-//OLD                   is poorly documented.  Somewhere this 
-//OLD           should be discribed better.  
-//OLD    1407 nsh       changed loop to only go over NPLASMA cells not NPLASMA+1
-//OLD  
-//OLD **************************************************************/
 
 
 
@@ -1044,44 +811,6 @@ pop_kappa_ff_array ()
   return (0);
 }
 
-
-
-
-//OLD /***********************************************************
-//OLD                 Southampton University
-//OLD 
-//OLD Synopsis: 
-//OLD   update_banded_estimators updates the estimators required for
-//OLD   mode 7 ionization- the Power law, pairwise, modified saha ionization solver.
-//OLD   It also records the values of IP.
-//OLD 
-//OLD Arguments:        
-//OLD   xplasma         PlasmaPtr for the cell
-//OLD   p                       Photon pointer
-//OLD   ds                      ds travelled
-//OLD   w_ave           the weight of the photon. 
-//In non macro atom mode,
-//OLD               this is an average weight (passed as w_ave), but 
-//OLD               in macro atom mode weights are never reduced (so p->w 
-//OLD               is used).
-//OLD 
-//OLD Returns:
-//OLD   increments the estimators in xplasma in the following modes:
-//
-//
-//OLD  
-//OLD Description:      
-//OLD   This routine does not contain new code on initial writing, but instead 
-//OLD   moves duplicated code from increment_bf_estimators and radiation() 
-//OLD   to here, as duplicating code is bad practice.
-//OLD 
-//OLD Notes:
-//OLD 
-//OLD 
-//OLD History:
-//OLD    1402 JM                Coding began
-//OLD  
-//OLD **************************************************************/
 
 
 /**********************************************************/
@@ -1226,36 +955,6 @@ update_banded_estimators (xplasma, p, ds, w_ave)
 
 
 
-//OLD /*************************************************************
-//OLD Synopsis: 
-//OLD   mean_intensity returns a value for the mean intensity 
-//OLD 
-//OLD Arguments:        
-//OLD   xplasma                 PlasmaPtr for the cell - supplies spectral model
-//OLD   freq                    the frequency at which we want to get a value of J
-//OLD   mode                    mode 1=use BB if we have not yet completed a cycle
-//OLD                           and so dont have a spectral model, mode 2=never use BB
-//OLD 
-//OLD Returns:
-//OLD  
-//OLD Description:
-//OLD    This subroutine returns a value for the mean intensity J at a 
-//OLD    given frequency, using either a dilute blackbody model
-//OLD    or a spectral model depending on the value of geo.ioniz_mode. 
-//OLD    to avoid code duplication.
-//OLD 
-//OLD Notes:
-//OLD    This subroutine was produced
-//OLD    when we started to use a spectral model to populaste the upper state of a
-//OLD    two level atom, as well as to calculate induced compton heating. This was
-//OLD 
-//OLD History:
-//OLD    1407 NSH               Coding began
-//OLD  
-//OLD **************************************************************/
-
-
-
 
 /**********************************************************/
 /** 
@@ -1306,7 +1005,7 @@ mean_intensity (xplasma, freq, mode)
 
 
 
-  if (geo.ioniz_mode == 5 || geo.ioniz_mode == IONMODE_MATRIX_SPECTRALMODEL)    /*If we are using power law ionization, use PL estimators */
+  if (geo.ioniz_mode == IONMODE_MATRIX_SPECTRALMODEL)   /*If we are using power law ionization, use PL estimators */
   {
     if (geo.spec_mod > 0)       /* do we have a spectral model yet */
     {

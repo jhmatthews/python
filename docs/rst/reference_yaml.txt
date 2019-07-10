@@ -4,9 +4,9 @@ description: |
   Can split across any number of lines.
 
   And will preserve linebreaks in the middle.
-type: Float
+type: Double
 unit: cm
-values: Greater than 0
+value: Greater than 0
 parent:
   parameter.name: A description, e.g. greater than zero or 0, 1, 2
 file: file_it_is_found_in.c
@@ -14,12 +14,17 @@ file: file_it_is_found_in.c
 name: example.enumerator
 description: |
   Enumerator description
-type: Enum (Int)
+type: Enumerator
 values:
-  0: Inline text
-  1: |
+  one: Inline text
+  two: |
     Multi-line text
-  2: Inline text again
+  three: Inline text again
 parent:
   example.parameter: Required for values of >2.
 file: file_it_is_found_in.c
+
+parent:
+  Line_transfer: [macro_atoms, macro_atoms_thermal_trapping]
+
+:ref:`example.enumerator`

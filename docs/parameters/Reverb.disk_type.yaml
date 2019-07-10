@@ -2,11 +2,9 @@ name: Reverb.disk_type
 description: |
   Setting for how photons generated in the disk are treated when generating path
   distributions for wind cells.
-type: Enum (Int)
+type: Enumerator
 values:
   correlated: |
-    **Correlated**
-
     This mode assumes that disk emission is correlated with the
     central source. Photons generated in the disk start with a delay equal to
     the direct distance to the central source. This assumes that the ionisation
@@ -14,16 +12,12 @@ values:
     unscattered photons from the central source.
 
   uncorrelated: |
-    **Uncorrelated**
-
     This mode generates photons with a delay of 0 wherever in the
     disk they come from. This mode is of slightly questionable use and should be
     ignored in preference to 0 or 2. It will, in practise, generally work out
     similar to type 0 as most of the UV photons are generated close-in to the CO.
 
   ignore: |
-    **Ignored**
-
     This mode assumes that disk photons do *not* correlate
     with the central source (i.e. disk surface  ionisation state and emissivity is
     driven not by irradiation from the CO but by the mass inflow). This means that
@@ -34,7 +28,7 @@ values:
     By removing the (generally) short-delay disk photons from the wind path
     distributions, this will slightly bias them towards the longer delays
     associated with wind self-heating/excitation.
-default: 2
+default: ignore
 parent:
-  reverb.type: [2, 3]
+  Reverb.type: [wind, matom]
 file: setup_reverb.c

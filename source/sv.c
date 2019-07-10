@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 
 #include "atomic.h"
 #include "python.h"
@@ -50,8 +51,6 @@ get_sv_wind_params (ndom)
   zdom[ndom].wind_mdot *= MSOL / YR;
 
 
-//OLD  zdom[ndom].sv_rmin = 2.8e9;
-//OLD  zdom[ndom].sv_rmax = 8.4e9;
   zdom[ndom].sv_thetamin = 20. / RADIAN;
   zdom[ndom].sv_thetamax = 65. / RADIAN;
   zdom[ndom].sv_gamma = 1.;
@@ -143,7 +142,7 @@ sv_velocity (x, v, ndom)
      int ndom;
 {
   double r, rzero, theta, speed;
-  double ldist, zzz, v_escape, vl;
+  double ldist, zzz, v_escape, vl = 0.0;
   struct photon ptest;
   double xtest[3];
   double s;

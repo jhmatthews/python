@@ -5,7 +5,7 @@ description: |
   for each desired incliniation
 type: Double
 unit: Degrees
-values: Normally betwween 0 and 99 degrees
+values: 0 to 90 degrees, where 0 is normal to the disk and 90 is on the disk plane
 parent:
-  parameter: Spectrum.no_observers
-file: setup2.c
+  Spectrum.no_observers: Greater than 0. Once per observer.
+file: setup.c

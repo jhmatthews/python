@@ -11,5 +11,5 @@ unit: |
 values: |
   >0:>0
 parent:
-  reverb.dump_cells: Greater than 0
+  Reverb.dump_cells: Greater than 0
 file: setup_reverb.c

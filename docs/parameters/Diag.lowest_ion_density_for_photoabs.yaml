@@ -1,12 +1,12 @@
-name: Diag.lowest_ion_density_for_photoabs               
+name: Diag.lowest_ion_density_for_photoabs
 description: |
-  For efficiencty reasons, Python does not try to calculate photoabsorption
+  For efficiency reasons, Python does not try to calculate photoabsorption
   for an ion with an extremly low density.  This advance parameter changes
   this density limit
 type: Double
-unit: None
-values: greater than 0 
+unit: n/cm**3
+values: Greater than 0
 parent:
-  parameter: Condition e.g. greater than 0 or list e.g. [1, 2, 5]
+  Diag.use_standard_care_factors: false
 file: diag.c
 advanced: true

@@ -25,55 +25,6 @@
 #include "python.h"
 
 
-//OLD /***********************************************************
-//OLD                                        Space Telescope Science Institute
-//OLD 
-//OLD Synopsis:
-//OLD   partition_functions calculates the partition functions
-//OLD   for a single cell in the grid
-//OLD 
-//OLD Arguments:
-//OLD 
-//OLD 
-//OLD Returns:
-//OLD   
-//OLD Description:
-//OLD 
-//OLD Mode here is identical to that used by nebular_concentrations, e.g
-//OLD 
-//OLD 0 = LTE using t_r
-//OLD 1 = LTE using t_e
-//OLD 2 = Lucy and Mazzali
-//OLD 
-//OLD 
-//OLD 
-//OLD Notes:
-//OLD 
-//OLD   0800802 - This is a rewritten version of two routines, do_partitions
-//OLD   and partition.   It is still true that levels is almost identical
-//OLD   to some of the code here and therefore it is unclear why it is needed.
-//OLD   levels is always called from partition_functions
-//OLD 
-//OLD 
-//OLD History:
-//OLD   080802  ksl     60b -- Brought levels routine into
-//OLD                   do_partitions since they are always
-//OLD                   called one after the other.  The routines
-//OLD                   are almost identical and it remains
-//OLD                   unclear why this was coded twice
-//OLD   080802  ksl     Combined two routines do_partitions
-//OLD                   and partition into one in order to
-//OLD                   make this routine very similar to
-//OLD                   levels
-//OLD   080804  ksl     Removed hubeny calculation of g from
-//OLD                   this code.  The advantage of the 
-//OLD                   Hubeny calculation was that it had
-//OLD                   a correction for density that we
-//OLD                   no longer had, but it was not being
-//OLD                   accessed by the code at all.
-//OLD 
-//OLD **************************************************************/
-
 
 
 
@@ -214,49 +165,6 @@ partition_functions (xplasma, mode)
 
 
 
-//OLD /***********************************************************
-//OLD                                        Southampton university
-//OLD 
-//OLD Synopsis:
-//OLD   partition_functions_2 calculates the partition functions
-//OLD   for a pair of states for a given temperature. This is needed
-//OLD   to support the pairwise ioinization state calculations where 
-//OLD   the saha equation is applied to a pair of states at a
-//OLD   useful temperature, then corrected. Part of this is 
-//OLD   a requirement to get the partition functions at that 
-//OLD   temperature for just tow two states of interest. It is 
-//OLD   wasteful to calculate all of the states at each temperature.
-//OLD 
-//OLD Arguments:
-//OLD 
-//OLD   xplasma - the cell we are interested in. Used to communicate back
-//OLD           the new partition functions.
-//OLD   xnion - the upper ion in the pair we are currently working on
-//OLD   temp - the temperature we are using for the saha equation. In the
-//OLD           original formulation of partition, this is got from xplasma,
-//OLD           in this case we don't want to use the cell temperature.
-//OLD 
-//OLD Returns:
-//OLD 
-//OLD   changes the partition functions of just two ions we are currently working on
-//OLD   
-//OLD Description:
-//OLD 
-//OLD 
-//OLD 
-//OLD Notes:
-//OLD 
-//OLD   There is no need for the weight term in the calculation since this is only called when
-//OLD           we are making the assumption that we are in LTE for the saha equation. 
-//OLD 
-//OLD 
-//OLD 
-//OLD History:
-//OLD   2012Feb nsh - began coding
-//OLD   2012Sep nsh - added weight as a calling value - this allows one to produce gs 
-//OLD                 only with w=0, or LTE with w=1 or to produce a correction factor with W = the measured value      
-//OLD 
-//OLD **************************************************************/
 
 
 
@@ -288,6 +196,10 @@ partition_functions (xplasma, mode)
  * @bug According to the historical notes, there is no need for the weight term in the calculation 
  * since this is only called when
  * we are making the assumption that we are in LTE for the saha equation.
+ *
+ * However
+ * 2012Sep nsh - added weight as a calling value - this allows one to produce gs
+ *                only with w=0, or LTE with w=1 or to produce a correction factor with W = the measured value
  *
  * One of the ways in which this routine differs from partition_functions is that
  * here the temperature and weight are passed to the routing directly instead of

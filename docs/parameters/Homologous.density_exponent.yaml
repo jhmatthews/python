@@ -3,7 +3,7 @@ description: |
   The power law exponent which defines the decline in density of
   a homologous flow as a function of radious.
 type: Double
-values: greater than 0 for a density that declines with radius
+values: Greater than 0 for a density that declines with radius
 parent:
-  parameter: A basic paameter needed to define a homlogous flow  
+  Wind.type: homologous
 file: homologous.c

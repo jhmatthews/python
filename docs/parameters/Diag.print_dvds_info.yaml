@@ -1,11 +1,9 @@
 name: Diag.print_dvds_info
 description: |
-  Print out information about the velocity gradients in the 
+  Print out information about the velocity gradients in the
   cells to a file root.dvds.diag.
-type: Int
-unit: None
-values: Condition e.g. greater than 0 or list e.g. [1, 2, 5]
+type: Boolean (yes/no)
 parent:
-  parameter: Extra_diagnostics
+  Diag.extra: true
 file: diag.c
 advanced: true

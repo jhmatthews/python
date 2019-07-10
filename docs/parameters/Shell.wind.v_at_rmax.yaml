@@ -1,12 +1,12 @@
 name: Shell.wind.v_at_rmax
 description: |
-  The velocity of a shell wind at the outer edge of the 
+  The velocity of a shell wind at the outer edge of the
   shell - the variation of the velocity in the shell is
-  set by the velocity law exponent. It allows a gradient 
+  set by the velocity law exponent. It allows a gradient
   to be enforced.
 type: Double
 unit: cm/s
-values: Greater than or equal to zero.
+values: Greater than or equal to 0
 parent:
-  Wind_type: 9
+  Wind.type: shell
 file: shell_wind.c

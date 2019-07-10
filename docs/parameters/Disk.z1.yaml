@@ -1,11 +1,10 @@
 name: Disk.z1
 description: |
   For a vertically extended the disk, the height of the disk is
-  set to be Disk.rad_mask*(r/Disk.rad_max)**Disk.z1 where Disk.z1
+  set to be :ref:`Disk.z0` * :ref:`Disk.radmax` * (r/:ref:`Disk.radmax`)**Disk.z1 where Disk.z1
   is the power law index
-type: rddoub
-unit: None
-values: Condition e.g. greater than 0 or list e.g. [1, 2, 5]
+type: Double
+values: Greater than 0
 parent:
-  Disk.type: This question is ascked whenever the Disk.type is vertically extended
+  Disk.type: vertically.extended
 file: setup_disk.c

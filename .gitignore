@@ -34,23 +34,26 @@ bin/windsave2table*
 *.hex
 
 
-# things from gsl, may not be necessary 
-software/gsl-1.15/Makefile
-software/gsl-1.15/*/Makefile
-software/gsl-1.15/*.dSYM
-software/gsl-1.15/*/*.dSYM
-software/gsl-1.15/bin/
-software/gsl-1.15/share/
+# things from gsl, may not be necessary
+software/gsl-2.5/Makefile
+software/gsl-2.5/*/Makefile
+software/gsl-2.5/*.dSYM
+software/gsl-2.5/*/*.dSYM
+software/gsl-2.5/bin/
+software/gsl-2.5/share/
 include/gsl/
 lib/pkgconfig/
 
-# the configure Makefile should not be tracked 
+# the configure Makefile should not be tracked
 Makefile
 
 # doxygen stuff
 docs/doxygen/html/
 docs/doxygen/latex/
 
+# For if you're running py_progs in a virtual environment
+py_progs/venv/
+py_progs/*.html
 
 # python and system files
 *.pyc
@@ -61,5 +64,18 @@ docs/doxygen/latex/
 *.Plo
 *.Po
 
-# atomic data files should not be tracked by this repository 
+# atomic data files should not be tracked by this repository
 data/
+
+# we shouldn't be tracking version.h either 
+source/version.h
+
+# python output files
+*.diag
+*.spec
+*.log_spec
+*.spec_tot
+*.log_spec_tot
+*.rdpar
+*.sig
+logfile

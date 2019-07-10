@@ -6,9 +6,8 @@ description: |
   in the grid.  This changes the default for the fraction of the maximum
   distance in a cell.
 type: Double
-unit: None
-values:  0 to 1
+values: 0 to 1
 parent:
-  parameter: Condition e.g. greater than 0 or list e.g. [1, 2, 5]
+  Diag.use_standard_care_factors: false
 file: diag.c
 advanced: true

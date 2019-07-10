@@ -21,48 +21,6 @@
 
 
 
-//OLD /***********************************************************
-//OLD                                        Space Telescope Science Institute
-//OLD
-//OLD  Synopsis:
-//OLD
-//OLD double one_continuum(spectype,t,g,freqmin,freqmax) gets a photon frequency
-//OLD from a continuum grid
-//OLD
-//OLD Arguments:
-//OLD
-//OLD   spectype                                An index to the continum grid which one wants
-//OLD                                           to use for obtaining a photon
-//OLD   double t,g,                             Two parameters defining the model for which
-//OLD                                           a photon is requried, often temperature and
-//OLD                                           gravity, though this is not required
-//OLD   freqmin,freqmax;                        minimum and maximum frequency of interest
-//OLD
-//OLD
-//OLD Returns:
-//OLD
-//OLD
-//OLD Description:
-//OLD
-//OLD
-//OLD Notes:
-//OLD   In versions of python prior to python_52, different routines
-//OLD   were used to read kurucz models and hubeny models.  This was
-//OLD   historical, since the routines ksl had to read the kurucz models
-//OLD   read binary files (from a time when compputers were very slow).
-//OLD
-//OLD   The new routines are much more general, and are based on routines
-//OLD   ksl had written for his fitting program kslfit.  The underlying
-//OLD   routines can interpolate between grids of more than two dimensions
-//OLD   although here we assume that all of the continuum grids are two
-//OLD   dimensional.
-//OLD
-//OLD History:
-//OLD   04aug   ksl     created from hub.c usied in all versions
-//OLD                   of python prior to python_52.
-//OLD
-//OLD **************************************************************/
-
 double old_t, old_g, old_freqmin, old_freqmax;
 double jump[] = { 913.8 };
 
@@ -94,13 +52,15 @@ double jump[] = { 913.8 };
  *
  * ### Notes ###
  *
- * @bug  The model structure is general in the sense that it was intended
+ * The model structure is general in the sense that it was intended
  * for situation with any number of variables.
  * However what is written here
  * is specific to the case of two variables. This is a problem, as we have
  * found in trying to use this in other situations.  A more general routine is needed.
  * The first step in doing this is to replace much of the code here with
  * a call to the routine model (spectype, par) in models.c
+ * This issue #539
+ *
  *
  **********************************************************/
 
@@ -139,7 +99,8 @@ one_continuum (spectype, t, g, freqmin, freqmax)
     lambdamax = C * 1e8 / freqmin;
     nwave = 0;
 
-    /* if the first wavelength in the model is below the wavelength range in the simulation,
+    /* Create the first element of the array, precisely at lambdamin if that is possible
+       Specifically, if the first wavelength in the model is below the wavelength range in the simulation,
        interpolate on the model flux to get the flux at lambdamin. copy relevant wavelengths and
        fluxes to w_local and f_local  */
     if (comp[spectype].xmod.w[0] < lambdamin && lambdamin < comp[spectype].xmod.w[comp[spectype].nwaves - 1])
@@ -150,10 +111,13 @@ one_continuum (spectype, t, g, freqmin, freqmax)
       nwave++;
     }
 
-    /* loop over rest of model wavelengths and fluxes and copy to w_local and f_local */
+    /* loop over rest of model wavelengths and fluxes and copy to w_local and f_local.
+       This does not include the end points
+     */
+
     for (n = 0; n < comp[spectype].nwaves; n++)
     {
-      if (comp[spectype].xmod.w[n] > lambdamin && comp[spectype].xmod.w[n] <= lambdamax)
+      if (comp[spectype].xmod.w[n] > lambdamin && comp[spectype].xmod.w[n] < lambdamax)
       {
         w_local[nwave] = comp[spectype].xmod.w[n];
         f_local[nwave] = comp[spectype].xmod.f[n];
@@ -161,8 +125,10 @@ one_continuum (spectype, t, g, freqmin, freqmax)
       }
     }
 
-    /* now check if upper bound is beyond lambdamax, and if so, interpolate to get appropriate flux
+    /* No add a point at lambdamax.  Specicxally  check if upper bound is beyond lambdamax, and if so, 
+       interpolate to get appropriate flux
        at lambda max. copy to w_local and f_local */
+
     if (comp[spectype].xmod.w[0] < lambdamax && lambdamax < comp[spectype].xmod.w[comp[spectype].nwaves - 1])
     {
       w_local[nwave] = lambdamax;
@@ -191,7 +157,7 @@ one_continuum (spectype, t, g, freqmin, freqmax)
 
     if (cdf_gen_from_array (&comp[spectype].xcdf, w_local, f_local, nwave, lambdamin, lambdamax) != 0)
     {
-      Error ("In one_continuum after return from cdf_gen_from_array\n");
+      Error ("One_continuum: after return from cdf_gen_from_array\n");
     }
     old_freqmin = freqmin;
     old_freqmax = freqmax;
@@ -265,7 +231,6 @@ emittance_continuum (spectype, freqmin, freqmax, t, g)
   int nwav;
   double x, lambdamin, lambdamax;
 
-//  double dlambda;
   double par[2];
   int model ();
 
@@ -287,8 +252,8 @@ emittance_continuum (spectype, freqmin, freqmax, t, g)
 
   if (lambdamax > comp[spectype].xmod.w[nwav - 1] || lambdamin < comp[spectype].xmod.w[0])
   {
-    printf ("freqmin %e freqmax %e\n", freqmin, freqmax);
-    printf ("emin %e emax %e\n", HEV * freqmin, HEV * freqmax);
+    Error ("emittance_contiuum: freqmin %e freqmax %e\n", freqmin, freqmax);
+    Error ("emittance_contiuum: emin %e emax %e\n", HEV * freqmin, HEV * freqmax);
 
     Error ("emittance_continum: Requested wavelengths extend beyond models wavelengths for list %s\n", comp[spectype].name);
     Error ("lambda %f %f  model %f %f\n", lambdamin, lambdamax, comp[spectype].xmod.w[0], comp[spectype].xmod.w[nwav - 1]);

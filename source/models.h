@@ -12,12 +12,11 @@
  /* 1405 JM -- Increased PDF array for use with disk14 models- also removed duplication of ncomps */
 /* 1409 JM -- Increased LINELEN to 160 */
 
-#define NWAVES  28000
-// #define NWAVES  2000
+#define NWAVES  28000           // The maximum number of wavelength bins in models
 #define NDIM	10              // The maximum number of free parameters
 #define NCOMPS	10              //The maximum number of separate components
 #define NPARS	10              //The maximum number of parameters in a component (not all variable)
-#define NMODS   1000            //The total number of models read in in all components
+#define NMODS   2000            //The total number of models read in in all components
 #define LINELEN 160             //This should always be the same as LINELENGTH in python.h!
 
 
@@ -48,7 +47,7 @@ struct ModSum
   char name[LINELEN];
   int npars;                    // Number of parameters that describe the model
   int nmods, modstart, modstop; //number of models of this type and the index into the model struct
-  double min[NPARS];            // The minimum and maximum for each "free" paratmenter of the model
+  double min[NPARS];            // The minimum and maximum for each "free" parameter of the model
   double max[NPARS];
   int nwaves;                   //All models in each comp should have same wavelengths;
   struct Model xmod;            //The current intepolated model of this type 

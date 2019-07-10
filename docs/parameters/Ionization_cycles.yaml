@@ -1,11 +1,8 @@
 name: Ionization_cycles
 description: |
-  The number of ionization cycles to execute - 
+  The number of ionization cycles to execute -
   these are cycles to determine the ionization and thermal state of the wind
-type: Int
-unit: None
-values: greater than 0 
+type: Integer
+values: Greater than 0
 default: 1
-parent:
-  parameter: none
-file: setup2.c
+file: setup.c

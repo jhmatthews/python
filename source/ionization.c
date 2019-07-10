@@ -195,7 +195,7 @@ convergence (xplasma)
        fabs (xplasma->t_r_old - xplasma->t_r) / (xplasma->t_r_old + xplasma->t_r)) > epsilon)
     xplasma->trcheck = trcheck = 1;
 
-  /* Check whether the heating and colling balance to within epsilon and if so set hccheck to 1
+  /* Check whether the heating and cooling balance to within epsilon and if so set hccheck to 1
    * - 110919 nsh modified line below to include the adiabatic cooling in the check that heating equals cooling
    * - 111004 nsh further modification to include DR and compton cooling, now moved out of lum_tot
    * - 130722 added a fabs to the bottom, since it is now conceivable that this could be negative if
@@ -238,7 +238,9 @@ convergence (xplasma)
     if (xplasma->gain < min_gain)
       xplasma->gain = min_gain;
   }
-  else                          // The cell is not converging
+  else                          /* The cell is not converging, which means either that the temperature is consistently moving in one direction
+                                   or that the oscillations of the temperature have increased in the past two cycles
+                                 */
   {
     /*
      * EP: allow the gain to increase more for the first cyc_frac * cycles to
@@ -272,7 +274,7 @@ convergence (xplasma)
 
 /**********************************************************/
 /**
- * @brief      The routine summarizes the how well the wind converging
+ * @brief      The routine summarizes the how well the wind is converging
  * to a solution as a whole
  *
  * @return     Always returns 0
@@ -282,8 +284,12 @@ convergence (xplasma)
  * the various convergence tests and writes this to the log file
  *
  * ### Notes ###
- * @bug It would make sense to write this information to a separate file so that
- * plots of the rate of convergence could be easily made.
+ *
+ * All of the checks are done in the routine convergence, which also uses
+ * the checks to set the gain for the the next cycle.  When a value for a
+ * check is 0, then a particular convergence check has been passed.
+ * Non-zero values represent conditions which resulted in the check being
+ * failed, and may be different for different checks.
  *
  **********************************************************/
 
@@ -421,7 +427,8 @@ meaning in nebular concentrations.
     if (nebular_concentrations (xplasma, mode))
     {
       Error ("ionization_on_the_spot: nebular_concentrations failed to converge\n");
-      Error ("ionization_on_the_spot: j %8.2e t_e %8.2e t_r %8.2e w %8.2e nphot %i\n", xplasma->j, xplasma->t_e, xplasma->w, xplasma->ntot);
+      Error ("ionization_on_the_spot: j %8.2e t_e %8.2e t_r %8.2e w %8.2e nphot %i\n", xplasma->j, xplasma->t_e, xplasma->t_r, xplasma->w,
+             xplasma->ntot);
     }
     if (xplasma->ne < 0 || VERY_BIG < xplasma->ne)
     {

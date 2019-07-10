@@ -1,9 +1,9 @@
 name: AGN.lamp_post_height
 description: |
   Multi-line description, must keep indentation.
-type: rddoub
-unit: co.gravitational_radius
-values: Condition e.g. greater than 0 or list e.g. [1, 2, 5]
+type: Double
+unit: :ref:`Central_object.radius`
+values: Greater than 0
 parent:
-  parameter: Condition e.g. greater than 0 or list e.g. [1, 2, 5]
+  BH.geometry_for_pl_source: lamp_post
 file: setup_star_bh.c

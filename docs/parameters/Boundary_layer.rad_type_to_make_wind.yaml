@@ -1,12 +1,12 @@
 name: Boundary_layer.rad_type_to_make_wind
 description: |
-  When the system contains a boundary layer, the spectrum of the boundary layer can be simulated
-  as a blackbody, from a model, or as a power law.
-type: Enum (Int)
+  Multi-line description, must keep indentation.
+type: Enumerator
 values:
-  0: bb
-  1: models
-  3: pow
-parent:
-  parameter: Condition e.g. greater than 0 or list e.g. [1, 2, 5]
-file: setup.c
+  bb: |
+    Multi-line description, must keep indentation.
+  models: |
+    Multi-line description, must keep indentation.
+  power: |
+    Multi-line description, must keep indentation.
+file: setup_star_bh.c

@@ -1,0 +1,5 @@
+name: Spectrum_cycles
+description: |
+  Multi-line description, must keep indentation.
+type: Integer
+file: setup.c

@@ -327,7 +327,6 @@ be optional which variables beyond here are moved to structures othere than Wind
     }
     else
     {
-//OLD     plasmamain[n].t_r = geo.twind_init;
       plasmamain[n].t_r = zdom[ndom].twind;
     }
 
@@ -491,44 +490,6 @@ be optional which variables beyond here are moved to structures othere than Wind
 }
 
 
-//OLD /***********************************************************
-//OLD                                        Space Telescope Science Institute
-//OLD
-//OLD  Synopsis:
-//OLD   where_in_grid locates the 1-d grid position of the photon.
-//OLD
-//OLD  Arguments:
-//OLD   ndom            The domain number for the search
-//OLD   double x[];     The position
-//OLD  Returns:
-//OLD   where_in_grid normally  returns element in wmain  associated with
-//OLD           a position.  If the photon is in the grid this will
-//OLD           be a positive integer.
-//OLD   photon is inside the grid        -1
-//OLD   photon is outside the grid       -2
-//OLD  Description:
-//OLD
-//OLD
-//OLD  Notes:
-//OLD   Where_in grid does not tell you whether the photon is in the wind!.
-//OLD
-//OLD   What one means by inside or outside the grid may well be different
-//OLD   for different coordinate systems..
-//OLD
-//OLD
-//OLD  History:
-//OLD   97jan   ksl     Coding on python began.
-//OLD   98jul   ksl     Removed WindPtr as one of arguments since not used
-//OLD   98dec   ksl     Modified so that the argument is simply a position
-//OLD   99jan   ksl     Modified to check that we are not trying to short
-//OLD                   circuit if we are asking for where_in_grid of same
-//OLD                   position as previously
-//OLD   04aug   ksl     52a -- Now almos a shell, as moved to allow
-//OLD                   multiple coordinate systems
-//OLD   05apr   ksl     55d -- Added spherical as a possiblity
-//OLD   15aug   ksl     Modified so that a domain number is requried
-//OLD
-//OLD **************************************************************/
 
 int wig_n;
 double wig_x, wig_y, wig_z;
@@ -611,66 +572,6 @@ where_in_grid (ndom, x)
   return (wig_n);
 }
 
-//OLD /***********************************************************
-//OLD                                        Space Telescope Science Institute
-//OLD
-//OLD  Synopsis:
-//OLD   vwind_xyz(ndom,p,v) finds the velocity vector v for the wind in cartesian
-//OLD   coordinates at the position of the photon p.
-//OLD
-//OLD  Arguments:
-//OLD   int ndom;
-//OLD   PhotPtr p;
-//OLD   double v[];
-//OLD
-//OLD Returns:
-//OLD   0       on successful completion
-//OLD           the value of where in grid if the photon outside the wind grid.
-//OLD
-//OLD Description:
-//OLD   This routine carries out a bilinear interpolation of the wind velocity.  The velocities
-//OLD   at the edges of the grid cells must have been defined elsewhere (e.g in wind_define).
-//OLD
-//OLD   If the position is outside the wind grid, then the velocities will be returned as 0.
-//OLD
-//OLD Notes:
-//OLD   For all of the 2d coordinate systems, the positions in the WindPtr array are
-//OLD   caclulated in the xz plane.  As a result, the velocities in that array are
-//OLD   calcuated there as well.  Hence, to obtain the velocity in cartesion coordinates
-//OLD   one needs to do a simple rotation of the velocity vector.
-//OLD
-//OLD   For spherical (1d) coordinates the situation is complex, the philosopy that
-//OLD   has been adopted is to let the program run even if the wind model is intrinsically
-//OLD   2d.   The xyz positions of the grid are defined are defined so that
-//OLD   are in the xz plane at an angle of 45 degrees to the x axis.  This was done
-//OLD   so that if one used, say an sv wind, in spherical coordinates, one would select
-//OLD   the wind velocities at a plausible location.   But it implies that the velocities
-//OLD   that have been accepted are not purely radial as one might expect.  The choice
-//OLD   that has been made is to assume that v[1] is preserved as a non zero value in
-//OLD   making the projection.  An alternative might have been to preserve the angular
-//OLD   rotation rate.
-//OLD
-//OLD   Regardless, the fundamental challenge is to make sure the program works correctly
-//OLD   for the spherically symmetric case, e.g a simple stellar wind, which it did not
-//OLD   before 56b.
-//OLD
-//OLD   If we ever implement a real 3d coordinate system, one will need to look at
-//OLD   this routine again.
-//OLD
-//OLD History:
-//OLD   97jan   ksl     Coding on python began.
-//OLD   02feb   ksl     Modified to use new general purpose fraction routine.
-//OLD   04aug   ksl     52a -- Made a shell for choosing what coordinate
-//OLD                   system to calculate this in
-//OLD   05jun   ksl     56b -- Despite the note above nothing had been done
-//OLD                   to fix vwind_xyz to handle spherical coordinates
-//OLD                   properly.  It was OK for any two-d system.  This
-//OLD                   is now fixed, but see the notes above.
-//OLD   06may   ksl     57+ -- Changed call to elimatnate passing the
-//OLD                   Wind array.  Use wmain instead.
-//OLD   15aug   ksl     Added a variable for the domain
-//OLD
-//OLD **************************************************************/
 int ierr_vwind = 0;
 
 
@@ -886,9 +787,6 @@ wind_div_v ()
     ppp.x[2] -= delta;
     vwind_xyz (ndom, &ppp, v1);
     div += xxx[2] = (v2[2] - v1[2]) / delta;
-
-
-//      printf ("BLAH cell %i div=%e\n",icell,div);
 
 
     /* we have now evaluated the divergence, so can store in the wind pointer */
@@ -1155,64 +1053,12 @@ zero_scatters ()
 }
 
 
-//OLD /*************************************************************
-//OLD                                        Space Telescope Science Institute
-//OLD
-//OLD   Check how many corners  of a wind cell are in the wind defined by this
-//OLD   particular domain
-//OLD
-//OLD Synopsis:
-//OLD
-//OLD   The routine basically just calls where_in_wind for each of the 4 corners
-//OLD   of the cell.
-//OLD
-//OLD
-//OLD Arguments:
-//OLD
-//OLD   int n where n is the cell number
-//OLD
-//OLD Returns:
-//OLD
-//OLD   The routine simply returns the number of corners of the cell that
-//OLD   is in the wind
-//OLD
-//OLD Description:
-//OLD   This is really just a driver routine for coordinate system specific
-//OLD   routines
-//OLD
-//OLD   It is intended to standardize this check so that one can
-//OLD   use such a routin in the volumes calculations.
-//OLD
-//OLD Notes:
-//OLD
-//OLD   It has not been implemented for a spherical (1d)
-//OLD   coordinate system.
-//OLD
-//OLD   The fact that none of the corners of a cell are in
-//OLD   the wind is not necessarily a guarantee that the wind
-//OLD   does not pass through the cell.  This is not only
-//OLD   a theoretical problem, because we generally use
-//OLD   a logarithmic spacing for the wind cells and thus
-//OLD   the dimensions of the cells get quite large as one
-//OLD   gets far from the center.
-//OLD
-//OLD   The only way to verify this is to check all four
-//OLD   surfaces of the wind.
-//OLD
-//OLD History
-//OLD   080403  ksl     68c - Added, or more correctly simply
-//OLD                   moved code into a separate routine so
-//OLD                   could be called from elsewhere
-//OLD   15sep   ksl     Modifidy so that it n_inwind is incremented
-//OLD                   only if we are in the domain associated with
-//OLD                   this particular cell.
-//OLD *****************************************************/
 
 
 /**********************************************************/
 /**
- * @brief      The routine basically just calls where_in_wind for each of the 4 corners
- * 	of the cell.
+ * @brief      The routine basically just calls where_in_wind for each of 
+ ' the 4 corners of a cell in one of the 2d coordinate systems.
  *
  * @param [in] int  n   the cell number in wmain
  * @return     the number of corners of the cell that
@@ -1222,12 +1068,14 @@ zero_scatters ()
  * This is really just a driver routine which calls coordinate system specific
  * routines
  *
- * It is intended to standardize this check so that one can
- * use such a routine in the volumes calculations.
+ * It is used to  standardize this check for calculations of 
+ * the volume of a cell that is in the wind in a domain.
  *
  * ### Notes ###
  * This is one of the routines that makes explicity assumptions
  * about guard cells, and it is not entirely clear why
+ *
+ * This rutine is not called for a spherical coordinate system
  *
  **********************************************************/
 

@@ -1,0 +1,7 @@
+name: BH.radiation
+description: |
+  Whether or not the BH/AGN should radiate.
+type: Boolean (yes/no)
+parent:
+  System_type: agn
+file: setup_star_bh.c

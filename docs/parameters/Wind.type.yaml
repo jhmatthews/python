@@ -1,0 +1,26 @@
+name: Wind.type
+description: |
+  Multi-line description, must keep indentation.
+type: Enumerator
+values:
+  SV: |
+    Multi-line description, must keep indentation.
+  corona: |
+    Multi-line description, must keep indentation.
+  homologous: |
+    Multi-line description, must keep indentation.
+  hydro: |
+    Multi-line description, must keep indentation.
+  imported: |
+    Multi-line description, must keep indentation.
+  kwd: |
+    Multi-line description, must keep indentation.
+  shell: |
+    Multi-line description, must keep indentation.
+  star: |
+    Multi-line description, must keep indentation.
+  yso: |
+    Multi-line description, must keep indentation.
+parent:
+  Wind.number_of_components: Greater than 0. Once per domain.
+file: setup_domains.c

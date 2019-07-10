@@ -140,12 +140,14 @@ init_geo ()
   geo.wcycles = geo.pcycles = 1;
   geo.wcycle = geo.pcycle = 0;
 
+  geo.model_count = 0;          //The number of models read in
+
   return (0);
 }
 
 /// This is to assure that we read model lists in the same order everytime
 char get_spectype_oldname[LINELENGTH] = "data/kurucz91.ls";
-int get_spectype_count = 0;
+//int model_count = 0;
 
 
 /**********************************************************/
@@ -221,18 +223,29 @@ get_spectype (yesno, question, spectype)
     {
       if (geo.run_type == RUN_TYPE_PREVIOUS)
       {                         // Continuing an old model
-        strcpy (model_list, geo.model_list[get_spectype_count]);
+        strcpy (model_list, geo.model_list[geo.model_count]);
       }
       else
       {                         // Starting a new model
         strcpy (model_list, get_spectype_oldname);
       }
-      rdstr ("Input_spectra.model_file", model_list);
-      get_models (model_list, 2, spectype);
 
-      strcpy (geo.model_list[get_spectype_count], model_list);  // Copy it to geo
+      rdstr ("Input_spectra.model_file", model_list);
+
+      for (i = 0; i < geo.model_count; i++)     //See if we have already read in this model
+      {
+        if (strcmp (model_list, geo.model_list[i]) == 0)
+        {
+          *spectype = i;
+          return (*spectype);
+        }
+      }
+
+      get_models (model_list, 2, spectype);
+      strcpy (geo.model_list[geo.model_count], model_list);     // Copy it to geo
       strcpy (get_spectype_oldname, model_list);        // Also copy it back to the old name
-      get_spectype_count++;
+
+      geo.model_count++;
     }
   }
   else
@@ -359,8 +372,8 @@ init_observers ()
   /* convert wavelengths to frequencies and store for use
      in computing macro atom and k-packet emissivities. */
 
-  em_rnge.fmin = C / (geo.swavemax * 1.e-8);
-  em_rnge.fmax = C / (geo.swavemin * 1.e-8);
+  geo.sfmin = C / (geo.swavemax * 1.e-8);
+  geo.sfmax = C / (geo.swavemin * 1.e-8);
 
   geo.matom_radiation = 0;      //initialise for ionization cycles - don't use pre-computed emissivities for macro-atom levels/ k-packets.
 
@@ -394,7 +407,6 @@ init_observers ()
 
   strcpy (answer, "extract");
   geo.select_extract = rdchoice ("Spectrum.live_or_die(live.or.die,extract)", "0,1", answer);
-  //OLD rdint ("Spectrum.live_or_die(0=live.or.die,extract=anything_else)", &geo.select_extract);
   if (geo.select_extract != 0)
   {
     geo.select_extract = 1;
@@ -412,9 +424,6 @@ init_observers ()
     strcpy (answer, "no");
     ichoice = rdchoice ("@Spectrum.select_specific_no_of_scatters_in_spectra(yes,no)", ",1,0", answer);
 
-    //OLD strcpy (yesno, "n");
-    //OLD rdstr ("@Spectrum.select_specific_no_of_scatters_in_spectra(y/n)", yesno);
-    //OLD if (yesno[0] == 'y')
     if (ichoice)
 
     {
@@ -426,19 +435,14 @@ init_observers ()
     }
     strcpy (answer, "no");
     ichoice = rdchoice ("@Spectrum.select_photons_by_position(yes,no)", "1,0", answer);
-    //OLD strcpy (yesno, "n");
-    //OLD rdstr ("@Spectrum.select_photons_by_position(y/n)", yesno);
-    //OLD if (yesno[0] == 'y')
     if (ichoice)
     {
-      //OLD Log ("OK 0->all; -1 -> below; 1 -> above the disk, 2 -> specific location in wind\n");
       for (n = 0; n < geo.nangles; n++)
       {
         strcpy (answer, "all");
         geo.top_bot_select[n] = rdchoice ("@Spectrum.select_location(all,below_disk,above_disk,spherical_region)", "0,-1,1,2", answer);
 
 
-        //OLD rdint ("@Spectrum.select_location", &geo.top_bot_select[n]);
         if (geo.top_bot_select[n] == 2)
         {
           Log ("Warning: Make sure that position will be in wind, or no joy will be obtained\n");
@@ -460,7 +464,6 @@ init_observers ()
 
   strcpy (answer, "flambda");
   geo.select_spectype = rdchoice ("Spectrum.type(flambda,fnu,basic)", "1,2,3", answer);
-  //OLD rdint ("Spectrum.type(flambda(1),fnu(2),basic(other)", &geo.select_spectype);
 
   if (geo.select_spectype == 1)
   {
@@ -508,8 +511,8 @@ init_photons ()
      read in as a double so it is easier for input
      (in scientific notation) */
 
-  double nphot = 1e5, min_nphot = 1e5, max_nphot = 1e7;
 
+  double nphot = 1e5;
   rddoub ("Photons_per_cycle", &nphot); // NPHOT is photons/cycle
   if ((NPHOT = (int) nphot) <= 0)
   {
@@ -517,47 +520,41 @@ init_photons ()
     Exit (1);
   }
 
-  if (modes.photon_speedup)
-  {
-    Log ("Photon logarithmic stepping algorithm enabled\n");
-    if (!PHOT_STEPS)
-    {
-      rddoub ("Min_photons_per_cycle", &min_nphot);
-      rddoub ("Max_photons_per_cycle", &max_nphot);
-    }
-    else
-      min_nphot /= pow (10, PHOT_STEPS);
-
-    NPHOT_MAX = NPHOT;
-    NPHOT = NPHOT_MIN = (int) min_nphot;
-    Log ("NPHOT_MIN %e\n", (double) NPHOT_MIN);
-    Log ("NPHOT_MAX %e\n", (double) NPHOT_MAX);
-  }
 
 #ifdef MPI_ON
   Log ("Photons per cycle per MPI task will be %d\n", NPHOT / np_mpi_global);
   NPHOT /= np_mpi_global;
-  if (modes.photon_speedup)
-  {
-    NPHOT_MIN /= np_mpi_global;
-    NPHOT_MAX /= np_mpi_global;
-    Log ("MPI NPHOT_MIN = %e\n", (double) NPHOT_MIN);
-    Log ("MPI NPHOT_MAX = %e\n", (double) NPHOT_MAX);
-  }
 #endif
 
   rdint ("Ionization_cycles", &geo.wcycles);
+
+  /* On restarts, the spectra that are read in have to be renormalized if
+   * the number of spectral cycles has been increased before a restart, and
+   * so we need to record this number. If this is not a restart, then
+   * geo.pcycles_renorm will not be used.
+   */
+
+  geo.pcycles_renorm = geo.pcycles;
+
   rdint ("Spectrum_cycles", &geo.pcycles);
+
 
   if (geo.wcycles == 0 && geo.pcycles == 0)
   {
     Log ("Both ionization and spectral cycles are set to 0; There is nothing to do so exiting\n");
-    Exit (1);                   //There is really nothing to do!
+    exit (1);                   //There is really nothing to do!
   }
 
   /* Allocate the memory for the photon structure now that NPHOT is established */
 
   photmain = p = (PhotPtr) calloc (sizeof (p_dummy), NPHOT);
+  /* If the number of photons per cycle is changed, NPHOT can be less, so we define NPHOT_MAX
+   * to the maximum number of photons that one can create.  NPHOT is used extensively with
+   * Python.  It is the NPHOT in a particular cycle, in a given thread.
+   */
+
+  NPHOT_MAX = NPHOT;
+
 
   if (p == NULL)
   {
@@ -614,7 +611,7 @@ init_ionization ()
 
   if (geo.ioniz_mode == IONMODE_FIXED)
   {
-    rdstr ("wind.fixed_concentrations_file", &geo.fixed_con_file[0]);
+    rdstr ("Wind.fixed_concentrations_file", &geo.fixed_con_file[0]);
   }
 
 
@@ -644,8 +641,6 @@ init_ionization ()
 
   strcpy (answer, "adiabatic");
 
-//OLD  thermal_opt = rdchoice ("Thermal_balance_options(adiabatic_only,all_off,nonthermal_only,all_on)", "0,1,2,3", answer);
-//  thermal_opt = rdchoice ("Thermal_balance_options(off,adiabatic_only,nonthermal_only,all_on)", "1,0,2,3", answer);
   thermal_opt = rdchoice ("Wind_heating.extra_processes(none,adiabatic,nonthermal,both)", "1,0,2,3", answer);
 
   if (thermal_opt == 0)
@@ -691,7 +686,6 @@ init_ionization ()
       ("Warning: Non-thermal heating has been selected.  This is a very special option put in place for modelling FU Ori stars, and should be used with extreme caution\n");
 
     geo.shock_factor = 0.001 * 4 * PI * pow (geo.rstar, 2) * STEFAN_BOLTZMANN * pow (geo.tstar, 4.);
-    //OLD rddoub ("Thermal_balance_options.extra_heating", &geo.shock_factor);
     rddoub ("Wind_heating.extra_luminosity", &geo.shock_factor);
     geo.shock_factor /= (4 * PI * pow (geo.rstar, 3));
     Log ("The non_thermal emissivity at the base is %.2e\n", geo.shock_factor);
@@ -699,7 +693,6 @@ init_ionization ()
     if (geo.rt_mode == RT_MODE_MACRO)
     {
       geo.frac_extra_kpkts = 0.1;
-      // OLD rddoub ("Thermal_balance_options.extra_kpacket_frac", &geo.frac_extra_kpkts);
       rddoub ("Wind_heating.kpacket_frac", &geo.frac_extra_kpkts);
 
     }

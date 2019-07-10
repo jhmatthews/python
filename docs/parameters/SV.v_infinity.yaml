@@ -7,5 +7,5 @@ type: Double
 unit: Escape velocity
 values: Greater than 0
 parent:
-  wind_type: 0
+  Wind.type: SV
 file: sv.c

@@ -254,19 +254,40 @@ set_max_time (char *root, double t)
  * Generally speaking one should send a message to xsignal before
  * invoking check_time to record the status of the signal file
  *
+ * Bug #518:
+ * Previously Python would, on occasion, deadlock when calling this function.
+ * This was due to some MPI processes exceeding max_time whilst others did not,
+ * resulting in some processes not exiting and continuing on with their work.
+ * They would then try to communicate with other processes which have already
+ * exited, get no response and then Python would deadlock. To avoid this happening,
+ * EP added an MPI_Allreduce operation to find return the largest execution time
+ * for a thread. This is then used to check if time > max_time, and if so then
+ * MPI is finalised and Python will exit.
  *
  **********************************************************/
 
 int
 check_time (char *root)
 {
-  double t;
-  if (max_time > 0.0 && (t = timer () > max_time))
+  double time = timer ();
+
+#ifdef MPI_ON
+  double mpi_max_time;
+  MPI_Allreduce (&time, &mpi_max_time, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+  time = mpi_max_time;
+#endif
+
+  if (max_time > 0.0 && time > max_time)
   {
-    error_summary ("Time allowed has expired expired\n");
-    xsignal (root, "COMMENT max_time %.1f exceeded\n", max_time);
-    Exit (0);
-  };
+    error_summary ("Maximum execution time allowed has been reached\n");
+    xsignal (root, "\nCOMMENT max_time %.1f seconds exceeded\n", max_time);
+
+#ifdef MPI_ON
+    MPI_Finalize ();
+#endif
+
+    exit (1);
+  }
 
   return (0);
 }

@@ -1,0 +1,8 @@
+name: Wind_heating.extra_luminosity
+description: |
+  This is a very special option put in place for modelling FU Ori stars, and should be used with extreme caution. Determines the shock factor.
+type: Double
+values: Condition e.g. greater than 0 or list e.g. [1, 2, 5]
+parent:
+  Wind_heating.extra_processes: [nonthermal, both]
+file: setup.c

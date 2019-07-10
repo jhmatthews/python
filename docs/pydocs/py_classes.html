@@ -53,7 +53,9 @@ Notes:&nbsp;<br>
 <font color="#000000" face="helvetica, arial"><a name="chianti_level">class <strong>chianti_level</strong></a>(<a href="builtins.html#object">builtins.object</a>)</font></td></tr>
     
 <tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>Stores&nbsp;chianti&nbsp;<a href="#level">level</a>&nbsp;data&nbsp;from&nbsp;file&nbsp;format&nbsp;.elvlc<br>
+<td colspan=2><tt><a href="#chianti_level">chianti_level</a>(_index,&nbsp;_config,&nbsp;_notation,&nbsp;_spin,&nbsp;_l,&nbsp;_l_symbol,&nbsp;_j,&nbsp;_multiplicity,&nbsp;_E_obs,&nbsp;_E_obs2,&nbsp;_E_th,&nbsp;_E_th2,&nbsp;_n)<br>
+&nbsp;<br>
+Stores&nbsp;chianti&nbsp;<a href="#level">level</a>&nbsp;data&nbsp;from&nbsp;file&nbsp;format&nbsp;.elvlc<br>
 See&nbsp;<a href="http://www.chiantidatabase.org/cug.pdf">http://www.chiantidatabase.org/cug.pdf</a>&nbsp;Page&nbsp;8&nbsp;for&nbsp;description<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%">Methods defined here:<br>
@@ -74,7 +76,9 @@ Data descriptors defined here:<br>
 <font color="#000000" face="helvetica, arial"><a name="chianti_rad">class <strong>chianti_rad</strong></a>(<a href="builtins.html#object">builtins.object</a>)</font></td></tr>
     
 <tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>Stores&nbsp;radiative&nbsp;chianti&nbsp;information&nbsp;from&nbsp;wgfa&nbsp;file.<br>
+<td colspan=2><tt><a href="#chianti_rad">chianti_rad</a>(_ll,&nbsp;_lu,&nbsp;_wave,&nbsp;_freq,&nbsp;_osc,&nbsp;_A,&nbsp;_note_low,&nbsp;_note_up)<br>
+&nbsp;<br>
+Stores&nbsp;radiative&nbsp;chianti&nbsp;information&nbsp;from&nbsp;wgfa&nbsp;file.<br>
 Contains&nbsp;the&nbsp;wavelengths,&nbsp;gf&nbsp;and&nbsp;A&nbsp;values&nbsp;of&nbsp;the&nbsp;transitions&nbsp;and&nbsp;the&nbsp;indices&nbsp;initial&nbsp;and<br>
 final&nbsp;<a href="#level">level</a>&nbsp;corresponding&nbsp;to&nbsp;the&nbsp;indices&nbsp;of&nbsp;the&nbsp;levels&nbsp;as&nbsp;given&nbsp;in&nbsp;the&nbsp;.elvlc&nbsp;file<br>
 See&nbsp;<a href="http://www.chiantidatabase.org/cug.pdf">http://www.chiantidatabase.org/cug.pdf</a>&nbsp;Page&nbsp;9&nbsp;for&nbsp;description<br>&nbsp;</tt></td></tr>
@@ -97,7 +101,9 @@ Data descriptors defined here:<br>
 <font color="#000000" face="helvetica, arial"><a name="level">class <strong>level</strong></a>(<a href="builtins.html#object">builtins.object</a>)</font></td></tr>
     
 <tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>Stores&nbsp;information&nbsp;from&nbsp;a&nbsp;Python&nbsp;levels&nbsp;file<br>&nbsp;</tt></td></tr>
+<td colspan=2><tt><a href="#level">level</a>(_z,&nbsp;_ion,&nbsp;_lvl,&nbsp;_ionpot,&nbsp;_E,&nbsp;_g,&nbsp;_rad_rate,&nbsp;_bracks,&nbsp;_nnstring)<br>
+&nbsp;<br>
+Stores&nbsp;information&nbsp;from&nbsp;a&nbsp;Python&nbsp;levels&nbsp;file<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%">Methods defined here:<br>
 <dl><dt><a name="level-__init__"><strong>__init__</strong></a>(self, _z, _ion, _lvl, _ionpot, _E, _g, _rad_rate, _bracks, _nnstring)</dt><dd><tt>Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</tt></dd></dl>
@@ -117,7 +123,9 @@ Data descriptors defined here:<br>
 <font color="#000000" face="helvetica, arial"><a name="line">class <strong>line</strong></a>(<a href="builtins.html#object">builtins.object</a>)</font></td></tr>
     
 <tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>This&nbsp;is&nbsp;a&nbsp;class&nbsp;analogous&nbsp;to&nbsp;<a href="#line">line</a>&nbsp;ptr&nbsp;in&nbsp;python<br>&nbsp;</tt></td></tr>
+<td colspan=2><tt><a href="#line">line</a>(_z,&nbsp;_ion,&nbsp;_wavelength,&nbsp;_freq,&nbsp;_osc,&nbsp;_g_l,&nbsp;_g_u,&nbsp;_ll,&nbsp;_lu)<br>
+&nbsp;<br>
+This&nbsp;is&nbsp;a&nbsp;class&nbsp;analogous&nbsp;to&nbsp;<a href="#line">line</a>&nbsp;ptr&nbsp;in&nbsp;python<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%">Methods defined here:<br>
 <dl><dt><a name="line-__init__"><strong>__init__</strong></a>(self, _z, _ion, _wavelength, _freq, _osc, _g_l, _g_u, _ll, _lu)</dt><dd><tt>Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</tt></dd></dl>
@@ -137,7 +145,9 @@ Data descriptors defined here:<br>
 <font color="#000000" face="helvetica, arial"><a name="specclass">class <strong>specclass</strong></a>(<a href="builtins.html#object">builtins.object</a>)</font></td></tr>
     
 <tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>This&nbsp;is&nbsp;a&nbsp;class&nbsp;for&nbsp;storing&nbsp;any&nbsp;values&nbsp;read&nbsp;from&nbsp;a&nbsp;Python&nbsp;spec&nbsp;file<br>&nbsp;</tt></td></tr>
+<td colspan=2><tt><a href="#specclass">specclass</a>(fre,&nbsp;wave,&nbsp;prod,&nbsp;emi,&nbsp;cen,&nbsp;dis,&nbsp;win,&nbsp;sca,&nbsp;hit,&nbsp;spe)<br>
+&nbsp;<br>
+This&nbsp;is&nbsp;a&nbsp;class&nbsp;for&nbsp;storing&nbsp;any&nbsp;values&nbsp;read&nbsp;from&nbsp;a&nbsp;Python&nbsp;spec&nbsp;file<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%">Methods defined here:<br>
 <dl><dt><a name="specclass-__init__"><strong>__init__</strong></a>(self, fre, wave, prod, emi, cen, dis, win, sca, hit, spe)</dt><dd><tt>Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</tt></dd></dl>
@@ -157,7 +167,9 @@ Data descriptors defined here:<br>
 <font color="#000000" face="helvetica, arial"><a name="spectotclass">class <strong>spectotclass</strong></a>(<a href="builtins.html#object">builtins.object</a>)</font></td></tr>
     
 <tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>This&nbsp;is&nbsp;a&nbsp;class&nbsp;for&nbsp;storing&nbsp;any&nbsp;values&nbsp;read&nbsp;from&nbsp;a&nbsp;Python&nbsp;spec_tot&nbsp;file<br>&nbsp;</tt></td></tr>
+<td colspan=2><tt><a href="#spectotclass">spectotclass</a>(fre,&nbsp;wave,&nbsp;create,&nbsp;emi,&nbsp;cen,&nbsp;dis,&nbsp;win,&nbsp;sca,&nbsp;hit)<br>
+&nbsp;<br>
+This&nbsp;is&nbsp;a&nbsp;class&nbsp;for&nbsp;storing&nbsp;any&nbsp;values&nbsp;read&nbsp;from&nbsp;a&nbsp;Python&nbsp;spec_tot&nbsp;file<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%">Methods defined here:<br>
 <dl><dt><a name="spectotclass-__init__"><strong>__init__</strong></a>(self, fre, wave, create, emi, cen, dis, win, sca, hit)</dt><dd><tt>Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</tt></dd></dl>

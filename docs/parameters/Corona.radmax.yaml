@@ -4,7 +4,7 @@ description: |
     above the disk.  radmax defines the outer edge of the box.
 type: Double
 unit: cm
-values: Greater than the radius of the central object
+values: Greater than :ref:`Central_object.radius`
 parent:
-  Wind.type: Selected as one of the choces for this variable
+  Wind.type: corona
 file: corona.c

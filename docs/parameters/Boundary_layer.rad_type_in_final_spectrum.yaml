@@ -1,11 +1,14 @@
 name: Boundary_layer.rad_type_in_final_spectrum
 description: |
   Multi-line description, must keep indentation.
-type: Enum (Int)
+type: Enumerator
 values:
-  0: bb
-  1: models
-  2: uniform
+  bb: |
+    Multi-line description, must keep indentation.
+  models: |
+    Multi-line description, must keep indentation.
+  uniform: |
+    Multi-line description, must keep indentation.
 parent:
-  parameter: Condition e.g. greater than 0 or list e.g. [1, 2, 5]
+  Spectrum_cycles: Greater than or equal to 0
 file: python.c

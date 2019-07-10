@@ -1,0 +1,16 @@
+name: BH.rad_type_to_make_wind
+description: |
+  Multi-line description, must keep indentation.
+type: Enumerator
+values:
+  bb: |
+    Multi-line description, must keep indentation.
+  brems: |
+    Multi-line description, must keep indentation.
+  cloudy: |
+    Multi-line description, must keep indentation.
+  models: |
+    Multi-line description, must keep indentation.
+  power: |
+    Multi-line description, must keep indentation.
+file: setup_star_bh.c

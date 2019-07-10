@@ -3,8 +3,8 @@ description: |
   This advanced options allows you to include or exclude photoabsorpiotn
   in calculating the final spectra.  (but ksl does not know what the
   default is)
-type: Boolean (1/0)
+type: Boolean (yes/no)
 parent:
-  parameter: Condition e.g. greater than 0 or list e.g. [1, 2, 5]
+  Diag.use_standard_care_factors: false
 file: diag.c
 advanced: true

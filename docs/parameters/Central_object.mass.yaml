@@ -2,8 +2,6 @@ name: Central_object.mass
 description: |
   Mass of the central object
 type: Double
-unit: Solar masses
-values: Greater than 0 
-parent:
-  parameter: None
-file: setup.c
+unit: M☉
+values: Greater than 0
+file: setup_star_bh.c

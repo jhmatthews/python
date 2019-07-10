@@ -1,11 +1,11 @@
 name: KWD.v_zero
 description: |
-  Multiple of the local sound speed at the base of the wind, this results in 
+  Multiple of the local sound speed at the base of the wind, this results in
   the initial velocity of the wind being able to be greater or less than the
   local sound speed.
 type: Double
-unit: None
+unit: Sound speed at wind base
 values: Greater than 0
 parent:
-  parameter:
+  Wind.type: kwd
 file: knigge.c

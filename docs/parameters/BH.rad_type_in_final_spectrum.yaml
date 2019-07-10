@@ -1,0 +1,14 @@
+name: BH.rad_type_in_final_spectrum
+description: |
+  Multi-line description, must keep indentation.
+type: Enumerator
+values:
+  brems: |
+    Multi-line description, must keep indentation.
+  cloudy: |
+    Multi-line description, must keep indentation.
+  power: |
+    Multi-line description, must keep indentation.
+parent:
+  Spectrum_cycles: Greater than or equal to 0
+file: python.c

@@ -1,0 +1,6 @@
+name: Photons_per_cycle
+description: |
+  Multi-line description, must keep indentation.
+type: Double
+values: Greater than 0
+file: setup.c

@@ -1,12 +1,12 @@
 name: Spectrum.select_photons_by_position
 description: |
-  Advanced command associated with adding conditions for 
+  Advanced command associated with adding conditions for
   the detailed spectra that are extracted.  This command simply
   asks whether one would like to select photons by position.  If
   so one will be asked to define a spheical region in interms of
   its cylindrical coordinates.
-type: Boolean (Y/N)
+type: Boolean (yes/no)
 parent:
-  parameter: Condition e.g. greater than 0 or list e.g. [1, 2, 5]
-file: setup2.c
+  Spectrum_cycles: Greater than or equal to 0
+file: setup.c
 advanced: true

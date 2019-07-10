@@ -1,0 +1,5 @@
+name: Wind.radiation
+description: |
+  Whether or not the wind should radiate.
+type: Boolean (yes/no)
+file: python.c

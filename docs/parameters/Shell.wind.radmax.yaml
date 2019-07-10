@@ -1,0 +1,9 @@
+name: Shell.wind.radmax
+description: |
+  Multi-line description, must keep indentation.
+type: Double
+unit: cm
+values: Greater than :ref:`Shell.wind.radmin`
+parent:
+  Wind.type: shell
+file: shell_wind.c

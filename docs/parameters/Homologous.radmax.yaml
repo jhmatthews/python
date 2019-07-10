@@ -1,0 +1,9 @@
+name: Homologous.radmax
+description: |
+  Maximum extent of the homologous wind.
+type: Double
+unit: cm
+values: Greater than :ref:`Homologous.radmin`
+parent:
+  Wind.type: homologous
+file: homologous.c

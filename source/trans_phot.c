@@ -89,7 +89,7 @@ trans_phot (WindPtr w, PhotPtr p, int iextract)
   int absorb_reflect;           /* this is a variable used to store geo.absorb_reflect during exxtract */
   double p_norm, tau_norm;
   int nreport;
-  struct timespec timer_t0;
+  struct timeval timer_t0;
 
   nreport = 100000;
   if (nreport < NPHOT / 100)
@@ -106,13 +106,12 @@ trans_phot (WindPtr w, PhotPtr p, int iextract)
 
   for (nphot = 0; nphot < NPHOT; nphot++)
   {
-    CURRENT_PHOT = nphot;       /* A diagnostic to make it easier to determine what photon is causing a problem */
     /* This is just a watchdog method to tell the user the program is still running */
 
-//OLD      if (nphot % 100000 == 0)
     if (nphot % nreport == 0)
     {
-      Log ("Cycle %d/%d: Photon %10d of %10d or %6.1f per cent \n", geo.wcycle, geo.pcycle, nphot, NPHOT, nphot * 100. / NPHOT);
+      Log ("Cycle %d/%d of %s : Photon %10d of %10d or %6.1f per cent \n", geo.wcycle, geo.pcycle, basename, nphot, NPHOT,
+           nphot * 100. / NPHOT);
     }
 
     Log_flush ();
@@ -201,9 +200,9 @@ trans_phot (WindPtr w, PhotPtr p, int iextract)
   /* This is the end of the loop over all of the photons; after this the routine returns */
 
   /* Line to complete watchdog timer */
-  Log ("\n\n");
+  Log ("\n");
 
-  print_timer_duration ("PHOTON TRANSPORT COMPLETED", timer_t0);
+  print_timer_duration ("!!python: photon transport completed in", timer_t0);
 
   /* sometimes photons scatter near the edge of the wind and get pushed out by DFUDGE. We record these */
   if (n_lost_to_dfudge > 0)
@@ -501,7 +500,7 @@ trans_phot_single (WindPtr w, PhotPtr p, int iextract)
           track_scatters (&pp, wmain[n].nplasma, "Resonant");
 
 
-        plasmamain[wmain[n].nplasma].scatters[line[nres].nion] += pp.w;
+        plasmamain[wmain[n].nplasma].scatters[line[nres].nion] += 1;
 
         if (geo.rt_mode == RT_MODE_2LEVEL)      // only do next line for non-macro atom case
         {
@@ -615,9 +614,9 @@ trans_phot_single (WindPtr w, PhotPtr p, int iextract)
       break;
     }
 
-    if (pp.istat == P_ADIABATIC)
+    if (pp.istat == P_ERROR_MATOM || pp.istat == P_LOFREQ_FF || pp.istat == P_ADIABATIC)
     {
-      istat = pp.istat = p->istat = P_ADIABATIC;
+      istat = p->istat = pp.istat;
       stuff_phot (&pp, p);
       break;
     }
@@ -633,7 +632,7 @@ trans_phot_single (WindPtr w, PhotPtr p, int iextract)
   }
   /* This is the end of the loop over a photon */
 
-  /* The next section is for diagnostic purpposes.  There are two possibilities.  If you wish to know where
+  /* The next section is for diagnostic purposes.  There are two possibilities.  If you wish to know where
    * the photon was last while in the wind, you want to track p; if you wish to know where it hits the
    * outer boundary of the calculation you would want pp.  So one should keep both lines below, and comment
    * out the one you do not want. */

@@ -5,8 +5,7 @@ description: |
   F is the local luminous flux and T is the local temperature at a radius R. A
   value of 0 sets a uniform mass loss rate.
 type: Double
-unit: None
-values: Greater than=0
+values: Greater than or equal to 0
 parent:
-  parameter:
+  Wind.type: kwd
 file: knigge.c

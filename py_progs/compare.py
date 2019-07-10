@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 '''
 090301	ksl	The main routine is apparently explore, which allows
-one to compare models to data.  
+one to compare models to data.
 
 Bugs - The problem aborst when one selects and inclination that is not
 there.  It's also not obvious from the what the inputs are and particularly
-how columns and inclinations are numbered.  
+how columns and inclinations are numbered.
 
 There is some evident overlap with monte.
 
@@ -14,7 +14,7 @@ There is some evident overlap with monte.
 '''
 
 import numpy
-import pylab 
+import pylab
 from matplotlib.ticker import FuncFormatter
 from kslio import *
 import carlo
@@ -26,7 +26,7 @@ def get_python_spec_angles(filename='py_ixvel/ixvel_00_00_00_00_00_00_00.spec'):
 	This routine simply finds the angles for which a specific python spectrum
 	has been calculated and returns them as a list
 	'''
-	try: 
+	try:
 		specfile=open(filename,'r')
 	except  IOError:
 		print filename, " does not exist"
@@ -51,7 +51,7 @@ def read_python_spec(filename,column):
 	"""
 	Read the a spectrum file created with python
 
-	columns are properly numbered in the sense that 
+	columns are properly numbered in the sense that
 	column 1 refers to the first real spectrum
 
 	The routine returns an empty spectrum on any
@@ -61,7 +61,7 @@ def read_python_spec(filename,column):
 	w=[]
 	f=[]
 
-	try: 
+	try:
 		specfile=open(filename,'r')
 	except  IOError:
 		print filename, " does not exist"
@@ -101,15 +101,15 @@ def read_python_spec(filename,column):
 	w=numpy.array(w)
 	f=numpy.array(f)
 	return w, f
-	
-	
+
+
 def read_data_spec(filename,col_wave=0,col_flux=1,col_err=2):
 	"""
 	Read the ascii data spectrum file with two
 	or three columns.  If there are three columnts
 	it is assumed that the third column is the
 	error.
-	
+
 	090306	ksl	Generalized so one could parse most
 			spectral files
 	"""
@@ -117,7 +117,7 @@ def read_data_spec(filename,col_wave=0,col_flux=1,col_err=2):
 	flux=[]
 	error=[]
 
-	try: 
+	try:
 		specfile=open(filename,'r')
 	except  IOError:
 		print filename," does not exist"
@@ -138,10 +138,10 @@ def read_data_spec(filename,col_wave=0,col_flux=1,col_err=2):
 	flux=numpy.array(flux)
 	error=numpy.array(error)
 	return wave, flux, error
-	
-	
+
+
 def reduce_xy(x,y,xmin,xmax):
-	''' 
+	'''
 	Get the portions of the array that are within xmin and xmax
 	'''
 	condition= (xmin < x) & (x < xmax)
@@ -180,14 +180,14 @@ def get_data_model (data,model,ang_no):
 	'''
 	get_data_model just gets an observed
 	spectrum, data, and a model spectrum
-	
+
 	data is the name of the observed spectrum
 	mdoel is the filename of the model
 	ang_no is the spectrum number beginning
 		with 1
 
 	Note - It's not clear that this routine
-	is that useful.  
+	is that useful.
 
 	'''
 	w,f,e=read_data_spec(data)
@@ -198,7 +198,7 @@ def plot_data_model(data,model,column,wmin,wmax):
 	"""
 	plot a rescaled model against the data where
 	data is a standard ascii spectrum file and
-	model is a python output spectrum and 
+	model is a python output spectrum and
 	wmin and wmax are rhe regions to be included int he plot
 	"""
 
@@ -240,7 +240,7 @@ def add_plot(w,f,wmod,fmod,wmin,wmax):
 	# Check that get_data_model succeeded
 	if len(f)==0 or len(fmod) == 0:
 		print 'data (%d) or mod (%d ) had zero length' % (len(f),len(fmod))
-		return 
+		return
 
 	ww,ff=reduce_xy(w,f,wmin,wmax)
 	wwmod,ffmod=reduce_xy(wmod,fmod,wmin,wmax)
@@ -273,7 +273,7 @@ def xadd_plot(w,f,wmod,fmod,band):
 	# Check that get_data_model succeeded
 	if len(f)==0 or len(fmod) == 0:
 		print 'data (%d) or mod (%d ) had zero length' % (len(f),len(fmod))
-		return 
+		return
 
 	wmin=band[0]
 	wmax=band[1]
@@ -305,14 +305,14 @@ def xadd_plot(w,f,wmod,fmod,band):
 		x=0.5*(wmin+wmid)
 		y=0.8*xreset[3]
 		pylab.text(x,y,band[2])
-		
+
 
 	pylab.axis(xreset)
 	return yname
 
 
-	
-	
+
+
 
 
 
@@ -322,7 +322,7 @@ def xplot(data,model,column,inst='hst'):
 	by intrument basis
 
 	090307 	This is a generalized versons of
-	the earlier routine to reflect 
+	the earlier routine to reflect
 	what I have learned earlier
 	"""
 	pylab.figure(2,figsize=(14,10))
@@ -348,7 +348,7 @@ def xplot(data,model,column,inst='hst'):
 
 	# SVI 933.378 (triplet) 944.523 singlet
 	fuse_bands=          [[920,960,'S VI']]
-	# CIII 977.0201 
+	# CIII 977.0201
 	# NIII 991.577 991.511 are slighly off the ground state, but have highes progs
 	# NIII 989.799 is the ground state, but has a lower gf.
 	fuse_bands=fuse_bands+[[960,1000,'CIII 977']]
@@ -364,7 +364,7 @@ def xplot(data,model,column,inst='hst'):
 	elif inst=='fuse':
 		band=fuse_bands
 		mytitle='FUSE'
-	else: 
+	else:
 		mytitle='HST'
 		band=hst_bands
 
@@ -391,7 +391,7 @@ def xplot(data,model,column,inst='hst'):
 	xadd_plot(w,f,wmod,fmod,band[3])
 	# pylab.xticks([1540,1560])
 
-	# The entire spectrum 
+	# The entire spectrum
 
 	pylab.subplot(212)
 	yname=xadd_plot(w,f,wmod,fmod,band[4])
@@ -416,7 +416,7 @@ def get_grid(filename='sscyg_kgrid0902/Models.ls',outfile='none'):
 	by gen_grid.py and read by pyfit3.
 
 	It returns
-		columns which is the list of the column names and 
+		columns which is the list of the column names and
 		files,which  is a list of all the files, with their associated values
 
 	If outfile is something other than none, all of the comments are written to
@@ -462,7 +462,7 @@ def get_grid(filename='sscyg_kgrid0902/Models.ls',outfile='none'):
 	if outfile !='none':
 		g.close()
 	return columns,files
-	
+
 
 
 def get_unique(mylist):
@@ -475,7 +475,7 @@ def get_unique(mylist):
 	xlist.sort()
 	finallist=xlist
 	return finallist
-	
+
 def get_chosen_model(files,possible,choices):
 	'''
 	get the name of a model that has the specific
@@ -504,7 +504,7 @@ def get_chosen_model(files,possible,choices):
 				#DEBUG print "compare",files[m][n+1],x
 				good=0
 			n=n+1
-		if good==1: 
+		if good==1:
 			# Have found the model
 			chosen=files[m][0]
 			break
@@ -512,7 +512,7 @@ def get_chosen_model(files,possible,choices):
 
 	print 'get_chosen: ',chosen
 
-	# Now the spectrum is given trivially, since we are using 
+	# Now the spectrum is given trivially, since we are using
 	# the number to indicate what spectrum we want
 
 	return chosen,choices[n]
@@ -550,7 +550,7 @@ def get_chosen_models(files,possible,choices):
 					k=k+1
 			if good=='nok':
 				break
-			n=n+1	
+			n=n+1
 
 
 		if good=='ok':
@@ -563,7 +563,7 @@ def get_chosen_models(files,possible,choices):
 def look(modellist='sscyg_kgrid0902/Models.ls',outfile='none'):
 	'''
 	look produces a list of the models and their parameters in
-	a format that one can select individual models.  
+	a format that one can select individual models.
 
 	The routine returns:
 		wholestring  -- a formatted version of the unique values for each variable
@@ -629,7 +629,7 @@ def look(modellist='sscyg_kgrid0902/Models.ls',outfile='none'):
 		n=n+1
 
 	return wholestring,possible,files
-	
+
 
 def censor(modellist='py_ixvel/Models.ls',outputfilename='test.ls'):
 	'''
@@ -658,7 +658,7 @@ def censor(modellist='py_ixvel/Models.ls',outputfilename='test.ls'):
 		string = "Choice (1 through %s) as python list, e,g [1,2]:  " % (jj-1)
 		zz=input(string)
 		print zz
-		if len(zz)==0: 
+		if len(zz)==0:
 			zz=[-1]
 		choices=choices+[zz]
 		n=n+1
@@ -684,18 +684,18 @@ def censor(modellist='py_ixvel/Models.ls',outputfilename='test.ls'):
 
 
 def explore(modellist='py_ixvel/models.ls',spectrum='ixvel_stis2',obs='hst',ions='no'):
-	''' 
+	'''
 
 	The imputs are a list of files produced by the .py routine that can be used
 	to generate a grid of models.  This is the same file that is read by
-	pyfit3 (in the new format).  
+	pyfit3 (in the new format).
 
 	A spectrum in a format similar to that produced by pyfit.3
 
 	and the type of observation 'fuse' or 'hst'
 
 	Bug - 090301 - Although the program runs, it currently produces so many diagnostics
-	that one cannot easily see where one was.  
+	that one cannot easily see where one was.
 
 	The routine fails if the inclination is not in the inclination range.
 
@@ -731,7 +731,7 @@ def explore(modellist='py_ixvel/models.ls',spectrum='ixvel_stis2',obs='hst',ions
 
 
 
-	
+
 		print ' Choices: ',choices
 		print 'Xchoices: ',xchoices
 
@@ -798,7 +798,7 @@ def do_one(data,model,column,wmin=1525.,wmax=1575.,wvel=1550.):
 		label=label+['%d' % (delta_v*i)]
 		i=i+1
 
-	return x,label 
+	return x,label
 
 
 def vel_lim(wave=1550.,max_v=3000,ntics=3):
@@ -815,7 +815,7 @@ def vel_lim(wave=1550.,max_v=3000,ntics=3):
 	dw=(wmax-wmin)/ntics
 	dv=(vmax-vmin)/ntics
 
-	
+
 	i=0
 	while i<ntics:
 		x=x+[wmin+(i+0.5)*dw]
@@ -855,7 +855,7 @@ def nice_flux_labels(ymax,nticks=5):
 	delta=3
 	while 3 > smax/delta:
 		delta=delta-0.1
-	
+
 	label=[]
 	y=[]
 	i=0
@@ -895,7 +895,7 @@ def pyfit3_out(filename,inst='hst'):
 
 	# SVI 933.378 (triplet) 944.523 singlet
 	fuse_bands=          [[933.378,'S VI']]
-	# CIII 977.0201 
+	# CIII 977.0201
 	# NIII 991.577 991.511 are slighly off the ground state, but have highes progs
 	# NIII 989.799 is the ground state, but has a lower gf.
 	fuse_bands=fuse_bands+[[977.02,'CIII 977']]
@@ -924,7 +924,7 @@ def pyfit3_out(filename,inst='hst'):
 
 	i=0
 	while i<4:
-	
+
 		subplotno=221+i
 
 		ax=pylab.subplot(subplotno)
@@ -988,12 +988,12 @@ The main routines are:
 compare.explore(modellist='py_ixvel/models.ls',spectrum='ixvel_stis2',obs='hst',ions='no')
 	allows one to explore models based on the variables that were used to generate the models
 
-comapare.pyfit3_out(filename,inst='hst')  
+comapare.pyfit3_out(filename,inst='hst')
 	which produces a plot that shows the results of a pyfit3 run.
 	This is rougly equivalent to sm.pyfit3
 
-compare.xplot(data,model,column,inst='hst')  
-	compare observed spectrum to a specific model and numbered angle on an instrument 
+compare.xplot(data,model,column,inst='hst')
+	compare observed spectrum to a specific model and numbered angle on an instrument
 	by instrument basis
 
 compare.censor(modellist,newlist)

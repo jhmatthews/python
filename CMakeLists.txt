@@ -64,7 +64,6 @@ add_executable(python
         source/gradv.c
         source/reposition.c
         source/anisowind.c
-        source/util.c
         source/density.c
         source/bands.c
         source/time.c
@@ -113,6 +112,8 @@ add_executable(python
         source/log.h
         source/get_models.c
         source/setup_line_transfer.c
+        source/cv.c
+        source/wind_util.c
         )
 
 add_executable(py_wind
@@ -156,7 +157,6 @@ add_executable(py_wind
         source/gradv.c
         source/reposition.c
         source/anisowind.c
-        source/util.c
         source/density.c
         source/bands.c
         source/time.c
@@ -210,6 +210,8 @@ add_executable(py_wind
         source/py_wind_sub.c
         source/py_wind_write.c
         source/setup_line_transfer.c
+        source/cv.c
+        source/wind_util.c
         )
 
 add_executable(windsave2table
@@ -253,7 +255,6 @@ add_executable(windsave2table
         source/gradv.c
         source/reposition.c
         source/anisowind.c
-        source/util.c
         source/density.c
         source/bands.c
         source/time.c
@@ -304,6 +305,8 @@ add_executable(windsave2table
         source/windsave2table.c
         source/windsave2table_sub.c
         source/setup_line_transfer.c
+        source/cv.c
+        source/wind_util.c
         )
 
 # Include external libs

@@ -6,7 +6,7 @@ description: |
   See figure 1 of Shlosman & Vitello 1993, ApJ 409,372.
 type: Double
 unit: cm
-values: Greater than or equal to sv.diskmin (inner radius disk wind)
+values: Greater than or equal to :ref:`sv.diskmin` (inner radius disk wind)
 parent:
-  wind_type: 0
+  Wind.type: SV
 file: sv.c

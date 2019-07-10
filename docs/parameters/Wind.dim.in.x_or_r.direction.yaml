@@ -9,8 +9,9 @@ description: |
   Note that in some situations there may be more than one wind
   component, known technically as a domain.  In that case the user
   will be queried for this value mulitple times, one for each domain
-type: Int
-values: Greater than 0
+type: Integer
+values: Greater than or equal to 4, to allow for boundaries.
 parent:
-  Number.of.wind.components: Greater than 0
+  Wind.number_of_components: Greater than or equal to 0. Once per wind.
+  Wind.type: Not imported
 file: setup_domains.c

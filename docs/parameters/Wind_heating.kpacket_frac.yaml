@@ -1,0 +1,10 @@
+name: Wind_heating.kpacket_frac
+description: |
+  Multi-line description, must keep indentation.
+type: Double
+unit: None
+values: Condition e.g. greater than 0 or list e.g. [1, 2, 5]
+parent:
+  Wind_heating.extra_processes: [nonthermal, both]
+  Line_transfer: [macro_atoms, macro_atoms_thermal_trapping]
+file: setup.c

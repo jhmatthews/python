@@ -1,11 +1,9 @@
 name: Diag.use_standard_care_factors
 description: |
-  Advanced command which allows one to change 
-  various other defaults associated with 
+  Advanced command which allows one to change
+  various other defaults associated with
   radiative transfer, inclusing the fractional distance
   in a cell that a photon can travel
-type: Boolean (1/0)
-parent:
-  parameter:  0 or 1
+type: Boolean (yes/no)
 file: diag.c
 advanced: true

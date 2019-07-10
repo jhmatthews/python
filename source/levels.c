@@ -9,57 +9,6 @@
  *
  ***********************************************************/
 
-//OLD /**************************************************************************
-//OLD                     Space Telescope Science Institute
-//OLD 
-//OLD 
-//OLD   Synopsis:
-//OLD   levels (xplasma, mode) calculates the fractional occupation numbers of
-//OLD   the various levels of atomic configurations as designated in
-//OLD   the atomic data files
-//OLD 
-//OLD   Description:
-//OLD 
-//OLD   mode    0       LTE with t_r
-//OLD           1       LTE with t_e
-//OLD           2       Non-LTE (reduced by weighted BB)
-//OLD 
-//OLD   Arguments:
-//OLD 
-//OLD   Returns:
-//OLD 
-//OLD   Notes:
-//OLD 
-//OLD   0808 - ksl - levels populates the levden array in the Plasma pointer.  It
-//OLD           is called from ion_abundances in python, and is called directly
-//OLD           from my diagnostic routine balance.  It's closely related to
-//OLD           another but separate routine which calculates the partition
-//OLD           functions, callled partition
-//OLD 
-//OLD   History:
-//OLD   01sep23 ksl     Began work
-//OLD   01oct10 ksl     Modified so modes matched python ionization modes
-//OLD                   more exactly.
-//OLD   01dec03 ksl     Modified to simplify so modes match those of
-//OLD                   nebular concentrations
-//OLD   01dec12 ksl     Modified to react to changes which split "nlte"
-//OLD                   and "lte" levels.  Levels is explicitly for so-
-//OLD                   called "nlte" levels, which are tracked in the
-//OLD                   Wind structure
-//OLD   04Apr   SS      If statement added to avoid this routine changing
-//OLD                         macro atom level populations.
-//OLD         04May   SS      The if statment added above is modified for the case
-//OLD                         of all "simple" ions.
-//OLD   06may   ksl     57+ -- Modified to make use of plasma structue
-//OLD   080810  ksl     62 - Fixed problem with how the levden array was
-//OLD                   indexed.  The problem was that the index into the
-//OLD                   levden array is not the same as the index into
-//OLD                   the so called nlte configurations.
-//OLD                   Also made the actual use of variables
-//OLD                   like nion,n,m resemble that in partitions so the
-//OLD                   routine was easier to compae
-//OLD 
-//OLD  ************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>

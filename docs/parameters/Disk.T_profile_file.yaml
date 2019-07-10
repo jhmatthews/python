@@ -5,5 +5,5 @@ description: |
   contains the desired profile.
 type: String
 parent:
-  Disk.temperature.profile: Unspecified
+  Disk.temperature.profile: readin
 file: setup_disk.c

@@ -3,5 +3,5 @@ description: |
   This is the relative path to the Atomic Data header file
 type: String
 parent:
-  parameter: none
-file: setup_domains.c
+  System_type: [AGN, binary, star]
+file: setup_line_transfer.c

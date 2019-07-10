@@ -10,5 +10,5 @@ values:
   -1: use all data
   X: use up to that angle (typically less than 90)
 parent:
-  parameter:
+  Wind.type: hydro
 file: hydro_import.c

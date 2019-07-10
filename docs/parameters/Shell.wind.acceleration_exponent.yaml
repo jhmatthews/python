@@ -5,5 +5,5 @@ description: |
 type: Double
 values: Greater than or equal to 0
 parent:
-  Wind_type: 9
+  Wind.type: shell
 file: shell_wind.c

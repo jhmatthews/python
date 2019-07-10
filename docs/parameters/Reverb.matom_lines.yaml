@@ -5,8 +5,9 @@ description: |
   the path of photons deexciting into it recorded in its own array. Note: This
   doesn't give rise to any noticable differences to the pure wind mode in most
   simulations.
-type: Int
-values: 0 or N
+type: Integer
+values: Greater than or equal to 0
 parent:
-  reverb.type: 3
+  Reverb.type: matom
+  Line_transfer: [macro_atoms, macro_atoms_thermal_trapping]
 file: setup_reverb.c

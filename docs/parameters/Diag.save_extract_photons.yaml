@@ -1,10 +1,8 @@
 name: Diag.save_extract_photons
 description: |
   Multi-line description, must keep indentation.
-type: Int
-unit: None
-values: Condition e.g. greater than 0 or list e.g. [1, 2, 5]
+type: Boolean (yes/no)
 parent:
-  parameter: Condition e.g. greater than 0 or list e.g. [1, 2, 5]
+  Diag.extra: true
 file: diag.c
 advanced: true

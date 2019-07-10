@@ -1,0 +1,9 @@
+name: Stellar_wind.radmax
+description: |
+  Multi-line description, must keep indentation.
+type: Double
+unit: cm
+values: Greater than or equal to :ref:`Stellar_wind.radmin`
+parent:
+  Wind.type: star
+file: stellar_wind.c

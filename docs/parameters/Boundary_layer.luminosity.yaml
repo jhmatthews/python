@@ -1,9 +1,10 @@
 name: Boundary_layer.luminosity
 description: |
-  The luminosity of the boundary layer          
+  The luminosity of the boundary layer
 type: Double
 unit: ergs/s
-values: Condition e.g. greater than 0 or list e.g. [1, 2, 5]
+values: Greater than 0
 parent:
-  parameter: Condition e.g. greater than 0 or list e.g. [1, 2, 5]
-file: setup.c
+  Boundary_layer.radiation: true
+  Boundary_layer.rad_type_to_make_wind: power
+file: setup_star_bh.c

@@ -1,9 +1,0 @@
-name: wind.fixed_concentrations_file
-description: |
-  The filename for the fixed ion concentrations if you have
-  set Wind_ionization to 2 (fixed). This file has format
-  [atomic_number  ionizationstage   ion fraction]. 
-type: String
-parent:
-  parameter: Whenever the wind ionization choice is fixed
-file: setup2.c

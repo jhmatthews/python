@@ -1,14 +1,12 @@
 name: Photon_sampling.band_min_frac
 description: |
-  When specifying manually the bands used for generating photons during the ionization pahse, this
-  parameter specifies the The minimum fraction of photons to be generated in this energy band. 
+  When specifying manually the bands used for generating photons during the ionization phase, this
+  parameter specifies the The minimum fraction of photons to be generated in this energy band.
   The number of times this parameter will be reqested depends upon the number of bands.  The summ
-  of the fractuibs need not sum to 1, in which case the remaining photons will be distributed according
+  of the fractions need not sum to 1, in which case the remaining photons will be distributed according
   to the luminosity in the energy bands
-
 type: Double
-unit: None
 values: Greater than 0 and should sum to less than 1 over all bands
 parent:
-  parameter: This parameter is requested whenever the user manually specifies the bands.
+  Photon_sampling.nbands: Greater than 0, once per band
 file: bands.c

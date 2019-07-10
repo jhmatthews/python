@@ -35,7 +35,8 @@ Wind.ionization(on.the.spot,ML93,LTE_tr,LTE_te,fixed,matrix_bb,matrix_pow)      
 Line_transfer(pure_abs,pure_scat,sing_scat,escape_prob,thermal_trapping,macro_atoms,macro_atoms_thermal_trapping)          escape_prob
 Atomic_data                                data/standard80
 Surface.reflection.or.absorption(reflect,absorb,thermalized.rerad)              reflect
-Thermal_balance_options(0=everything.on,1=no.adiabatic)   1
+
+Wind_heating.extra_processes(none,adiabatic,nonthermal,both)                    none
 
 ### Parameters for Domain 0
 Hydro.file                                 hdf000002nsh_dw33.zeu

@@ -1,12 +1,12 @@
 name: AGN.power_law_cutoff
 description: |
-  An advanced option - this is a low frequency cutoff for an 
-  AGN power law spectrum. It prevents the powerlaw being 
+  An advanced option - this is a low frequency cutoff for an
+  AGN power law spectrum. It prevents the powerlaw being
   applied to low frequencies and giving an odd SED.
 type: Double
 unit: Hz
 values: Greater than 0
 parent:
-  parameter: 
+  BH.radiation: true
 file: setup_star_bh.c
 advanced: true

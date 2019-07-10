@@ -24,7 +24,8 @@
  *
  * @param [in]  int  argc   the number of command line arguments
  * @param [in]  char *  argv[]   The command line arguments
- * @return      restart_stat   1 if restarting a previous model
+ * @return      restart_stat   1 if restarting a previous model,
+ * 0 in all other cases.
  *
  * Python has a fairly rich set of command line options, which
  * are parsed by this routine
@@ -40,6 +41,10 @@
  * If changes to the command line interface are made they should
  * be described in the routine help 
  *
+ * Although this routine uses the standard Log and Error commands
+ * the diag files have not been created yet and so this information
+ * is really simply written to the terminal.  
+ *
  **********************************************************/
 
 int
@@ -52,14 +57,19 @@ parse_command_line (argc, argv)
   char dummy[LINELENGTH];
   int mkdir ();
   double time_max;
-  char *fgets_result;
+  char *fgets_rc;
 
   restart_stat = 0;
 
   if (argc == 1)
   {
     printf ("Parameter file name (e.g. my_model.pf, or just my_model):");
-    fgets_result = fgets (dummy, LINELENGTH, stdin);
+    fgets_rc = fgets (dummy, LINELENGTH, stdin);
+    if (!fgets_rc)
+    {
+      Error ("Input rootname is NULL or invalid\n");
+      exit (1);
+    }
     get_root (files.root, dummy);
     strcpy (files.diag, files.root);
     strcat (files.diag, ".diag");
@@ -84,7 +94,7 @@ parse_command_line (argc, argv)
         if (sscanf (argv[i + 1], "%lf", &time_max) != 1)
         {
           Error ("python: Expected time after -t switch\n");
-          exit (0);
+          exit (1);
         }
         set_max_time (files.root, time_max);
         i++;
@@ -110,7 +120,7 @@ parse_command_line (argc, argv)
         if (sscanf (argv[i + 1], "%d", &max_errors) != 1)
         {
           Error ("python: Expected max errors after -e switch\n");
-          exit (0);
+          exit (1);
         }
         Log_quit_after_n_errors (max_errors);
         i++;
@@ -123,7 +133,7 @@ parse_command_line (argc, argv)
         if (sscanf (argv[i + 1], "%d", &max_errors) != 1)
         {
           Error ("python: Expected max errors after -e switch\n");
-          exit (0);
+          exit (1);
         }
         Log_print_max (max_errors);
         i++;
@@ -165,14 +175,14 @@ parse_command_line (argc, argv)
       {
         Log ("Logarithmic photon stepping enabled\n");
         modes.photon_speedup = 1;
-
-        if (sscanf (argv[i + 1], "%i", &PHOT_STEPS) != 1)
+        if (sscanf (argv[i + 1], "%lf", &PHOT_RANGE) == 1)
         {
-          Log ("n_steps not provided, will search .pf for min and max NPHOT\n");
-          PHOT_STEPS = 0;
           i++;
         }
-        i++;
+        else
+        {
+          PHOT_RANGE = 1.;
+        }
         j = i;
       }
       else if (strcmp (argv[i], "--dry-run") == 0)
@@ -190,7 +200,7 @@ parse_command_line (argc, argv)
         int git_diff_status = GIT_DIFF_STATUS;
         if (git_diff_status > 0)
           Log ("This version was compiled with %i files with uncommitted changes.\n", git_diff_status);
-        exit (0);
+        exit (1);
       }
 
       else if (strncmp (argv[i], "-", 1) == 0)
@@ -205,7 +215,7 @@ parse_command_line (argc, argv)
     if (j + 1 == argc)
     {
       Error ("All of the command line has been consumed without specifying a parameter file name, so exiting\n");
-      exit (0);
+      exit (1);
     }
 
 
@@ -288,7 +298,9 @@ These are largely diagnostic or for special cases. These include\n\
  -e_write 	Change the maximum number of errors to print out before recording errors silently\n\
  -f             Invoke a fixed temperature mode, used for runs with Zeus \n\
  -z             Invoke a special mode for that causes Python to start with a run from Zeus\n\
- -p n_steps     Invoke the photon logarithmic stepping algorithm which in some cases can result in a speed up\n\
+ -p range       Invoke the photon logarithmic stepping algorithm which in some cases can result in a speed up\n\
+                Range is in powers of 10, the difference beween the number of photons in the first cycle \n\
+                compared to the last \n\
 \n\
 If one simply types py or pyZZ where ZZ is the version number, one is queried for a name \n\
 of the parameter file and inputs will be requested from the command line. \n\

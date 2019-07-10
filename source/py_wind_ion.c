@@ -10,61 +10,6 @@
  ***********************************************************/
 
 
-/**********************************************************/
-/** 
- * @brief      Import a gridded model
- *
- * @param [in] int  ndom   The domain for the model
- * @return   Always returns 0  
- *
- * @details
- *
- *
- * ### Notes ###
- *
- **********************************************************/
-//OLD /***********************************************************
-//OLD                                        Space Telescope Science Institute
-//OLD 
-//OLD  Synopsis:
-//OLD  
-//OLD   This file contains various subroutines of py_wind.  It is not part of python!
-//OLD   
-//OLD   ion_summary (w, element, istate, iswitch, rootname, ochoice) calculates and 
-//OLD   displays information for a specific element and ionization state.  The information
-//OLD   displayed depends upon the value of iswitch  
-
-
-//OLD Arguments:                
-//OLD   WindPtr w;
-//OLD   int element,istate;
-//OLD   char filename[]                 Output file name, if "none" then nothing is written;
-//OLD   int iswitch                     0 = ion fraction
-//OLD                                   1 = ion density
-//OLD                                   2 = number of scatters 
-//OLD           char rootname[];                rootname of the output file
-//OLD           int ochoice;                    The screen display is always the actual value. If ochoice
-//OLD                                   is non-zere an output file is written.
-//OLD 
-//OLD Returns:
-//OLD  
-//OLD Description:      
-//OLD   
-//OLD           
-//OLD Notes:
-//OLD 
-//OLD History:
-//OLD   97jun   ksl     Coding on py_wind began.
-//OLD   01sep   ksl     Added switch to ion summary so that ion density rather than ion fraction could
-//OLD                   be printed out.  iswitch==0 --> fraction, otherwise density
-//OLD   01dec   ksl     Updated for new calling structure for two_level_atom & scattering_fraction.
-//OLD   04nov   ksl     Updated for multiple coordinate systems, i.e to use the routine display. 
-//OLD                   Note that many of these summaries seem quite dated, and I have really not 
-//OLD                   checked what they are supposed to do.
-//OLD   05apr   ksl     Eliminated MDIM references
-//OLD   090125  ksl     Added capability to display the number of scatters of an ion taking
-//OLD                   place in a cell.
-//OLD **************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

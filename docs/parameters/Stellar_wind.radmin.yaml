@@ -4,7 +4,7 @@ description: |
   radius of the star.
 type: Double
 unit: cm
-values: Greater than or equal to radius of the central object
+values: Greater than or equal to :ref:`Central_object.radius`
 parent:
-  parameter: Required when the wind_type is set to 1, a stellar wind
+  Wind.type: star
 file: stellar_wind.c

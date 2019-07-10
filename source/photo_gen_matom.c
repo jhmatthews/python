@@ -327,7 +327,8 @@ get_matom_f (mode)
 
                 if (nres > NLINES + nphot_total)
                 {
-                  Error ("Problem in get_matom_f (1). Abort. \n");
+                  Error ("Problem in get_matom_f (1). Abort. nres is %d, NLINES %d, nphot_total %d m %d %8.4e\n",
+                         nres, NLINES, nphot_total, m, macromain[n].matom_abs[m]);
                   Exit (0);
                 }
 
@@ -364,7 +365,7 @@ get_matom_f (mode)
               }
 
 
-              if (ppp.freq > em_rnge.fmin && ppp.freq < em_rnge.fmax && ppp.istat != P_ADIABATIC)
+              if (ppp.freq > geo.sfmin && ppp.freq < geo.sfmax && ppp.istat != P_ADIABATIC)
               {
                 if (which_out == 1)
                 {
@@ -555,7 +556,7 @@ photo_gen_kpkt (p, weight, photstart, nphot)
   double fmin, fmax;
 
   photstop = photstart + nphot;
-  Log ("photo_gen_kpkt creates nphot %5d photons from %5d to %5d, weight %8.4e \n", nphot, photstart, photstop, weight);
+  Log ("photo_gen_kpkt  creates nphot %5d photons from %5d to %5d, weight %8.4e \n", nphot, photstart, photstop, weight);
 
   if (geo.ioniz_or_extract)
   {
@@ -567,8 +568,8 @@ photo_gen_kpkt (p, weight, photstart, nphot)
   else
   {
     /* we are in the spectral cycles, so use all the required frequency range */
-    fmin = em_rnge.fmin;
-    fmax = em_rnge.fmax;
+    fmin = geo.sfmin;
+    fmax = geo.sfmax;
     /* we only want k->r processes */
     kpkt_mode = KPKT_MODE_CONTINUUM;
   }
@@ -790,7 +791,7 @@ photo_gen_matom (p, weight, photstart, nphot)
 
     test = pp.freq;
 
-    while (test > em_rnge.fmax || test < em_rnge.fmin)
+    while (test > geo.sfmax || test < geo.sfmin)
     {
 
       /* Call routine that will select an emission process for the

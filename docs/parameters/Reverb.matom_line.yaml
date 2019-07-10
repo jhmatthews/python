@@ -9,5 +9,5 @@ type: |
 values: |
   >0:>0:>1:>0
 parent:
-  reverb.matom_lines: Greater than 0
+  Reverb.matom_lines: Greater than 0, once per matom line.
 file: setup_reverb.c

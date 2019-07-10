@@ -36,6 +36,7 @@ int Shout (char *format, ...);
 int sane_check (double x);
 int error_count (char *format);
 int error_summary (char *message);
+int error_summary_parallel (char *msg);
 int Log_flush (void);
 int Log_set_mpi_rank (int rank, int n_mpi);
 int Log_parallel (char *format, ...);

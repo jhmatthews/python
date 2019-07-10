@@ -3,7 +3,7 @@ description: |
     Exponent beta for the Caster and Lamers description of a stellar wind
     v(r)=v_o + (v_inf - v_o) (1+R_s/r)**beta
 type: Double
-values: Greater than or equal to 0 
+values: Greater than or equal to 0
 parent:
-  parameter: Required when the wind_type is set to 1, a stellar wind
+  Wind.type: star
 file: stellar_wind.c

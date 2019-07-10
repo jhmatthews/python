@@ -3,9 +3,9 @@ description: |
   Used when generating 3d .vtk output files for visualisation. Sets the number
   of angle bins used in the output. Aesthetic only; bigger makes prettier meshes
   with larger filesizes.
-type: Int
+type: Integer
 values: Greater than 0
 default: 100
 parent:
-  reverb.visualisation: [1, 3]
+  Reverb.visualisation: [vtk, both]
 file: setup_reverb.c

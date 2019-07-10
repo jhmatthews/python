@@ -1,13 +1,11 @@
 name: Diag.keep_ioncycle_windsaves
 description: |
   Decide whether or not to keep a copy of the windsave file after
-  each ionization cycle in order to track the changes as the 
-  code converges. Produces files of format python01.wind_save and so 
-  on (02,03...) for subsequent cycles. 
-type: Int
-unit: None
-values: 0,1
+  each ionization cycle in order to track the changes as the
+  code converges. Produces files of format python01.wind_save and so
+  on (02,03...) for subsequent cycles.
+type: Boolean(yes/no)
 parent:
-  parameter: Extra_diagnostics
+  Diag.extra: true
 file: diag.c
 advanced: true

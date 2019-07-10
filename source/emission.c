@@ -238,7 +238,7 @@ photo_gen_wind (p, weight, freqmin, freqmax, photstart, nphot)
   double xlum, xlumsum, lum;
   double v[3];
   int icell, icell_old;
-  int nplasma;
+  int nplasma = 0;
   int nnscat;
   int ndom;
   int ptype[NPLASMA][3];        //Store for the types of photons we want, ff first, fb next, line third
@@ -537,13 +537,27 @@ total_free (one, t_e, f1, f2)
   xplasma = &plasmamain[nplasma];
   if (f2 < f1)
   {
+    Error ("total_free: band limited ff  emissivity requested by f1 %g > f2 %g\n", f1, f2);
+    return (0.0);
+  }
+
+  if (ALPHA_FF * xplasma->t_e / H_OVER_K < f1)
+  {
+    return (0.0);
+  }
+
+  if (ALPHA_FF * xplasma->t_e / H_OVER_K < f2)
+  {
+    f2 = ALPHA_FF * xplasma->t_e / H_OVER_K;
+  }
+
+  if (t_e < TMIN)
+  {
     return (0.0);
   }
 
 
-
-
-  if (gaunt_n_gsqrd == 0)       //Maintain old behaviour
+  if (gaunt_n_gsqrd == 0)       //Maintain old behaviour because atomic data files do not include gaunt factor.
   {
     g_ff_h = g_ff_he = 1.0;
     if (nelements > 1)
@@ -588,11 +602,11 @@ total_free (one, t_e, f1, f2)
 
 /**********************************************************/
 /**
- * @brief      calculate f_nu for ff emisssion
+ * @brief      calculate f_nu for free free emisssion
  *
- * @param [in out] WindPtr  one   A wind cell
- * @param [in out] double  t_e   The temperature of the plasma
- * @param [in out] double  freq   The frequency at which f_nu is to be calculated
+ * @param [in] WindPtr  one   A wind cell
+ * @param [in] double  t_e   The temperature of the plasma
+ * @param [in] double  freq   The frequency at which f_nu is to be calculated
  * @return     f_nu for the specific freqency, temperature requested and densities
  * contained in the cell indicated
  *
@@ -604,6 +618,8 @@ total_free (one, t_e, f1, f2)
  * missed?  Not also that the code having to do with the gaunt factor
  * is duplicated from another routine.  Should a gaunt_ff routine
  * be created for both?
+ *
+ * Within python, this routine is accessed through one_ff
  *
  **********************************************************/
 
@@ -620,9 +636,9 @@ ff (one, t_e, freq)
   PlasmaPtr xplasma;
   nplasma = one->nplasma;
   xplasma = &plasmamain[nplasma];
-  if (t_e < 100.)
+  if (t_e < TMIN)
     return (0.0);
-  if (gaunt_n_gsqrd == 0)       //Maintain old behaviour
+  if (gaunt_n_gsqrd == 0)       //Maintain old behaviour because gaunt factors have not been provided in atomic data files
   {
     g_ff_h = g_ff_he = 1.0;
     if (nelements > 1)
@@ -752,7 +768,8 @@ one_ff (one, f1, f2)
  *
  * @details
  * It interpolates simply interpolates between the tabulated
- * factors from Table 3 of Sutherland.
+ * factors from Table 3 of Sutherland (which is a spline fit
+ * to the calculated gaunt factors at various values of gsquared)
  *
  * ### Notes ###
  * The reference for this is Sutherland, R.~S. 1998, MNRAS, 300, 321
@@ -770,6 +787,7 @@ gaunt_ff (gsquared)
   double gaunt;
   double log_g2;
   double delta;                 //The log difference between our G2 and the one in the table
+
   delta = 0.0;                  /* NSH 130605 to remove o3 compile error */
   index = 0;                    /* NSH 130605 to remove o3 compile error */
   log_g2 = log10 (gsquared);    //The data is in log format
@@ -777,14 +795,26 @@ gaunt_ff (gsquared)
   {
     return (1.0);
   }
-  for (i = 0; i < gaunt_n_gsqrd; i++)   /*first find the pair of parameter arrays that bracket our temperature */
+
+//OLD  for (i = 0; i < gaunt_n_gsqrd; i++)   /*first find the pair of parameter arrays that bracket our temperature */
+//OLD  {
+//OLD    if (gaunt_total[i].log_gsqrd <= log_g2 && gaunt_total[i + 1].log_gsqrd > log_g2)
+//OLD    {
+//OLD      index = i;                /* the array to use */
+//OLD      delta = log_g2 - gaunt_total[index].log_gsqrd;
+//OLD    }
+//OLD  }
+
+  i = 0;
+  while (gaunt_total[i].log_gsqrd < log_g2)
   {
-    if (gaunt_total[i].log_gsqrd <= log_g2 && gaunt_total[i + 1].log_gsqrd > log_g2)
-    {
-      index = i;                /* the array to use */
-      delta = log_g2 - gaunt_total[index].log_gsqrd;
-    }
+    i++;
   }
+
+  index = i - 1;
+  delta = log_g2 - gaunt_total[index].log_gsqrd;
+
+  /* The outherland interpolation data is a spline fit to the gaunt function. */
 
   gaunt = gaunt_total[index].gff + delta * (gaunt_total[index].s1 + delta * (gaunt_total[index].s2 + gaunt_total[index].s3));
   return (gaunt);

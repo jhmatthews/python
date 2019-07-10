@@ -144,61 +144,6 @@ fb_topbase_partial (freq)
   return (partial);
 }
 
-//OLD /**************************************************************************
-//OLD                     Space Telescope Science Institute
-//OLD
-//OLD
-//OLD   Synopsis: integ_fb calculates the integrated emissivity of the plasma, or the number of
-//OLD recombinations per second of a particular ion.
-//OLD
-//OLD   Description:
-//OLD
-//OLD   Arguments:
-//OLD   t                   The temperature at which the emissivity
-//OLD                       or recombination rate is calculated
-//OLD   f1,f2           The frequency limits on the calculation
-//OLD                       of the emissivity (ignored if the number
-//OLD                       of recombinations is desired.
-//OLD   nion            The ion for which the emissivity is returned
-//OLD   fb_choice       A switch which determines exactly what is to
-//OLD                       be returned:
-//OLD                       0- the full emissivity including
-//OLD                       the energy associated associated with the
-//OLD                       threshold
-//OLD                       1- the (reduced) emissivity, e.g. excluding
-//OLD                       the threshold energy.  This is the energy
-//OLD                       associated with kinetic energy loss
-//OLD                       2- the specific recombination rate.
-//OLD mode      inner or outer shell
-//OLD
-//OLD
-//OLD
-//OLD   Returns:
-//OLD   The routine returns the specific emissivity, e.g. the emissivity and
-//OLD   or recombination rate per electron and per ion.
-//OLD
-//OLD   Notes:
-//OLD   As written, in July02, the idea is that if the recombination coefficients
-//OLD   have been calculated the program is going to return an interpolated
-//OLD   coefficient, if not, it will calculate it from scratch.  (The later is
-//OLD   much slower if one has to do it a lot of times.
-//OLD
-//OLD   ???? Error -- There is definitely an error because the program does
-//OLD   not support option 0, and this is needed for calculation of the
-//OLD   relative numbers of photons by fb vs free free photons.  ksl 02jul
-//OLD
-//OLD
-//OLD
-//OLD   History:
-//OLD   02jul   ksl     Modified to elimate need to include information about the cell.
-//OLD                   At this point integ_fb yields answers per electron and per ion.
-//OLD                   Moved DENSITY_PHOT_MIN test out of integ_fb
-//OLD   02jul   ksl     Original routines has been pushed down to xinteg_fb so
-//OLD                   that integ_fb can be modified to use stored values when
-//OLD                   desired.
-//OLD
-//OLD  ************************************************************************/
-
 
 
 /**********************************************************/
@@ -347,37 +292,6 @@ integ_fb (t, f1, f2, nion, fb_choice, mode)
 
 
 
-//OLD /**************************************************************************
-//OLD                     Space Telescope Science Institute
-//OLD
-//OLD
-//OLD   Synopsis: total_fb returns the energy lost from the plasma due to fb emission in a
-//OLD   single wind cell at a temperature t between the frequncy limits f1 and f2.
-//OLD   The energy lost is just the kinetic energy lost from the plasma
-//OLD   because it does not include the ionization potential
-//OLD   associated with each recombination.  Python tracks effectively the kinetic energy
-//OLD   of the plasma (not the potential energy available if everything recombined.
-//OLD
-//OLD   Description:
-//OLD
-//OLD   Arguments:
-//OLD
-//OLD
-//OLD   Returns:
-//OLD
-//OLD   Notes:
-//OLD
-//OLD
-//OLD   History:
-//OLD   02jul   ksl     Modified so computes fb contributions of individual ions, instead
-//OLD           of just h, he, and z, and so that one does not need to pass
-//OLD           the entire wind cell to integ_fb
-//OLD   02jul   ksl     Added call to init_freebound so that precalculated values would
-//OLD                   be used where possible.  This seemed the most conservative place
-//OLD           to put these calls since total_fb is always called whenever the
-//OLD           band-limited luminosities are needed.
-//OLD
-//OLD  ************************************************************************/
 
 
 
@@ -658,7 +572,7 @@ use that instead if possible --  57h */
 
     if (cdf_gen_from_array (&cdf_fb, fb_x, fb_y, nnn, f1, f2) != 0)
     {
-      Error ("one_fb after error: f1 %g f2 %g te %g ne %g nh %g vol %g\n",
+      Error ("one_fb after cdf_gen_from_array error: f1 %g f2 %g te %g ne %g nh %g vol %g\n",
              f1, f2, xplasma->t_e, xplasma->ne, xplasma->density[1], one->vol);
       Error ("Giving up\n");
       Exit (0);
@@ -754,37 +668,6 @@ num_recomb (xplasma, t_e, mode)
   return (0);
 }
 
-
-//OLD /**************************************************************************
-//OLD                     Space Telescope Science Institute
-//OLD
-//OLD
-//OLD   Synopsis: fb calculates the free_bound emissivity of the plasma at a specific frequency
-//OLD
-//OLD   Description:
-//OLD
-//OLD   Arguments:
-//OLD
-//OLD   ion_choice      Either the total emissivity or the emissivity for a specific
-//OLD                   ion is caculated depending on whether ion_choice=nions, or
-//OLD                   a value less than the total number of ions
-//OLD     fb_choice determines whether what is returned is the emissivity a specific frecuency 0
-//OLD             the emissivity reduced by the ionization potential 1, or the number of photons per
-//OLD             unit Hz
-//OLD
-//OLD   Returns:
-//OLD
-//OLD   Notes:
-//OLD
-//OLD
-//OLD   History:
-//OLD   02jul   ksl     Modified to reflect desire to make fb_xtopbase and fb_verner
-//OLD                   independent of the wind cell.
-//OLD   06may   ksl     57+ -- Switched to plasma structure since no volume
-//OLD   06jul   ksl     57h -- Cleaned this routine up a bit, in part to avoid
-//OLD                   calling fb_verner_partial when it should not be called.
-//OLD
-//OLD  ************************************************************************/
 
 
 
@@ -1062,30 +945,6 @@ on the assumption that the fb information will be reused.
 
   return (0);
 }
-
-
-
-
-//OLD /**************************************************************************
-//OLD                     Space Telescope Science Institute
-//OLD
-//OLD
-//OLD   Synopsis: Return the recombination coefficient
-//OLD
-//OLD   Description:
-//OLD
-//OLD   Arguments:
-//OLD
-//OLD
-//OLD   Returns:
-//OLD
-//OLD   Notes:
-//OLD
-//OLD
-//OLD   History:
-//OLD           13sep   nsh     changed call to linterp to reflect new option
-//OLD
-//OLD  ************************************************************************/
 
 
 
@@ -1827,7 +1686,7 @@ matom_select_bf_freq (WindPtr one, int nconf)
 
   if (cdf_gen_from_array (&cdf_fb, fb_x, fb_y, ARRAY_PDF / 100, f1, f2) != 0)
   {
-    Error ("matom_select_bf_freq: f1 %g f2 %g te %g \n", f1, f2, xplasma->t_e);
+    Error ("matom_select_bf_freq after cdf_gen_from_array: f1 %g f2 %g te %g \n", f1, f2, xplasma->t_e);
     Error ("Giving up\n");
     Exit (0);
   }

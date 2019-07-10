@@ -1,8 +1,8 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python
 
 '''
 
-Synopsis:  
+Synopsis:
 
 Find all of the python files in a directory and write out html
 pydoc documentation of them in the current working directory
@@ -16,7 +16,7 @@ Command line usage (if any):
                 the routine is being run from the pydocs directory
                 and the the directory to be documented is ../../py_progs
 
-Description:  
+Description:
 
     The routine finds all of the .py files in the named directory and
     generates a shell script which runs pydocs to create html help
@@ -39,8 +39,8 @@ Notes:
     not.
 
     The does not delete help from routines that have been deleted from
-    a package, which is a problem.  One could fix this, but one would 
-    then need to keep some kind of database so that you knew what files 
+    a package, which is a problem.  One could fix this, but one would
+    then need to keep some kind of database so that you knew what files
     should exist.
 
     Note that you should watch the written output.  If it gives
@@ -48,13 +48,13 @@ Notes:
     means that one has not put
 
     if __name__ == "__main__":
-    
+
     in front of the main routine.  If this happens you will need
     to indent all of the lines in main, and then rerun this
     script
 
-    
-                                       
+
+
 History:
 
 100805    ksl    Coding begun
@@ -69,41 +69,42 @@ History:
 import sys
 import os
 import glob
-import markup
+from MarkupPy import markup
 
-def make_toplevel(dirname,names):
+
+def make_toplevel(dirname, names):
     '''
     Create an html page to point to all
     of the individual help pages that have
     been made
     '''
     # First get the name of the directory
-    dirname=dirname.replace('/',' ')
-    dirname=dirname.strip()
-    dirname=dirname.split()
-    dirname=dirname[len(dirname)-1]
+    dirname = dirname.replace('/', ' ')
+    dirname = dirname.strip()
+    dirname = dirname.split()
+    dirname = dirname[len(dirname)-1]
     print(dirname)
 
-    html_name='doc_'+dirname+'.html'
+    html_name = 'doc_'+dirname+'.html'
 
     # Start a page
     page = markup.page( )
 
-    page.init( title="Documentation for %s" % dirname)  
+    page.init(title="Documentation for %s" % dirname)
 
-    page.h1("Documentation for python scripts in the directory  %s" % dirname) 
+    page.h1("Documentation for python scripts in the directory  %s" % dirname)
 
-    items=[]
+    items = []
     for name in names:
-        item=markup.oneliner.a(name,href="./%s.html" % name)
+        item = markup.oneliner.a(name, href="./%s.html" % name)
         items.append(item)
-    
+
     page.ul(class_='mylist' )
-    page.li( items, class_='myitem' )
-    page.ul.close( )
+    page.li(items, class_='myitem' )
+    page.ul.close()
 
     page.p('Warning: This page is rewritten every whenever write_docs.py is run on this directoryand so this page should not be edited')
-    g=open(html_name,'w')
+    g = open(html_name, 'w')
     g.write('%s' % page)
     g.close()
 
@@ -115,18 +116,18 @@ def write_docs(dirname='../../py_progs'):
     using pydocs
     '''
 
-    search_name=dirname+'/*.py'
-    names=glob.glob(search_name)
+    search_name = dirname+'/*.py'
+    names = glob.glob(search_name)
     print(names)
-    g=open('DoDocs','w')
+    g = open('DoDocs', 'w')
 
-    roots=[]
+    roots = []
 
     for name in names:
-        words=name.split('/')
-        filename=words[len(words)-1]
-        words=filename.split('.')
-        root=words[0]
+        words = name.split('/')
+        filename = words[len(words)-1]
+        words = filename.split('.')
+        root = words[0]
         roots.append(root)
         # g.write('pydoc -w %s\n' % root)
         g.write('pydoc -w %s\n' % name)
@@ -135,19 +136,16 @@ def write_docs(dirname='../../py_progs'):
 
     # Now make a page that points to all the html pages
     # that have already been made
-    make_toplevel(dirname,roots)
-    
+    make_toplevel(dirname, roots)
+
 
 # Next lines permit one to run the routine from the command line
 if __name__ == "__main__":
-    import sys
-    if len(sys.argv)==1:
+    if len(sys.argv) == 1:
         write_docs()
-    elif len(sys.argv)==2 and sys.argv[1]=='-h':
+    elif len(sys.argv) == 2 and sys.argv[1] == '-h':
         print(__doc__)
-    elif len(sys.argv)==2:
-        # doit(int(sys.argv[1]))
+    elif len(sys.argv) == 2:
         write_docs(sys.argv[1])
     else:
         print('usage: write_docs.py  dirname or -h for info')
-

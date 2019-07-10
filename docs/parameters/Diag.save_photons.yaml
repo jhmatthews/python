@@ -1,0 +1,8 @@
+name: Diag.save_photons
+description: |
+  Multi-line description, must keep indentation.
+type: Boolean (yes/no)
+parent:
+  Diag.extra: true
+file: diag.c
+advanced: true

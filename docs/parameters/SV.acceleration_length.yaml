@@ -1,10 +1,10 @@
 name: SV.acceleration_length
 description: |
   The size of the acceleration length scale for a disk wind described by the
-  Shlosman Vitelo model. See equation (2) Shlosman & Vitelo ApJ (1993),409,372 
+  Shlosman Vitelo model. See equation (2) Shlosman & Vitelo ApJ (1993),409,372
 type: Double
 unit: cm
 values: Greater than 0
 parent:
-  wind_type: 0
+  Wind.type: SV
 file: sv.c

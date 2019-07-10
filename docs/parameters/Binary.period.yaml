@@ -1,12 +1,12 @@
 name: Binary.period
 description: |
-  The perids of a binary system. Along with a mass, the binary period is 
+  The perids of a binary system. Along with a mass, the binary period is
   used to define the Roche lobe of the system, which in turn can be used
   to see the effect of eclipses on the spectrum.  Defining the system as
   a secondary also initializes the outer radius of the disk.
 type: Double
 unit: Hours
-values: greater than 0 
+values: Greater than 0 
 parent:
-  parameter: Required whenever the system is defined to be a binary system
+  System_type: binary
 file: setup_star_bh.c

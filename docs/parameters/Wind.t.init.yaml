@@ -1,0 +1,9 @@
+name: Wind.t.init
+description: |
+  Starting temperature of the wind.
+type: Double
+unit: Kelvin
+values: Greater than 0
+parent:
+  Wind.number_of_components: Greater than 0. Once per domain.
+file: setup_domains.c

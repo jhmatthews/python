@@ -1,10 +1,10 @@
 name: Photon_sampling.high_energy_limit
 description: |
-    Stratified sampling is used during ionization cycles to generate photons.  This parmeter
-    specires the high energy limit for the frequenies of photons to be generated..
+    Stratified sampling is used during ionization cycles to generate photons.  This parameter
+    specifies the high energy limit for the frequencies of photons to be generated.
 type: Double
 unit: eV
-values: greater than 0 
+values: Greater than :ref:`Photon_sampling.low_energy_limit`
 parent:
-  parameter: This paremeter is requied whenever the user wants to customize energy bands for stratified sampling
+  Photon_sampling.approach: user_bands
 file: bands.c

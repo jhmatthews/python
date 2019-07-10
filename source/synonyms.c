@@ -7,10 +7,10 @@
  * @brief  Translate the keywords used in previous versions of Python to the current keywords
  *
  * The input variable used in Python have evolved over time.  The routine provided hre
- * is intened to make it possible to associte a new keyword with one that was used in 
- * an earlier version of Python.  As long as the keyword has simply been renamed then one 
+ * is intened to make it possible to associte a new keyword with one that was used in
+ * an earlier version of Python.  As long as the keyword has simply been renamed then one
  * can use a synomym to allow one to extact information from the old parameter file and translate
- * it so, one can use an old parmeter file with a new version of Python.  
+ * it so, one can use an old parmeter file with a new version of Python.
  *
  * It is important to note that this process cannot continue indefinitely because , one may want
  * to change keyword/parameters so that they are not simple rplacements.
@@ -59,6 +59,7 @@ char *old_names[] = { "mstar", "rstar", "Disk.illumination.treatment", "disk.typ
   "kn.rmax", "kn.rmin", "kn.v_infinity", "kn.v_zero", "QSO_BH_radiation", "lum_agn", "AGN.power_law_index",
   "AGN.blackbody_temp", "@AGN.power_law_cutoff", "AGN.geometry_for_pl_source", "Rad_type_for_agn", "Rad_type_for_agn",
   "wind.mdot", "Wind_ionization", "Wind_radiation", "Wind_type", "Thermal_balance_options",
+  "wind.fixed_concentrations_file",
   NULL
 };
 
@@ -88,7 +89,7 @@ char *new_names[] = { "Central.object.mass", "Central.object.radius",
   "@Diag.use_standard_care_factors", "@Diag.fractional_distance_photon_may_travel",
   "@Diag.lowest_ion_density_for_photoabs", "@Diag.keep_photoabs_in_final_spectra",
   "@Diag.adjust_grid",
-  "Wind.filling_factor", "Wind.coord_system", "@Diag.write_atomicdata", "Wind.fixed_concntrations_file",
+  "Wind.filling_factor", "Wind.coord_system", "@Diag.write_atomicdata", "Wind.fixed_concentrations_file",
   "@Diag.extra", "Wind.model2import", "Wind.number_of_components", "Wind.old_windfile",
   "Input_spectra.model_file", "AGN.power_law_index", "Hydro.file", "Hydro.thetamax",
   "KWD.acceleration_exponent", "KWD.acceleration_length", "KWD.d", "KWD.mdot_r_exponent",
@@ -96,18 +97,19 @@ char *new_names[] = { "Central.object.mass", "Central.object.radius",
   "BH.blackbody_temp", "@Bh.power_law_cutoff", "BH.geometry_for_pl_source",
   "BH.rad_type_in_final_spectrum", "BH.rad_type_to_make_wind",
   "Wind.mdot", "Wind.ionization", "Wind.radiation", "Wind.type", "Wind_heating.extra_processes",
+  "Wind.fixed_concentrations_file",
   NULL
 };
 
 
 
-int number_of_names = 102;
+int number_of_names = 103;
 
 #define MIN(a,b) ((a)<b ? a:b)
 
 
 /**********************************************************/
-/** 
+/**
  * @brief      This is a routine which is intended to help with program updates that
  *   change the name of a keyword in a parameter file.  It is called from
  *   rdpar.string_process_from_file
@@ -120,19 +122,19 @@ int number_of_names = 102;
  * 	  the old_value
  *
  * The routine simply matches the string in new_question to a string in
- *   the array new_names, below.  If it finds a match, the old_name is 
+ *   the array new_names, below.  If it finds a match, the old_name is
  *   returned in old_question.
  *
  * ###Notes###
  *
  * To add another variable to the list, just record the new_name and the
  *   old_name in the arrays below, and increase the number of names by 1
- * 
+ *
  *   Do not include the material that is in paren, that is for
- * 
+ *
  *   xxx(many_choices) -->  xxxx
- * 
- *   The routine is completely hardwired as wrtten though clearly this 
+ *
+ *   The routine is completely hardwired as wrtten though clearly this
  *   could be changed, so that information was read from a file.
  *
  * Note that there can be multiple old names that are the same due
@@ -152,7 +154,7 @@ check_synonyms (new_question, old_question)
   int nwords, wordlength;
   char *ccc, *index ();
 
-  /* First check that the synonyms list has the smae number of entries in both lists and that 
+  /* First check that the synonyms list has the smae number of entries in both lists and that
    * this agrees with the number that it is supposed to have
    */
 

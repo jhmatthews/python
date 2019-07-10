@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <sys/stat.h>
 
 #include "atomic.h"
 #include "python.h"
@@ -43,6 +44,8 @@
 int
 get_line_transfer_mode ()
 {
+  int rc;                       // Return code from running Setup_Py_Dir
+  struct stat file_stat;        // Used to check the atomic data exists
   char answer[LINELENGTH];
 
   int user_line_mode = 0;
@@ -54,9 +57,6 @@ get_line_transfer_mode ()
   user_line_mode =
     rdchoice ("Line_transfer(pure_abs,pure_scat,sing_scat,escape_prob,thermal_trapping,macro_atoms,macro_atoms_thermal_trapping)",
               "0,1,2,3,5,6,7", answer);
-//OLD  rdint
-//OLD    ("Line_transfer(0=pure.abs,1=pure.scat,2=sing.scat,3=escape.prob,5=thermal_trapping,6=macro_atoms,7=macro_atoms+aniso.scattering)",
-//OLD     &user_line_mode);
 
   /* JM 1406 -- geo.rt_mode and geo.macro_simple control different things. geo.rt_mode controls the radiative
      transfer and whether or not you are going to use the indivisible packet constraint, so you can have all simple 
@@ -88,12 +88,6 @@ get_line_transfer_mode ()
     Log ("Line_transfer mode:  Simple, isotropic scattering, escape probabilities\n");
     geo.line_mode = user_line_mode;
   }
-//OLD  else if (user_line_mode == 4)
-//OLD  {
-//OLD    Error ("get_line_transfer_mode: Line transfer mode %d is deprecated\n", user_line_mode);
-//OLD    line_transfer_help_message ();
-//OLD    Exit (0);
-//OLD  }
   else if (user_line_mode == 5)
   {
     Log ("Line_transfer mode:  Simple, thermal trapping, Single scattering \n");
@@ -161,12 +155,29 @@ get_line_transfer_mode ()
     if (modes.iadvanced)
     {
 
-      //OLD  rdint ("@Diag.write_atomicdata(0=no,anything_else=yes)", &write_atomicdata);
 
       strcpy (answer, "no");
       write_atomicdata = rdchoice ("@Diag.write_atomicdata(yes,no)", "1,0", answer);
       if (write_atomicdata)
         Log ("You have opted to save a summary of the atomic data\n");
+    }
+
+    /*
+     * Check that geo.atomic_filename exists - i.e. that the directory is readable
+     * and in the directory Python is being executed from. If it isn't - then
+     * try to run Setup_Py_Dir. If both fail, then warn the user and exit Python
+     */
+
+    if (stat (geo.atomic_filename, &file_stat))
+    {
+      Log ("Unable to open atomic masterfile %s\n", geo.atomic_filename);
+      Log ("Running Setup_Py_Dir to try and fix the situation\n");
+      rc = system ("Setup_Py_Dir");
+      if (rc)
+      {
+        Error ("Unable to open %s and run Setup_Py_Dir\n", geo.atomic_filename);
+        Exit (1);
+      }
     }
 
     get_atomic_data (geo.atomic_filename);

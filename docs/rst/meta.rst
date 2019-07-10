@@ -29,6 +29,24 @@ possible choices:
    :language: yaml
    :lines: 14-25
 
+The ``parent`` key is used to link between parameters, so you can see which options depend on others
+(for example, :ref:`Reverb.matom_lines` depends on :ref:`Line_transfer` being a macro-atom mode).
+Parent should be a list of parameters, followed by one (or a list of) values of the parent that result
+in this parameter being used, for example:
+
+.. literalinclude:: reference_yaml.txt
+   :language: yaml
+   :lines: 27-28
+
+Parent will automatically link to the page for each parent. Parent is also used when figuring out the structure
+within each file, so put any local parents at the top of the list. 
+If you'd like to reference one parameter elsewhere within another, you can use the following format
+
+.. literalinclude:: reference_yaml.txt
+   :language: yaml
+   :lines: 30-30
+
+
 TODO: Make structure of parent explicit.
 
 autogenerate_parameter_docs.py
@@ -37,7 +55,7 @@ autogenerate_parameter_docs.py
 This tool takes the *python* .c input files, and scans them for calls to input parameters from file.
 It is run from the command line as::
 
-  python autogenerate_parameter_docs.py
+  autogenerate_parameter_docs.py
 
 This mode will tell you which parameters are **new**, and undocumented, and which files are
 **deprecated** and refer to parameters that no longer exist. In many cases, deprecated parameters
@@ -46,7 +64,7 @@ documentation file.
 
 Once this has been done, it can be run using::
 
-  python autogenerate_parameter_docs.py -w
+  autogenerate_parameter_docs.py -w
 
 This will move any deprecated documentation to *docs/parameters/old*, and generate new *YAML*
 documentation files for the new parameters in *docs/parameters*. You can now proceed to fill
@@ -74,7 +92,7 @@ then automatically open it in your browser. You may see some errors during the c
 This occurs during the *YAML* step when a file has an invalid entry, and that parameter file will be
 skipped as a consequence. Typically it is cause when a text line is malformed. For inline text
 (e.g. ``values: condition``) it occurs when the string starts with a non-alphanumeric character like
-``>` (so ```values: >0`` is invalid).
+``>`` (so ```values: >0`` is invalid).
 
 You may also see it when using block text (e.g. ``description:|``) if the following lines are not
 correctly indented e.g.::

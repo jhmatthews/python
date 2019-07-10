@@ -16,69 +16,6 @@
 #include "atomic.h"
 #include "python.h"
 
-//OLD /***********************************************************
-//OLD                                        Space Telescope Science Institute
-//OLD 
-//OLD  Synopsis:
-//OLD 
-//OLD int extract(w,p,itype) is the supervisory routine which helps normally
-//OLD   builds detailed spectra as the photons are transit the wind.
-//OLD 
-//OLD Arguments:                
-//OLD   PhotPtr p;      The initial photon
-//OLD   WindPtr w;
-//OLD   int itype       
-//PTYPE_STAR->the photon came for the star 
-//OLD                   PTYPE_BL->the photon came from the boundary layer
-//OLD                   PTYPE_DISK->the photon being redirected arose in the disk,
-//OLD                   PTYPE_WIND->the photon being redirected arose in the wind,
-//OLD Returns:
-//OLD  
-//OLD  
-//OLD Description:      
-//OLD 
-//OLD extract is called when a photon begins it's flight and every time that photon
-//OLD scatters, unless the user has exercised the "live or die" option, in
-//OLD which case it is not called.  extract calls extract_one for each spectrum
-//OLD it wants to build, where the actual incrementing of the spectrum is done.
-//OLD 
-//OLD An option allows one to construct spectra which have undergone a certain
-//OLD number of scatters.  The parameters for this option all come in through
-//OLD python.h.  
-//OLD   If s[n].nscat>999; then one obtains the entire spectrum
-//OLD   if s[n].nscat is a positive number, then the spectrum is composed just 
-//OLD           of photons with that number of scatters
-//OLD   if s[n].nscat is a negative number, then the spectrum contains all photons
-//OLD           with >=  the absolute value of s[n].nscat
-//OLD Another option allows one to construct spectra from photons which have
-//OLD   scattered above or below the plane of the disk.  As for the number of
-//OLD   scatters this option comes through python.h, in this case from s[n].top_bot
-//OLD   s[n].top_bot=0 -> accept all photons
-//OLD                     >0  -> accept photons last above the disk
-//OLD                     <0  -> accept photons below the disk
-//OLD Notes:
-//OLD 
-//OLD History:
-//OLD   97march ksl     Coded and debugged as part of Python effort.  
-//OLD   97aug28 ksl     Added the option which allows one to construct spectra with a
-//OLD                   specific number of scatters.
-//OLD   97sep1  ksl     Added the option which allows one to construct spectra which
-//OLD                   originate from a specific position above or below the disk
-//OLD   02jan   ksl     Fixed problems with itypes. (Photons which were wind photons
-//OLD                   for the purpose of extract were not being properly labelled
-//OLD                   as such, and this meant they were not doppler shifted properly.
-//OLD                   This produced photons that were further from resonance in the
-//OLD                   local frame and made the wind more transmissive, especially
-//OLD                   in the blue wing of the line.  It suggests
-//OLD                   that a lot of the absorption in extract is fairly local and
-//OLD                   that the blue wing structure could be fairly sensitive to how
-//OLD                   the doppler shift is carried out.)
-//OLD   09feb   ksl     68b - Added hooks to track energy deposition of extracted photons
-//OLD                   in the wind 
-//OLD   15aug   ksl     Modifications to allow multiple domains.
-//OLD 
-//OLD **************************************************************/
-
 
 
 /**********************************************************/

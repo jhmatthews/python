@@ -85,9 +85,10 @@ typedef struct elements
                                    provides and index to the atomic data */
   char name[20];                /* Element name */
   int z;                        /* Atomic number */
-  int firstion;                 /*Index into struct ions  ion[firstion] is the lowest ionization state of this ion */
-  int nions;                    /*The number of ions actually read in from the data file for this element */
-  double abun;                  /*Abundance */
+  int firstion;                 /* Index into struct ions  ion[firstion] is the lowest ionization state of this ion */
+  int nions;                    /* The number of ions actually read in from the data file for this element */
+  double abun;                  /* Abundance */
+  int istate_max;               /* highest ionization stage of element */
 }
 ele_dummy, *ElemPtr;
 
@@ -103,7 +104,8 @@ double rho2nh;                  /* The conversion constant from rho to nh the to
 typedef struct ions
 {
   int z;                        /* defines the element for this ion */
-  int istate;                   /*1=neutral, 2 = once ionized, etc. */
+  int istate;                   /* 1=neutral, 2 = once ionized, etc. */
+  int nelem;                    /* index to elements structure */
   double ip;                    /* ionization potential of this ion (converted from eV to ergs by get_atomic) */
   double g;                     /* multiplicity of ground state, note that this is not totally consistent
                                    with energy levels and this needs to be reconciled */
@@ -314,7 +316,7 @@ typedef struct topbase_phot
                                    for the correct array elements, or whether this process
                                    can be short circuited */
   int n_elec_yield;             /*Index to the electron yield array - only used for inner shell ionizations */
-  int n_fluor_yield;            /*Inder to the fluorescent photon yield array - only used for inner shell ionizations */
+//  int n_fluor_yield;            /*Inder to the fluorescent photon yield array - only used for inner shell ionizations */
   int macro_info;               /* Identifies whether line is to be treated using a Macro Atom approach.
                                    set to -1 initially
                                    set to 0 if not a macro atom line  

@@ -22,7 +22,6 @@
 #include "log.h"
 
 
-
 #define EPS 1.0e-6
 #define JMAX 100
 #define JMAXP JMAX+1

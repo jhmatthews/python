@@ -3,11 +3,10 @@ description: |
   While most simple description of a wind consist of a single region of space, Python can calculate
   radiative transfer through more complicated structres, where one region of space is described with one
   prescription and another region of space with a second prescription. For example, one might want to place
-  a disk atomospher between the disk and a wind.  This parameter describes the number of components (aka domains)
+  a disk atmoosphere between the disk and a wind.  This parameter describes the number of components (aka domains)
   of the wind.
-type: Int
-unit: None
-values: greater than 0 
+type: Integer
+values: Greater than 0
 parent:
-  parameter: This question is always asked.                       
+  System_type: [star, binary, agn]
 file: python.c

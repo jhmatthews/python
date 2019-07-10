@@ -1,11 +1,11 @@
 name: Spectrum.select_specific_no_of_scatters_in_spectra
 description: |
   Advanced command which allows one to place additional
-  constraints on the detailed spectra which are extract.  
+  constraints on the detailed spectra which are extract.
   This includes selectiong photons from above or below the
-  disk, only photons which have scttered, etc.  
-type: Boolean (Y/N)
+  disk, only photons which have scttered, etc.
+type: Boolean (yes/no)
 parent:
-  parameter: Condition e.g. greater than 0 or list e.g. [1, 2, 5]
-file: setup2.c
+  Spectrum_cycles: Greater than or equal to 0
+file: setup.c
 advanced: true

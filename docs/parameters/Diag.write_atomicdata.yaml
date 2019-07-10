@@ -1,9 +1,7 @@
 name: Diag.write_atomicdata
 description: |
-  Choose whether to write the atomic data that is being used to 
+  Choose whether to write the atomic data that is being used to
   an output file.
-type: Boolean (1/0)
-parent:
-  parameter: Asked whenever advanced commands are enaabled        
+type: Boolean (yes/no)   
 file: setup_domains.c
 advanced: true

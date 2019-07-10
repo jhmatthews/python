@@ -1,0 +1,9 @@
+name: Wind.mdot
+description: |
+  Multi-line description, must keep indentation.
+type: Double
+unit: M☉/year
+values: Greater than 0
+parent:
+  Wind.type: [knigge, SV]
+file: [knigge.c, sv.c]

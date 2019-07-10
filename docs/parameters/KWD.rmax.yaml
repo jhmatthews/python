@@ -3,8 +3,8 @@ description: |
   The radius at which the disk wind terminates, in units of central object
   radii. This has to be greater than rmin.
 type: Double
-unit: co.radius
-values: Greater than 0
+unit: :ref:`Central_object.radius`
+values: Greater than :ref:`KWD.rmin`
 parent:
-  parameter:
+  Wind.type: kwd
 file: knigge.c

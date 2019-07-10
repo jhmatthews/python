@@ -7,8 +7,8 @@ description: |
   of the region.
 type: Double
 unit: cm
-values: Condition e.g. greater than 0 or list e.g. [1, 2, 5]
+values: Within the z range of the model
 parent:
-  parameter: Condition e.g. greater than 0 or list e.g. [1, 2, 5]
-file: setup2.c
+  Spectrum.select_location: spherical_region
+file: setup.c
 advanced: true

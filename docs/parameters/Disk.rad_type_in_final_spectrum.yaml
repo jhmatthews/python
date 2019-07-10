@@ -1,14 +1,14 @@
-name: Rad_type_for_disk_in_final_spectrum
+name: Disk.rad_type_in_final_spectrum
 description: |
-  If the system contains a disk then the spectrum of the disk is generally simulated either a collection of blackbodies
-  based on the temperature, as an appropriately weighted set of stellar atomosphers.  One can also simply generate
-  a flat spectrum, in which case the relative contribution of different annulae is based on the wavelength limited 
-  luminostiy in each annulus, something that is usually done only for diagnostic purposes.
-type: Enum (Int)
+  Multi-line description, must keep indentation.
+type: Enumerator
 values:
-  0: bb
-  1: models
-  2: uniform
+  bb: |
+    Multi-line description, must keep indentation.
+  models: |
+    Multi-line description, must keep indentation.
+  uniform: |
+    Multi-line description, must keep indentation.
 parent:
-  parameter: Condition e.g. greater than 0 or list e.g. [1, 2, 5]
+  Spectrum_cycles: Greater than or equal to 0
 file: python.c

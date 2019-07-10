@@ -1,11 +1,11 @@
 name: Spectrum.select_r
 description: |
-  Part of a set of parameters which define a spherical region of space from which 
+  Part of a set of parameters which define a spherical region of space from which
   photons are to be extracted. select_r defines the radius of the spherical region
 type: Double
 unit: cm
-values: greater than 0 
+values: Greater than 0
 parent:
-  parameter: Required when one asks to to extract photons from a spherical region in the wind
-file: setup2.c
+  Spectrum.select_location: spherical_region
+file: setup.c
 advanced: true

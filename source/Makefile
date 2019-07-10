@@ -1,30 +1,16 @@
 # This is the makefile for the python related programs
 #
 # usage      make [CC=...] [D] python
+# 			 make [CC=...] [D] all to remake all of the routines, and assure they
+# 			 					are properly indented.
 #
 # Adding D causes the routine to be run in a way that profiling and ddd can be used.
 # Otherwise the run will be optimized to run as fast as possible. CC is an option to choose
 # a different compiler other than mpicc.
 #
-# History
-# 05jan	ksl	54f  Modified Makefile so that the Version number is automatically
-# 		copied to version.h  Also fixed so that one does not need to put
-# 		a new filename in two separate places, and so that the latest
-# 		compile version automatically becomve shte
-# 05apr	ksl	55c   Modified in a way that implies that one must have gsl as part
-# 		of the Python directory tree.  This is because I was having problems
-# 		with gsl after we went to Redhat Enterprise at the Institute, and
-# 		so that Stuart and I could standardise on the distribution.
-# 08jul	ksl	Removed pfop from routines so no need to complile with g77
-# 13jun jm      Added capability to switch to use debugger routne
-#
-# 13jun jm/ss	SS added parallel flag -DMPI_ON and mpicc wrapper for gcc
-#		is now used as C compiler
-# 13jul jm	can now compiled with gcc using 'make CC=gcc python'
-# 13jul jm	kpar is now integrated into python and compiled here
 
 
-#MPICC is now default compiler- currently code will not compile with gcc
+#MPICC is now default compiler
 CC = mpicc
 # CC = gcc	can use GCC either from command line or by uncommenting this
 FC = g77
@@ -35,7 +21,7 @@ LDFLAGS =
 
 
 # Check a load of compiler options
-# This is mostly to address GitHub issues #100 and #474
+# This is mostly to address GitHub issues #100
 ifeq (mpicc, $(CC))
 	# you're using mpicc, so we'll compile with the DMPI_ON flag
 	MPI_FLAG = -DMPI_ON
@@ -48,7 +34,6 @@ ifeq (mpicc, $(CC))
 
 	# if it's gcc we want to check if the version is 4.8 or later
 	# if it is then we'll disable aggressive loop optimizations, see #100
-	# for issue #474, we don't need to add -lrt as the mpicc wrapper will do this for us
 	ifeq (gcc, $(MPI_COMPILER))
 		GCCVERSIONGTEQ4 := $(shell expr `gcc -dumpversion | cut -f1-2 -d.` \>= 4.8)
 		ifeq ("$(GCCVERSIONGTEQ4)", "1")
@@ -67,23 +52,12 @@ else ifeq (gcc, $(CC))
 
 	# if it's gcc we want to check if the version is 4.8 or later
 	# if it is then we'll disable aggressive loop optimizations, see #100
-	# for old versions of gcc, we need to link -lrt for our timing routines
 	GCCVERSIONGTEQ4 := $(shell expr `gcc -dumpversion | cut -f1-2 -d.` \>= 4.8)
 	COMPILER_PRINT_STRING = Compiling with $(CC) $(COMPILER_VERSION)
 	ifeq ("$(GCCVERSIONGTEQ4)", "1")
 		EXTRA_FLAGS += -fno-aggressive-loop-optimizations
 		COMPILER_PRINT_STRING += with -fno-aggressive-loop-optimizations
-	else
-		# This is to ensure that we don't add -lrt to clang which uses an old version of gcc
-		# Most likely, this check should be smarter i.e. check if it really is clang and we
-		# should probably check for masOS 10.12 or later
-		OS := $(shell uname -s)
-		ifneq (Darwin, $(OS))
-			LDFLAGS += -lrt
-			COMPILER_PRINT_STRING += with -lrt
-		endif
 	endif
-
 else	# you must be using clang or icc
 	MPI_FLAG =
 
@@ -96,31 +70,6 @@ endif
 GIT_DIFF_STATUS := $(shell expr `git status --porcelain 2>/dev/null| grep "^ M" | wc -l`)
 GIT_COMMIT_HASH := $(shell expr `git rev-parse HEAD`)
 
-# Test if indent is installed. We use a different version on mac and linux.
-# OS_TYPE := $(shell uname -s)
-# ifeq ($(OS_TYPE), Darwin)
-# 	INDENT_PATH := $(shell which gnuindent)
-# 	INDENT_VERSION = $(shell gnuindent -version)
-# else
-# 	INDENT_PATH := $(shell which indent)
-# 	INDENT_VERSION := $(shell indent -version)
-# endif
-
-# ifeq (, $(INDENT_PATH))
-# 	#If indent is not installed, error
-# 	INDENT_STRING = Gnuindent not installed so not indenting code
-# 	INDENT_CMD =
-# else
-# 	ifeq (GNU,$(firstword $(INDENT_VERSION)))
-# 		INDENT_STRING = Indenting code with $(INDENT_VERSION)
-# 		# this command runs indent with GNU styling
-# 		INDENT_CMD = $(INDENT_PATH) -gnu -l140 -bli0 -nut *.c *.h
-# 	else
-# 		# if it is not GNU indent then do not run
-# 		INDENT_STRING = $(INDENT_PATH) is not the GNU version
-# 		INDENT_CMD =
-# 	endif
-# endif
 
 
 INCLUDE = ../include
@@ -151,7 +100,7 @@ LDFLAGS+= -L$(LIB) -lm -lgsl -lgslcblas
 
 #Note that version should be a single string without spaces.
 
-VERSION = 83
+VERSION = 83b
 
 startup:
 	@echo $(COMPILER_PRINT_STRING)			# prints out compiler information
@@ -186,7 +135,7 @@ python_objects = bb.o get_atomicdata.o photon2d.o photon_gen.o parse.o setup_fil
 		spectral_estimators.o matom_diag.o \
 		xlog.o rdpar.o direct_ion.o pi_rates.o matrix_ion.o para_update.o \
 		setup_star_bh.o setup_domains.o setup_disk.o photo_gen_matom.o macro_gov.o windsave2table_sub.o \
-		import.o import_spherical.o import_cylindrical.o import_rtheta.o \
+		import.o import_spherical.o import_cylindrical.o import_rtheta.o  \
 		reverb.o paths.o setup.o run.o brem.o synonyms.o \
 		setup_reverb.o setup_line_transfer.o rdpar_init.o cv.o poltest.o
 
@@ -269,7 +218,8 @@ table_objects = windsave2table.o windsave2table_sub.o get_atomicdata.o py_wind_s
 		cylind_var.o bilinear.o gridwind.o py_wind_macro.o partition.o \
 		spectral_estimators.o shell_wind.o compton.o zeta.o dielectronic.o \
 		bb.o rdpar.o rdpar_init.o xlog.o direct_ion.o diag.o matrix_ion.o \
-		pi_rates.o photo_gen_matom.o macro_gov.o reverb.o paths.o time.o synonyms.o cooling.o
+		pi_rates.o photo_gen_matom.o macro_gov.o reverb.o paths.o time.o synonyms.o \
+		cooling.o
 
 
 

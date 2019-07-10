@@ -123,7 +123,7 @@ cdf_gen_from_func (cdf, func, xmin, xmax, njumps, jump)
   if (xmax <= xmin)
   {
     Error ("pdf_gen_from_func: xmin %g <= xmax %g\n", xmin, xmax);
-    Exit (0);
+    Exit (1);
   }
   if (njumps > 0)
   {
@@ -132,7 +132,7 @@ cdf_gen_from_func (cdf, func, xmin, xmax, njumps, jump)
       if (jump[j] <= jump[j - 1])
       {
         Error ("pdf_gen_from_func: jump[%d]=%g <=jump[%d]=%g out of order\n", j, jump[j], j - 1, jump[j - 1]);
-        Exit (0);
+        Exit (1);
       }
     }
     njump_min = 0;
@@ -293,7 +293,7 @@ gen_array_from_func (func, xmin, xmax, pdfsteps)
     if ((pdf_array = calloc (sizeof (x), pdfsteps)) == NULL)
     {
       Error ("pdf: Could not allocate space for pdf_array\n");
-      Exit (0);
+      Exit (1);
     }
     init_pdf = 1;
     pdf_steps_current = pdfsteps;
@@ -369,13 +369,13 @@ int pdf_n;
 /**
  * @brief      Generate a cumulative distribution function (cdf) from an array of values
  *
- * @param [in] cdf			Pointer to the cdf that will be populated here
- * @param [in] x			Locations of points in supplied data - usually wavelength or freuency
- * @param [in] y			Data - e.g. cross section or emissivity
- * @param [in] n_xy			Number of data points
- * @param [in] xmin			Lower limit to required cdf
- * @param [in] xmin			Upper limit to required cdf
- * @return 		echeck		the reutrn value from cdf_check
+ * @param [in] cdf	Pointer to the cdf that will be populated here
+ * @param [in] x	Locations of points in supplied data - usually wavelength or freuency
+ * @param [in] y	Data - e.g. cross section or emissivity
+ * @param [in] n_xy	Number of data points
+ * @param [in] xmin	Lower limit to required cdf
+ * @param [in] xmin	Upper limit to required cdf
+ * @return     echeck	the return value from cdf_check
  *
  * @details
  * Takes two arrays of some values of a function y at locations
@@ -387,10 +387,12 @@ int pdf_n;
  *
  * cdf_gen_from_array does not have the concept of jumps. All of
  * this needs to be taken care of by the routine that generates
- * the array.
+ * the array.  This means the x's should be monotonic, withoug
+ * duplicates, and all the values of y should be 0 or positive.
+ * The program exits if these conditions are not fulfilled.
  *
  * In constructing the cdf the routine collapses regions of the
- * pdf that have zero probability of occuring
+ * pdf that have zero probability of occuring.
  *
  **********************************************************/
 
@@ -403,9 +405,9 @@ cdf_gen_from_array (cdf, x, y, n_xy, xmin, xmax)
 {
   int allzero;
   int nmin, nmax, cdf_n;
-  int n;
+  int n, nn;
   double sum;
-  int echeck;
+  int echeck, zcheck = 0;
 
 
 /* Perform various checks on the inputs */
@@ -414,14 +416,14 @@ cdf_gen_from_array (cdf, x, y, n_xy, xmin, xmax)
   if (n_xy > NCDF)              //If the supplied data array is larger than the output array - fixed as NCDF
   {
     Error ("cdf_gen_from_array: supplied data %i is larger than default aray size %i - increase NCDF\n", n_xy, NCDF);
-    Exit (0);
+    Exit (1);
   }
 
 
   if (xmax < xmin)              //This must be a mistake, the limits are reversed
   {
     Error ("cdf_gen_from_array: xmin %g <= xmax %g\n", xmin, xmax);
-    Exit (0);
+    Exit (1);
   }
 
   /*We are now going to crawl down the input array, checking for mistakes.
@@ -435,13 +437,22 @@ cdf_gen_from_array (cdf, x, y, n_xy, xmin, xmax)
   {
     if (x[n] <= x[n - 1])       //One x-point is less than the one above - this would cause problems later
     {
+      for (nn = 0; nn < n_xy; nn++)
+      {
+        Log ("cdf_gen_from_array: %5d %11.6e %11.6e\n", nn, x[nn], y[nn]);
+      }
       Error ("cdf_gen_from_array: input x not in ascending order at element %5d/%5d  %11.6e %11.6e\n", n, n_xy, x[n - 1], x[n]);
-      Exit (0);
+
+      Exit (1);
     }
     if (y[n] < 0)               //A negative point!
     {
+      for (nn = 0; nn < n_xy; nn++)
+      {
+        Log ("cdf_gen_from_array: %5d %11.6e %11.6e\n", nn, x[nn], y[nn]);
+      }
       Error ("cdf_gen_from_array: probability density %g < 0 at element %d\n", y[n], n);
-      Exit (0);
+      Exit (1);
     }
     else if (y[n] > 0)          //At least one point is positive
     {
@@ -451,13 +462,13 @@ cdf_gen_from_array (cdf, x, y, n_xy, xmin, xmax)
 
 
 
-  /* ksl - Our requrements are as follows.  We want the cdf to have boundaries given by xmin and xmax, unless
+  /* ksl - Our requirements are as follows.  We want the cdf to have boundaries given by xmin and xmax, unless
    * the array does not encompass this, in which case we will only include what the array contains.  We also
    * want to suppress regions at the end of the cdf where the pdf was 0
    */
 
 
-  /*Firstly, find the point in the input array that matches the required start point
+  /*First, find the point in the input array that matches the required start point
      we step up through the input data until we reach a point where the x-point is greater
      than xmin, or we reach the end of the array */
 
@@ -477,7 +488,7 @@ cdf_gen_from_array (cdf, x, y, n_xy, xmin, xmax)
   if (nmin == n_xy)
   {
     Error ("cdf_gen_from_array: xmin greater than all array values\n");
-    Exit (0);
+    Exit (1);
   }
 
   /* if xmin is equal to one of the values in the x array then nmin will point to that value, but otherwise it
@@ -501,7 +512,7 @@ cdf_gen_from_array (cdf, x, y, n_xy, xmin, xmax)
   if (nmax == nmin)
   {
     Error ("cdf_gen_from_array: nmin and nmax are identical which is not desirable\n");
-    Exit (0);
+    Exit (1);
   }
 
   if (nmin == 0 && xmin < x[0]) /*We are requesting a CDF that starts below where we have data
@@ -552,7 +563,7 @@ cdf_gen_from_array (cdf, x, y, n_xy, xmin, xmax)
   if (nmax == nmin)
   {
     Error ("cdf_gen_from_array - modified nmax=nmin followin interpolation at ends\n");
-    Exit (0);
+    Exit (1);
   }
 
 
@@ -565,6 +576,7 @@ cdf_gen_from_array (cdf, x, y, n_xy, xmin, xmax)
     cdf->norm = 1.0;
     cdf->ncdf = 1;
     Error ("cdf_gen_from_array: all y's were zero or xmin xmax out of range of array x-- returning uniform distribution %d\n", allzero);
+    zcheck = -1;
 
   }
   else
@@ -603,15 +615,21 @@ cdf_gen_from_array (cdf, x, y, n_xy, xmin, xmax)
   if (calc_cdf_gradient (cdf))
   {
     Error ("cdf_gen_from_array: Error returned from calc_cdf_gradient\n");
-  }                             // 57ib
+  }
 
   if ((echeck = cdf_check (cdf)) != 0)
   {
     Error ("cdf_gen_from_array: error %d on cdf_check - check CDF_err.diag\n", echeck);
     cdf_to_file (cdf, "CDF_err.diag");  //output the CDF to a file
-    Exit (0);
+    Exit (1);
   }
 //  cdf_to_file(cdf,"foo.diag"); //output the CDF to a file
+
+  if (zcheck)
+  {
+    return (zcheck);            // Trap the case where values were initially all zeros
+  }
+
   return (echeck);
 
 }
@@ -722,7 +740,7 @@ cdf_limit (cdf, xmin, xmax)
   if (cdf->y[cdf->ncdf] != 1.0)
   {
     Error ("cdf_limit: cdf not defined!)");
-    Exit (0);
+    Exit (1);
   }
   if (xmin >= cdf->x[cdf->ncdf])
   {
@@ -731,7 +749,7 @@ cdf_limit (cdf, xmin, xmax)
   if (xmax <= cdf->x[0])
   {
     Error ("cdf_limit: xmax %g < cdf->x[0] %g\n", xmax, cdf->x[0]);
-    Exit (0);
+    Exit (1);
   }
 
 /* Set the limits for the minimum */

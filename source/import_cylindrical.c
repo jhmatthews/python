@@ -18,7 +18,9 @@
 #define NCELLS  512
 /** The structure that holds the inputs and any subsidiary variables
  *
- * Note that i is the row number nd j is the column number */
+ * Note that i is the row number and j is the column number 
+ */
+
 struct
 {
   int ndim, mdim, ncell;
@@ -86,7 +88,7 @@ import_cylindrical (ndom, filename)
   if ((fptr = fopen (filename, "r")) == NULL)
   {
     Error ("import_cylindrical: No such file\n");
-    Exit (0);
+    exit (1);                   /* No need to worry about mp at this point */
   }
 
 
@@ -124,13 +126,28 @@ import_cylindrical (ndom, filename)
   }
 
 
-/* Having read in the data define some initial variables concerning the model. We cannot create
- * the wind grid or other things at this point, because we do not at this point know what
- * wind cells correspnd to whate elements of the grid */
+/* 
+ * Now calculate the dimensions of the grid.  This next calculation makes the assumption that
+ * The last element of the grid was the last grid cell.  So we now calculate the sizes of
+ * the grid.
+ *
+ * Although the initialization of most of zdom should be postponed
+ * one has to give zdom the dimensions of the array; otherwise
+ * the wrong number of elements in wmain for the wind will be allocated
+ */
 
-  xx_cyl.ndim = icell + 1;
-  xx_cyl.mdim = jcell + 1;
+  zdom[ndom].ndim = xx_cyl.ndim = icell + 1;
+  zdom[ndom].mdim = xx_cyl.mdim = jcell + 1;
+  zdom[ndom].ndim2 = zdom[ndom].ndim * zdom[ndom].mdim;
   xx_cyl.ncell = ncell;
+
+  /* Check that the grid is complete */
+
+  if (ncell != xx_cyl.ndim * xx_cyl.mdim)
+  {
+    Error ("The dimensions of the imported grid seem wrong % d x %d != %d\n", xx_cyl.ndim, xx_cyl.mdim, xx_cyl.ncell);
+    exit (1);
+  }
 
 
 
@@ -177,16 +194,6 @@ import_cylindrical (ndom, filename)
   xx_cyl.wind_midx[n] = xx_cyl.wind_x[n - 1] + 0.5 * delta;
 
 
-  /* Although the initialization of most of zdom should be postponed
-   * one has to give zdom the dimensions of the array; otherwise
-   * the wrong number of elements in wmains wind will be allocated
-   */
-
-  zdom[ndom].ndim = xx_cyl.ndim;
-  zdom[ndom].mdim = xx_cyl.mdim;
-  zdom[ndom].ndim2 = zdom[ndom].ndim * zdom[ndom].mdim;
-
-
   return (0);
 }
 
@@ -223,8 +230,8 @@ cylindrical_make_grid_import (w, ndom)
 {
   int n;
   int nn;
-  double r, rmin, rmax, rho_min, rho_max, zmin, zmax;
-  double x[3];
+  double rmin, rmax, rho_min, rho_max, zmin, zmax;
+  double x[3], r_inner, r_outer;
 
   Log ("XX Dimensions of read in model: %d %d\n", zdom[ndom].ndim, zdom[ndom].mdim);
 
@@ -271,11 +278,18 @@ cylindrical_make_grid_import (w, ndom)
 
 
   /* Now set up wind boundaries so they are harmless.
+
    * Note that given that we have already filled out
    * the WindPtr it seems like we could do this
-   * without needing the internal structure
-   * I am attempting this in the rtheta model in
-   * this fashion - ksl  */
+   * without needing the internal structure used in this 
+   * routine.  It's done this way to follow the procedure
+   * in the rtheta model
+   * 
+   * Note that one has to be careful here, because one
+   * has to include all of the outer most cell that
+   * is in the wind.
+   * 
+   */
 
 
   rmax = rho_max = zmax = 0;
@@ -283,45 +297,52 @@ cylindrical_make_grid_import (w, ndom)
   for (n = 0; n < xx_cyl.ncell; n++)
 
   {
-    x[0] = xx_cyl.x[n];
-    x[1] = 0;
-    x[2] = xx_cyl.z[n];
-
-    r = length (x);
-
     if (xx_cyl.inwind[n] >= 0)
     {
-      if (xx_cyl.x[n] > rho_max)
+      x[0] = xx_cyl.x[n];
+      x[1] = 0;
+      x[2] = xx_cyl.z[n];
+
+      r_inner = length (x);
+
+      x[0] = xx_cyl.x[n + xx_cyl.mdim];
+      x[1] = 0;
+      x[2] = xx_cyl.z[n + 1];
+
+      r_outer = length (x);
+
+      if (xx_cyl.x[n + xx_cyl.mdim] > rho_max)
       {
-        rho_max = xx_cyl.x[n];
+        rho_max = xx_cyl.x[n + xx_cyl.mdim];
       }
-      if (xx_cyl.z[n] > zmax)
+      if (xx_cyl.z[n + 1] > zmax)
       {
-        zmax = xx_cyl.z[n];
+        zmax = xx_cyl.z[n + 1];
       }
       if (xx_cyl.z[n] < zmin)
       {
         zmin = xx_cyl.z[n];
       }
-      if (r > rmax)
+      if (r_outer > rmax)
       {
-        rmax = r;
+        rmax = r_outer;
       }
-    }
-    else
-    {
       if (rho_min > xx_cyl.x[n])
       {
         rho_min = xx_cyl.x[n];
       }
-      if (rmin > r)
+      if (rmin > r_inner)
       {
-        rmin = r;
+        rmin = r_inner;
       }
     }
   }
 
 
+
+  Log ("Imported:    rmin    rmax  %e %e\n", rmin, rmax);
+  Log ("Imported:    zmin    zmax  %e %e\n", zmin, zmax);
+  Log ("Imported: rho_min rho_max  %e %e\n", rho_min, rho_max);
 
   zdom[ndom].wind_rho_min = zdom[ndom].rho_min = rho_min;
   zdom[ndom].wind_rho_max = zdom[ndom].rho_max = rho_max;

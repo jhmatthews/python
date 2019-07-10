@@ -54,21 +54,19 @@ calculate_ionization (restart_stat)
      int restart_stat;
 {
   int n, nn;
-  double zz, zzz, zze, ztot, zz_adiab;
+  double zz, zzz, zze, ztot, zz_adiab, zz_lofreq;
   double zz_abs, zz_scat, zz_star, zz_disk;
   double zz_err, zz_else;
-  int nn_adiab;
+  int nn_adiab, nn_lofreq;
   WindPtr w;
   PhotPtr p;
 
   char dummy[LINELENGTH];
 
-  double freqmin, freqmax;
-  long nphot_to_define;
+  double freqmin, freqmax, x;
+  long nphot_to_define, nphot_min;
   int iwind;
 
-  int nphot_steps = 0, nphot_next_cycle = geo.wcycles;
-  int nphot_cycle_gap = geo.wcycles;
 
 #ifdef MPI_ON
   int ioniz_spec_helpers;
@@ -128,23 +126,11 @@ calculate_ionization (restart_stat)
     delay_dump_prep (restart_stat);
   }
 
-  /*
-   * EP: if the photon increment speed up is being used, figure out at which
-   * cycle NPHOT will be increased.
-   */
-
-  if (modes.photon_speedup)
-  {
-    nphot_steps = PHOT_STEPS + 1;
-    nphot_next_cycle = nphot_cycle_gap = geo.wcycles / nphot_steps;
-    Log ("NPHOT will increase %i times every %i cycles\n", nphot_steps - 1, nphot_cycle_gap);
-  }
-
 
   while (geo.wcycle < geo.wcycles)
   {                             /* This allows you to build up photons in bunches */
 
-    xsignal (files.root, "%-20s Starting %d of %d ionization cycle \n", "NOK", geo.wcycle + 1, geo.wcycles);
+    xsignal (files.root, "%-20s Starting %3d of %3d ionization cycle \n", "NOK", geo.wcycle + 1, geo.wcycles);
 
     Log ("!!Python: Beginning cycle %d of %d for defining wind\n", geo.wcycle + 1, geo.wcycles);
     Log_flush ();               /* Flush the log file (so that we know where are if there are problems */
@@ -167,54 +153,24 @@ calculate_ionization (restart_stat)
     else
       iwind = 1;                /* Create wind photons and force a reinitialization of wind parms */
 
-    if (modes.photon_speedup && geo.wcycle == nphot_next_cycle)
+
+    /* If we are using photon speed up mode then the number of photons varies by cycle in the
+     * ionization phase.  We set this up here
+     */
+
+    if (modes.photon_speedup)
     {
-      /*
-       * EP: If photon incrementing is enabled, figure out the number of photons
-       * to use. When in multiprocessor mode, there is a bit of messing about with
-       * multiplying and division to ensure that NPHOT is set correctly across
-       * all processes for an arbitrary number of MPI processes. Previously,
-       * NPHOT would be increased incorrectly by a value of 10 / np_mpi_global
-       * leading to less photons than we wanted
-       */
+      nphot_min = NPHOT_MAX / pow (10., PHOT_RANGE);
 
-#ifdef MPI_ON
-      NPHOT *= np_mpi_global;
-#endif
-      NPHOT *= 10;
-#ifdef MPI_ON
-      NPHOT /= np_mpi_global;
-#endif
-
-      /*
-       * EP: we don't want NPHOT to become larger than NPHOT_MAX, which can
-       * happen with some values of ionisation cycles and values of NPHOT_MIN
-       * and NPHOT_MAX
-       */
-
+      x = log10 (NPHOT_MAX / nphot_min) / (geo.wcycles - 1);
+      NPHOT = nphot_min * pow (10., (x * geo.wcycle));
       if (NPHOT > NPHOT_MAX)
-        NPHOT = NPHOT_MAX;
-
-      /*
-       * EP: both p and photmain realloc'd otherwise photmain would end
-       * up not pointing to anything and segfault in make_spectra()
-       */
-
-      p = photmain = (PhotPtr) realloc (photmain, sizeof (p_dummy) * NPHOT);
-
-      if (!p)
       {
-        Error ("Could not reallocate memory for %i photons for p and photmain\n", NPHOT);
-        Exit (1);
+        NPHOT = NPHOT_MAX;
       }
-
-      nphot_next_cycle += nphot_cycle_gap;
-
-      if (NPHOT * 10 <= NPHOT_MAX)
-        Log ("NPHOT will next increase to %e on cycle %i\n", (double) NPHOT * 10, nphot_next_cycle);
     }
 
-    Log ("NPHOT: %1.2e photons will be transported for CYCLE %i\n", (double) NPHOT, geo.wcycle);
+    Log ("!!Python: %1.2e photons will be transported for cycle %i\n", (double) NPHOT, geo.wcycle);
 
     /* Create the photons that need to be transported through the wind
      *
@@ -270,8 +226,8 @@ calculate_ionization (restart_stat)
     trans_phot (w, p, 0);
 
     /*Determine how much energy was absorbed in the wind */
-    zze = zzz = zz_adiab = zz_abs = zz_scat = zz_star = zz_disk = zz_err = zz_else = 0.0;
-    nn_adiab = 0;
+    zze = zzz = zz_adiab = zz_abs = zz_scat = zz_star = zz_disk = zz_err = zz_else = zz_lofreq = 0.0;
+    nn_adiab = nn_lofreq = 0;
     for (nn = 0; nn < NPHOT; nn++)
     {
       zzz += p[nn].w;
@@ -283,6 +239,11 @@ calculate_ionization (restart_stat)
       {
         zz_adiab += p[nn].w;
         nn_adiab++;
+      }
+      else if (p[nn].istat == P_LOFREQ_FF)
+      {
+        zz_lofreq += p[nn].w;
+        nn_lofreq++;
       }
       else if (p[nn].istat == P_ABSORB)
       {
@@ -300,7 +261,7 @@ calculate_ionization (restart_stat)
       {
         zz_disk += p[nn].w;
       }
-      else if (p[nn].istat == P_ERROR)
+      else if (p[nn].istat == P_ERROR || p[nn].istat == P_ERROR_MATOM)
       {
         zz_err += p[nn].w;
       }
@@ -314,7 +275,10 @@ calculate_ionization (restart_stat)
       ("!!python: Total photon luminosity after transphot  %18.12e (absorbed/lost  %18.12e). Radiated luminosity %18.12e\n",
        zzz, zzz - zz, zze);
     if (geo.rt_mode == RT_MODE_MACRO)
+    {
       Log ("!!python: luminosity lost by adiabatic kpkt destruction %18.12e number of packets %d\n", zz_adiab, nn_adiab);
+      Log ("!!python: luminosity lost to low-frequency free-free    %18.12e number of packets %d\n", zz_lofreq, nn_lofreq);
+    }
     Log ("!!python: luminosity lost by being completely absorbed  %18.12e \n", zz_abs);
     Log ("!!python: luminosity lost by too many scatters          %18.12e \n", zz_scat);
     Log ("!!python: luminosity lost by hitting the star           %18.12e \n", zz_star);
@@ -405,7 +369,7 @@ calculate_ionization (restart_stat)
     /* NSH1306 - moved geo.wcycle++ back, but moved the log and xsignal statements */
 
 
-    xsignal (files.root, "%-20s Finished %d of %d ionization cycle \n", "OK", geo.wcycle + 1, geo.wcycles);
+    xsignal (files.root, "%-20s Finished %3d of %3d ionization cycle \n", "OK", geo.wcycle + 1, geo.wcycles);
     geo.wcycle++;               //Increment ionisation cycles
 
 
@@ -432,7 +396,7 @@ calculate_ionization (restart_stat)
       {
         strcpy (dummy, "");
         sprintf (dummy, "diag_%s/%s%02d", files.root, files.root, geo.wcycle);
-        do_windsave2table (dummy);
+        do_windsave2table (dummy, 0);
       }
 
 #ifdef MPI_ON
@@ -538,6 +502,15 @@ make_spectra (restart_stat)
 
   kbf_need (freqmin, freqmax);
 
+  /* force recalculation of kpacket rates */
+  if (geo.rt_mode == RT_MODE_MACRO)
+  {
+    for (n = 0; n < NPLASMA; n++)
+    {
+      macromain[n].kpkt_rates_known = -1;
+    }
+  }
+
   /* BEGIN CYCLES TO CREATE THE DETAILED SPECTRUM */
 
   /* the next section initializes the spectrum array in two cases, for the
@@ -570,7 +543,7 @@ make_spectra (restart_stat)
        have already completed some. The memory for the spectral arrays
        should already have been allocated, and the spectrum was initialised
        on the original run, so we just need to renormalise the saved spectrum */
-    /* See issue #134 (JM) */
+    /* See issue #134 and #503  */
 
     if (restart_stat == 0)
       Error ("Not restarting, but geo.pcycle = %i and trying to renormalise!\n", geo.pcycle);
@@ -582,12 +555,13 @@ make_spectra (restart_stat)
   while (geo.pcycle < geo.pcycles)
   {                             /* This allows you to build up photons in bunches */
 
-    xsignal (files.root, "%-20s Starting %d of %d spectral cycle \n", "NOK", geo.pcycle + 1, geo.pcycles);
+    xsignal (files.root, "%-20s Starting %3d of %3d spectral cycle \n", "NOK", geo.pcycle + 1, geo.pcycles);
 
 
 
     Log ("!!Cycle %d of %d to calculate a detailed spectrum\n", geo.pcycle + 1, geo.pcycles);
-    Log_flush ();               /*NSH June 13 Added call to flush logfile */
+    Log_flush ();
+
     if (!geo.wind_radiation)
       iwind = -1;               /* Do not generate photons from wind */
     else if (geo.pcycle == 0)
@@ -603,6 +577,8 @@ make_spectra (restart_stat)
        JM 130306 must convert NPHOT and pcycles to double precision variable nphot_to_define
 
      */
+
+    NPHOT = NPHOT_MAX;          // Assure that we really are creating as many photons as we expect.
 
     nphot_to_define = (long) NPHOT *(long) geo.pcycles;
     define_phot (p, freqmin, freqmax, nphot_to_define, 1, iwind, 0);

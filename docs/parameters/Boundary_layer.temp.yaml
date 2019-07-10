@@ -3,8 +3,9 @@ description: |
   The temperature of the boundary layer in situations where temperature
   is meaningful in generating the spectrum
 type: Double
-unit: Degrees Kelvin
+unit: Kelvin
 values: Greater than 0
 parent:
-  parameter: Condition e.g. greater than 0 or list e.g. [1, 2, 5]
+  Boundary_layer.radiation: true
+  Boundary_layer.rad_type_to_make_wind: power
 file: setup.c

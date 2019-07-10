@@ -91,40 +91,6 @@ cooling (xxxplasma, t)
 
 
 
-//OLD /***********************************************************
-//OLD              Space Telescope Science Institute
-//OLD
-//OLD Synopsis:  xtotal_emission (one, f1, f2) Calculate the total cooling of a single cell
-//OLD                   due to free free - line and recombination processes.
-//OLD
-//OLD Arguments:
-//OLD
-//OLD
-//OLD Returns:
-//OLD
-//OLD Description:
-//OLD
-//OLD
-//OLD Notes:
-//OLD   xtotal_emission gives the total enery loss due to photons.  It does
-//OLD   not include other coooling sources, e. g. adiabatic expansion.
-//OLD
-//OLD   It returns the total cooling, but also stores the luminosity due
-//OLD   to various types of emssion, e.g ff and  lines into the
-//OLD   Plasms cells. The fb cooling calculated here is *not* equal to
-//OLD   the fb lumniosity and so this value is stored in cool_rr.
-//OLD
-//OLD   Comment: The call to this routine was changed when PlasmaPtrs
-//OLD   were introduced, but it appears that the various routines
-//OLD   that were called were not changed.
-//OLD
-//OLD History:
-//OLD   2017 - copied from total_emission and modified for use in calculatingh
-//OLD                   cooling alone.
-//OLD
-//OLD
-//OLD **************************************************************/
-
 
 
 /**********************************************************/

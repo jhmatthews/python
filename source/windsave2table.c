@@ -62,6 +62,111 @@
 
 
 
+/**********************************************************/
+/**
+ * @brief Parse the command line arguments given to windsave2table
+ *
+ * @param[in] int argc        The number of arguments in the command line
+ * @param[in] char *argv[]    The command line arguments
+ * @param[out] char root[]    The rootname of the Python simulation
+ *
+ * @return void
+ *
+ * @details
+ *
+ * Parse arguments provided in the command line whilst invoking windsave2table.
+ *
+ * The allowed switches include 
+ *
+ *  --version    Print out information about the version number
+ *
+ *  -d   Write out ion densisties, rather than ion fractions in the cell
+ *  -s   Write out the number of scatters per unit volume  by an ion in a cell, instead of the 
+ *       ion fraction
+ *
+ * The switches only affect the ion tables not the master table
+ * This was originally implemented to enable somebody to query which version of
+ * Python windsave2table was compiled with. Works in a similar fashion to how
+ * the version information is stored and viewed in Python.
+ * 
+ * 
+ *
+ **********************************************************/
+
+char windsave2table_help[] = "Usage: windsave2table [-r or -s] [-h] [--version] rootname \n\
+-d return denisities instead of ion fraction in ion tables \n\
+-s return number of scatters per unit volume of an ion instead if ion fracions \n\
+--version return version info and quit \n\
+-h get this help message and quit\n\
+";
+
+void
+parse_arguments (int argc, char *argv[], char root[], int *ion_switch)
+{
+  int i;
+  char *fget_rc;
+  char input[LINELENGTH];
+
+  *ion_switch = 0;
+
+
+  if (argc == 1)
+  {
+    printf ("Root for wind file :");
+    fget_rc = fgets (input, LINELENGTH, stdin);
+    if (!fget_rc)
+    {
+      printf ("No root file provided, exiting\n\n");
+      printf ("%s", windsave2table_help);
+
+      exit (0);
+    }
+    get_root (root, input);
+  }
+  else
+  {
+    for (i = 1; i < argc; i++)
+    {
+      if (!strcmp (argv[i], "--version"))
+      {
+        printf ("Python Version %s\n", VERSION);
+        printf ("windsave2table built from git commit hash %s\n", GIT_COMMIT_HASH);
+        if (GIT_DIFF_STATUS)
+          printf ("This version was compiled with %i files with uncommitted changes.\n", GIT_DIFF_STATUS);
+        exit (0);
+      }
+      else if (!strncmp (argv[i], "-d", 2))
+      {
+        *ion_switch = 1;
+        printf ("Ion outputs will be densities");
+      }
+      else if (!strncmp (argv[i], "-s", 2))
+      {
+        *ion_switch = 2;
+        printf ("Ion outputs will be the number of scatters for this ion in a cell");
+      }
+      else if (!strncmp (argv[i], "-h", 2))
+      {
+        printf ("%s", windsave2table_help);
+        exit (0);
+      }
+      else if (!strncmp (argv[i], "-", 1))
+      {
+        printf ("Unknown switch %s\nExiting\n\n", argv[i]);
+        printf ("%s", windsave2table_help);
+        exit (0);
+      }
+      else
+      {
+        strcpy (input, argv[argc - 1]);
+        get_root (root, input);
+      }
+    }
+  }
+}
+
+
+
 
 /**********************************************************/
 /** 
@@ -95,16 +200,11 @@ main (argc, argv)
      int argc;
      char *argv[];
 {
-
-
-  char *fgets_return;
-  char root[LINELENGTH], input[LINELENGTH];
+  char root[LINELENGTH];
   char outputfile[LINELENGTH];
   char windsavefile[LINELENGTH];
   char parameter_file[LINELENGTH];
-  int create_master_table (), create_ion_table ();
-  int do_windsave2table ();
-
+  int ion_switch;
 
 
   strcpy (parameter_file, "NONE");
@@ -112,18 +212,13 @@ main (argc, argv)
   /* Next command stops Debug statements printing out in py_wind */
   Log_set_verbosity (3);
 
-  if (argc == 1)
-  {
-    printf ("Root for wind file :");
-    fgets_return = fgets (input, LINELENGTH, stdin);
-    get_root (root, input);
-  }
-  else
-  {
-    strcpy (input, argv[argc - 1]);
-    get_root (root, input);
-  }
+  /*
+   * EP: added some extra argument parsing for windsave2table - specifically
+   * because I was having some trouble with knowing when windsave2table was
+   * last compiled and on what commit this was
+   */
 
+  parse_arguments (argc, argv, root, &ion_switch);
 
   printf ("Reading data from file %s\n", root);
 
@@ -151,7 +246,9 @@ main (argc, argv)
 
   printf ("Read Atomic data from %s\n", geo.atomic_filename);
 
-  do_windsave2table (root);
+
+
+  do_windsave2table (root, ion_switch);
 
   return (0);
 }

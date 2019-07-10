@@ -4,8 +4,8 @@ description: |
   with the period to establish the Roche lobes, so that one can
   see the effects of eclipses on the system
 type: Double
-unit: msol  
-values: greater than 0 
+unit: M☉/year
+values: Greater than 0
 parent:
-  parameter: Required whenever the system is a binary            
+  System_type: binary           
 file: setup_star_bh.c

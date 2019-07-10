@@ -1,9 +1,18 @@
 name: Photon_sampling.approach
 description: |
   Choice of whether and how to use stratified sampling in creating photons during the
-  ionization stage of the calculation.  
-type: Enum (Int)
-values: 0=T,1=(f1,f2),2=cv,3=yso,4=user_defined,5=cloudy_test,6=wide,7=AGN,8=logarithmic
-parent:
-  parameter: list e.g. [1, 2, 5]
+  ionization stage of the calculation.
+type: Enumerator
+values:
+  T_star: Sets a single band based on the temperature given
+  cv: Traditional cv setup
+  yso: YSO setup
+  AGN: Test for balance matching the bands we have been using for AGN runs
+  min_max_freq: Mode 1 sets a single wide band defined by f1 and f2
+  user_bands: User-defined bands
+  cloudy_test: |
+    Set up to compare with cloudy power law table command note
+    that this also sets up the weight and photon index for the PL, to ensure a continuous distribution
+  wide: Test for balance to have a really wide frequency range
+  logarithmic: Generalized method to set up logarithmic bands
 file: bands.c

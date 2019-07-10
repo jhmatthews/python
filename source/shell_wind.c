@@ -211,12 +211,10 @@ shell_make_grid (w, ndom)
   nstart = zdom[ndom].nstart;
 
 
-//OLD  w[0].r = zdom[ndom].rmin - (zdom[ndom].rmax - zdom[ndom].rmin);
   w[nstart + 0].r = 0.95 * zdom[ndom].rmin;
   w[nstart + 1].r = zdom[ndom].rmin;
   w[nstart + 2].r = zdom[ndom].rmax;
   w[nstart + 3].r = 1.05 * zdom[ndom].rmax;
-//OLD  w[3].r = zdom[ndom].rmax + (zdom[ndom].rmax - zdom[ndom].rmin);
 
 
 

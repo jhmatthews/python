@@ -121,11 +121,11 @@ matrix_ion_populations (xplasma, mode)
   {
     newden[mm] = xplasma->density[mm] / elem_dens[ion[mm].z];   // newden is our local fractional density array
     xion[mm] = mm;              // xion is an array we use to track which ion is in which row of the matrix
-    if (ion[mm].istate != 1)    // We can recombine since we are not in the first ionization stage
+    if (mm != ele[ion[mm].nelem].firstion)      // We can recombine since we are not in the first ionization stage
     {
       rr_rates[mm] = total_rrate (mm, xplasma->t_e);    // radiative recombination rates          
     }
-    if (ion[mm].istate != ion[mm].z + 1)        // we can photoionize, since we are not in the z+1th ionization state (bare)
+    if (ion[mm].istate != ele[ion[mm].nelem].istate_max)        // we can photoionize, since we are not in the highest ionization state
     {
       if (mode == NEBULARMODE_MATRIX_BB)
       {
@@ -308,14 +308,18 @@ matrix_ion_populations (xplasma, mode)
         newden[nn] = xplasma->density[nn] / elem_dens[ion[nn].z];
       }
 
-      for (mm = 0; mm < nrows; mm++)    // inner loop over the elements of the population array
+      /* if the ion is "simple" then find it's calculated ionization state in populations array */
+      else
       {
-        if (xion[mm] == nn)     // if this element contains the population of the ion is question
+
+        for (mm = 0; mm < nrows; mm++)  // inner loop over the elements of the population array
         {
-          newden[nn] = populations[mm]; // get the population
+          if (xion[mm] == nn)   // if this element contains the population of the ion is question
+          {
+            newden[nn] = populations[mm];       // get the population
+          }
         }
       }
-
 
       if (newden[nn] < DENSITY_MIN)     // this wil also capture the case where population doesnt have a value for this ion
         newden[nn] = DENSITY_MIN;
@@ -455,7 +459,7 @@ populate_ion_rate_matrix (rate_matrix, pi_rates, inner_rates, rr_rates, b_temp, 
 
   for (mm = 0; mm < nions; mm++)
   {
-    if (ion[mm].istate != ion[mm].z + 1)        // we have electrons
+    if (ion[mm].istate != ele[ion[mm].nelem].istate_max)        // we have electrons
     {
       rate_matrix[mm][mm] -= pi_rates[mm];
     }
@@ -469,7 +473,7 @@ populate_ion_rate_matrix (rate_matrix, pi_rates, inner_rates, rr_rates, b_temp, 
     for (nn = 0; nn < nions; nn++)
     {
 
-      if (mm == nn + 1 && ion[nn].istate != ion[nn].z + 1 && ion[mm].z == ion[nn].z)
+      if (mm == nn + 1 && ion[nn].istate != ele[ion[nn].nelem].istate_max && ion[mm].z == ion[nn].z)
       {
         rate_matrix[mm][nn] += pi_rates[nn];
       }
@@ -480,7 +484,7 @@ populate_ion_rate_matrix (rate_matrix, pi_rates, inner_rates, rr_rates, b_temp, 
 
   for (mm = 0; mm < nions; mm++)
   {
-    if (ion[mm].istate != ion[mm].z + 1 && ion[mm].dere_di_flag > 0)    // we have electrons and a DI rate
+    if (ion[mm].istate != ele[ion[mm].nelem].istate_max && ion[mm].dere_di_flag > 0)    // we have electrons and a DI rate
     {
       rate_matrix[mm][mm] -= (xne * di_coeffs[mm]);
     }
@@ -492,7 +496,7 @@ populate_ion_rate_matrix (rate_matrix, pi_rates, inner_rates, rr_rates, b_temp, 
   {
     for (nn = 0; nn < nions; nn++)
     {
-      if (mm == nn + 1 && ion[nn].istate != ion[nn].z + 1 && ion[mm].z == ion[nn].z && ion[nn].dere_di_flag > 0)
+      if (mm == nn + 1 && ion[nn].istate != ele[ion[nn].nelem].istate_max && ion[mm].z == ion[nn].z && ion[nn].dere_di_flag > 0)
       {
         rate_matrix[mm][nn] += (xne * di_coeffs[nn]);
       }
@@ -504,7 +508,7 @@ populate_ion_rate_matrix (rate_matrix, pi_rates, inner_rates, rr_rates, b_temp, 
 
   for (mm = 0; mm < nions; mm++)
   {
-    if (ion[mm].istate != 1)    // we have space for electrons
+    if (mm != ele[ion[mm].nelem].firstion)      // we have space for electrons
     {
       rate_matrix[mm][mm] -= xne * (rr_rates[mm] + xne * qrecomb_coeffs[mm]);
     }
@@ -517,7 +521,7 @@ populate_ion_rate_matrix (rate_matrix, pi_rates, inner_rates, rr_rates, b_temp, 
   {
     for (nn = 0; nn < nions; nn++)
     {
-      if (mm == nn - 1 && ion[nn].istate != 1 && ion[mm].z == ion[nn].z)
+      if (mm == nn - 1 && nn != ele[ion[nn].nelem].firstion && ion[mm].z == ion[nn].z)
       {
         rate_matrix[mm][nn] += xne * (rr_rates[nn] + xne * qrecomb_coeffs[nn]);
       }
@@ -528,7 +532,7 @@ populate_ion_rate_matrix (rate_matrix, pi_rates, inner_rates, rr_rates, b_temp, 
 
   for (mm = 0; mm < nions; mm++)
   {
-    if (ion[mm].istate != 1 && ion[mm].drflag > 0)      // we have space for electrons
+    if (mm != ele[ion[mm].nelem].firstion && ion[mm].drflag > 0)        // we have space for electrons
     {
       rate_matrix[mm][mm] -= (xne * dr_coeffs[mm]);
     }
@@ -543,7 +547,7 @@ populate_ion_rate_matrix (rate_matrix, pi_rates, inner_rates, rr_rates, b_temp, 
   {
     for (nn = 0; nn < nions; nn++)
     {
-      if (mm == nn - 1 && ion[nn].istate != 1 && ion[mm].z == ion[nn].z && ion[mm].drflag > 0)
+      if (mm == nn - 1 && nn != ele[ion[nn].nelem].firstion && ion[mm].z == ion[nn].z && ion[mm].drflag > 0)
       {
         rate_matrix[mm][nn] += (xne * dr_coeffs[nn]);
       }
@@ -588,7 +592,7 @@ populate_ion_rate_matrix (rate_matrix, pi_rates, inner_rates, rr_rates, b_temp, 
   zcount = 0;
   for (nn = 0; nn < nions; nn++)
   {
-    if (ion[nn].istate == 1)
+    if (nn == ele[ion[nn].nelem].firstion)
     {
       b_temp[nn] = 1.0;         //In the relative abundance schene this equals one.
 

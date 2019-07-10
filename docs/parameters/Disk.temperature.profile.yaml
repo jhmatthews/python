@@ -1,12 +1,12 @@
 name: Disk.temperature.profile
 description: |
   The choice of disk temperature profile
-type: Enum (Int)
+type: Enumerator
 values:
     standard: A Shakura - Sunyaev  disk, with a hard inner boundar
     readin: Read the profile in from a file; the user will be queried for the name of the file
     yso: YSO???
     analytic: DEPRECATED??? A profile designed for the situation where the disk is being illuminated by star
 parent:
-  Disk.radiation: This input is requested for all disks that radiate
+  Disk.radiation: true
 file: setup_disk.c

@@ -193,8 +193,6 @@ bands_init (imode, band)
     mode =
       rdchoice ("Photon_sampling.approach(T_star,cv,yso,AGN,min_max_freq,user_bands,cloudy_test,wide,logarithmic)", "0,2,3,7,1,4,5,6,8",
                 answer);
-    //OLD mode = 2;
-    //OLD rdint ("Photon_sampling.approach(0=T,1=(f1,f2),2=cv,3=yso,4=user_defined,5=cloudy_test,6=wide,7=AGN,8=logarithmic)", &mode);
   }
   else
   {

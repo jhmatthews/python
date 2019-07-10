@@ -25,7 +25,6 @@ import pylab as p
 import os, sys 
 import numpy as np
 from astropy.io import ascii
-from py_plot_output import set_pretty
 
 def qdisk_plot(root):
 

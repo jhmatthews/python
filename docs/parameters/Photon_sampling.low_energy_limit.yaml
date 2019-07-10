@@ -5,7 +5,7 @@ description: |
   bands.
 type: Double
 unit: eV
-values: greater than 0 
+values: Greater than 0
 parent:
-  parameter: This parameter is required whenever the user wants to customize the bands for stratified smapling in the ionzation phase
+  Photon_sampling.approach: user_bands
 file: bands.c

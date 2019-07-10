@@ -7,8 +7,8 @@ description: |
   just from photons that originate or scatter int he region
 type: Double
 unit: Degrees
-values: Normally a number between 0, and 360 or -180 to 180 
+values: Between 0, and 360 or -180 to 180
 parent:
-  parameter: Required when extracting photons by position.        
-file: setup2.c
+  Spectrum.select_location: spherical_region
+file: setup.c
 advanced: true

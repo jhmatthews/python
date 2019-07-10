@@ -170,7 +170,6 @@ get_bl_and_agn_params (lstar)
   {
     strcpy (answer, "no");
     geo.bl_radiation = rdchoice ("Boundary_layer.radiation(yes,no)", "1,0", answer);
-    //OLD rdint ("Boundary_layer.radiation(y=1)", &geo.bl_radiation);
     geo.agn_radiation = 0;      // So far at least, our star systems don't have a BH
   }
 
@@ -298,7 +297,6 @@ get_bl_and_agn_params (lstar)
     strcpy (answer, "sphere");
     geo.pl_geometry = rdchoice ("BH.geometry_for_pl_source(sphere,lamp_post)", "0,1", answer);
 
-    //OLD rdint ("AGN.geometry_for_pl_source(0=sphere,1=lamp_post)", &geo.pl_geometry);
 
     if (geo.pl_geometry == PL_GEOMETRY_LAMP_POST)
     {

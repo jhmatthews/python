@@ -6,8 +6,8 @@
   </head>
   <body>
     <h1>Documentation Overview</h1>
-    <p>We are currently working to improve documentation for
-      Python.&nbsp; This is an ongoing challenge.<br>
+    <p>Note:&nbsp; Documentation is an ongoing effort, and is not
+      uptodate <br>
     </p>
     <p>At present the main resources are as follows:<br>
     </p>
@@ -31,6 +31,7 @@
       <li>A <a href="pydocs/doc_py_progs.html">pydocs repository </a>which
 
 
+
         provides information about the python scripts contained in
         $PYTHON/py_progs</li>
       <ul>
@@ -42,14 +43,17 @@
         <li>To regenerate them, use the routine write_docs.py which is
           in py_progs.&nbsp; <br>
         </li>
-        <li>The program should be run from the docs/pydocs
+        <li>Issue the following command from the docs/pydocs
           directory.&nbsp; <br>
         </li>
-        <li>../../py_progs/write_docs.py ../../py_progs</li>
-        <li>No special sofwate is required<br>
+        <ul>
+          <li>../../py_progs/write_docs.py ../../py_progs</li>
+        </ul>
+        <li>No special sofware is required<br>
         </li>
       </ul>
       <li>A <a href="doxygen/html/index.html">Doxygen repository, </a>which
+
 
         provides information about the source code.</li>
       <ul>
@@ -60,16 +64,19 @@
         </li>
         <li>To do this, one must go to the docs/doxygen directory and
           run</li>
-        <li>doxygen python_docs.config</li>
+        <ul>
+          <li>doxygen python_docs.config</li>
+        </ul>
         <li>Of course the assumes that you have doxygen <br>
         </li>
         <ul>
-          <li>The Doxygen home page is <a
-              href="http://www.stack.nl/%7Edimitri/doxygen/">here</a>.&nbsp;
+          <li>The Doxygen home page is <a href="http://www.doxygen.nl/">here</a>.&nbsp;
+
             <br>
           </li>
-          <li>To get the graphs, you also need to have the dot tool from
-            <a href="http://www.graphviz.org/">Graphviz</a> installed as
+          <li>To get the graphs that show which routines call which
+            other routines, you also need to have the dot tool from <a
+              href="http://www.graphviz.org/">Graphviz</a> installed as
             well.&nbsp; <br>
           </li>
         </ul>
@@ -82,10 +89,20 @@
       <li>The S/W discussed above is readily available on various
         package distributions, e.g <a href="https://brew.sh/">Homebrew</a>
         or <a href="http://www.finkproject.org/">Fink</a> or <a
-          href="https://www.macports.org/">MacPorts</a><br>
-        for Macs.&nbsp; Presumably, various linux package managers
-        contain as well. &nbsp; <br>
+          href="https://www.macports.org/">MacPorts</a> for Macs.&nbsp;
+        Presumably, various linux package managers contain as well.
+        &nbsp; <br>
       </li>
+      <ul>
+        <li>The Homebrew command for Sphinx is simply "brew install
+          Sphinx"<br>
+        </li>
+        <li>The Homebrew command for doxygen is simply "brew install
+          doxygen"</li>
+        <li>The Homebrew command for GraphViz is similarly "brew install
+          GraphViz" <br>
+        </li>
+      </ul>
       <li>Alternatively, one can go to&nbsp; the home pages and download
         and install using the instruction provided.<br>
       </li>

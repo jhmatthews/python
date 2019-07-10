@@ -4,22 +4,19 @@ description: |
   of photon paths per cell can output them either as averages in a 3d model, or
   as a selection of flat text files with full bin-by-bin breakdowns. Useful for
   diagnostics.
-type: Enum (Int)
+type: Enumerator
 values:
-  none: None
+  none: |
+    No visualisation.
   vtk: |
-    **Mesh visualisation**
-
-    Outputs mean incident path per cell, photon count per cell, and mean
+    Mesh visualisation. Outputs mean incident path per cell, photon count per cell, and mean
     observed delay to '.vtk' format, readable using a range of programs including
     (my preferred option) VisIt, available at https://visit.llnl.gov/.
   dump: |
-    **Dump cells**
-
     Outputs distributions of paths for continuum heating and each line to a range of 'dump cells'
-    specified by X & Z position using the reverb.dump_cells/reverb.dump_cell options.
+    specified by X & Z position.
   both: |
-    **Both**
+    Outputs both vtk and dump.
 parent:
-  reverb.type: [2, 3]
+  Reverb.type: [wind, matom]
 file: setup_reverb.c

@@ -1,9 +1,0 @@
-name: AGN.blackbody_temp
-description: |
-  The temperature of a blackbody SED to be used for the central AGN source
-type: Double
-unit: K
-values: Greater than 0
-parent:
-  parameter:
-file: setup_star_bh.c

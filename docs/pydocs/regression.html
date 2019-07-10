@@ -54,10 +54,20 @@ Notes:<br>
 &nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Regression&nbsp;here&nbsp;means&nbsp;to&nbsp;run&nbsp;a&nbsp;series&nbsp;of&nbsp;models.&nbsp;These&nbsp;routines&nbsp;do&nbsp;not&nbsp;compare&nbsp;the<br>
 &nbsp;&nbsp;&nbsp;&nbsp;models&nbsp;to&nbsp;earlier&nbsp;runs<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;It&nbsp;is&nbsp;possible&nbsp;to&nbsp;add&nbsp;special&nbsp;tests&nbsp;for&nbsp;regression,&nbsp;either&nbsp;to&nbsp;because&nbsp;models&nbsp;must&nbsp;be&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;run&nbsp;in&nbsp;a&nbsp;certain&nbsp;order&nbsp;or&nbsp;because&nbsp;special&nbsp;options&nbsp;must&nbsp;be&nbsp;used.&nbsp;&nbsp;These&nbsp;should<br>
+&nbsp;&nbsp;&nbsp;&nbsp;be&nbsp;added&nbsp;in&nbsp;a&nbsp;special&nbsp;section&nbsp;of&nbsp;doit,&nbsp;and&nbsp;should&nbsp;be&nbsp;self-contained.&nbsp;&nbsp;<br>
+&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
 History:<br>
 &nbsp;<br>
-170903&nbsp;ksl&nbsp;Coding&nbsp;begun</tt></p>
+170903&nbsp;ksl&nbsp;Coding&nbsp;begun<br>
+180225&nbsp;ksl&nbsp;nsh&nbsp;had&nbsp;added&nbsp;a&nbsp;special&nbsp;test&nbsp;for&nbsp;hydro.&nbsp;&nbsp;This&nbsp;is&nbsp;useful&nbsp;in&nbsp;the&nbsp;sense&nbsp;that<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;it&nbsp;allows&nbsp;one&nbsp;to&nbsp;deal&nbsp;with&nbsp;situations&nbsp;where&nbsp;several&nbsp;runs&nbsp;must&nbsp;be&nbsp;carreid&nbsp;out<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sequentially&nbsp;but&nbsp;but&nbsp;the&nbsp;mechanism&nbsp;that&nbsp;he&nbsp;chose&nbsp;makes<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;it&nbsp;difficult&nbsp;to&nbsp;add&nbsp;new&nbsp;tests,&nbsp;because&nbsp;the&nbsp;standard&nbsp;and&nbsp;speciial&nbsp;tests&nbsp;are&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;not&nbsp;sufficently&nbsp;isolated&nbsp;from&nbsp;one&nbsp;another.</tt></p>
 <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#aa55cc">
@@ -66,10 +76,13 @@ History:<br>
     
 <tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="astropy.io.ascii.html">astropy.io.ascii</a><br>
+<a href="balmer_decrement.html">balmer_decrement</a><br>
 <a href="numpy.html">numpy</a><br>
 </td><td width="25%" valign=top><a href="os.html">os</a><br>
-<a href="shutil.html">shutil</a><br>
-</td><td width="25%" valign=top><a href="subprocess.html">subprocess</a><br>
+<a href="py_error.html">py_error</a><br>
+<a href="regression_check.html">regression_check</a><br>
+</td><td width="25%" valign=top><a href="shutil.html">shutil</a><br>
+<a href="subprocess.html">subprocess</a><br>
 <a href="sys.html">sys</a><br>
 </td><td width="25%" valign=top><a href="time.html">time</a><br>
 </td></tr></table></td></tr></table><p>
@@ -96,6 +109,24 @@ History:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;attempted&nbsp;to&nbsp;get&nbsp;a&nbsp;more&nbsp;readable&nbsp;stderr&nbsp;output<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Also,&nbsp;eliminted&nbsp;pf&nbsp;files&nbsp;with&nbsp;the&nbsp;extension&nbsp;.out.pf<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;because&nbsp;these&nbsp;are&nbsp;mostlikely&nbsp;duplicates</tt></dd></dl>
+ <dl><dt><a name="-py_hydro"><strong>py_hydro</strong></a>(version, pf_dir, outputfile)</dt><dd><tt>This&nbsp;is&nbsp;a&nbsp;self&nbsp;contained&nbsp;script&nbsp;to&nbsp;perform&nbsp;specialised&nbsp;tests&nbsp;of<br>
+the&nbsp;py_hydro&nbsp;models.&nbsp;We&nbsp;need&nbsp;to&nbsp;run&nbsp;on&nbsp;one&nbsp;processor,&nbsp;otherwise<br>
+the&nbsp;test&nbsp;of&nbsp;the&nbsp;heatcool&nbsp;wont&nbsp;work&nbsp;-&nbsp;but&nbsp;its&nbsp;quick!<br>
+&nbsp;<br>
+Notes:<br>
+&nbsp;<br>
+This&nbsp;routine&nbsp;is&nbsp;run&nbsp;from&nbsp;within&nbsp;the&nbsp;current&nbsp;working&nbsp;directory,<br>
+which&nbsp;is&nbsp;the&nbsp;directory&nbsp;created&nbsp;earlier&nbsp;be&nbsp;doit<br>
+&nbsp;<br>
+&nbsp;<br>
+History<br>
+&nbsp;<br>
+1801&nbsp;&nbsp;nsh<br>
+1802&nbsp;&nbsp;ksl&nbsp;Modified&nbsp;this&nbsp;routine&nbsp;so&nbsp;that&nbsp;it&nbsp;is&nbsp;more&nbsp;standalone<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;than&nbsp;previously.&nbsp;&nbsp;Special&nbsp;regression&nbsp;tests&nbsp;need&nbsp;to<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;be&nbsp;isolated&nbsp;from&nbsp;the&nbsp;internal&nbsp;logic&nbsp;of&nbsp;doit&nbsp;so&nbsp;they<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;can&nbsp;be&nbsp;added/removed&nbsp;easily.</tt></dd></dl>
+ <dl><dt><a name="-run_cmds"><strong>run_cmds</strong></a>(commands, root_names, outputfile)</dt></dl>
  <dl><dt><a name="-steer"><strong>steer</strong></a>(argv)</dt><dd><tt>This&nbsp;is&nbsp;just&nbsp;a&nbsp;steering&nbsp;routine&nbsp;so&nbsp;that&nbsp;switches&nbsp;can&nbsp;be&nbsp;processed&nbsp;<br>
 from&nbsp;the&nbsp;command&nbsp;line</tt></dd></dl>
  <dl><dt><a name="-sum_errors"><strong>sum_errors</strong></a>(root='1d_sn')</dt><dd><tt>This&nbsp;sums&nbsp;the&nbsp;errors&nbsp;from&nbsp;various&nbsp;threads<br>

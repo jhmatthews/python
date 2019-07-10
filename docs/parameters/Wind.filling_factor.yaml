@@ -1,12 +1,10 @@
 name: Wind.filling_factor
 description: |
   The volume filling factor of the outflow. The implementation
-  of clumping (microclumping) is described in 
-  Matthews et al. (2016), 2016MNRAS.458..293M. Asked once per domain. 
-type: Enum (Int)
-values:
-  1: smooth
-  <1: clumped
+  of clumping (microclumping) is described in
+  Matthews et al. (2016), 2016MNRAS.458..293M. Asked once per domain.
+type: Double
+values: 0 < f <= 1, where 1 is a fully smooth wind.
 parent:
-  parameter: Asked whenever there is a wind                       
+  Wind.number_of_components: Greater than 0. Once per domain.
 file: setup_domains.c

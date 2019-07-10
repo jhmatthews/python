@@ -51,11 +51,16 @@
  * sobolev optical depths are used.  The temperature in the
  * cell does not come into the calculation.
  *
- * Unlike the old routine randwind, this routine does not explicitly need to to
- * make a transformation from the xz plane to the location of the
- * photon.  This is because dvds is calculated directly using dwind_ds
- *
+ * 1904 - ksl - In certain situations, see issue #505, the photon can
+ * get trapped in the while loop.  To prevent his from hanging
+ * the routine bails after NSCAT_MAX trips through the while loop
+ * and chooses the direction with the lowest tau it has found. 
+ * From a physics perspective, this is not an ideal treatment of
+ * the problem ans so if this occurs a lot of times, something
+ * better needs to be done.
  **********************************************************/
+
+#define NSCAT_MAX 10000
 
 int
 randwind_thermal_trapping (p, nnscat)
@@ -64,7 +69,9 @@ randwind_thermal_trapping (p, nnscat)
 {
   double tau_norm, p_norm;
   double tau, dvds, z, ztest;
-  double z_prime[3];
+  double z_prime[3], z_min[3];
+  int nscat;
+  double tau_min = VERY_BIG;
   WindPtr one;
 
   /* find the wind pointer for the photon */
@@ -92,9 +99,10 @@ randwind_thermal_trapping (p, nnscat)
      before extract is called.
    */
   *nnscat = *nnscat - 1;
+  nscat = 0;
 
   /* rejection method loop, which chooses direction and also calculated nnscat */
-  while (ztest > z)
+  while (ztest > z && nscat < NSCAT_MAX)
   {
     *nnscat = *nnscat + 1;
     randvec (z_prime, 1.0);     /* Get a new direction for the photon (isotropic */
@@ -108,7 +116,20 @@ randwind_thermal_trapping (p, nnscat)
     dvds = dvwind_ds (p);
     tau = sobolev (one, p->x, -1.0, lin_ptr[p->nres], dvds);
 
+    if (tau < tau_min)
+    {
+      stuff_v (z_prime, z_min);
+      tau_min = tau;
+    }
+
     z = p_escape_from_tau (tau);        /* probability to see if it escapes in that direction */
+    nscat++;
+  }
+
+  if (nscat == NSCAT_MAX)
+  {
+    stuff_v (z_min, p->lmn);    // copy to photon pointer
+    Error ("rand_wind_thermal_trapping: photon had more than  %d internal scatters\n", nscat);
   }
 
   return (0);

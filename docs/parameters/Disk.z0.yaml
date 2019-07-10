@@ -1,10 +1,9 @@
 name: Disk.z0
 description: |
-  fractional.height.at.diskrad.  The physical height at the
-  outer disk will be this * disk.radmax
-type: rddoub
-unit: None
+  Fractional height at maximum radius.  The physical height at the
+  outer disk will be this * :ref:`Disk.radmax`.
+type: Double
 values: Greater than 0
 parent:
-  disk_type: disk_type=vertically extended
+  Disk.type: vertically.extended
 file: setup_disk.c

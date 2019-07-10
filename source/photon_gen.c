@@ -1463,7 +1463,7 @@ photon_checks (p, freqmin, freqmax, comment)
     Debug ("photon_checks: All photons passed checks successfully\n");
   else
   {
-    Log ("photon_checks: %d of %d or %e per cent of photons failed checks\n", nn, NPHOT, nn * 100. / NPHOT);
+    Log ("photon_checks: %d of %d or %e per cent of photons failed checks\n", nnn, NPHOT, nnn * 100. / NPHOT);
   }
 
 //OLD  if (nnn > max_errors)

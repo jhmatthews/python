@@ -1,49 +1,13 @@
 
 /***********************************************************/
 /** @file  dielectronic.c
- * @author ksl
+ * @author Nick
  * @date   January, 2018
  *
- * @brief  ???
+ * @brief  The routines in this file all have to do with dielectronic recombination
  *
- * ???
  ***********************************************************/
 
-//OLD /**************************************************************************
-//OLD                     Southampton University
-//OLD
-//OLD
-//OLD   Synopsis:
-//OLD
-//OLD The routines in this file all have to do with dielectronic recombination.
-//OLD
-//OLD
-//OLD   Description:
-//OLD
-//OLD The first routine is compute_dr_coeffs
-//OLD It takes as its input a temperature, and it populates the fd_coeff array.
-//OLD This is an initial test, and it will be called every time a cell needs a set
-//OLD of DR coefficients. It could well be quicker in the future to generate one,
-//OLD temperature split array, and then sample it. Lets see...
-//OLD
-//OLD
-//OLD
-//OLD
-//OLD   Arguments:
-//OLD
-//OLD
-//OLD   Returns:
-//OLD
-//OLD   Notes:
-//OLD
-//OLD
-//OLD
-//OLD
-//OLD   History:
-//OLD   11aug   nsh     Began work
-//OLD
-//OLD
-//OLD  ************************************************************************/
 
 
 #include <stdio.h>
@@ -55,34 +19,6 @@
 #include "python.h"
 #include "recipes.h"
 
-
-
-
-//OLD /**************************************************************************
-//OLD                     Space Telescope Science Institute
-//OLD
-//OLD
-//OLD   Synopsis: compute_dr_coeffs returns the volumetric dielectronic rate
-//OLD   coefficients for a given temperature.
-//OLD
-//OLD   Description:
-//OLD
-//OLD   Arguments:
-//OLD   temperature
-//OLD
-//OLD
-//OLD   Returns:
-//OLD   nothing, but populates the array dr_coeffs
-//OLD
-//OLD   Notes:
-//OLD   the rates are associated with the ion being recombined into.
-//OLD
-//OLD
-//OLD
-//OLD   History:
-//OLD   11sep   nsh     Written as part of python70 effort to incorporate DR.
-//OLD
-//OLD  ************************************************************************/
 
 
 /**********************************************************/
@@ -146,34 +82,6 @@ compute_dr_coeffs (temp)
 }
 
 
-//OLD /**************************************************************************
-//OLD                     Space Telescope Science Institute
-//OLD
-//OLD
-//OLD   Synopsis: total_dr calculates the total luminosity from DR.
-//OLD
-//OLD   Description:
-//OLD
-//OLD   Arguments:
-//OLD   pointer to grid cell we are interested in
-//OLD   temperature
-//OLD
-//OLD
-//OLD
-//OLD   Returns:
-//OLD           the total luminosity of this cell due to dielectronic recombinaions
-//OLD
-//OLD   Notes:
-//OLD
-//OLD
-//OLD
-//OLD
-//OLD   History:
-//OLD   11sep   nsh     Written as part of python70 effort to incorporate DR. Initally we are just doing a ROM calculation by multiplying the volumetric rate be the ion density, the electron density and mean eelectron energy.
-//OLD         12jul     nsh     Changed to take account of the fact tha we are now assiciating a rate with the ion being recombined into, this means that for rate[nion] we need density [nion+1].
-//OLD
-//OLD  ************************************************************************/
-
 
 /**********************************************************/
 /**
@@ -184,15 +92,16 @@ compute_dr_coeffs (temp)
  * @return     the total luminosity of this cell due to dielectronic recombinaions - currently set to zero
  *
  * @details
- * This routine is a placeholder at the moment - it mirrors the other
- * routines which compute the luminosity due to various cooling routines.
- * However, as of the current time we do not know how to work out the luminosity
+ * This routine is a dummy routine at the moment - it mirrors the other
+ * routines which compute the luminosity due to various cooling routines, but
+ * currently always returns zero, because
+ * as of the current time we do not know how to work out the luminosity
  * from dielectronic recombination. We know the rate, which is used in ionization
  * calculations but the energy released by each recombination is complex and
  * depends on what happens to the excited ion.
  *
  * ### Notes ###
- * ??? NOTES ???
+ * This is issue #186
  *
  **********************************************************/
 
@@ -234,7 +143,7 @@ total_dr (one, t_e)
 		is absorbed, so a guess would be to just say its energy is re-radiated. This is clearly an over estimate
 		since some of the enegy is lost to binding energy 	*/
 //              x += xplasma->vol * xplasma->ne * xplasma->density[n + 1] * dr_coeffs[n] * meanke;
-/* A dfferent estimate is to use the ionization potential of the ion - this is order of magnitude at best */
+/* A different estimate is to use the ionization potential of the ion - this is order of magnitude at best */
 //              x += xplasma->vol * xplasma->ne * xplasma->density[n + 1] * dr_coeffs[n] * ion[n].ip;
       x += 0.0;                 //At present, we just set it to zero - obviously an underestimate!
     }

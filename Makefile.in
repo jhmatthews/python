@@ -9,7 +9,7 @@
 # for manual install.
 
 CMAKE = mpicc
-GSL = $(PYTHON)/software/gsl-1.15
+GSL = $(PYTHON)/software/gsl-2.5
 GIT = True
 LIBS = True
 
@@ -29,7 +29,7 @@ MAKE_SOURCE = cd $(PYTHON)/source; make CC=$(CMAKE) python; make CC=$(CMAKE) py_
 
 
 ifeq (True, $(LIBS))
-	INSTALL_GSL = cd $(GSL); ./configure --disable-shared --prefix=$(GSL) CC=gcc CCP=ccp; make; make check 2>&1; make install; make clean; 
+	INSTALL_GSL = cd $(GSL); ./configure --disable-shared --prefix=$(GSL) CC=gcc CCP=ccp; make -i; make check 2>&1; make -i install; make clean; 
 	MOVE_GSL = mkdir $(PYTHON)/include/gsl/; mv $(GSL)/include/gsl/* $(PYTHON)/include/gsl; mv $(GSL)/lib/lib* $(PYTHON)/lib/;
 else
 	INSTALL_GSL = 

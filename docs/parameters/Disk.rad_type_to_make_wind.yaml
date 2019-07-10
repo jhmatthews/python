@@ -1,12 +1,12 @@
-name: Disk.rad_type_for_disk_to_make_wind
+name: Disk.rad_type_to_make_wind
 description: |
-  The disk is generally described in terms of a run of temperature and possibly gravity with radius.  The spectrum
-  of the disk can be simulated either as a collection of apppriately weighted blackbodies or from stellar
-  models which are read in and sampled.
-type: Enum (Int)
+  Multi-line description, must keep indentation.
+type: Enumerator
 values:
-  0: bb
-  1: models
+  bb: |
+    Multi-line description, must keep indentation.
+  models: |
+    Multi-line description, must keep indentation.
 parent:
-  parameter: Condition e.g. greater than 0 or list e.g. [1, 2, 5]
-file: python.c
+  Disk.type: [flat, vertically.extended]
+file: setup_disk.c

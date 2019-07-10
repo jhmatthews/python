@@ -230,7 +230,7 @@ def doit(version='py',pf_dir='',out_dir='',np=3,outputfile='Summary.txt'):
     for one in pf_files:
         if one.count('.out.pf')==0:
             select.append(one)
-    pf_files=select
+    pf_files=sorted(select)  # Assure that files are executed in alphabeticall order
 
     if len(pf_files)==0:
         print ('No input files found for %s search' % (pf_dir+'/*pf'))

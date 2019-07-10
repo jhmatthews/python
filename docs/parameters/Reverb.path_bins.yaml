@@ -7,9 +7,9 @@ description: |
   (10 * the 'maximum radius' in any domain). Default value is 1000, going much
   higher does not lead to qualitative differences in TF, going lower makes the
   bin boundaries show up in the TF.
-type: Int
+type: Integer
 values: Greater than 0
 default: 1000
 parent:
-  reverb.type: [2, 3]
+  Reverb.type: [wind, matom]
 file: setup_reverb.c

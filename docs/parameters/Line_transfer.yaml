@@ -6,10 +6,10 @@ description: |
   and macro-atom machinery, and whether to use isotropic or
   anisotropic scattering.
 
-  Mode 5 is recommended for non-macro atom runs,
-  while mode 7 is recommended for macro-atom runs.
+  Thermal trapping mode is recommended for non-macro atom runs,
+  while thermal trapping macro-atom mode is recommended for macro-atom runs.
 
-type: Enum (Int)
+type: Enumerator
 values:
   pure_abs: |
     *Pure absorption*
@@ -37,8 +37,7 @@ values:
   thermal_trapping: |
     *Escape probability + anisotropic scattering*
 
-    as mode 4, but we use
-    the 'thermal trapping method' to choose an
+    We use the 'thermal trapping method' to choose an
     anistropic direction when an r-packet deactivation
     or scatter occurs.
 
@@ -57,6 +56,4 @@ values:
     as macro_atoms, but we use the 'thermal trapping method' to choose an anistropic direction
     when an r-packet deactivation or scatter occurs.
 
-parent:
-  parameter: Condition e.g. greater than 0 or list e.g. [1, 2, 5]
-file: setup_domains.c
+file: setup_line_transfer.c

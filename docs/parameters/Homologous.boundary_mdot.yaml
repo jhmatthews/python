@@ -5,8 +5,8 @@ description: |
   decline with radius, depending on the exponent of the power law that describes
   the trend in density.
 type: Double
-unit: Msol/yr  
-values: greater than 0 
+unit: M☉/yr
+values: Greater than 0
 parent:
-  parameter: One of the basic parameters for defining a hologous flow in Python
+  Wind.type: homologous
 file: homologous.c

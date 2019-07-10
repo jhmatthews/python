@@ -1,9 +1,9 @@
 name: Homologous.vbase
 description: |
-  Multi-line description, must keep indentation.
+  Velocity at the base of the wind
 type: Double
 unit: cm
-values: Condition e.g. greater than 0 or list e.g. [1, 2, 5]
+values: Greater than 0
 parent:
-  parameter: Condition e.g. greater than 0 or list e.g. [1, 2, 5]
+  Wind.type: homologous
 file: homologous.c

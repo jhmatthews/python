@@ -1,0 +1,10 @@
+name: SV.v_zero
+description: |
+  The velocity at the wind base.
+type: Double
+unit: ['Speed of sound in the wind', cm/s]
+values: Greater than 0
+parent:
+  SV.v_zero_mode: [sound_speed, fixed]
+file: sv.c
+advanced: true

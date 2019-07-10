@@ -4,15 +4,13 @@ description: |
   additional conditions on the location of photons extracted in
   the detailed spectrum. The location refers here to the either
   where the photons was created or where it last scattered
-type: Int
-unit: None
+type: Enumerator
 values:
-    "-1": Select only photons generated from below (-z) the disk
-    "0": Select photons regardless of where they are generated.
-    "1": Select only photons orginating above the disk
-    "2": Select photons by defining a spherical region
-
+  all: Select photons regardless of where they are generated
+  below_disk: Select only photons generated from below (-z) the disk
+  above_disk: Select only photons orginating above the disk
+  spherical_region: Select photons by defining a spherical region
 parent:
-  Select_photons_by_position: y
-file: setup2.c
+  Spectrum.select_photons_by_position: true
+file: setup.c
 advanced: true

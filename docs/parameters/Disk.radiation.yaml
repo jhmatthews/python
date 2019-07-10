@@ -3,5 +3,5 @@ description: |
   Multi-line description, must keep indentation.
 type: Boolean(yes/no)
 parent:
-  parameter: Condition e.g. greater than 0 or list e.g. [1, 2, 5]
+  Disk.type: [flat, vertically.extended]
 file: setup_disk.c

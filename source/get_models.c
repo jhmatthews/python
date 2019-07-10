@@ -135,7 +135,6 @@ get_models (modellist, npars, spectype)
   int get_one_model ();
   int nw, nwaves;
 
-
   nwaves = 0;
 
   if (get_models_init == 0)
@@ -161,6 +160,7 @@ get_models (modellist, npars, spectype)
   }
 
 
+
   if ((mptr = fopen (modellist, "r")) == NULL)
   {
     Error ("get_models:Could not open file %s containing list of models \n", modellist);
@@ -174,6 +174,8 @@ get_models (modellist, npars, spectype)
   comp[ncomps].xcdf.limit1 = -99.;
   comp[ncomps].xcdf.limit2 = -99.;
 
+
+
 /* Now get all the models of this type */
   n = nmods_tot;                // This is the starting point since may have read models in before
 /* Establish initial limits on xmin and xmax so that they can be properly populated */
@@ -183,6 +185,8 @@ get_models (modellist, npars, spectype)
     xmax[m] = (-BIG);
     comp[ncomps].xmod.par[m] = -99;
   }
+
+
 
   nw = -1;                      // Initiallize nw
   while (n < NMODS && (fgets (dummy, LINELENGTH, mptr)) != NULL)
@@ -224,30 +228,42 @@ get_models (modellist, npars, spectype)
     }
   }
 
+
   if (n == NMODS)
   {
     Error ("get_models: Reached maximum number of models %d. Please increase NMODS in .h file \n", n);
     Exit (0);
   }
+
+
+
 /* Now complete the initialization of the modsum structure */
   comp[ncomps].modstop = nmods_tot = n;
   comp[ncomps].nmods = comp[ncomps].modstop - comp[ncomps].modstart;
   comp[ncomps].nwaves = nwaves;
+
+
+
+
   for (n = 0; n < nwaves; n++)
   {
     comp[ncomps].xmod.w[n] = mods[comp[ncomps].modstart].w[n];
   }
+
+
+
   if (comp[ncomps].nmods == 0)
   {
     Error ("get_models: No models from %s were read. Please check list of models!\n", comp[ncomps].name);
-    Exit (0);
   }
+
 
   /* The next 3 lines set a normalization that is used by kslfit.  They are mostly
    * not relevant to python, where comp[ncomp[.min[0] refers to a normalization for
    * a model.  I've kept this initialization for now */
   comp[ncomps].min[0] = 0;
   comp[ncomps].max[0] = 1000;
+
 
   for (m = 0; m < npars; m++)
   {
@@ -256,9 +272,13 @@ get_models (modellist, npars, spectype)
   }
 
 
+
   *spectype = ncomps;           // Set the spectype
 
+
   ncomps++;
+
+
   return (*spectype);
 }
 

@@ -75,7 +75,7 @@ int i_spec_start = 0;
  * Warning - Do not put anything in this routine that does anything but initialize
  * or reinitialize the spectrum structure s. This is important because this routine
  * is not accessed if one is continuing an old calculation of the detailed spectrum.
- * It is still use on a restart where the detailed spectral cycles have not begun
+ * It is still used on a restart where the detailed spectral cycles have not begun
  * because in that case the spectra are not saved.
  *
  **********************************************************/
@@ -680,7 +680,6 @@ spectrum_summary (filename, nspecmin, nspecmax, select_spectype, renorm, loglin,
   double x, dd;
 
 
-
   /* Open or reopen a file for writing the spectrum */
   if ((fptr = fopen (filename, "w")) == NULL)
   {
@@ -852,9 +851,12 @@ spectrum_summary (filename, nspecmin, nspecmax, select_spectype, renorm, loglin,
  * to reduce the fluxes for the spectral cycles that are read
  * in, so we can continue.
  * 	renorm_factor = (cycles in old pf file) / (cycles in new pf file)
- *
+ * 
+ * Restarts can also occur when one is just completing a previous
+ * run, without increasing the number of cycles, and in this case
+ * no renormalization is required.
  * ### Notes ###
- * see Issue #134
+ * see Issue #134 and more importantly #503
  *
  **********************************************************/
 
@@ -865,11 +867,29 @@ spectrum_restart_renormalise (nangle)
   double renorm_factor;
   int n, m, nspec;
 
+  if (geo.pcycles == geo.pcycles_renorm)
+  {
+    return (0);
+  }
+
   nspec = nangle + MSPEC;
-  renorm_factor = ((double) geo.pcycle + 1.0) / ((double) geo.pcycles + 1.0);
+
+  /* If we have gooten to this point, then the number of pcycles to which the
+   * spectrum has been renormalized has changed, and so we must renormalize
+   * the spectrum.  The original spectrum current is normalized to g
+   * geo.pcycle/geo.pcycles_renorm of the final value.  We want the psectrum
+   * to be geo.pcycles/geo.pcycles of the final value, so the renormlization
+   * factor is geo.pcycles_renorm/geo.pcycles.
+   */
+
+
+  renorm_factor = ((double) geo.pcycles_renorm) / ((double) geo.pcycles);
+
+
+  Log ("spectrum_restart_renormalise:  %d %d %d %f\n", geo.pcycle, geo.pcycles_renorm, geo.pcycles, renorm_factor);
 
   /* loop over each spectrum column and each wavelength bin */
-  for (n = MSPEC; n < nspec; n++)
+  for (n = 0; n < nspec; n++)
   {
     for (m = 0; m < NWAVE; m++)
     {

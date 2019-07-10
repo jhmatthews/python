@@ -1,0 +1,8 @@
+name: BH.power_law_index
+description: |
+  Multi-line description, must keep indentation.
+type: Double
+values: Greater than 0
+parent:
+  BH.rad_type_to_make_wind: [cloudy, power]
+file: setup_star_bh.c

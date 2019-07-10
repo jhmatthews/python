@@ -2,12 +2,10 @@ name: Diag.save_cell_statistics
 description: |
   Choose whether to save the statistics for a selection of save_cell_statistics.
   If yes, it looks for a file called "diag_cells.dat" which contains the cells to track,
-  and saves the photon details (weights, frequencies) for those that interact in 
+  and saves the photon details (weights, frequencies) for those that interact in
   the cell. Useful for checking the detailed MC radiation field in a cell.
-type: Int
-unit: None
-values: Condition e.g. greater than 0 or list e.g. [1, 2, 5]
+type: Boolean (yes/no)
 parent:
-  parameter: Condition e.g. greater than 0 or list e.g. [1, 2, 5]
+  Diag.extra: true
 file: diag.c
 advanced: true

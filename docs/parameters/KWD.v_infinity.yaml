@@ -1,11 +1,11 @@
 name: KWD.v_infinity
 description: |
-  The velocity at large distances of a steller wind described by the KWD model, 
+  The velocity at large distances of a steller wind described by the KWD model,
   in units of escape velocity. Described in terms of Castor & Lamers equation,
   v(r) = v_0 + (v_inf - v_0) * (1 - R_s/r) ** beta.
 type: Double
 unit: Escape velocity
 values: Greater than 0
 parent:
-  parameter:
+  Wind.type: kwd
 file: knigge.c

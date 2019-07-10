@@ -1,0 +1,9 @@
+name: BH.blackbody_temp
+description: |
+  Multi-line description, must keep indentation.
+type: Double
+unit: Kelvin
+values: Greater than 0
+parent:
+  BH.rad_type_to_make_wind: bb
+file: setup_star_bh.c

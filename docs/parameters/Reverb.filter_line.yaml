@@ -1,14 +1,14 @@
 name: Reverb.filter_line
 description: |
-  Line number of one line to include in the output .delay_dump file. This is
+  Line number of one line to include in the output ``.delay_dump`` file. This is
   the python internal line number. It can be found using either the macro-atom
   mode (which prints out the line number once it's found one) or by doing an
-  exploratory run with reverb.filter_lines = -1, then looking through the delay
+  exploratory run with :ref:`reverb.filter_lines` = -1, then looking through the delay
   dump file for photons of the right wavelength to see what their line is. This
   should almost certainly be changed to be specified using a species and
   wavelength!
-type: Int
+type: Integer
 values: Any valid line index
 parent:
-  reverb.filter_lines: Greater than 0
+  Reverb.filter_lines: Greater than 0, once per filer line.
 file: setup_reverb.c

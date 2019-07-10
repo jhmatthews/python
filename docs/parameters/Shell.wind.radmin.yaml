@@ -4,7 +4,7 @@ description: |
   (ideally thin) shell.
 type: Double
 unit: cm
-values: greater than zero, less than wind.radmax
+values: Greater than 0
 parent:
-  Wind_type: 9
+  Wind.type: shell
 file: shell_wind.c

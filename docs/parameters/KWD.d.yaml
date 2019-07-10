@@ -1,11 +1,11 @@
 name: KWD.d
 description: |
-  The ratio d/d_min is used to describe the degree of geometric collimation of 
+  The ratio d/d_min is used to describe the degree of geometric collimation of
   the disk wind in the KWD model. However, d (the distance to the focal point in
   central object radii) is used as this provides a more natural parameter.
 type: Double
-unit: co.radius
+unit: :ref:`Central_object.radius`
 values: Greater than 0
 parent:
-  parameter:
+  Wind.type: kwd
 file: knigge.c

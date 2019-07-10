@@ -1,0 +1,20 @@
+name: Wind.ionization
+description: |
+  Multi-line description, must keep indentation.
+type: Enumerator
+values:
+  LTE_te: |
+    Multi-line description, must keep indentation.
+  LTE_tr: |
+    Multi-line description, must keep indentation.
+  ML93: |
+    Multi-line description, must keep indentation.
+  fixed: |
+    Multi-line description, must keep indentation.
+  matrix_bb: |
+    Multi-line description, must keep indentation.
+  matrix_pow: |
+    Multi-line description, must keep indentation.
+  on.the.spot: |
+    Multi-line description, must keep indentation.
+file: setup.c

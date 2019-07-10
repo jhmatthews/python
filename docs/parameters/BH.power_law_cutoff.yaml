@@ -1,0 +1,10 @@
+name: BH.power_law_cutoff
+description: |
+  Adds a low-frequency cutoff to the power law spectrum.
+type: Double
+unit: ??? Hz ???
+values: Greater than or equal to 0
+parent:
+  BH.rad_type_to_make_wind: power
+file: setup_star_bh.c
+advanced: true

@@ -1,15 +1,15 @@
 name: System_type
 description: |
   The parameter is provides the program with a broad
-  overview of the tyep of system that will be simulated, and is used
+  overview of the type of system that will be simulated, and is used
   by Python to initialize certain variable, and to control what variables
   are asked for later.
-type: Enum (Int)
+type: Enumerator
 values:
-    0: star - System in which the central object is a star or WD
-    1: binary - Syatem with a secondary star, which can occult the central object and disk depending on phase
-    2: agn - AGN or BH binary (curruently)
-    3: previous - In this case, one is starting from a previous run with python, and one want to either continue the
-      run or change some parameters associated with radiations sources
-parent: None - This is always read.
+    star: System in which the central object is a star or WD
+    binary: System with a secondary star, which can occult the central object and disk depending on phase
+    agn: AGN or BH binary (currently)
+    previous: |
+      In this case, one is starting from a previous run with python, and one want to either continue the
+      run or change some parameters associated with radiation sources
 file: python.c

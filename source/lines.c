@@ -419,44 +419,6 @@ line_nsigma (line_ptr, xplasma)
 
 
 
-//OLD /***********************************************************
-//OLD                                        Space Telescope Science Institute
-//OLD
-//OLD scattering fraction(line_ptr,ne,te,dd,dvds,w,tr) calculate the fraction of excited
-//OLD state atoms which correspond to scattered photons, i.e. the portion which are
-//OLD excited by radiation and return to the ground state via spontaneous emission.
-//OLD
-//OLD Description:
-//OLD
-//OLD In the radiative transfer equation for lines, we separate the fraction of photons
-//OLD which are "absorbed" and the fraction which are "scattered".
-//OLD
-//OLD If line_mode==0, the atomosphere is a completely absorbing and no photons
-//OLD           will be scattered.  In this mode, assuming the wind is a source
-//OLD           of emission, the emissivity will be the Einstein A coefficient
-//OLD If line_mode==1, the atmosphere is completely scattering, there will be no
-//OLD           interchange of energy between the photons and the electrons
-//OLD           as a result of radiation transfer
-//OLD If line_mode==2, then a simple single scattering approximation is applied in which
-//OLD           case the scattered flux is just  A21/(C21+A21*(1-exp(-h nu/k T_e).
-//OLD If line_mode==3, then radiation trapping is included as well.  The basic idea
-//OLD           is to calculate the average number of scatters in a single
-//OLD           interaction and there is heat lost in each of these scatters.
-//OLD Notes:
-//OLD   It may be more efficient to combine several of these routines in view
-//OLD   of the fact that the exp is calculated several times
-//OLD
-//OLD History:
-//OLD   98      ksl     Coded
-//OLD   98aug   ksl     Rewritten to allow for stimulated decays in a
-//OLD                   two-level atom population.  Also rewrote the
-//OLD                   radiative trapping section.  It was clearly not
-//OLD                   correct previously! But is it correct now???
-//OLD   98nov   ksl     Corrected scattering fraction to agree with Python notes.
-//OLD                   It was not correct previously
-//OLD   06may   ksl     57+ -- Modified to use plasma structure
-//OLD ************************************************/
-
 
 
 /**********************************************************/
@@ -648,7 +610,7 @@ p_escape (line_ptr, xplasma)
  * probility
  *
  * @param [in] double  tau   An optical depth
- * @return     The escape proability
+ * @return     The escape probability
  *
  * @details
  * p_escape_from_tau calculates the probability of escape

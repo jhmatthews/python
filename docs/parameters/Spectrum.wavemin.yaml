@@ -5,5 +5,5 @@ type: Double
 unit: Angstroms
 values: Greater than 0
 parent:
-  parameter: Condition e.g. greater than 0 or list e.g. [1, 2, 5]
-file: setup2.c
+  Spectrum_cycles: Greater than or equal to 0
+file: setup.c

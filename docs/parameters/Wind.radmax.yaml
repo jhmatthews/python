@@ -1,0 +1,9 @@
+name: Wind.radmax
+description: |
+  Multi-line description, must keep indentation.
+type: Double
+unit: cm
+values: Greater than :ref:`Central_object.radius` and any minimum wind radii in the system.
+parent:
+  Wind.number_of_components: Greater than 0. Once per domain.
+file: setup_domains.c

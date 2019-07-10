@@ -59,13 +59,6 @@ get_domain_params (ndom)
 
   strcpy (answer, "SV");
   zdom[ndom].wind_type = rdchoice ("Wind.type(SV,star,hydro,corona,kwd,homologous,yso,shell,imported)", "0,1,3,4,5,6,7,9,10", answer);
-//OLD  rdint ("Wind_type(0=SV,1=Star,3=Hydro,4=corona,5=knigge,6=homologous,7=yso,9=shell,10=imported)", &zdom[ndom].wind_type);
-
-//OLD  if (zdom[ndom].wind_type == 2)
-//OLD  {
-//OLD    Error ("Wind_type 2, which was used to read in a previous model is no longer allowed! Use System_type instead!\n");
-//OLD    Exit (0);
-//OLD  }
 
 
   strcat (zdom[ndom].name, "Wind");
@@ -113,7 +106,6 @@ get_domain_params (ndom)
   {
     strcpy (answer, "no");
     modes.adjust_grid = rdchoice ("@Diag.adjust_grid(yes,no)", "1,0", answer);
-//OLD    rdint ("@Diag.adjust_grid(0=no,1=yes)", &modes.adjust_grid);
 
     if (modes.adjust_grid)
     {

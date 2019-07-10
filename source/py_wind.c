@@ -152,7 +152,7 @@ main (argc, argv)
   char windradfile[LINELENGTH], windsavefile[LINELENGTH];
   char parameter_file[LINELENGTH];
   char photfile[LINELENGTH];
-  char *fgets_result;
+  char *fgets_rc;
   double freq;
   int interactive;
 
@@ -173,7 +173,12 @@ main (argc, argv)
   if (argc == 1)
   {
     printf ("Root for wind file :");
-    fgets_result = fgets (input, LINELENGTH, stdin);
+    fgets_rc = fgets (input, LINELENGTH, stdin);
+    if (!fgets_rc)
+    {
+      Error ("Input rootname is NULL or EOF\n");
+      exit (1);                 // Exit if NULL returned
+    }
     get_root (root, input);
   }
   else

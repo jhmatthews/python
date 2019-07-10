@@ -1,9 +1,10 @@
 name: Spectrum.wavemax
 description: |
-  The maximum waveleenght of the detailed spectra that are to be produced
+  The maximum wavelength of the detailed spectra that are to be produced
 type: Double
 unit: Angstroms
-values: Greater than 0 and greater than Spectrum.wavemin
+values:
+  Spectrum.wavemin: Greater than
 parent:
-  parameter: Condition e.g. greater than 0 or list e.g. [1, 2, 5]
-file: setup2.c
+  Spectrum_cycles: Greater than or equal to 0
+file: setup.c

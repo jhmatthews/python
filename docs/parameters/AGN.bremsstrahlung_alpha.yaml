@@ -3,8 +3,7 @@ description: |
   The frequency exponent alpha in bremstrahlung SED of the form
   L_nu=nu**alpha exp(-hnu/kT)
 type: Double
-unit: None
-values: Any - sign is not asssumed so use negative if you want negative
+values: Any - sign is not assumed so use negative if you want negative
 parent:
-  parameter: Condition e.g. greater than 0 or list e.g. [1, 2, 5]
+  BH.rad_type_to_make_wind: brems
 file: setup_star_bh.c

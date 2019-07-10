@@ -1,7 +1,7 @@
 name: Boundary_layer.radiation
 description: |
-  Says whether the boundary layer will radiate 0=no, 1=yes
+  Says whether the boundary layer will radiate.
 type: Boolean (yes/no)
 parent:
-  parameter:
+  System_type: [star, binary]
 file: setup_star_bh.c

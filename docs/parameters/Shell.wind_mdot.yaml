@@ -1,11 +1,11 @@
 name: Shell.wind_mdot
 description: |
-  The mass loss thruogh a diagnostic shell type wind. One normally sets
+  The mass loss through a diagnostic shell type wind. One normally sets
   this experimentally in order to get a required hydrogen density in
   the shell
 type: Double
-unit: Msol/year
+unit: M☉/year
 values: Greater than 0
 parent:
-  Wind_type: 9
+  Wind.type: shell
 file: shell_wind.c

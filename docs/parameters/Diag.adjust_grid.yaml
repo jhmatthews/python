@@ -4,6 +4,6 @@ description: |
   for the logarithmic grid. Advanced command.
 type: Boolean (yes/no)
 parent:
-  parameter: Condition e.g. greater than 0 or list e.g. [1, 2, 5]
+  Wind.number_of_components: Greater than 0. Once per domain.
 file: setup_domains.c
 advanced: true

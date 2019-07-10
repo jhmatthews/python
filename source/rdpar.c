@@ -559,7 +559,7 @@ string_process_from_file (question, dummy)
 {
 
   char firstword[LINELEN], secondword[LINELEN];
-  char *line, *fgets_return;
+  char *line, *fgets_rc;
   char *ccc, *index (), *fgets ();
   int nwords = 0;               // Initialise to avoid warning
   int wordlength;
@@ -669,7 +669,12 @@ string_process_from_file (question, dummy)
 
     strcpy (secondword, dummy);
 
-    fgets_return = fgets (dummy, LINELEN, stdin);
+    fgets_rc = fgets (dummy, LINELEN, stdin);
+    if (!fgets_rc)
+    {
+      Error ("Input value is NULL or invalid\n");
+      exit (1);
+    }
 
     if (strcmp (dummy, "\n") == 0)
     {                           /* Store the provided value since \n */

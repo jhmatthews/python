@@ -1,0 +1,9 @@
+name: BH.lum
+description: |
+  Multi-line description, must keep indentation.
+type: Double
+unit: ergs/s
+values: Condition e.g. greater than 0 or list e.g. [1, 2, 5]
+parent:
+  bh.rad_type_to_make_wind: [brems, cloudy, model, power]
+file: setup_star_bh.c

@@ -2,14 +2,13 @@ name: Spectrum.orbit_phase
 description: |
   For binary systems, the orbital phase at which the spectrum
   is to be extracted (so the effects of an eclipse can be taken
-  into account in creating the spectrum. Phase 0 corresponds to
-  inferior conjunciton, that is with the secondary in front (or 
+  into account in creating the spectrum). Phase 0 corresponds to
+  inferior conjunciton, that is with the secondary in front (or
   depending on inclination angle, partially in front of) the
   primary
 type: Double
-unit: None
-values: Normally between 0 and 1                 
+values: Between 0 and 1
 parent:
-  parameter: |
-      Only required when the system is a described as a binary
-file: setup2.c
+  Spectrum_cycles: Greater than or equal to 0
+  System_type: binary
+file: setup.c

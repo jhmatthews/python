@@ -1,4 +1,0 @@
-ellint.c:124:9: warning: type specifier missing, defaults to 'int' [-Wimplicit-int]
-  const nmax = 10000;
-  ~~~~~ ^
-1 warning generated.

@@ -4,5 +4,5 @@ description: |
   survace as a star would.
 type: Boolean (yes/no)
 parent:
-  parameter: Condition e.g. greater than 0 or list e.g. [1, 2, 5]
-file: setup.c
+  System_type: [star, binary, previous]
+file: setup_star_bh.c

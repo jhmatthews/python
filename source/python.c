@@ -8,224 +8,6 @@
  * that are central to the operation of Python
  *
  ***********************************************************/
-//OLD /***********************************************************
-//OLD                                        Space Telescope Science Institute
-//OLD
-//OLD  Synopsis:
-//OLD   Python is a program designed to simulate the transfer of radiation in a wind.  It uses the
-//OLD   Sobolev approximation.  It models a wind as a biconical flow.
-//OLD
-//OLD   This is the "main" routine for Python.  It's basic purpose is to gather the input variables
-//OLD   and to control the flow of the program
-//OLD
-//OLD Arguments:
-//OLD
-//OLD   Usage:  py [-h] [-r] [-d] [-f] [-t time_max] xxx  or simply py
-//OLD
-//OLD   where xxx is the rootname or full name of a parameter file, e. g. test.pf
-//OLD
-//OLD   and the switches have the following meanings
-//OLD
-//OLD   -h      to get this help message
-//OLD   -r      restart a run of the program reading the file xxx.windsave
-//OLD
-//OLD   -t time_max     limit the total time to approximately time_max seconds.  Note that the program checks
-//OLD           for this limit somewhat infrequently, usually at the ends of cycles, because it
-//OLD           is attempting to save the program outputs so that the program can be restarted with
-//OLD           -r if theat is desired.
-//OLD   -v num  determines the amount of information that is printed out.  If num is small, then
-//OLD           less information is printed out; if num is large more is printed out.  Setting
-//OLD           v to 5 causes the routine to print out all the information which outputs have
-//OLD           included previously.  The current default is set to 3 which suppresses Debug, Log_silent
-//OLD           and Error_silent
-//OLD   -e nnn  The program stops normally stops after 1e6 errors of any type.  This switch allows one to
-//OLD           adjust this number
-//OLD   -d      Enters detailed or advanced mode. Allows one to access extra diagnositics and some
-//OLD           other advanced commands
-//OLD     -f    Fixed temperature mode - does not attempt to change the temperature of cells.
-//OLD   -i      Diagnostic mode which quits after reading in inputs. Used for Travis test suite.
-//OLD     --dry-run     Create a new .pf file and stop (equivalent to -i)
-//OLD   -z      Mode to connect with zeus - it either runs two cycles in this is the first call - in order
-//OLD           to obtain a good starting state, else it runs just one cycle. In both cases, it does
-//OLD                   not attempt to seek a new temperature, but it does output heating and cooling rates
-//OLD     --version     print out python version, commit hash and if there were files with uncommitted
-//OLD           changes
-//OLD       --rseed     set the random number seed to be time based, rather than fixed.
-//OLD
-//OLD
-//OLD   if one simply types py or pyZZ where ZZ is the version number one is queried for a name
-//OLD   of the parameter file.
-//OLD
-//OLD   NOTE - If this is modified, please also modify the help message in help() below
-//OLD Returns:
-//OLD
-//OLD Description:
-//OLD   Python is far too complicated to describe.  Basically it simulates the radiative transfer
-//OLD   of photons through the wind of a cataclysmic variable or a star.  The kinematic formulation for
-//OLD   the CV wind is due to Schlossman and Vitello while that of the star is due to Castor & Larmors.
-//OLD
-//OLD    Radiation from an optically thick disk, the WD star, a boundary layer and the wind itself
-//OLD    may be included
-//OLD
-//OLD   There are 3 basic portions to the program which are easy to see in the main program.
-//OLD
-//OLD   1. A data gathering stage
-//OLD
-//OLD   2. A calculation of the state of ionization of the wind.
-//OLD
-//OLD   3. A calculation of a detailed spectrum in which the ionization is held fixed.
-//OLD
-//OLD
-//OLD Notes:
-//OLD   The program has been designed and tested both on Suns and MacIntoshes (with Symentec's
-//OLD   C compiler).  Some of its peculiarities are due to memory limitations and relatively small
-//OLD   stack sizes on the Mac.  When compiling, check to see that the global varible MAC is
-//OLD   set properly in python.h.
-//OLD
-//OLD History:
-//OLD   97jan   ksl     Coding on python began.
-//OLD   97jul   ksl     Added capability model the spectrum as a function of orbital phase.
-//OLD   97aug   ksl     Added boundary layer as additional source of radiation
-//OLD   97aug   ksl     Added capability to extract spectra with a specific number of scatters
-//OLD   97nov   ksl     Changed error and diagnostic logging
-//OLD   98july  ksl     Added radiation from the wind itself
-//OLD   98nov   ksl     Added spherical winds and greatly modified I/O
-//OLD   99jan   ksl     Added ability to enter parameter file (w/out) root on command line
-//OLD   99jul   ksl     Begin eliminating MAC dependencies
-//OLD   00sep   ksl     Began work on adding a new coronal possibility
-//OLD   01mar   ksl     Added a knigge wind
-//OLD         01sept    ksl     Added a thierry wind
-//OLD   01dec   ksl     Incorporated improved atomic data reading codes, and
-//OLD                   made a variety of other major changes to the way in
-//OLD                   which many of the subroutines operate.
-//OLD   01dec   ksl     Revised way in which old windfile option works.  It
-//OLD                   was not working at all originally, because of a
-//OLD                   change I made in April.  The new method is a bit dangerous
-//OLD                   because it does change a good bit of geo, since all of the
-//OLD                   input data is read in.  In principle, his can create an inconsistency
-//OLD                   between some of the info in geo and some in the wind array.
-//OLD                   But it keeps the wind the same, which is what was desired.
-//OLD   01dec   ksl     Added a general capability to python(40) so that during the
-//OLD                   the ionization cycle photons do not necessarily have identical
-//OLD                   weights.
-//OLD   02jan   ksl     Moved specific inputs for KWD wind to knigge.c
-//OLD   02feb   ksl     Added anisotropic wind scattering
-//OLD   02feb   ksl     41.1 -- Allowed user to chose between anisotropic and
-//OLD                   isotropic scattering in the wind.
-//OLD   02feb   ksl     41.2 -- Added aditional options for choosing what photons
-//OLD                   to count
-//OLD   02apr   ksl     43.1 -- Added additional radiative transfer options.  Modified main
-//OLD                   so that a spectrum is printed out after each cycle
-//OLD   02jul   ksl     43.7 -- Considerable changes associated with photoionization
-//OLD                   and recombination were made.  The initial attemps to allow
-//OLD                   for using a more accurate detailed balance approach were
-//OLD                   included in the ionizatio routines.
-//OLD   03dec   ksl     Added back some timing ability
-//OLD         04Mar   SS      Minor changes to set switch for macro atom method.
-//OLD                         geo.line_mode=6 switches geo.rt_mode=2 (macro method)
-//OLD                         and then geo.ine_mode back to =3. (SS)
-//OLD         04Apr   SS      Minor change to set a switch for geo.line_mode=7
-//OLD                         which is the same as 6 but with anisotropic scattering
-//OLD         04May   SS      geo.line_mode=8 added: this mode is the same as mode 6
-//OLD                         BUT will treat all ions as simple - it is for
-//OLD                         test purposes only.
-//OLD   04Jun   ksl     Added new disk + wind model for ysos.  In process, moved
-//OLD                   the variables describing the wind mdots to subroutines
-//OLD   04Aug   ksl     52 -- Modified input variables to allow a variety of input models
-//OLD                   all ascii-based.
-//OLD   04Aug   ksl     52 -- Modified input variables to allow for various disk illumination
-//OLD                   models
-//OLD   04Aug   ksl     52 -- Modified to allow for vertically extended disks. Note that some of
-//OLD                   the input variables were rearranged in the process.
-//OLD         04Aug   SS      Minor modifications to cope with finite disk thickness calculations.
-//OLD   04dec   ksl     54a -- Minor mod to calculation of fraction of luminosity that hits
-//OLD                   disk so that correct values are printed out in situation where there
-//OLD                   are multiple subcycles.
-//OLD   04dec   ksl     54e -- Minor mod to record master atomic file in geo, and, for the
-//OLD                   case of fixed concentration to store the file where the concentrations
-//OLD                   are contaned.
-//OLD   05apr   ksl     56 -- Added new variable geo.binary_system to avoid binary system
-//OLD                   questions in cases where one was modelling a single object.  Note
-//OLD                   that I did not remove seemingly superfluous quesions regarding
-//OLD                   phase because one can still extract photons in various azimuthal
-//OLD                   directions, and if we ever move to 3d situations one might want
-//OLD                   to deal with non-axially symmetric systems.
-//OLD   05jul   ksl     56d -- Updated to include new windcone definitions.
-//OLD   05jul   ksl     56d -- Completed basic work to allow vertically extended disk
-//OLD   06may   ksl     57g -- Began work on modifying structures to lower memory requirments
-//OLD                   At empty wind cells have mostly been eliminated, and macroatoms
-//OLD                   have been split off into a separate structure so this is not
-//OLD                   used.
-//OLD   06jul   ksl     57h -- Have contined work to speed program up as much as possible
-//OLD                   by giving more control over the parameters that govern the speed
-//OLD                   such as SMAX_FRAC.
-//OLD   06oct   ksl     58 -- This version is a cleaned up version of py57ib, which differs
-//OLD                   from 57h primarily in bb.c and pdf.c.   In addition, this version
-//OLD                   makes it possible to use the SV velocity law in what is otherwise
-//OLD                   a KWD description of the wind.
-//OLD   06nov   ksl     58c -- This version requires and updated version of kpar, that
-//OLD                   keeps track of all the errors.
-//OLD   07aug   ksl     58f -- Modified the way in which the program handles a situation
-//OLD                   in which one attempts to run with a non-existent .pf file.
-//OLD   08may   ksl     60a -- Significant modifications were made to the main routine
-//OLD                   to make sure we could restart models.  Unfortunaaely rhe point
-//OLD                   at which the user was asked for the atomic data needed to be changed,
-//OLD                   so earlier .pf files will need to be modified.
-//OLD   080808  ksl     62 -- Cleaned up wind ionization options
-//OLD   081110  ksl     67 -- Revised a number of portions of the main python.c routine
-//OLD                   to enable restarts.  There are still inconsistencies in the
-//OLD                   way one reads information from the .pf file after having read
-//OLD                   in the windsave files that could be cleaned up.
-//OLD   081218  ksl     67c -- Added a switch -h to provide information about usage.
-//OLD   090202  ksl     68b -- Added switch -v  to control the level of verbosity.  Updated
-//OLD                   Plasma to allow routine to track scatters and absorption during
-//OLD                   generation of detailed spectrum
-//OLD   090402  ksl     NSPEC has been moved to the main routine, as its only remaining
-//OLD                   purpose is to define some arrays in the main routine.  Note that
-//OLD                   MSPEC still has meaning as the number of spectra of various types
-//OLD                   that are construced without going through types.
-//OLD   1108    ksl/nsh Adding code to keep track of gross spectra in a cell though xbands,
-//OLD                   xj and xave_freq.  Just set up the frequence limits here.
-//OLD   1112    ksl     Moved everything associated with frequency bands into bands_init
-//OLD   1212    nsh     changed the way DFUDGE is defined.
-//OLD         1302      jm      74b5 introduced double precision variable for photon number for calling
-//OLD                   define_phot. Fixes Bug JM130302 in photon weights. It has been suggested
-//OLD                   that we should make NPHOT a long integer- at the moment I have not done
-//OLD                   this and simply comverted to double before calling define_phot (otherwise
-//OLD                   I believe rdint would have to be redone for long integers).
-//OLD   1304    ksl     75 rewrote the fix above to use a long, instead of double.
-//OLD                   This has plenty of range.  Notge that there is no need to make NPHOT
-//OLD                   a long, as suggested above.  We do not expect it to exceed 2e9,
-//OLD                   although some kind of error check might be reasonble.
-//OLD   1306    ksl     Modified to allow a power law component to a stellar spectrum.  Made
-//OLD                   some changes use DEF variables instead of numbers to make choices
-//OLD   1307    jm      SS Parallelized Python in June 2013, for release 76a. I have now introduced
-//OLD                   slightly altered reporting to allow more succinct reporting in parallel mode.
-//OLD   1307    ksl     Removed the Thierry & Hubeny O-star models as an option from the code.
-//OLD                   This was never tested, and never really used.  Knox no longer even has the
-//OLD                   models.  Note that Stuart is replacing this with a homologous expansion
-//OLD                   model
-//OLD   1308    nsh     Added a call to generate rtheta wind cones - issue #41
-//OLD   1309    nsh     Changed the loop around where disk parameters are read in - issue #44
-//OLD   1309    nsh     Added commands to write out warning summary - relating to issue #47
-//OLD           1312    nsh     Added a new parameter file command to turn off heating and cooling mechanisms
-//OLD                   at the moment it only does adiabatc
-//OLD                   Also some modifications to the parallel communiactions to deal with some new
-//OLD                   plasma variabales, and the min and max frequency photons seen in bands.
-//OLD   1409    ksl     Added new switch -d to enable use of a new Debug logging feature
-//OLD   1411    JM removed photons per cycle in favour of NPHOT. subcycles are now eliminated
-//OLD   1501    JM moved some parallelization stuff to subroutines in para_update.c
-//OLD                   functions are communicate_estimators_para, communicate_matom_estimators_para,
-//OLD                   and gather_spectra_para
-//OLD   1502            Major reorganisation of input gathering and setup. See setup.c, #136 and #139
-//OLD   1508    ksl     Instroduction of the concept of domains to handle the disk and wind as separate
-//OLD                   domains
-//OLD     1711    ksl Removed the Elvis wind option
-//OLD
-//OLD   Look in Readme.c for more text concerning the early history of the program.
-//OLD
-//OLD **************************************************************/
-
 
 
 #include <stdio.h>
@@ -293,7 +75,8 @@ main (argc, argv)
   double freqmin, freqmax;
   int n;
   char answer[LINELENGTH];
-
+  int get_models ();            // Note: Needed because get_models cannot be included in templates.h
+  int dummy_spectype;
 
   FILE *fopen ();
 
@@ -407,6 +190,14 @@ main (argc, argv)
 
     xsignal (files.root, "%-20s Read %s\n", "COMMENT", files.old_windsave);
 
+
+    if (geo.model_count > 0)    //We have previously used models - we need to read them in again
+    {
+      for (n = 0; n < geo.model_count; n++)
+      {
+        get_models (geo.model_list[n], 2, &dummy_spectype);
+      }
+    }
     if (geo.pcycle > 0)
     {
       spec_read (files.specsave);
@@ -428,8 +219,6 @@ main (argc, argv)
     strcpy (answer, "star");
     geo.system_type = rdchoice ("System_type(star,binary,agn,previous)", "0,1,2,3", answer);
 
-//OLD      rdint ("System_type(0=star,1=binary,2=agn,3=previous)",
-//OLD        &geo.system_type);
 
     if (geo.system_type == SYSTEM_TYPE_PREVIOUS)
     {
@@ -642,8 +431,9 @@ main (argc, argv)
  * radiation and then value given to return a spectrum type. The output is not the same
  * number as one inputs. It' s not obvious that this is a good idea. */
 
-  if (geo.pcycles > 0)
+  if (geo.pcycles > 0 && geo.pcycle == 0)
   {
+    // This should only evaluate true for when no spectrum cycles have run (I hope)
 
     rdpar_comment ("Parameters defining the spectra seen by observers\n");
 
@@ -697,7 +487,6 @@ main (argc, argv)
     /* Do we require extra diagnostics or not */
     strcpy (answer, "no");
     modes.diag_on_off = rdchoice ("@Diag.extra(yes,no)", "1,0", answer);
-//OLD      rdint ("@Diag.extra(0=no,1=yes) ", &modes.diag_on_off);
     if (modes.diag_on_off)
     {
       get_extra_diagnostics ();
@@ -727,6 +516,7 @@ main (argc, argv)
   if (modes.quit_after_inputs)
   {
     Log ("This was was run with the -i or --dry-run flag set, so quitting now inputs have been gathered.\n");
+    error_summary ("dry run.");
     exit (0);
   }
 

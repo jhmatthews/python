@@ -7,8 +7,8 @@ description: |
   number is positive, the velicty is the r direction is
   toward the central object).
 type: Double
-unit: None
+unit: Disk velocity
 values: Any, 0 implies no radial velocity.
 parent:
-  Wind.type: Selected as one of the choces for this variable
+  Wind.type: corona
 file: corona.c

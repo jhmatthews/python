@@ -102,25 +102,26 @@ get_time (curtime)
 
 /**********************************************************/
 /**
- * @brief initialise a timespec structure with the current time
+ * @brief initialise a timeval structure with the current time
  *
- * @return struct timespec timer_t0 The current CPU time as a timespec structure
+ * param[in] void
  *
- * The clock id used to get the time can be modified by changing the define macro
- * CLOCK_TYPE. CLOCK_REALTIME will measure the time using actual wall clock time.
- * Whereas something such as CLOCK_PROCESS_CPUTIME_ID will measure time using
- * the amount of CPU time used by the process.
+ * @return struct timeval timer_t0 The current CPU time as a timespec structure
+ *
+ * ###Notes###
+ *
+ * Note that NULL is passed as the second argument to gettimeofday as we most
+ * likely do not require to know the time zone.
  *
  **********************************************************/
 
-#define CLOCK_TYPE CLOCK_PROCESS_CPUTIME_ID
 
-struct timespec
+struct timeval
 init_timer_t0 (void)
 {
-  struct timespec timer_t0;
+  struct timeval timer_t0;
 
-  clock_gettime (CLOCK_TYPE, &timer_t0);
+  gettimeofday (&timer_t0, NULL);
 
   return timer_t0;
 }
@@ -142,15 +143,20 @@ init_timer_t0 (void)
  * time_t0 was initialised will be printed to screen down to nanosecond resolution.
  * The time difference will be preceded by the message provided by *msg.
  *
+ * ###Notes###
+ *
+ * Note that NULL is passed as the second argument to gettimeofday as we most
+ * likely do not require to know the time zone.
+ *
  **********************************************************/
 
 void
-print_timer_duration (char *msg, struct timespec timer_t0)
+print_timer_duration (char *msg, struct timeval timer_t0)
 {
   double td;
-  struct timespec timer_t1;
+  struct timeval timer_t1;
 
-  clock_gettime (CLOCK_TYPE, &timer_t1);
-  td = (timer_t1.tv_sec - timer_t0.tv_sec) + (timer_t1.tv_nsec - timer_t0.tv_nsec) * 1e-9;
-  Log ("%s in %f seconds\n", msg, td);
+  gettimeofday (&timer_t1, NULL);
+  td = (timer_t1.tv_sec - timer_t0.tv_sec) + (timer_t1.tv_usec - timer_t0.tv_usec) * 1e-6;
+  Log ("%s: %f seconds\n", msg, td);
 }

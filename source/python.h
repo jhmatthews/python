@@ -89,13 +89,14 @@ double DENSITY_PHOT_MIN;        /* This constant is a minimum density for the pu
 #define DANG_LIVE_OR_DIE   2.0  /* If constructing photons from a live or die run of the code, the
                                    angle over which photons will be accepted must be defined */
 
-int PHOT_STEPS;                 /* The switch for turning on the photon increase algorithm */
-int NPHOT_MIN;                  /* The minimum number of photon bundles created per  */
+double PHOT_RANGE;              /* When a variable number of photons are called in different ionization
+                                   cycles this is the log of the difference between NPHOT_MAX
+                                   and the value in the first cycle
+                                 */
 int NPHOT_MAX;                  /* The maximum number of photon bundles created per cycle */
 int NPHOT;                      /* The number of photon bundles created, defined in setup.c */
-int CURRENT_PHOT;               /* A diagnostic so that one can always determine what the current photon number being run is */
 
-#define NWAVE  			  1000 //Increasing from 4000 to 10000 (SS June 04) and decrease to 1000 (MH Jun 19)
+#define NWAVE  			  10000 //This is the number of wavelength bins in spectra that are produced
 #define MAXSCAT 			500
 
 /* Define the structures */
@@ -153,7 +154,6 @@ enum coord_type_enum
 #define KNIGGE			5
 #define	HOMOLOGOUS 		6
 #define	YSO 			7
-//OLD #define   ELVIS                   8  Deleted option
 #define	SHELL 			9
 #define IMPORT          10      // Model that is read in from a file
 #define	DISK_ATMOS 		11
@@ -198,7 +198,7 @@ cone_dummy, *ConePtr;
 
 /* End of structures which are used to define boundaries to the emission regions */
 
-#define NDIM_MAX 500            // maximum size of the grid in each dimension
+#define NDIM_MAX 1000           // maximum size of the grid in each dimension
 
 typedef struct domain
 {
@@ -341,9 +341,12 @@ struct geometry
    * in the calculation */
 
   int wcycle, pcycle;           /* The number of completed ionization and spectrum cycles */
-  int wcycles, pcycles;         /* The number of ionization and spectrum cycles desired */
+  int wcycles, pcycles, pcycles_renorm; /* The number of ionization and spectrum cycles desired, pcycles_renorm 
+                                         * is only used on restarts.  See spectrum_restart_renormalize
+                                         */
 
-  /* This section stores information whihc specifies the spectra to be extracted.  Some of the parameters
+
+  /* This section stores information which specifies the spectra to be extracted.  Some of the parameters
    * are used only in advanced modes.  
    */
 
@@ -352,7 +355,7 @@ struct geometry
   double angle[NSPEC], phase[NSPEC];
   int scat_select[NSPEC], top_bot_select[NSPEC];
   double rho_select[NSPEC], z_select[NSPEC], az_select[NSPEC], r_select[NSPEC];
-  double swavemin, swavemax;
+  double swavemin, swavemax, sfmin, sfmax;      // The minimum and maximum wavelengths/freqs for detailed spectra
   int select_extract, select_spectype;
 
 /* Begin description of the actual geometery */
@@ -409,17 +412,13 @@ struct geometry
                                    - 1 means use emissivities for BOTH macro atom levels and kpkts. 0 means don't
                                    (which is correct for the ionization cycles. */
   int ioniz_mode;               /* describes the type of ionization calculation which will
-                                   be carried out.  0=on the spot, 1=LTE, 2=fixed ionization
-                                   fractions,  3 means to recalculate the ionization structure 
-                                   based on the energy absorbed in the wind (mod_on_the_spot), 4
-                                   is a test.  It is currently set to do the same as 3, except
-                                   that ground state mulitpliciites are used instead of 
-                                   a partition function */
+                                   be carried out.  The various ioniz_modes are defined by #defines IONMODE_MATRIX_BB
+                                   etc.  See the documentation in this file for what these mean. */
   int macro_ioniz_mode;         /* Added by SS Apr04 to control the use of macro atom populations and
                                    ionization fractions. If it is set to 1 then macro atom populations
                                    computed from estimators are used. If set to 0 then the macro atom
                                    populations are computed as for minor ions. By default it is set to
-                                   0 initially in python.c and then set to 1 the first time that
+                                   0 initially and then set to 1 the first time that
                                    Monte Carlo estimators are normalised. */
   int ioniz_or_extract;         /* Set to 1 (true) during ionization cycles, set to 0 (false) during calculation of
                                    detailed spectrum.  Originally introduced by SS in July04 as he added
@@ -483,7 +482,7 @@ struct geometry
 
   /* The next set pf variables assign a SPECTYPE (see above) for
      each possible source of radiation in a model.  The value assigned can be different for
-     the ionization and detaled spectrum generation part of the code */
+     the ionization and detailed spectrum generation part of the code */
 
   int star_ion_spectype, star_spectype; /* The type of spectrum used to create the continuum
                                            for the star in the ionization and final spectrum calculation */
@@ -493,6 +492,7 @@ struct geometry
   int search_light_ion_spectype, search_light_spectype; /* Same as above but for the search_light. Created for 1d test */
 
   char model_list[NCOMPS][LINELENGTH];  /* The file which contains the model names and the associated values for the model */
+  int model_count;              /*The number of distinct models that have been read in */
 
   double mdot_norm;             /*A normalization factor used in SV wind, and Knigge wind */
   int adiabatic;                /*0-> Do not include adiabatic heating in calculating the cooling of the wind
@@ -692,9 +692,6 @@ done to make it easier to control the size of the entire structure   06jul-ksl
  */
 #define NIONIZ	5               /*The number of ions (normally H and He) for which one separately tracks ionization 
                                    and recombinations */
-//OLD #define LPDF   3                /*The number of bins into which the line luminosity is divided in the course pdf
-//OLD                                    created by total_line_emission 
-//OLD                                    Reduced from 10 to 3 by SS for testing data with few lines. */
 
 
 /* 061104 -- 58b -- ksl -- Added definitions to characterize whether a cell is in the wind. */
@@ -886,19 +883,17 @@ typedef struct plasma
 
 
 
-//OLD  int npdf;                     /* The number of points actually used in the luminosity pdf */
-//OLD  int pdf_x[LPDF];              /* The line numbers of *line_ptr which form the boundaries the luminosity pdf */
-//OLD  double pdf_y[LPDF];           /* Where the pdf is stored -- values between 0 and 1 */
   double gain;                  /* The gain being used in interations of the structure */
   double converge_t_r, converge_t_e, converge_hc;       /* Three measures of whether the program believes the grid is converged.
-                                                           The first wo  are the fraction changes in t_r, t_e between this and the last cycle. The third
+                                                           The first two are the fractional changes in t_r, t_e between this and the last cycle. The third
                                                            number is the fraction between heating and cooling divided by the sum of the 2       */
   int trcheck, techeck, hccheck;        /* NSH the individual convergence checks used to calculate converge_whole.  Each of these values
                                            is 0 if the fractional change or in the case of the last check error is less than a value, currently
                                            set to 0.05.  ksl 111126   
                                            NSH 130725 - this number is now also used to say if the cell is over temperature - it is set to 2 in this case   */
   int converge_whole, converging;       /* converge_whole is the sum of the indvidual convergence checks.  It is 0 if all of the
-                                           convergence checks indicated convergence.subroutine convergence feels point is converged, converging is an
+                                           convergence checks indicated convergence. 
+                                           converging is an
                                            indicator of whether the program thought the cell is on the way to convergence 0 implies converging */
 
 
@@ -1007,7 +1002,7 @@ typedef struct macro
      and used to select destruction rates for kpkts */
   double cooling_normalisation;
   double cooling_bbtot, cooling_bftot, cooling_bf_coltot;
-  double cooling_ff;
+  double cooling_ff, cooling_ff_lofreq;
   double cooling_adiabatic;     // this is just cool_adiabatic / vol / ne
 
 
@@ -1022,12 +1017,11 @@ int size_Jbar_est, size_gamma_est, size_alpha_est;
 #define TMAX_FACTOR			1.5     /*Factor by which t_e can exceed
                                                    t_r in order for absorbed to 
                                                    match emitted flux */
-//OLD - moved to zeta.c #define TMIN                            2000.
-/* ??? TMIN appears to be used both for the minimum temperature and for 
-   calculating the fraction of recombinations that go to the ground state.  This
-   looks like a problem ksl-98jul???? It is used in py_wind_updates2d, zeta.c, and py_wind_ion.c */
 
-#define TMAX    5e8             /*NSH 130725 - this is the maximum temperature permitted - this was introduced following problems with adaibatically heated cells increasing forever. The value was suggested by DP as a sensible compton teperature for the PK05/P05 Zeus models. */
+#define TMAX    5e8             /*NSH 130725 - this is the maximum temperature permitted - this was 
+                                   introduced following problems with adiabatically heated cells increasing 
+                                   forever. The value was suggested by DP as a sensible compton teperature for the PK05/P05 Zeus models. */
+#define TMIN   100              /* A minimum temperature below which various emission processes are set to 0 */
 
 
 //These constants are used in the various routines which compute ionization state
@@ -1043,11 +1037,8 @@ int size_Jbar_est, size_gamma_est, size_alpha_est;
 #define IONMODE_LTE_TE 4        // LTE using t_e
 #define IONMODE_FIXED 2         // Hardwired concentrations
 #define IONMODE_ML93 3          // Lucy Mazzali
-//OLD #define IONMODE_LTE_SIM 4 // LTE with SIM correction
-//OLD #define IONMODE_PAIRWISE_ML93 6 // pairwise version of Lucy Mazzali
-//OLD #define IONMODE_PAIRWISE_SPECTRALMODEL 7        // pairwise modeled J_nu approach
 #define IONMODE_MATRIX_BB 8     // matrix solver BB model
-#define IONMODE_MATRIX_SPECTRALMODEL 9  // matrix solver spectral model
+#define IONMODE_MATRIX_SPECTRALMODEL 9  // matrix solver spectral model based on power laws
 
 // and the corresponding modes in nebular_concentrations
 #define NEBULARMODE_TR 0        // LTE using t_r
@@ -1077,11 +1068,13 @@ typedef struct photon
     P_ESCAPE = 2,               //Escaped to reach the universe,
     P_HIT_STAR = 3,             //absorbed by photosphere of star,
     P_TOO_MANY_SCATTERS = 4,    //in wind after MAXSCAT scatters
-    P_ERROR = 5,                //Too many calls to translate without something happening
+    P_ERROR = 5,                //Trying to scatter a photon in a location where it should not scatter
     P_ABSORB = 6,               //Photoabsorbed within wind
     P_HIT_DISK = 7,             //Banged into disk
     P_SEC = 8,                  //Photon hit secondary
-    P_ADIABATIC = 9             //records that a photon created a kpkt which was destroyed by adiabatic cooling
+    P_ADIABATIC = 9,            //records that a photon created a kpkt which was destroyed by adiabatic cooling
+    P_ERROR_MATOM = 10,         //Some kind of error in processing of a photon which excited a macroattom
+    P_LOFREQ_FF = 11            //records a photon that had too low a frequency  
   } istat;                      /*status of photon. */
 
   int nscat;                    /*number of scatterings */
@@ -1211,7 +1204,7 @@ typedef struct spectrum
   double lfreq[NWAVE];          /* We need to hold what frequency intervals our logarithmic spectrum
                                  has been taken over */
   double f_wind[NWAVE];         /* The spectrum of photons created in the wind or scattered in the wind. Created for 
-                                   reflection studies but possible useful for other reasons as well. */
+                                   reflection studies but possibly useful for other reasons as well. */
   double lf_wind[NWAVE];        /* The logarithmic version of this */
 }
 spectrum_dummy, *SpecPtr;
@@ -1240,7 +1233,8 @@ have access to the proper normalization.
 */
 
 
-#define NCDF 30000              //The default size for these arrays
+#define NCDF 30000              //The default size for these arrays.  This needs to be greater than
+                                //the size of any model that is read in, hence larger than NWAVE in models.h
 #define FUNC_CDF  200           //The size for CDFs made from functional form CDFs
 #define ARRAY_PDF 1000          //The size for PDFs to be turned into CDFs from arrays
 
@@ -1282,10 +1276,6 @@ char hubeny_list[132];          //Location of listing of files representing hube
 /* Allow for the transfer of tau info to scattering routine */
 
 
-//180414-ksl-moved to anisowind.c which is the only place they were called.
-//OLD struct Cdf cdf_randwind_store[100];
-//OLD CdfPtr cdf_randwind;
-//OLD struct photon phot_randwind;
 
 /* N.B. cdf_randwind and phot_randwind are used in the routine anisowind for 
 as part of effort to incorporate anisotropic scattering in to python.  
@@ -1346,15 +1336,6 @@ double fb_t[NTEMPS];
 int nfb;                        // Actual number of freqency intervals calculated
 
 
-//This is a new structure to contain the frequency range of the final spectrum
-//During the ionization cycles, the emissivity due to k-packets and macro atom
-//deactivations in this range will be computed and then used in the final spectral
-//synthesis part of the code (SS June04).
-struct emiss_range
-{
-  double fmin, fmax;            // min and max frequency required in the final spectrum
-}
-em_rnge;
 
 
 #include "version.h"            /*54f -- Added so that version can be read directly */
@@ -1463,6 +1444,7 @@ files;
 
 /* Variable introducted to cut off macroatom / estimator integrals when exponential function reaches extreme values. Effectivevly a max limit imposed on x = hnu/kT terms */
 #define ALPHA_MATOM_NUMAX_LIMIT 30      /* maximum value for h nu / k T to be considered in integrals */
+#define ALPHA_FF 100.           // maximum h nu / kT to create the free free CDF
 
 
 /* non-radiative heat flow mode */

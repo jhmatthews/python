@@ -1,4 +1,3 @@
-
 /***********************************************************/
 /** @file  import_rtheta.c
  * @author ksl
@@ -43,8 +42,6 @@ struct
   int ndim, mdim, ncell;
   int i[NDIM_MAX * NDIM_MAX], j[NDIM_MAX * NDIM_MAX], inwind[NDIM_MAX * NDIM_MAX];
   double r[NDIM_MAX * NDIM_MAX], theta[NDIM_MAX * NDIM_MAX];
-//OLD  double v_r[NDIM_MAX * NDIM_MAX], v_theta[NDIM_MAX * NDIM_MAX],
-//OLD    v_phi[NDIM_MAX * NDIM_MAX];
   double v_x[NDIM_MAX * NDIM_MAX], v_y[NDIM_MAX * NDIM_MAX], v_z[NDIM_MAX * NDIM_MAX];
   double rho[NDIM_MAX * NDIM_MAX], t[NDIM_MAX * NDIM_MAX];
 
@@ -57,38 +54,6 @@ struct
 } xx_rtheta;
 
 
-
-
-
-//OLD /***********************************************************
-//OLD     Space Telescope Science Institute
-//OLD
-//OLD Synopsis:
-//OLD     Read the an arbitray wind model in polar coordinates
-//OLD
-//OLD
-//OLD Arguments:
-//OLD
-//OLD Returns:
-//OLD
-//OLD Description:
-//OLD
-//OLD Notes:
-//OLD
-//OLD     The basic data we need to read in are
-//OLD
-//OLD //OLD    r theta v_r v_theta v_phi  rho (and optionally T)
-//OLD     r theta v_x v_y v_z  rho (and optionally T)
-//OLD
-//OLD     We assume that all of the variables are centered, that is
-//OLD     we are not assuming that we are giving rho at the center of
-//OLD     a cell, but that r and v_r are at the edges of a cell.
-//OLD     This is someghing that would presumable be easy to change
-//OLD
-//OLD
-//OLD History:
-//OLD   17nov   ksl Began coding
-//OLD **************************************************************/
 
 
 /**********************************************************/
@@ -113,7 +78,7 @@ struct
  * * r is the radial coordianate
  * * theta is the angular coordinate measured from the z axis
  * * v_x, v_y, and v_z is the velocity in cartesian coordinates
- * as mearued in the x,z plane
+ *      as measured in the x,z plane
  * * rho is the density in cgs units
  * * inwind defines whether or not a particular cell is actually
  * in the wind
@@ -180,10 +145,27 @@ import_rtheta (ndom, filename)
     }
   }
 
+  /* Set and check the dimensions of the grids to be set up.
+   * 
+   * Note that some assumptions are built into the way the grid
+   * is read in, most notably that the last cell to be read in
+   * defines the dimensions of the entire grid.
+   */
+
   zdom[ndom].ndim = xx_rtheta.ndim = icell + 1;
   zdom[ndom].mdim = xx_rtheta.mdim = jcell + 1;
   xx_rtheta.ncell = ncell;
   zdom[ndom].ndim2 = zdom[ndom].ndim * zdom[ndom].mdim;
+
+  /* Check that the number of cells read in matches the number that was expected */
+
+  if (ncell != xx_rtheta.ndim * xx_rtheta.mdim)
+  {
+    Error ("The dimensions of the imported grid seem wrong % d x %d != %d\n", xx_rtheta.ndim, xx_rtheta.mdim, xx_rtheta.ncell);
+    exit (1);
+  }
+
+
   jz = jx = 0;
   for (n = 0; n < xx_rtheta.ncell; n++)
   {
@@ -221,10 +203,6 @@ import_rtheta (ndom, filename)
 }
 
 
-/* Create the grid f r a rtheta coordiante system..
-
-
- * */
 
 
 /**********************************************************/
@@ -255,8 +233,8 @@ rtheta_make_grid_import (w, ndom)
 {
   int n, nn;
   double theta;
-  double rho_max, rho_min, r, rmin, rmax;
-  double zmax;
+  double rho_max, rho_min, r_inner, r_outer, rmin, rmax;
+  double zmin, zmax;
 
   /* As in the case of other models we assume that the grid has been
    * read in correctly and so now that the WindPtrs have been generated
@@ -292,11 +270,6 @@ rtheta_make_grid_import (w, ndom)
     /* JM 1711 -- copy across the inwind variable to the wind pointer */
     w[nn].inwind = xx_rtheta.inwind[n];
 
-//0LD    /* JM 1711 -- you're either in, or you're out. No part in wind cells allowed!
-//0LD     *          there is a question here about which choice (of not in wind or all in
-//0LD     *                   wind) is most appropriate */
-//0LD    if (w[nn].inwind == W_PART_INWIND)
-//0LD      w[nn].inwind = W_NOT_INWIND;
 
     /* 1812 - ksl - For imported models, one is either in the wind or not. But we need
      * to make sure the rest of the code knows that this cell is to be ignored in
@@ -319,46 +292,55 @@ rtheta_make_grid_import (w, ndom)
     zdom[ndom].wind_z[n] = xx_rtheta.wind_z[n];
   }
 
-  /* Now set up wind boundaries so they are harmless */
+  /* Now set up wind boundaries so they are harmless.
+   * Note that the grid goes from near the pole
+   * to the equator
+   */
 
 
   rmax = rho_max = zmax = 0;
-  rmin = rho_min = VERY_BIG;
+  rmin = rho_min = zmin = VERY_BIG;
   for (n = 0; n < xx_rtheta.ncell; n++)
   {
     wind_ij_to_n (ndom, xx_rtheta.i[n], xx_rtheta.j[n], &nn);
 
-    r = length (w[nn].x);
+    r_inner = length (w[nn].x);
+
+    r_outer = length (w[nn + xx_rtheta.mdim].x);
 
 
     if (w[nn].inwind >= 0)
     {
-      if (w[nn].x[0] > rho_max)
+      if (w[nn + xx_rtheta.mdim].x[0] > rho_max)
       {
-        rho_max = w[nn].x[0];
+        rho_max = w[nn + xx_rtheta.mdim].x[0];
       }
-      if (w[nn].x[2] > zmax)
+      if (w[nn - 1].x[2] > zmax)
       {
-        zmax = w[nn].x[2];
+        zmax = w[nn - 1].x[2];
       }
-      if (r > rmax)
+      if (w[nn].x[2] < zmin && w[nn].x[2] > 0)
       {
-        rmax = r;
+        zmin = w[nn].x[2];
       }
-    }
-    else
-    {
+      if (r_outer > rmax)
+      {
+        rmax = r_outer;
+      }
       if (rho_min > w[nn].x[0])
       {
         rho_min = w[nn].x[0];
       }
-      if (rmin > r)
+      if (rmin > r_inner)
       {
-        rmin = r;
+        rmin = r_inner;
       }
     }
   }
 
+  Log ("Imported:    rmin    rmax  %e %e\n", rmin, rmax);
+  Log ("Imported:    zmin    zmax  %e %e\n", zmin, zmax);
+  Log ("Imported: rho_min rho_max  %e %e\n", rho_min, rho_max);
 
 
   zdom[ndom].wind_rho_min = zdom[ndom].rho_min = rho_min;

@@ -1,10 +1,11 @@
 name: lum_agn
 description: |
   The luminosity of an AGN component. This is defined as the luminosity
-  from 2-10keV. 
+  from 2-10keV.
 type: Double
 unit: ergs/s
 values: Greater than 0
 parent:
-  QSO_BH_radiation: 1
-file: setup.c
+  System_type: agn
+  BH.radiation: true
+file: setup_star_bh.c

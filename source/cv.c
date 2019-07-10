@@ -92,11 +92,8 @@ diskrad (m1, m2, period)
   double rlobe1, q;
   double roche2 ();
 
-//OLD  m1 *= MSOL;  In python, the mass is stored in grm
-//OLD  m2 *= MSOL;
   q = m2 / m1;
 
-//OLD  period *= 3600;  In Python the period is stored in seconds
   t2p = period / (2 * PI);
   x = GRAV * t2p * t2p * (m1 + m2);
 

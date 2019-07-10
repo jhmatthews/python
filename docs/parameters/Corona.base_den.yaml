@@ -6,5 +6,5 @@ type: Double
 unit: number/cm**3
 values: Greater than 0
 parent:
-  Wind.type: Selected as one of the choces for this variable
+  Wind.type: corona
 file: corona.c

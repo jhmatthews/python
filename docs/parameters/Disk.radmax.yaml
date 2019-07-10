@@ -3,9 +3,9 @@ description: |
   The outer edge of the disk.  Photons inside this radius are
   absorbed or re-radiated.  Photons which are outside this radius
   pass through the disk plane.
-type: rddoub
+type: Double
 unit: cm
 values: Greater than 0
 parent:
-  disk.type: disktype must be 1 or 2, standard or vertically extended disk
+  disk.type: [flat, vertically.extended]
 file: setup_disk.c

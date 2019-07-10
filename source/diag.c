@@ -125,14 +125,12 @@ get_standard_care_factors ()
   if (modes.iadvanced)
   {
     strcpy (answer, "no");
-    //OLD rdint ("@Diag.use_standard_care_factors(1=yes)", &istandard);
     istandard = rdchoice ("@Diag.use_standard_care_factors(yes,no)", "1,0", answer);
 
     if (!istandard)
     {
       rddoub ("@Diag.fractional_distance_photon_may_travel", &SMAX_FRAC);
       rddoub ("@Diag.lowest_ion_density_for_photoabs", &DENSITY_PHOT_MIN);
-      //OLD rdint ("@Diag.keep_photoabs_in_final_spectra(1=yes)", &modes.keep_photoabs);
       strcpy (answer, "no");
       modes.keep_photoabs = rdchoice ("@Diag.keep_photoabs_in_final_spectra(yes,no)", "1,0", answer);
     }
@@ -174,31 +172,24 @@ get_extra_diagnostics ()
 
   /* read the options. */
   strcpy (answer, "no");
-  //OLD rdint ("@Diag.save_cell_statistics", &modes.save_cell_stats);
   modes.save_cell_stats = rdchoice ("@Diag.save_cell_statistics(yes,no)", "1,0", answer);
 
   strcpy (answer, "no");
-  //OLD rdint ("@Diag.keep_ioncycle_windsaves", &modes.keep_ioncycle_windsaves);
   modes.keep_ioncycle_windsaves = rdchoice ("@Diag.keep_ioncycle_windsaves(yes,no)", "1,0", answer);
 
   strcpy (answer, "no");
-  //OLD rdint ("@Diag.make_ioncycle_tables", &modes.make_tables);
   modes.make_tables = rdchoice ("@Diag.make_ioncycle_tables(yes,no)", "1,0", answer);
 
   strcpy (answer, "no");
-  //OLD rdint ("@Diag.save_photons", &modes.save_photons);
   modes.save_photons = rdchoice ("@Diag.save_photons(yes,no)", "1,0", answer);
 
   strcpy (answer, "no");
-  //OLD rdint ("@Diag.save_extract_photons", &modes.save_extract_photons);
   modes.save_extract_photons = rdchoice ("@Diag.save_extract_photons(yes,no)", "1,0", answer);
 
   strcpy (answer, "no");
-  //OLD rdint ("@Diag.print_dvds_info", &modes.print_dvds_info);
   modes.print_dvds_info = rdchoice ("@Diag.print_dvds_info(yes,no)", "1,0", answer);
 
   strcpy (answer, "no");
-  //OLD rdint ("@Diag.track_resonant_scatters", &modes.track_resonant_scatters);
   modes.track_resonant_scatters = rdchoice ("@Diag.track_resonant_scatters(yes,no)", "1,0", answer);
 
   if (modes.save_cell_stats || modes.save_photons || modes.save_extract_photons | modes.track_resonant_scatters)

@@ -1,0 +1,12 @@
+name: BH.geometry_for_pl_source
+description: |
+  Multi-line description, must keep indentation.
+type: Enumerator
+values:
+  lamp_post: |
+    Multi-line description, must keep indentation.
+  sphere: |
+    Multi-line description, must keep indentation.
+parent:
+  bh.radiation: true
+file: setup_star_bh.c
