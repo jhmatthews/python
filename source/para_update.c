@@ -324,6 +324,76 @@ gather_spectra_para (nspec_helper, nspecs)
 
   free (redhelper);
   free (redhelper2);
+
+
+  // Now update for polarization parameter Q
+
+   redhelper = calloc (sizeof (double), nspec_helper);
+  redhelper2 = calloc (sizeof (double), nspec_helper);
+
+  for (mpi_i = 0; mpi_i < NWAVE; mpi_i++)
+  {
+    for (mpi_j = 0; mpi_j < nspecs; mpi_j++)
+    {
+      redhelper[mpi_i * nspecs + mpi_j] = xxspec[mpi_j].Q[mpi_i] / np_mpi_global;
+
+      if (geo.ioniz_or_extract) // this is True in ionization cycles only, when we also have a log_spec_tot file
+        redhelper[mpi_i * nspecs + mpi_j + (NWAVE * nspecs)] = xxspec[mpi_j].lQ[mpi_i] / np_mpi_global;
+    }
+  }
+
+  MPI_Reduce (redhelper, redhelper2, nspec_helper, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+  MPI_Bcast (redhelper2, nspec_helper, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+  for (mpi_i = 0; mpi_i < NWAVE; mpi_i++)
+  {
+    for (mpi_j = 0; mpi_j < nspecs; mpi_j++)
+    {
+      xxspec[mpi_j].Q[mpi_i] = redhelper2[mpi_i * nspecs + mpi_j];
+
+      if (geo.ioniz_or_extract) // this is True in ionization cycles only, when we also have a log_spec_tot file
+        xxspec[mpi_j].lQ[mpi_i] = redhelper2[mpi_i * nspecs + mpi_j + (NWAVE * nspecs)];
+    }
+  }
+  MPI_Barrier (MPI_COMM_WORLD);
+
+  free (redhelper);
+  free (redhelper2);
+
+  // Now update for polarization parameter U
+
+   redhelper = calloc (sizeof (double), nspec_helper);
+  redhelper2 = calloc (sizeof (double), nspec_helper);
+
+  for (mpi_i = 0; mpi_i < NWAVE; mpi_i++)
+  {
+    for (mpi_j = 0; mpi_j < nspecs; mpi_j++)
+    {
+      redhelper[mpi_i * nspecs + mpi_j] = xxspec[mpi_j].U[mpi_i] / np_mpi_global;
+
+      if (geo.ioniz_or_extract) // this is True in ionization cycles only, when we also have a log_spec_tot file
+        redhelper[mpi_i * nspecs + mpi_j + (NWAVE * nspecs)] = xxspec[mpi_j].lU[mpi_i] / np_mpi_global;
+    }
+  }
+
+  MPI_Reduce (redhelper, redhelper2, nspec_helper, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+  MPI_Bcast (redhelper2, nspec_helper, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+  for (mpi_i = 0; mpi_i < NWAVE; mpi_i++)
+  {
+    for (mpi_j = 0; mpi_j < nspecs; mpi_j++)
+    {
+      xxspec[mpi_j].U[mpi_i] = redhelper2[mpi_i * nspecs + mpi_j];
+
+      if (geo.ioniz_or_extract) // this is True in ionization cycles only, when we also have a log_spec_tot file
+        xxspec[mpi_j].lU[mpi_i] = redhelper2[mpi_i * nspecs + mpi_j + (NWAVE * nspecs)];
+    }
+  }
+  MPI_Barrier (MPI_COMM_WORLD);
+
+  free (redhelper);
+  free (redhelper2);
+
 #endif
 
   return (0);

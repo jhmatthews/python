@@ -381,9 +381,12 @@ calculate_ionization (restart_stat)
     {
 #endif
 
-/* The variables for spectrum_sumamry are the filename, the attribute for the file write, the minimum and maximum spectra to write out, 
- * the type of spectrum (RAW meaning internal luminosity units, the amount by which to renormalize (1 means use the existing
- * values, loglin (0=linear, 1=log for the wavelength scale), all photons or just wind photons
+/* The variables for spectrum_summary are the filename, the attribute for the file write,
+ * the minimum and maximum spectra to write out,
+ * the type of spectrum (RAW meaning internal luminosity units, the amount by which to renormalize
+ * (1 means use the existing values, loglin
+ * (0=linear, 1=log for the wavelength scale, 2=polarized Q linear, 3=polarized q log),
+ * all photons or just wind photons
  */
 
       spectrum_summary (files.wspec, 0, 6, SPECTYPE_RAW, 1., 0, 0);     /* .spec_tot */
@@ -644,6 +647,14 @@ make_spectra (restart_stat)
 
       spectrum_summary (files.spec, 0, nspectra - 1, geo.select_spectype, renorm, 0, 0);
       spectrum_summary (files.lspec, 0, nspectra - 1, geo.select_spectype, renorm, 1, 0);
+
+      /* Next lines  produce spectra from polarized photons only */
+      spectrum_summary (files.Q_polarize,  0, nspectra - 1, geo.select_spectype, renorm, 2, 0);
+      spectrum_summary (files.lQ_polarize, 0, nspectra - 1, geo.select_spectype, renorm, 3, 0);
+
+      /* Next lines  produce spectra from polarized photons only */
+      spectrum_summary (files.U_polarize,  0, nspectra - 1, geo.select_spectype, renorm, 4, 0);
+      spectrum_summary (files.lU_polarize, 0, nspectra - 1, geo.select_spectype, renorm, 5, 0);
 
       /* Next lines  produce spectra from photons in the wind only */
       spectrum_summary (files.spec_wind, 0, nspectra - 1, geo.select_spectype, renorm, 0, 1);
