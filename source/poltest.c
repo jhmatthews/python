@@ -79,10 +79,13 @@ poltest (p, pp)
     double *vect1;
     double *vect2;
     double adotb3;
-    vect1 = p->lmn;                         // vect1 now points to the address of the inbound photon
+//    double *new_lmn;
+    vect1 = p->orig;                         // vect1 now points to the address of the inbound photon
     vect2 = pp->lmn;                        // vect2 now points to the address of the outbound photon
-//    printf ("POLTEST %p \n", p->lmn);
-//    printf ("POLTEST L %f M %f N %f L %f M %f N %f \n", vect1[0], vect1[1], vect1[2], vect2[0], vect2[1], vect2[2]);
+//    new_lmn = p->lmn;                         // orig maybe points to the original photon direction
+//    Log ("POLTEST p %p L %f M %f N %f \n", p, p->lmn[0], p->lmn[1], p->lmn[2]);
+//    Log ("POLTEST pp %p, L %f M %f N %f  \n", pp, pp->lmn[0], pp->lmn[1], pp->lmn[2]);
+//    Log ("POLTEST P %p Lorig %f Morig %f Norig %f L %f M %f N %f \n", p, vect1[0], vect1[1], vect1[2], vect2[0], vect2[1], vect2[2]);
     int i, j, mainloop, r1, c1, r2, c2, k, errno;
 //    int count, n,
 //    int verbosity;                                        // there is a global verbosity flag in python.h
@@ -820,7 +823,8 @@ poltest (p, pp)
 
             sinphi = (sinphi_numerator / (mag_mag*magnitude_b));
 
-//            printf("Sin phi is: %f \n",sinphi);
+//            printf("Sin phi and  cos phi are: %f %f \n",sinphi, cosphi);
+
 
             // todo initialize rotation vector
 

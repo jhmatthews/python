@@ -54,6 +54,13 @@ stuff_phot (pin, pout)
   pout->lmn[1] = pin->lmn[1];
   pout->lmn[2] = pin->lmn[2];
 
+  pout->orig[0] = pin->orig[0];
+  pout->orig[1] = pin->orig[1];
+  pout->orig[2] = pin->orig[2];
+
+  pout->q = pin->q;
+  pout->u = pin ->u;
+
   pout->w = pin->w;
   pout->w_orig = pin->w_orig;
   pout->freq = pin->freq;

@@ -247,12 +247,22 @@ one is odd. We do frequency here but weighting is carried out in  extract */
       }
 
 
-      /* Now collect polarization information */
+      /* Now collect polarization information for electron scattered photons only */
+//      printf("extract: nres for this photon is %d \n", p->nres);
 
+      if (p->nres == -1 && p->nscat > 0)
+      {
+//        Log("extract: entering poltest now... type is %d \n p nres is %d and pp nres is %d \n p ncat is %d and pp nscat is %d \n",
+//            itype, p->nres, pp.nres, p->nscat, pp.nscat);
         poltest(p, &pp);
+      } else {
+        /* Zero the stokes q and u for this photon as its not electron scattered */
+        pp.q = 0;
+        pp.u = 0;
+//        Log("extract: not electron scattered. stokes q is %f and u is %f \n",pp.q, pp.u);
+      }
 
       /* Now extract the photon */
-
       extract_one (w, &pp, itype, n);
 
       /* Make sure phot_hist is on, for just one extraction */

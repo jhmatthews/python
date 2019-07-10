@@ -1249,6 +1249,10 @@ scatter (p, nres, nnscat)
   if (*nres == -1)              //Its an electron scatter, so we will call compton to get a direction
   {
     p->freq = freq_comoving;    //This is the photon frequency in the electron rest frame calculated earlier in the routine
+    p->orig[0] = p->lmn[0];    //store original photon direction for polarization
+    p->orig[1] = p->lmn[1];
+    p->orig[2] = p->lmn[2];
+//    Log("scatter (resonate.c) stored photon p %p origin %g %g %g \n", p, p->orig[0], p->orig[1], p->orig[2]);
     compton_dir (p, xplasma);   //Get a new direction using the KN formula
     v_dop = dot (p->lmn, v);    //Find the dot product of the new velocity with the wind
     p->freq = p->freq / (1. - v_dop / C);       //Transform back to the observers frame
