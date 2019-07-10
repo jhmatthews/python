@@ -247,12 +247,9 @@ one is odd. We do frequency here but weighting is carried out in  extract */
       }
 
 
-      /* Now collect polarization information for disk wind photons only */
+      /* Now collect polarization information */
 
-      // if (itype == PTYPE_WIND)
-      // {
         poltest(p, &pp);
-      // }
 
       /* Now extract the photon */
 
