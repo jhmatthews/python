@@ -345,25 +345,6 @@ both roots were imaginary */
 
 
 
-//OLD /**************************************************************************
-//OLD
-//OLD
-//OLD   Synopsis:
-//OLD   This is more generalized routine to find the positive distance to
-//OLD           a sphere centered at x with radius r
-//OLD
-//OLD   Description:
-//OLD
-//OLD   Arguments:
-//OLD
-//OLD   Returns:
-//OLD
-//OLD   Notes:
-//OLD
-//OLD   History:
-//OLD
-//OLD  ************************************************************************/
-
 
 /**********************************************************/
 /**
