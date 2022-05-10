@@ -144,7 +144,7 @@ def wind_to_masked(d, value_string, return_inwind=False, mode="2d", ignore_parti
         x = d["r"]
         values = d[value_string]
 
-    # create an inwind boolean to use to create mask
+        # create an inwind boolean to use to create mask
         inwind_bool = (inwind >= inwind_crit[0]) * (inwind < inwind_crit[1])
         mask = ~inwind_bool
 

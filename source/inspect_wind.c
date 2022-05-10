@@ -460,7 +460,8 @@ line_matom_lum_single (lum, xplasma, uplvl)
     line_ptr = &line[config[uplvl].bbd_jump[n]];
     if ((line_ptr->freq > freq_min) && (line_ptr->freq < freq_max))     // correct range
     {
-      bb_cont = (a21 (line_ptr) * p_escape (line_ptr, xplasma));
+      // bb_cont = (a21 (line_ptr) * p_escape (line_ptr, xplasma));
+      bb_cont = (a21 (line_ptr) * 1.0);
       eprbs[m] = bb_cont * (config[uplvl].ex - config[line[config[uplvl].bbd_jump[n]].nconfigl].ex);    //energy difference
       penorm += eprbs[m];
     }
