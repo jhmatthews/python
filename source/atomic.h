@@ -31,7 +31,7 @@ extern int nlevels;                    /**< These are the actual number of level
 extern int nlte_levels;                /**<  Actual number of levels to treat explicityly */
 
 /* AUGER NOTE: recommended to increase NLEVELS_MACRO to at least 500 for Auger macro-atoms */
-#define NLEVELS_MACRO   300     /**<  Maximum number of macro atom levels. (SS, June 04) */
+#define NLEVELS_MACRO   500     /**<  Maximum number of macro atom levels. (SS, June 04) */
 extern int nlevels_macro;              /**<  Actual number of macro atom levels. (SS, June 04) */
 #define NLINES 		200000  /**<  Maximum number of lines to be read */
 extern int nlines;                     /**<  Actual number of lines that were read in */
@@ -42,8 +42,8 @@ extern int n_inner_tot;                /**< The actual number of inner shell ion
 
 
 /* AUGER NOTE: recommended to increase these values to at least 200 for Auger macro-atoms */
-#define NBBJUMPS         100    /**<  Maximum number of Macro Atom bound-bound jumps from any one configuration (SS) */
-#define NBFJUMPS         100    /**<  Maximum number of Macro Atom Bound-free jumps from any one configuration (SS) */
+#define NBBJUMPS         200    /**<  Maximum number of Macro Atom bound-bound jumps from any one configuration (SS) */
+#define NBFJUMPS         200    /**<  Maximum number of Macro Atom Bound-free jumps from any one configuration (SS) */
 
 #define MAXJUMPS          1000000       /**<  The maximum number of Macro Atom jumps before emission (if this is exceeded
                                            it gives up (SS) */
@@ -313,8 +313,9 @@ extern int nxphot;                     /**< The actual number of ions for which 
 extern double phot_freq_min;           /**< The lowest frequency for which photoionization can occur */
 extern double inner_freq_min;          /**< The lowest frequency for which inner shell ionization can take place */
 
-#define NCROSS 3000            /**<  Maximum number of x-sections for a single photionization process */
-#define NTOP_PHOT 400           /**<  Maximum number of photoionisation processes.  */
+#define NCROSS 2000             /**<  Maximum number of x-sections for a single photionization process */
+#define NTOP_PHOT 1000           /**<  Maximum number of photoionisation processes.  */
+
 /* AUGER NOTE: recommended to increase NTOP_PHOT to 1000 for Auger macro-atoms */
 extern int ntop_phot;                  /**<  The actual number of TopBase photoionzation x-sections */
 extern int nphot_total;                /**<  total number of photoionzation x-sections = nxphot + ntop_phot */
