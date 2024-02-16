@@ -876,7 +876,7 @@ kpkt (p, nres, escape, mode)
            approach to choosing photon weights - this means we
            multipy down the photon weight by a factor nu/(nu-nu_0)
            and we force a kpkt to be created */
-        if (!modes.turn_off_upweighting_of_simple_macro_atoms)
+        if (modes.use_upweighting_of_simple_macro_atoms)
         {
           if (phot_top[i].macro_info == FALSE || geo.macro_simple == TRUE)
           {
@@ -957,7 +957,7 @@ kpkt (p, nres, escape, mode)
 
 
   else if (destruction_choice <
-           (mplasma->cooling_bftot + cooling_bbtot + mplasma->cooling_ff + mplasma->cooling_ff_lofreq + cooling_adiabatic))
+           (mplasma->cooling_bftot + cooling_bbtot + mplasma->cooling_ff + mplasma->cooling_ff_lofreq + mplasma->cooling_compton))
   {
     /* It is a k-packat that is destroyed by adiabatic cooling */
 
@@ -972,12 +972,25 @@ kpkt (p, nres, escape, mode)
     return (0);
   }
 
+  else if (destruction_choice <
+           (mplasma->cooling_bftot + cooling_bbtot + mplasma->cooling_ff + mplasma->cooling_ff_lofreq + mplasma->cooling_compton + cooling_adiabatic))
+  {
+    /* It is a k-packat that is destroyed by Compton cooling */
+    /* we treat Compton cooling as a sync process -- the energy should be made up 
+       on a scatter by scatter basis by rewighting of r-packets*/
+    *escape = TRUE;
+    *nres = NRES_FF;
+    p->istat = P_COMP_COOL;
+
+    return (0);
+  }
+
 
   else
   {
     /* It is a k-packed destroyed by collisional ionization in a macro atom. */
     destruction_choice =
-      destruction_choice - mplasma->cooling_bftot - cooling_bbtot - mplasma->cooling_ff - mplasma->cooling_ff_lofreq - cooling_adiabatic;
+      destruction_choice - mplasma->cooling_bftot - cooling_bbtot - mplasma->cooling_ff - mplasma->cooling_ff_lofreq - mplasma->cooling_compton - cooling_adiabatic;
 
     for (i = 0; i < nphot_total; i++)
     {
@@ -1003,13 +1016,15 @@ kpkt (p, nres, escape, mode)
     }
   }
 
+  
+
 
 
   Error ("kpkt: Failed to select a destruction process in kpkt. Abort.\n");
   Error
-    ("kpkt: choice %8.4e norm %8.4e cooling_bftot %g, cooling_bbtot %g, cooling_ff %g, cooling_ff_lofreq %g, cooling_bf_coltot %g cooling_adiabatic %g cooling_adiabatic %g\n",
+    ("kpkt: choice %8.4e norm %8.4e cooling_bftot %g, cooling_bbtot %g, cooling_ff %g, cooling_ff_lofreq %g, cooling_bf_coltot %g cooling_adiabatic %g cooling_adiabatic %g cooling_compton %g\n",
      destruction_choice, cooling_normalisation, mplasma->cooling_bftot, cooling_bbtot, mplasma->cooling_ff,
-     mplasma->cooling_ff_lofreq, cooling_bf_coltot, mplasma->cooling_adiabatic, cooling_adiabatic);
+     mplasma->cooling_ff_lofreq, cooling_bf_coltot, mplasma->cooling_adiabatic, cooling_adiabatic, mplasma->cooling_compton);
 
   *escape = TRUE;
   p->istat = P_ERROR_MATOM;

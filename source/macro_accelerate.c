@@ -257,6 +257,7 @@ calc_matom_matrix (xplasma, matom_matrix)
   kpacket_to_rpacket_rate += mplasma->cooling_bftot;
   kpacket_to_rpacket_rate += mplasma->cooling_adiabatic;
   kpacket_to_rpacket_rate += mplasma->cooling_ff + mplasma->cooling_ff_lofreq;
+  kpacket_to_rpacket_rate += mplasma->cooling_compton;
   R_matrix[nlevels_macro][nlevels_macro] += Rcont = kpacket_to_rpacket_rate;
   Q_norm[nlevels_macro] += Rcont;
 
@@ -374,7 +375,7 @@ fill_kpkt_rates (xplasma, escape, p)
   double cooling_bf[nphot_total];
   double cooling_bf_col[nphot_total];   //collisional cooling in bf transitions
   double cooling_bb[NLINES];
-  double cooling_adiabatic;
+  double cooling_adiabatic, cooling_compton;
   struct topbase_phot *cont_ptr;
   struct lines *line_ptr;
   double cooling_normalisation;
@@ -416,6 +417,7 @@ fill_kpkt_rates (xplasma, escape, p)
     cooling_bbtot = 0.0;
     cooling_ff = 0.0;
     cooling_bf_coltot = 0.0;
+    cooling_compton = 0.0;
     mplasma->cooling_bb_simple_tot = 0.0;
 
     /* Start of BF calculation */
@@ -523,11 +525,13 @@ fill_kpkt_rates (xplasma, escape, p)
     {
       cooling_ff = mplasma->cooling_ff = total_free (xplasma, xplasma->t_e, freqmin, freqmax) / xplasma->vol / xplasma->ne;
       cooling_ff += mplasma->cooling_ff_lofreq = total_free (xplasma, xplasma->t_e, 0.0, freqmin) / xplasma->vol / xplasma->ne;
+      cooling_compton = mplasma->cooling_compton = total_comp (one, t);
     }
     else
     {
       /* This should never happen */
       cooling_ff = mplasma->cooling_ff = mplasma->cooling_ff_lofreq = 0.0;
+      cooling_compton = mplasma->cooling_compton = 0.0;
       Error ("kpkt: np %d A scattering event in cell %d with vol = 0???\n", p->np, one->nwind);
       *escape = TRUE;
       p->istat = P_ERROR_MATOM;
@@ -545,6 +549,17 @@ fill_kpkt_rates (xplasma, escape, p)
     else
     {
       cooling_normalisation += cooling_ff;
+    }
+    if (cooling_compton < 0)
+    {
+      Error ("kpkt: np %d Compton cooling rate negative. Abort.\n", p->np);
+      *escape = TRUE;
+      p->istat = P_ERROR_MATOM;
+      return (0);
+    }
+        else
+    {
+      cooling_normalisation += cooling_compton;
     }
 
 

@@ -1182,7 +1182,7 @@ typedef struct macro
   double cooling_normalisation;
   double cooling_bbtot, cooling_bftot, cooling_bf_coltot;
   double cooling_bb_simple_tot;
-  double cooling_ff, cooling_ff_lofreq;
+  double cooling_ff, cooling_ff_lofreq, cooling_compton;
   double cooling_adiabatic;     // this is just cool_adiabatic / vol / ne
 
 #define MATOM_MC_JUMPS 0

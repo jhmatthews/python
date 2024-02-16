@@ -887,7 +887,7 @@ scatter (p, nres, nnscat)
   int i, n;
   double p_init[3], p_final[3], dp[3], dp_cyl[3];
   WindPtr one;
-  double prob_kpkt, kpkt_choice, freq_comoving;
+  double prob_kpkt, kpkt_choice, freq_comoving, w_before_scatter;
   double gamma_twiddle, gamma_twiddle_e, stim_fact;
   int m, llvl, ulvl;
   PlasmaPtr xplasma;
@@ -1160,6 +1160,25 @@ scatter (p, nres, nnscat)
       macro_gov (p, nres, 2, &which_out);       //ff always make a k-packet
     }
 
+    else if (*nres == NRES_ES)
+    {
+      w_before_scatter = p->w;
+      compton_scatter (p);
+
+      /* if the photon has lost weight then we have a heating process
+         and there is a chance to create a k-packet */
+      if (w_before_scatter > p->w)
+      {
+        prob_kpkt = (w_before_scatter - p->w) / w_before_scatter;
+        p->w = w_before_scatter;
+        kpkt_choice = random_number (0.0, 1.0); //random number for kpkt choice
+        if (prob_kpkt > kpkt_choice)
+        {
+          macro_gov (p, nres, 2, &which_out);   //routine to deal with kpkt
+        }
+        /* if we don't excite a k-packet, we just carry on */
+      }
+    }
 
 
   }
@@ -1186,9 +1205,9 @@ scatter (p, nres, nnscat)
      frame of the electron, we transform back to the fluid frame.
    */
 
-  if (*nres == NRES_ES)
-  {
 
+  if (*nres == NRES_ES && geo.rt_mode == RT_MODE_2LEVEL)
+  {
     compton_scatter (p);
   }
   else if (*nres == NRES_FF || *nres > NRES_BF || geo.scatter_mode == SCATTER_MODE_ISOTROPIC)

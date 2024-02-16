@@ -535,7 +535,7 @@ communicate_matom_estimators_para ()
   gamma_helper = calloc (sizeof (double), NPLASMA * 4 * size_gamma_est);
   alpha_helper = calloc (sizeof (double), NPLASMA * 2 * size_alpha_est);
   level_helper = calloc (sizeof (double), NPLASMA * nlevels_macro);
-  cell_helper = calloc (sizeof (double), 8 * NPLASMA);
+  cell_helper = calloc (sizeof (double), 9 * NPLASMA);
   cooling_bf_helper = calloc (sizeof (double), NPLASMA * 2 * nphot_total);
   cooling_bb_helper = calloc (sizeof (double), NPLASMA * nlines);
 
@@ -543,7 +543,7 @@ communicate_matom_estimators_para ()
   gamma_helper2 = calloc (sizeof (double), NPLASMA * 4 * size_gamma_est);
   alpha_helper2 = calloc (sizeof (double), NPLASMA * 2 * size_alpha_est);
   level_helper2 = calloc (sizeof (double), NPLASMA * nlevels_macro);
-  cell_helper2 = calloc (sizeof (double), 8 * NPLASMA);
+  cell_helper2 = calloc (sizeof (double), 9 * NPLASMA);
   cooling_bf_helper2 = calloc (sizeof (double), NPLASMA * 2 * nphot_total);
   cooling_bb_helper2 = calloc (sizeof (double), NPLASMA * nlines);
 
@@ -568,6 +568,7 @@ communicate_matom_estimators_para ()
     cell_helper[mpi_i + 5 * NPLASMA] = macromain[mpi_i].cooling_ff / np_mpi_global;
     cell_helper[mpi_i + 6 * NPLASMA] = macromain[mpi_i].cooling_ff_lofreq / np_mpi_global;
     cell_helper[mpi_i + 7 * NPLASMA] = macromain[mpi_i].cooling_adiabatic / np_mpi_global;
+    cell_helper[mpi_i + 8 * NPLASMA] = macromain[mpi_i].cooling_compton / np_mpi_global;
 
 
 
@@ -652,6 +653,7 @@ communicate_matom_estimators_para ()
     macromain[mpi_i].cooling_ff = cell_helper2[mpi_i + 5 * NPLASMA];
     macromain[mpi_i].cooling_ff_lofreq = cell_helper2[mpi_i + 6 * NPLASMA];
     macromain[mpi_i].cooling_adiabatic = cell_helper2[mpi_i + 7 * NPLASMA];
+    macromain[mpi_i].cooling_compton = cell_helper2[mpi_i + 8 * NPLASMA];
 
 
     for (n = 0; n < nlevels_macro; n++)
