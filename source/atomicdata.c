@@ -1448,8 +1448,9 @@ described as macro-levels. */
           }
           else
           {
-            Error ("getatomic_data: file %s line %d: More Auger macro-atom records than allowed. Increase NAUGER_MACRO in atomic.h\n", file,
-                   lineno);
+            Error
+              ("getatomic_data: file %s line %d: More Auger macro-atom records (%d) than allowed (%d). Increase NAUGER_MACRO in atomic.h\n",
+               file, lineno, nauger_macro, NAUGER_MACRO);
             exit (0);
           }
 
