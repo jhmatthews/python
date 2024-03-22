@@ -1,7 +1,7 @@
 /***********************************************************/
 /** @file   hydro_import.c
  * @author KSL/NSH
- * @date   January 2018  
+ * @date   January 2018
  * @brief  Routines to import hydro-dynamic snapshots.
  *
  * These routines are designed to read the velocity and densities
@@ -60,15 +60,15 @@ HydroPtr hydro_ptr;
 
 
 /**********************************************************/
-/** 
+/**
  * @brief	Sets up geometry ready to accept a hydro-dynamic model
  *
  * @param [in] ndom			The number of the domain which will be populated by the geometry
  * @return 					0 if successful
  *
  * Sets up the geometry - max and min - for the hydro-dynamic
- * snapshot. It uses limits read in from the file to fill in 
- * parameters more usually read in from a .pf file        
+ * snapshot. It uses limits read in from the file to fill in
+ * parameters more usually read in from a .pf file
  *
  *
  * ###Notes###
@@ -98,7 +98,7 @@ get_hydro_wind_params (ndom)
 
 
   Log ("rmax=%e\n", zdom[ndom].rmax);
-  zdom[ndom].wind_rhomin_at_disk = 0.0; //Set wind_rmin 0.0, otherwise wind cones dont work properly 
+  zdom[ndom].wind_rhomin_at_disk = 0.0; //Set wind_rmin 0.0, otherwise wind cones dont work properly
   Log ("rho_min=%e\n", zdom[ndom].wind_rhomin_at_disk);
   zdom[ndom].wind_rhomax_at_disk = zdom[ndom].rmax;     //This is the outer edge of the
   Log ("rho_max=%e\n", zdom[ndom].wind_rhomax_at_disk);
@@ -127,14 +127,14 @@ get_hydro_wind_params (ndom)
 
 
 /**********************************************************/
-/** 
+/**
  * @brief	Reads in and decodes a hydro-dynamic model
  *
  * @param [in] ndom			The number of the domain which will be populated by the geometry
  * @return 					0 if successful
  *
  * This deals with importing the hydro-dynamic snapshot
- * It asks the user the filename and the maximum theta to be used 
+ * It asks the user the filename and the maximum theta to be used
  * It also works out the maximum theta bin to be used, and
  * interpolates if this doesnt quite line up.
  *
@@ -222,7 +222,7 @@ get_hydro (ndom)
         hydro_r_cent[i] = r;
         hydro_theta_cent[j] = theta;
         hydro_theta_edge[j] = theta_edge;
-        //keep track of how many r and theta cells there are            
+        //keep track of how many r and theta cells there are
         if (j > ithetamax)
           ithetamax = j;
         if (i > irmax)
@@ -305,7 +305,7 @@ get_hydro (ndom)
 
 
 /**********************************************************/
-/** 
+/**
  * @brief	Interpolates on supplied data file to get velocity at all vertices
  *
  * @param [in] ndom			The number of the domain which will be populated by the geometry
@@ -313,13 +313,13 @@ get_hydro (ndom)
  * @param [in] v			The velocity we are returning
  * @return 					The speed - relating the velocity we have computed
  *
- * The velocities in a zeus hydro-grid are defined on the middle of cell 
+ * The velocities in a zeus hydro-grid are defined on the middle of cell
  * edges, wheras in python we require them at the verticies. This routine
  * interpolates on rhe supplied grid to make the python grid.
  *
  *
  * ###Notes###
- *  
+ *
 ***********************************************************/
 
 
@@ -356,7 +356,7 @@ hydro_velocity (ndom, x, v)
     theta = asin (xxx);
 
 
-  /* We compute the radial velocity - in zeus this is defined at the 
+  /* We compute the radial velocity - in zeus this is defined at the
      cell centre in the theta dimension and the edge in the r dimension */
 
 
@@ -367,7 +367,7 @@ hydro_velocity (ndom, x, v)
   v_r_interp = hydro_interp_value (v_r_input, im, ii, jm, jj, f1, f2);
 
 
-  /* We compute the theta velocity - in zeus this is defined at the 
+  /* We compute the theta velocity - in zeus this is defined at the
      cell centre in the r dimension and the edge in the theta dimension */
 
   im = jm = ii = jj = 0;
@@ -377,7 +377,7 @@ hydro_velocity (ndom, x, v)
   v_theta_interp = hydro_interp_value (v_theta_input, im, ii, jm, jj, f1, f2);
 
 
-  /* We compute the phi velocity - in zeus this is defined at the 
+  /* We compute the phi velocity - in zeus this is defined at the
      cell centre in both the r and theta dimension */
 
 
@@ -412,7 +412,7 @@ hydro_velocity (ndom, x, v)
 
 
 /**********************************************************/
-/** 
+/**
  * @brief	Interpolates on supplied data file to get cell densities
  *
  * @param [in] x			The x location we need a density for
@@ -471,7 +471,7 @@ hydro_rho (x)
 
 
 /**********************************************************/
-/** 
+/**
  * @brief	calculates the wind temperature at any position x in cartesian
  * coordiantes
  *
@@ -537,16 +537,16 @@ hydro_temp (x)
 
 
 /**********************************************************/
-/** 
+/**
  * @brief	Defines an r-theta grid to accept a Zeus hydro model
- * 
+ *
  * @param [in] w			The wind pointer
  * @param [in] ndom			The number of the domain which will be populated by the geometry
  * @return 					0 if successful
  *
- * rtheta_make_zeus_grid defines the cells in a rtheta grid based 
- * upon the coordinates that can be read in from a zeus 
- * (the hydrocode used by Proga for some simulations)            
+ * rtheta_make_zeus_grid defines the cells in a rtheta grid based
+ * upon the coordinates that can be read in from a zeus
+ * (the hydrocode used by Proga for some simulations)
  *
  * ###Notes###
 ***********************************************************/
@@ -554,9 +554,7 @@ hydro_temp (x)
 
 
 int
-rtheta_make_hydro_grid (w, ndom)
-     WindPtr w;
-     int ndom;
+rtheta_make_hydro_grid (int ndom, WindPtr w)
 {
   double theta, thetacen, dtheta;
   int i, j, n;
@@ -633,59 +631,54 @@ rtheta_make_hydro_grid (w, ndom)
 
 
 /**********************************************************/
-/** 
- * @brief	Computes volumes for cells in an r-theta hydro model
- * 
- * @param [in] ndom			The number of the domain which will be populated by the geometry
- * @param [in] w			The wind pointer
+/**
+ * @brief	Computes the volume for a cell in an r-theta hydro model
+ *
+ * @param [in,out] WindPtr  w   a single wind cell to calculate the volume for
+ *
  * @return 					0 if successful
  *
- *   rtheta_zeus_volumes replaces rtheta_volumes for a zeus model. 
+ *   rtheta_zeus_volumes replaces rtheta_volumes for a zeus model.
  * We know wether cells are in the wimnd
  * so all we need to do is work out the volumes.
- *          
+ *
  *
  * ###Notes###
 ***********************************************************/
 
 
 int
-rtheta_hydro_volumes (ndom, w)
-     int ndom;
-     WindPtr w;
+rtheta_hydro_cell_volume (WindPtr w)
 {
-  int i, j, n;
+  int i, j;
+  int ndom;
   double rmin, rmax, thetamin, thetamax;
   DomainPtr one_dom;
 
+  ndom = w->ndom;
   one_dom = &zdom[ndom];
+  wind_n_to_ij (ndom, w->nwind, &i, &j);
 
-  for (i = 0; i < one_dom->ndim; i++)
+  if (w->inwind == W_ALL_INWIND)
   {
-    for (j = 0; j < one_dom->mdim; j++)
+
+    rmin = one_dom->wind_x[i];
+    rmax = one_dom->wind_x[i + 1];
+    thetamin = one_dom->wind_z[j] / RADIAN;
+    thetamax = one_dom->wind_z[j + 1] / RADIAN;
+
+    //leading factor of 2 added to allow for volume above and below plane (SSMay04)
+    w->vol = 2. * 2. / 3. * PI * (rmax * rmax * rmax - rmin * rmin * rmin) * (cos (thetamin) - cos (thetamax));
+
+    if (w->vol == 0.0)
     {
-
-      wind_ij_to_n (ndom, i, j, &n);
-      if (w[n].inwind == W_ALL_INWIND)
-      {
-
-        rmin = one_dom->wind_x[i];
-        rmax = one_dom->wind_x[i + 1];
-        thetamin = one_dom->wind_z[j] / RADIAN;
-        thetamax = one_dom->wind_z[j + 1] / RADIAN;
-
-        //leading factor of 2 added to allow for volume above and below plane (SSMay04)
-        w[n].vol = 2. * 2. / 3. * PI * (rmax * rmax * rmax - rmin * rmin * rmin) * (cos (thetamin) - cos (thetamax));
-
-        if (w[n].vol == 0.0)
-        {
-          Log ("Found wind cell (%i) with no volume (%e) in wind, resetting\n", n, w[n].vol);
-          w[n].inwind = W_NOT_INWIND;
-        }
-      }
-      else
-        w[n].vol = 0.0;
+      Log ("Found wind cell (%i) with no volume (%e) in wind, resetting\n", w->nwind, w->vol);
+      w->inwind = W_NOT_INWIND;
     }
+  }
+  else
+  {
+    w->vol = 0.0;
   }
 
   return (0);
@@ -694,9 +687,9 @@ rtheta_hydro_volumes (ndom, w)
 
 
 
-/** 
+/**
  * @brief	Helper routine to interpolate on a grid
- * 
+ *
  * @param [in] coord			The coordinate we want a value for
  * @param [in] coord_array		The array of grid points
  * @param [in] imax				The maximum extent of the array
@@ -710,14 +703,14 @@ rtheta_hydro_volumes (ndom, w)
  * interpolate on the input grid to get value for the python grid.
  * This code find out the fraction along a coord array where the centre
  * or edge of the python grid cell lies on the hydro grid
- *          
+ *
  *
  * ###Notes###
- * 
+ *
  * ### Programming Comment ###
  * This is rather similar to the routine coord_frac, but that
  * loops over all the values in a domain. Here, because of the
- * way wind parameters are set up on a cell by cell basis, in 
+ * way wind parameters are set up on a cell by cell basis, in
  * order to keep things the same between hydro and other wind
  * models we have routines that are called for a single cell.
 ***********************************************************/
@@ -766,9 +759,9 @@ hydro_frac (coord, coord_array, imax, cell1, cell2, frac)
 
 
 
-/** 
+/**
  * @brief	Helper routine to interpolate on a grid
- * 
+ *
  * @param [in] array			the array of input data
  * @param [in] im,ii			the two cells surrounding the cell in the first dim (r)
  * @param [in] jm,jj			the two cells surrounding the cell in the second dim (theta)
@@ -779,12 +772,12 @@ hydro_frac (coord, coord_array, imax, cell1, cell2, frac)
  * hydro_interp_value replaces many lines of identical code, all of which
  * interpolate on the input grid to get value for the python grid.
  * This returns the actuak value of an interpolated array
- *          
+ *
  *
  * ###Notes###
  *
  * ### Programming Comment ###
- * This called after hydro_interp_frac and the programming 
+ * This called after hydro_interp_frac and the programming
  * comment for that routine applies here too.
 ***********************************************************/
 
@@ -813,19 +806,19 @@ hydro_interp_value (array, im, ii, jm, jj, f1, f2)
 
 
 
-/** 
+/**
  * @brief	Allows a previous windsave to be used in a new hydro simulation
- * 
+ *
  * @param [in] ndom			The number of the domain which will be populated by the geometry
  * @return 					0 if successful
 
  *
- * hydro_restart is a subroutine which permits a previous wind save 
+ * hydro_restart is a subroutine which permits a previous wind save
  * file to be used in a hydro simulation. The density and temperature
  * for each cell are those from the hydro simulation. The ion fractions
  * are taken from the windsave file. The routine therefore changes *most*
  * things in the wind - only the ion fractions remain
- *          
+ *
  *
  * ###Notes###
 ***********************************************************/
@@ -881,4 +874,165 @@ hydro_restart (ndom)
   /* Recreate the wind cones because these are not part of the windsave file */
   rtheta_make_cones (ndom, wmain);
   return (0);
+}
+
+/**********************************************************/
+/**
+ * @brief
+ *
+ * @param
+ *
+ *
+ * ###Notes###
+ *
+***********************************************************/
+
+void
+create_hydro_output_files (void)
+{
+  FILE *fptr;
+  FILE *fptr2;
+  FILE *fptr3;
+  FILE *fptr4;
+  FILE *fptr5;
+
+  int i;
+  int ii;
+  int j;
+  int nwind;
+  int nplasma;
+
+  double v_th;
+  double kappa_es;
+  double t_opt;
+  struct photon ptest;
+  double t_UV;
+  double t_Xray;
+  double fhat[4];
+
+  WindPtr w = wmain;
+  double vol;
+
+  Log ("Outputting heatcool file for connecting to zeus\n");
+  fptr = fopen ("py_heatcool.dat", "w");
+  fptr2 = fopen ("py_flux.dat", "w");
+  fptr3 = fopen ("py_ion_data.dat", "w");
+  fptr4 = fopen ("py_spec_data.dat", "w");
+  fptr5 = fopen ("py_pcon_data.dat", "w");
+
+  fprintf (fptr,
+           "i j rcen thetacen vol temp xi ne heat_xray heat_comp heat_lines heat_ff cool_comp cool_lines cool_ff rho n_h rad_f_w rad_f_phi rad_f_z bf_f_w bf_f_phi bf_f_z\n");
+  fprintf (fptr2, "i j F_vis_x F_vis_y F_vis_z F_UV_theta F_UV_phi F_UV_r F_Xray_x F_Xray_y F_Xray_z\n");       //directional flux by band
+
+  fprintf (fptr3, "nions %i\n", nions);
+  for (i = 0; i < nions; i++)
+  {
+    fprintf (fptr3, "ion %i %s %i %i\n", i, ele[ion[i].nelem].name, ion[i].z, ion[i].istate);
+  }
+  fprintf (fptr3, "nplasma %i\n", NPLASMA);
+
+  fprintf (fptr4, "model %i\n", geo.ioniz_mode);
+  fprintf (fptr4, "nbands %i\n", geo.nxfreq);
+  fprintf (fptr4, "nplasma %i\n", NPLASMA);
+  for (i = 0; i < geo.nxfreq + 1; i++)
+    fprintf (fptr4, "%e ", geo.xfreq[i]);       //hard wired band edges
+  fprintf (fptr4, "\n ");
+
+  fprintf (fptr5, "nplasma %i\n", NPLASMA);
+
+  for (nwind = zdom[geo.hydro_domain_number].nstart; nwind < zdom[geo.hydro_domain_number].nstop; nwind++)
+  {
+    if (wmain[nwind].inwind >= 0)
+    {
+      nplasma = wmain[nwind].nplasma;
+      wind_n_to_ij (geo.hydro_domain_number, plasmamain[nplasma].nwind, &i, &j);
+      i = i - 1;                //There is a radial 'ghost zone' in python, we need to make our i,j agree with zeus
+      vol = w[plasmamain[nplasma].nwind].vol;
+      fprintf (fptr, "%d %d %e %e %e ", i, j, w[plasmamain[nplasma].nwind].rcen, w[plasmamain[nplasma].nwind].thetacen / RADIAN, vol);  //output geometric things
+      fprintf (fptr, "%e %e %e ", plasmamain[nplasma].t_e, plasmamain[nplasma].xi, plasmamain[nplasma].ne);     //output temp, xi and ne to ease plotting of heating rates
+      fprintf (fptr, "%e ", (plasmamain[nplasma].heat_photo + plasmamain[nplasma].heat_auger) / vol);   //Xray heating - or photoionization
+      fprintf (fptr, "%e ", (plasmamain[nplasma].heat_comp) / vol);     //Compton heating
+      fprintf (fptr, "%e ", (plasmamain[nplasma].heat_lines) / vol);    //Line heating 28/10/15 - not currently used in zeus
+      fprintf (fptr, "%e ", (plasmamain[nplasma].heat_ff) / vol);       //FF heating 28/10/15 - not currently used in zeus
+      fprintf (fptr, "%e ", (plasmamain[nplasma].cool_comp) / vol);     //Compton cooling
+      fprintf (fptr, "%e ", (plasmamain[nplasma].lum_lines + plasmamain[nplasma].cool_rr + plasmamain[nplasma].cool_dr) / vol); //Line cooling must include all recombination cooling
+      fprintf (fptr, "%e ", (plasmamain[nplasma].lum_ff) / vol);        //ff cooling
+      fprintf (fptr, "%e ", plasmamain[nplasma].rho);   //density
+      fprintf (fptr, "%e ", plasmamain[nplasma].rho * rho2nh);  //hydrogen number density
+      fprintf (fptr, "%e ", plasmamain[nplasma].rad_force_es[0]);       //electron scattering radiation force in the w(x) direction
+      fprintf (fptr, "%e ", plasmamain[nplasma].rad_force_es[1]);       //electron scattering radiation force in the phi(rotational) directionz direction
+      fprintf (fptr, "%e ", plasmamain[nplasma].rad_force_es[2]);       //electron scattering radiation force in the z direction
+      fprintf (fptr, "%e ", plasmamain[nplasma].rad_force_bf[0]);       //bound free scattering radiation force in the w(x) direction
+      fprintf (fptr, "%e ", plasmamain[nplasma].rad_force_bf[1]);       //bound free scattering radiation force in the phi(rotational) direction
+      fprintf (fptr, "%e \n", plasmamain[nplasma].rad_force_bf[2]);     //bound free scattering radiation force in the z direction
+      fprintf (fptr2, "%d %d ", i, j);  //output geometric things
+      fprintf (fptr2, "%e %e %e ", plasmamain[nplasma].F_vis[0], plasmamain[nplasma].F_vis[1], plasmamain[nplasma].F_vis[2]);   //directional flux by band
+      fprintf (fptr2, "%e %e %e ", plasmamain[nplasma].F_UV[0], plasmamain[nplasma].F_UV[1], plasmamain[nplasma].F_UV[2]);      //directional flux by band
+      fprintf (fptr2, "%e %e %e ", plasmamain[nplasma].F_Xray[0], plasmamain[nplasma].F_Xray[1], plasmamain[nplasma].F_Xray[2]);        //directional flux by band
+
+      fprintf (fptr2, "\n");
+      fprintf (fptr3, "%d %d ", i, j);  //output geometric things
+      for (ii = 0; ii < nions; ii++)
+        fprintf (fptr3, "%e ", plasmamain[nplasma].density[ii]);
+      fprintf (fptr3, "\n");
+
+      fprintf (fptr4, "%d %d ", i, j);  //output geometric things
+      for (ii = 0; ii < geo.nxfreq; ii++)
+        fprintf (fptr4, "%e %e %i %e %e %e %e ",
+                 plasmamain[nplasma].fmin_mod[ii], plasmamain[nplasma].fmax_mod[ii], plasmamain[nplasma].spec_mod_type[ii],
+                 plasmamain[nplasma].pl_log_w[ii], plasmamain[nplasma].pl_alpha[ii], plasmamain[nplasma].exp_w[ii],
+                 plasmamain[nplasma].exp_temp[ii]);
+      fprintf (fptr4, "\n ");
+
+
+      //We need to compute the g factor for this cell and output it.
+
+      v_th = pow ((2. * BOLTZMANN * plasmamain[nplasma].t_e / MPROT), 0.5);     //We need the thermal velocity for hydrogen
+      stuff_v (w[plasmamain[nplasma].nwind].xcen, ptest.x);     //place our test photon at the centre of the cell
+      ptest.grid = nwind;       //We need our test photon to know where it is
+      kappa_es = THOMPSON * plasmamain[nplasma].ne / plasmamain[nplasma].rho;
+
+      //First for the optical band (up to 4000AA)
+      if (length (plasmamain[nplasma].F_vis) > 0.0)     //Only makes sense if flux in this band is non-zero
+      {
+        stuff_v (plasmamain[nplasma].F_vis, fhat);
+        renorm (fhat, 1.);      //A unit vector in the direction of the flux - this can be treated as the lmn vector of a pretend photon
+        stuff_v (fhat, ptest.lmn);      //place our test photon at the centre of the cell
+        t_opt = kappa_es * plasmamain[nplasma].rho * v_th / fabs (dvwind_ds_cmf (&ptest));
+      }
+      else
+        t_opt = 0.0;            //Essentually a flag that there is no way of computing t (and hence M) in this cell.
+
+      //Now for the UV band (up to 4000AA->100AA)
+      if (length (plasmamain[nplasma].F_UV) > 0.0)      //Only makes sense if flux in this band is non-zero
+      {
+        stuff_v (plasmamain[nplasma].F_UV, fhat);
+        renorm (fhat, 1.);      //A unit vector in the direction of the flux - this can be treated as the lmn vector of a pretend photon
+        stuff_v (fhat, ptest.lmn);      //place our test photon at the centre of the cell
+        t_UV = kappa_es * plasmamain[nplasma].rho * v_th / fabs (dvwind_ds_cmf (&ptest));
+      }
+      else
+        t_UV = 0.0;             //Essentually a flag that there is no way of computing t (and hence M) in this cell.
+
+
+      //And finally for the Xray band (up to 100AA and up)
+      if (length (plasmamain[nplasma].F_Xray) > 0.0)    //Only makes sense if flux in this band is non-zero
+      {
+        stuff_v (plasmamain[nplasma].F_Xray, fhat);
+        renorm (fhat, 1.);      //A unit vector in the direction of the flux - this can be treated as the lmn vector of a pretend photon
+        stuff_v (fhat, ptest.lmn);      //place our test photon at the centre of the cell
+        t_Xray = kappa_es * plasmamain[nplasma].rho * v_th / fabs (dvwind_ds_cmf (&ptest));
+      }
+      else
+        t_Xray = 0.0;           //Essentually a flag that there is no way of computing t (and hence M) in this cell.
+
+      fprintf (fptr5, "%i %i %e %e %e %e %e %e %e\n", i, j, plasmamain[nplasma].t_e, plasmamain[nplasma].rho,
+               plasmamain[nplasma].rho * rho2nh, plasmamain[nplasma].ne, t_opt, t_UV, t_Xray);
+    }
+  }
+  fclose (fptr);
+  fclose (fptr2);
+  fclose (fptr3);
+  fclose (fptr4);
+  fclose (fptr5);
 }

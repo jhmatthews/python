@@ -143,7 +143,7 @@ main (argc, argv)
 
   struct photon ptest;          //We need a test photon structure in order to compute t
 
-  FILE *fptr_hc, *fptr_drive, *fptr_ion, *fptr_spec, *fptr_pcon, *fptr_debug, *fptr_flux, *fptr_flux_x, *fptr_flux_y, *fptr_flux_z, *fopen ();  /*This is the file to communicate with zeus */
+  FILE *fptr_hc, *fptr_drive, *fptr_ion, *fptr_spec, *fptr_pcon, *fptr_debug, *fptr_flux, *fptr_flux_theta, *fptr_flux_phi, *fptr_flux_r, *fopen ();  /*This is the file to communicate with zeus */
   domain = geo.hydro_domain_number;
 
   /* Initialize  MPI, which is needed because some of the routines are MPI enabled */
@@ -269,33 +269,33 @@ main (argc, argv)
   }
   else if (zdom[domain].coord_type == RTHETA)
   {
-    fprintf (fptr_drive, "i j rcen thetacen vol rho ne F_vis_x F_vis_y F_vis_z F_vis_mod F_UV_x F_UV_y F_UV_z F_UV_mod F_Xray_x F_Xray_y F_Xray_z F_Xray_mod es_f_x es_f_y es_f_z es_f_mod bf_f_x bf_f_y bf_f_z bf_f_mod\n");   //directional flux by band
+    fprintf (fptr_drive, "i j rcen thetacen vol rho ne F_vis_x F_vis_y F_vis_z F_vis_mod F_UV_theta F_UV_phi F_UV_r F_UV_mod F_Xray_x F_Xray_y F_Xray_z F_Xray_mod es_f_x es_f_y es_f_z es_f_mod bf_f_x bf_f_y bf_f_z bf_f_mod\n");   //directional flux by band
     fprintf (fptr_flux, "i j rcen thetacen F_vis_x F_vis_y F_vis_z F_vis_mod F_UV_x F_UV_y F_UV_z F_UV_mod F_Xray_x F_Xray_y F_Xray_z F_Xray_mod\n");   //directional flux by band
   }
 
   /* Write out the directional flux table */
 
-  fptr_flux_x = fopen ("directional_flux_x.dat", "w");
-  fptr_flux_y = fopen ("directional_flux_y.dat", "w");
-  fptr_flux_z = fopen ("directional_flux_z.dat", "w");
+  fptr_flux_theta = fopen ("directional_flux_theta.dat", "w");
+  fptr_flux_phi = fopen ("directional_flux_phi.dat", "w");
+  fptr_flux_r = fopen ("directional_flux_r.dat", "w");
 
-  fprintf (fptr_flux_x, "#  i   j  inwind       x           z");
-  fprintf (fptr_flux_y, "#  i   j  inwind       x           z");
-  fprintf (fptr_flux_z, "#  i   j  inwind       x           z");
+  fprintf (fptr_flux_theta, "#  i   j  inwind       x           z");
+  fprintf (fptr_flux_phi, "#  i   j  inwind       x           z");
+  fprintf (fptr_flux_r, "#  i   j  inwind       x           z");
 
   for (ii = 0; ii < NFLUX_ANGLES; ii++)
   {
-    fprintf (fptr_flux_x, "       A%03d", ii * 360 / NFLUX_ANGLES + 5);
-    fprintf (fptr_flux_y, "       A%03d", ii * 360 / NFLUX_ANGLES + 5);
-    fprintf (fptr_flux_z, "       A%03d", ii * 360 / NFLUX_ANGLES + 5);
+    fprintf (fptr_flux_theta, "       A%03d", ii * 360 / NFLUX_ANGLES + 5);
+    fprintf (fptr_flux_phi, "       A%03d", ii * 360 / NFLUX_ANGLES + 5);
+    fprintf (fptr_flux_r, "       A%03d", ii * 360 / NFLUX_ANGLES + 5);
   }
-  fprintf (fptr_flux_x, "\n");
-  fprintf (fptr_flux_y, "\n");
-  fprintf (fptr_flux_z, "\n");
+  fprintf (fptr_flux_theta, "\n");
+  fprintf (fptr_flux_phi, "\n");
+  fprintf (fptr_flux_r, "\n");
 
-  fprintf (fptr_flux_x, "# NANGLES %i\n", NFLUX_ANGLES);
-  fprintf (fptr_flux_y, "# NANGLES %i\n", NFLUX_ANGLES);
-  fprintf (fptr_flux_z, "# NANGLES %i\n", NFLUX_ANGLES);
+  fprintf (fptr_flux_theta, "# NANGLES %i\n", NFLUX_ANGLES);
+  fprintf (fptr_flux_phi, "# NANGLES %i\n", NFLUX_ANGLES);
+  fprintf (fptr_flux_r, "# NANGLES %i\n", NFLUX_ANGLES);
 
 
   for (nwind = zdom[domain].nstart; nwind < zdom[domain].nstop; nwind++)
@@ -305,19 +305,19 @@ main (argc, argv)
       nplasma = wmain[nwind].nplasma;
       wind_n_to_ij (domain, plasmamain[nplasma].nwind, &i, &j);
 
-      fprintf (fptr_flux_x, "%3d %3d      %3d %10.3e %10.3e ", i, j, wmain[nwind].inwind, wmain[nwind].xcen[0], wmain[nwind].xcen[2]);  //output geometric things
-      fprintf (fptr_flux_y, "%3d %3d      %3d %10.3e %10.3e ", i, j, wmain[nwind].inwind, wmain[nwind].xcen[0], wmain[nwind].xcen[2]);  //output geometric things
-      fprintf (fptr_flux_z, "%3d %3d      %3d %10.3e %10.3e ", i, j, wmain[nwind].inwind, wmain[nwind].xcen[0], wmain[nwind].xcen[2]);  //output geometric things
+      fprintf (fptr_flux_theta, "%3d %3d      %3d %10.3e %10.3e ", i, j, wmain[nwind].inwind, wmain[nwind].xcen[0], wmain[nwind].xcen[2]);  //output geometric things
+      fprintf (fptr_flux_phi, "%3d %3d      %3d %10.3e %10.3e ", i, j, wmain[nwind].inwind, wmain[nwind].xcen[0], wmain[nwind].xcen[2]);  //output geometric things
+      fprintf (fptr_flux_r, "%3d %3d      %3d %10.3e %10.3e ", i, j, wmain[nwind].inwind, wmain[nwind].xcen[0], wmain[nwind].xcen[2]);  //output geometric things
       for (ii = 0; ii < NFLUX_ANGLES; ii++)
       {
-        fprintf (fptr_flux_x, "%10.3e ", plasmamain[nplasma].F_UV_ang_x_persist[ii]);
-        fprintf (fptr_flux_y, "%10.3e ", plasmamain[nplasma].F_UV_ang_y_persist[ii]);
-        fprintf (fptr_flux_z, "%10.3e ", plasmamain[nplasma].F_UV_ang_z_persist[ii]);
+        fprintf (fptr_flux_theta, "%10.3e ", plasmamain[nplasma].F_UV_ang_theta_persist[ii]);
+        fprintf (fptr_flux_phi, "%10.3e ", plasmamain[nplasma].F_UV_ang_phi_persist[ii]);
+        fprintf (fptr_flux_r, "%10.3e ", plasmamain[nplasma].F_UV_ang_r_persist[ii]);
 
       }
-      fprintf (fptr_flux_x, "\n");
-      fprintf (fptr_flux_y, "\n");
-      fprintf (fptr_flux_z, "\n");
+      fprintf (fptr_flux_theta, "\n");
+      fprintf (fptr_flux_phi, "\n");
+      fprintf (fptr_flux_r, "\n");
 
 
     }
@@ -520,9 +520,9 @@ main (argc, argv)
   fclose (fptr_pcon);
   fclose (fptr_debug);
   fclose (fptr_flux);
-  fclose (fptr_flux_x);
-  fclose (fptr_flux_y);
-  fclose (fptr_flux_z);
+  fclose (fptr_flux_theta);
+  fclose (fptr_flux_phi);
+  fclose (fptr_flux_r);
 
   exit (0);
 }

@@ -7,6 +7,11 @@ in a single angle range. The two methods should yield the same or very similar r
 but the extraction method is much more efficient and live or die is basically a
 diagnostic mode.
 
+*Note: Small differences between the two methods can occur if a wind model has an 
+edge a particular inclination angle, because in the live-or-die method, one must
+accept photons in a small angle range, whereas the "extract" method involves photon packets
+that emerge from the system at a single angle.*
+
 Type
   Enumerator
 

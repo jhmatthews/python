@@ -1,10 +1,10 @@
 # Python
 
-Python is a (confusingly named) Monte Carlo radiative transfer code which uses the Sobolev approximation. It has been developed by Knox Long, Christian Knigge, Stuart Sim, Nick Higginbottom, James Matthews, Sam Mangham and Edward Parkinson.The code has been used for a variety of research projects invovling the winds of cataclysmic variables, of young stellar objects, and of AGN.
+Python is a (confusingly named) Monte Carlo radiative transfer code which uses the Sobolev approximation. It has been developed by Knox Long, Christian Knigge, Stuart Sim, Nick Higginbottom, James Matthews, Sam Manghamm Edward Parkinson, Mandy Hewitt and Nico Scepi.The code has been used for a variety of research projects invovling the winds of cataclysmic variables, young stellar objects, X-ray binaries and AGN.
 
-The code is under active development, but we are looking for beta users to test the code, and potentially use it for their own research. If you are interested in using Python please email the collaboration at agn-winds[at]googlegroups[dot]com or contact Knox Long via long[at]stsci[dot]edu. 
+The code is under active development, but we are looking for beta users to test the code, and potentially use it for their own research. If you are interested in using Python please contact Knox Long via long[at]stsci[dot]edu. 
 
-Documentation of input parameters is hosted on [ReadTheDocs](http://agnwinds.readthedocs.io/en/dev/).
+Documentation is hosted on [ReadTheDocs](http://agnwinds.readthedocs.io/en/dev/).
 
 ## CI \& Docs Build Status
 
@@ -22,7 +22,7 @@ If you want to download the latest dev version, you can zip up the git repositor
 
     $ git clone https://github.com/agnwinds/python.git 
 
-If you anticipate contributing to development we suggest Forking the repository and submitting pull requests with any proposed changes.
+If you anticipate contributing to development we suggest forking the repository and submitting pull requests with any proposed changes.
 
 Once you have the files, you need to cd to the new directory and set your environment variables
     

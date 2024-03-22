@@ -543,7 +543,7 @@ double q21_a, q21_t_old;
 
 /**********************************************************/
 /**
- * @brief      Calculates the collisional de-excitation coefficient q21
+ * @brief      Calculates the collisional de-excitation coefficient q21 
  *
  * @param [in] struct lines *  line_ptr   A single line
  * @param [in] double  t   The temperature at which to calculate the coefficient
@@ -554,8 +554,18 @@ double q21_a, q21_t_old;
  * approximation if we do not.
  *
  * ### Notes ###
- * The relevant paper to consult here is 
+ * The relevant papers to consult here are 
  * [Van Regemorter 1962 (ApJ 136 906)](https://ui.adsabs.harvard.edu/abs/1962ApJ...136..906V/abstract). 
+ * or
+ * 
+ * [Storey & Sochi 2015, MNRAS, 449, 2974](https://ui.adsabs.harvard.edu/abs/2015MNRAS.449.2974S/abstract)
+ * 
+ * This is what is implemented
+ *
+ * Q_{ji} = \frac{2\sqrt\pi c \alpha a_o^2}{g_j} \sqrt{\frac{R}{k T}} \Upsilon 
+ * = \frac{8.629\times 10^{-6} \Upsilon}{g_j \sqrt T} \Upsilon
+ * 
+ * 
  * We use an effective gaunt factor to calculate collision strengths.  
  * 
 ************************************************************/
@@ -611,7 +621,7 @@ q21 (line_ptr, t)
 
 /**********************************************************/
 /**
- * @brief      Calculate the collisional excitation coefficient for a line
+ * @brief      Calculate the collisional excitation coefficient from a lower to upper level
  *
  * @param [in] struct lines *  line_ptr   The line of interest
  * @param [in] double  t   The temperature of interest
@@ -619,6 +629,13 @@ q21 (line_ptr, t)
  *
  * @details
  * The routine calls q21 and uses detailed balance to derive q12
+ *
+ * This is what is implemented:
+ *
+ * Q_{ij} = \frac{2\sqrt\pi c \alpha a_o^2}{g_i} \sqrt{\frac{R}{k T}} \Upsilon_s = \frac{8.629\times 10^{-6} \Upsilon_s}{g_i \sqrt T}
+ *
+ * See 
+ * [Storey & Sochi 2015, MNRAS, 449, 2974](https://ui.adsabs.harvard.edu/abs/2015MNRAS.449.2974S/abstract)
  *
  * ### Notes ###
  *
@@ -696,7 +713,7 @@ a21 (line_ptr)
  *
  * ### Notes ###
  * It uses data extracted from Chianti stored in coll_stren.
- * The paper to consult is Burgess and Tully A&A 254,436 (1992).
+ * The paper to consult is [Burgess and Tully A&A 254,436 (1992)](https://ui.adsabs.harvard.edu/abs/1992A%26A...254..436B/abstract).
  * u0 is the ratio of Boltzmans constant times the electron temperature in the cell
  * divided by Plancks constant times the frequency of the line under analysis.
  *
@@ -803,7 +820,7 @@ upsilon (n_coll, u0)
  **********************************************************/
 
 void
-skiplines (FILE * fptr, int nskip)
+skiplines (FILE *fptr, int nskip)
 {
   int i, c;
 

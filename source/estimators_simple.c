@@ -284,10 +284,20 @@ update_flux_estimators (xplasma, phot_mid, ds_obs, w_ave, ndom)
 
   project_from_xyz_cyl (phot_mid->x, flux_orig, flux);  //Transform to the frame ine which fluxes are summed 
 
-  if (phot_mid->x[2] < 0)       //If the photon is in the lower hemisphere, reverse the sense of the z flux
-    flux[2] *= (-1);
-  angle = 0.0;
+  double theta;
+  double r = sqrt (pow (phot_mid->x[0], 2) + pow (phot_mid->x[1], 2));
 
+  if (phot_mid->x[2] < 0)
+  {                             //If the photon is in the lower hemisphere - we need to reverse the sense of the z flux
+    flux[2] *= (-1);
+    theta = atan2 (r, -phot_mid->x[2]);
+  }
+  else
+  {
+    theta = atan2 (r, phot_mid->x[2]);
+  }
+
+  angle = 0.0;
 
   if (flux[2] > 0 && flux[0] > 0)
     angle = (atan (flux[0] / flux[2]) * RADIAN);
@@ -302,9 +312,15 @@ update_flux_estimators (xplasma, phot_mid, ds_obs, w_ave, ndom)
 
 
   iangle = (angle) / binw;      //Turn the angle into an integer to pass into the flux array
-  xplasma->F_UV_ang_x[iangle] += flux[0];
-  xplasma->F_UV_ang_y[iangle] += flux[1];
-  xplasma->F_UV_ang_z[iangle] += flux[2];
+
+  //xplasma->F_UV_ang_theta[iangle] += flux[0];
+  //xplasma->F_UV_ang_phi[iangle] += flux[1];
+  //xplasma->F_UV_ang_r[iangle] += flux[2];
+
+  xplasma->F_UV_ang_r[iangle] += flux[0] * sin (theta) + flux[2] * cos (theta);
+  xplasma->F_UV_ang_phi[iangle] += flux[1];
+  xplasma->F_UV_ang_theta[iangle] += flux[0] * cos (theta) - flux[2] * sin (theta);
+
 
 
 
@@ -594,7 +610,8 @@ normalise_simple_estimators (xplasma)
    * and densities
    */
 
-  electron_density_obs = xplasma->ne / wmain[nwind].xgamma_cen; // Mihalas & Mihalas p146
+  /* there was an error here before, see #1030. The observer frame density is gamma times the CMF one */
+  electron_density_obs = xplasma->ne * wmain[nwind].xgamma_cen; // Mihalas & Mihalas p146
   volume_obs = wmain[nwind].vol / wmain[nwind].xgamma_cen;
 
   for (i = 0; i < 4; i++)
@@ -607,21 +624,78 @@ normalise_simple_estimators (xplasma)
 
   for (i = 0; i < NFLUX_ANGLES; i++)
   {
-
-//ksl - commented out set but not used variables
-//OLD    rmin = wmain[xplasma->nwind].r;
-//OLD    rmax = wmain[xplasma->nwind + 1].r;
-//OLD    thetamin = i * RADIAN;
-//OLD    thetamax = (i + 1) * RADIAN;
-
-//OLD    wedge_volume = 2. * 2. / 3. * PI * (rmax * rmax * rmax - rmin * rmin * rmin) * (cos (thetamin) - cos (thetamax));
-    xplasma->F_UV_ang_x[i] /= volume_obs;
-    xplasma->F_UV_ang_y[i] /= volume_obs;
-    xplasma->F_UV_ang_z[i] /= volume_obs;
-
-    //   xplasma->idomega[i] /= (4. * PI * volume_obs);
-
+    xplasma->F_UV_ang_theta[i] /= volume_obs;
+    xplasma->F_UV_ang_phi[i] /= volume_obs;
+    xplasma->F_UV_ang_r[i] /= volume_obs;
   }
 
   return (0);
+}
+
+/**********************************************************/
+/**
+ * @brief
+ *
+ * @details
+ *
+ * ### Notes ###
+ *
+ **********************************************************/
+
+void
+update_persistent_directional_flux_estimators (int nplasma, double flux_persist_scale)
+{
+  int n;
+  double flux_helper[3];
+
+  if (geo.wcycle == 0)          //If this is the first time through, then the persistent flux is empty.
+  {
+    vadd (plasmamain[nplasma].F_vis_persistent, plasmamain[nplasma].F_vis, plasmamain[nplasma].F_vis_persistent);
+    vadd (plasmamain[nplasma].F_UV_persistent, plasmamain[nplasma].F_UV, plasmamain[nplasma].F_UV_persistent);
+    vadd (plasmamain[nplasma].F_Xray_persistent, plasmamain[nplasma].F_Xray, plasmamain[nplasma].F_Xray_persistent);
+    vadd (plasmamain[nplasma].rad_force_bf_persist, plasmamain[nplasma].rad_force_bf, plasmamain[nplasma].rad_force_bf_persist);
+
+    for (n = 0; n < NFLUX_ANGLES; n++)
+    {
+      plasmamain[nplasma].F_UV_ang_theta_persist[n] = plasmamain[nplasma].F_UV_ang_theta_persist[n] + plasmamain[nplasma].F_UV_ang_theta[n];
+      plasmamain[nplasma].F_UV_ang_phi_persist[n] = plasmamain[nplasma].F_UV_ang_phi_persist[n] + plasmamain[nplasma].F_UV_ang_phi[n];
+      plasmamain[nplasma].F_UV_ang_r_persist[n] = plasmamain[nplasma].F_UV_ang_r_persist[n] + plasmamain[nplasma].F_UV_ang_r[n];
+    }
+  }
+  else
+  {
+    rescale (plasmamain[nplasma].F_vis_persistent, (1 - flux_persist_scale), plasmamain[nplasma].F_vis_persistent);
+    rescale (plasmamain[nplasma].F_vis, flux_persist_scale, flux_helper);
+    vadd (plasmamain[nplasma].F_vis_persistent, flux_helper, plasmamain[nplasma].F_vis_persistent);
+
+    rescale (plasmamain[nplasma].F_UV_persistent, (1 - flux_persist_scale), plasmamain[nplasma].F_UV_persistent);
+    rescale (plasmamain[nplasma].F_UV, flux_persist_scale, flux_helper);
+    vadd (plasmamain[nplasma].F_UV_persistent, flux_helper, plasmamain[nplasma].F_UV_persistent);
+
+    rescale (plasmamain[nplasma].F_Xray_persistent, (1 - flux_persist_scale), plasmamain[nplasma].F_Xray_persistent);
+    rescale (plasmamain[nplasma].F_Xray, flux_persist_scale, flux_helper);
+    vadd (plasmamain[nplasma].F_Xray_persistent, flux_helper, plasmamain[nplasma].F_Xray_persistent);
+
+    rescale (plasmamain[nplasma].rad_force_bf_persist, (1 - flux_persist_scale), plasmamain[nplasma].rad_force_bf_persist);
+    rescale (plasmamain[nplasma].rad_force_bf, flux_persist_scale, flux_helper);
+    vadd (plasmamain[nplasma].rad_force_bf_persist, flux_helper, plasmamain[nplasma].rad_force_bf_persist);
+
+    for (n = 0; n < NFLUX_ANGLES; n++)
+    {
+      plasmamain[nplasma].F_UV_ang_theta_persist[n] = plasmamain[nplasma].F_UV_ang_theta_persist[n] * (1 - flux_persist_scale);
+      plasmamain[nplasma].F_UV_ang_phi_persist[n] = plasmamain[nplasma].F_UV_ang_phi_persist[n] * (1 - flux_persist_scale);
+      plasmamain[nplasma].F_UV_ang_r_persist[n] = plasmamain[nplasma].F_UV_ang_r_persist[n] * (1 - flux_persist_scale);
+      plasmamain[nplasma].F_UV_ang_theta_persist[n] =
+        plasmamain[nplasma].F_UV_ang_theta_persist[n] + plasmamain[nplasma].F_UV_ang_theta[n] * flux_persist_scale;
+      plasmamain[nplasma].F_UV_ang_phi_persist[n] =
+        plasmamain[nplasma].F_UV_ang_phi_persist[n] + plasmamain[nplasma].F_UV_ang_phi[n] * flux_persist_scale;
+      plasmamain[nplasma].F_UV_ang_r_persist[n] =
+        plasmamain[nplasma].F_UV_ang_r_persist[n] + plasmamain[nplasma].F_UV_ang_r[n] * flux_persist_scale;
+    }
+  }
+  plasmamain[nplasma].F_vis_persistent[3] = length (plasmamain[nplasma].F_vis_persistent);
+  plasmamain[nplasma].F_UV_persistent[3] = length (plasmamain[nplasma].F_UV_persistent);
+  plasmamain[nplasma].F_Xray_persistent[3] = length (plasmamain[nplasma].F_Xray_persistent);
+  plasmamain[nplasma].rad_force_bf_persist[3] = length (plasmamain[nplasma].rad_force_bf_persist);
+
 }

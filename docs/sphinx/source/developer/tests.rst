@@ -140,7 +140,7 @@ implementation. If you need to create your own assertion, these should be kept i
       /* Use the following assertion to compare the value of the "correct" values (vector_x)
          against the output from `solve_matrix` (test_vector_x) */
 
-      CU_CHECK_DOUBLE_ARRAY_EQ_FATAL(test_vector_x, vector_x, vector_size, EPSILON);  /* Custom from assert.h */
+      CU_ASSERT_DOUBLE_ARRAY_EQUAL_FATAL(test_vector_x, vector_x, vector_size, EPSILON);  /* Custom from assert.h */
 
       free(matrix_a);
       free(vector_b);

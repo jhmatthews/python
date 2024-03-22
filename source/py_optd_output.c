@@ -29,7 +29,7 @@
  * ************************************************************************** */
 
 void
-write_generic_file_header (FILE * fp)
+write_generic_file_header (FILE *fp)
 {
   char time_string[LINELENGTH];
 
@@ -60,7 +60,7 @@ write_generic_file_header (FILE * fp)
  * ************************************************************************** */
 
 void
-print_optical_depths (SightLines_t * inclinations, int n_inclinations, Edges_t edges[], int n_edges, double *optical_depth,
+print_optical_depths (SightLines_t *inclinations, int n_inclinations, Edges_t edges[], int n_edges, double *optical_depth,
                       double *column_density)
 {
   int i, j;
@@ -126,7 +126,7 @@ print_optical_depths (SightLines_t * inclinations, int n_inclinations, Edges_t e
  * ************************************************************************** */
 
 void
-write_optical_depth_spectrum (SightLines_t * inclinations, int n_inclinations, double *tau_spectrum, double freq_min, double d_freq)
+write_optical_depth_spectrum (SightLines_t *inclinations, int n_inclinations, double *tau_spectrum, double freq_min, double d_freq)
 {
   int i, j;
   double c_wavelength, c_frequency;
@@ -192,7 +192,7 @@ write_optical_depth_spectrum (SightLines_t * inclinations, int n_inclinations, d
  * ************************************************************************** */
 
 void
-write_photosphere_location_to_file (Positions_t * positions, int n_angles)
+write_photosphere_location_to_file (Positions_t *positions, int n_angles)
 {
   int i;
   double pos1d[3];

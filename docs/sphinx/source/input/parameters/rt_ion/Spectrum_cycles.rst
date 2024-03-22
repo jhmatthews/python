@@ -1,6 +1,14 @@
 Spectrum_cycles
 ===============
-Multi-line description, must keep indentation.
+
+In Python, the detailed spectra are calculate with flights of photons that have
+the same number of photon bundles as in ionization cycles. The detiled spectra
+are calculated between a minimum and maximum wavelenth, and at specific inclination
+angles. Various other conditions can be placed on each spectrum that is accumulated.
+
+The spectra are actually output at the end of each spectrum cycle with a normalization
+that is correct for a distance of 100 pc, so one can look at the detailed spectra as
+it builds up, if one wishes.
 
 Type
   Integer

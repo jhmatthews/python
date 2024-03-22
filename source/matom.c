@@ -563,7 +563,7 @@ int temp_choice;                //choice of type of calcualation for alpha_sp
 #define ALPHA_SP_CONSTANT 5.79618e-36
 
 double
-alpha_sp (cont_ptr, xplasma, ichoice)
+xalpha_sp (cont_ptr, xplasma, ichoice)
      struct topbase_phot *cont_ptr;
      PlasmaPtr xplasma;
      int ichoice;
@@ -596,6 +596,112 @@ alpha_sp (cont_ptr, xplasma, ichoice)
   }
 
   alpha_sp_value = alpha_sp_value * ALPHA_SP_CONSTANT;
+
+
+  return (alpha_sp_value);
+}
+
+
+double
+alpha_sp (cont_ptr, xplasma, ichoice)
+     struct topbase_phot *cont_ptr;
+     PlasmaPtr xplasma;
+     int ichoice;
+{
+  double alpha_sp_value;
+  double fthresh, flast;
+  double temp;
+
+  temp_choice = ichoice;
+  temp = temp_ext = xplasma->t_e;       //external for use in alph_sp_integrand
+  cont_ext_ptr = cont_ptr;      //"
+
+  fthresh = cont_ptr->freq[0];  //first frequency in list
+  flast = cont_ptr->freq[cont_ptr->np - 1];     //last frequency in list
+  if ((H_OVER_K * (flast - fthresh) / temp) > ALPHA_MATOM_NUMAX_LIMIT)
+  {
+    //flast is currently very far into the exponential tail: so reduce flast to limit value of h nu / k T.
+    flast = fthresh + temp * ALPHA_MATOM_NUMAX_LIMIT / H_OVER_K;
+  }
+
+#if MATOM_VER == 1
+  /* This is the line we want to replace */
+  // alpha_sp_value = num_int (alpha_sp_integrand, fthresh, flast, 1e-4);
+  double freq, dfreq;
+  double freq1, freq2;
+  double x, integrand;
+  int n, nmax;
+
+  alpha_sp_value = 0;
+
+  nmax = 10000;
+  double log_fmin, dlog_freq;
+  log_fmin = log10 (cont_ptr->freq[0]);
+  dlog_freq = log10 (flast / cont_ptr->freq[0]) / nmax;
+
+  freq1 = cont_ptr->freq[0];
+  for (n = 1; n < nmax; n++)
+  {
+    freq2 = pow (10., log_fmin + n * dlog_freq);
+    freq = 0.5 * (freq1 + freq2);
+    dfreq = freq2 - freq1;
+    x = sigma_phot (cont_ptr, freq);
+    freq1 = freq2;
+
+
+
+    if (freq > flast)
+    {
+      break;
+    }
+
+    integrand = x * freq * freq * exp (H_OVER_K * (fthresh - freq) / temp);
+
+    if (ichoice == 1)
+    {
+      integrand *= freq / fthresh;
+
+    }
+    else if (ichoice == 2)
+    {
+      integrand *= (freq - fthresh) / fthresh;  // difference case
+    }
+
+    alpha_sp_value += integrand * dfreq;
+
+  }
+
+#elif MATOM_VER == 2
+  alpha_sp_value = num_int (alpha_sp_integrand, fthresh, flast, 1e-4);
+#warning "Using old gsl routine for alpha_sp"
+#else
+#error "Unsupported MATOM_VER value"
+#endif
+
+
+//  Log ("Xxxx %e  %e %d %d %d %d %e %e \n", alpha_sp_value, temp_ext, ichoice, cont_ptr->nion, cont_ptr->nlev, cont_ptr->uplev,
+//       cont_ptr->freq[0], cont_ptr->x[0]);
+
+  /* This is the end of the modification */
+
+  /* The lines above evaluate the integral in alpha_sp. Now we just want to multiply
+     through by the appropriate constant. */
+  if (cont_ptr->macro_info == TRUE && geo.macro_simple == FALSE)
+  {
+    alpha_sp_value = alpha_sp_value * xconfig[cont_ptr->nlev].g / xconfig[cont_ptr->uplev].g * pow (xplasma->t_e, -1.5);
+  }
+  else                          //case for simple element
+  {
+    alpha_sp_value = alpha_sp_value * xconfig[cont_ptr->nlev].g / ion[cont_ptr->nion + 1].g * pow (xplasma->t_e, -1.5); //g for next ion up used
+  }
+
+  alpha_sp_value = alpha_sp_value * ALPHA_SP_CONSTANT;
+
+  if (sane_check (alpha_sp_value))
+  {
+    Error ("alpha_sp:sane_check value is %e\n", alpha_sp_value);
+
+  }
 
   return (alpha_sp_value);
 }
@@ -876,7 +982,7 @@ kpkt (p, nres, escape, mode)
            approach to choosing photon weights - this means we
            multipy down the photon weight by a factor nu/(nu-nu_0)
            and we force a kpkt to be created */
-        if (!modes.turn_off_upweighting_of_simple_macro_atoms)
+        if (modes.use_upweighting_of_simple_macro_atoms)
         {
           if (phot_top[i].macro_info == FALSE || geo.macro_simple == TRUE)
           {

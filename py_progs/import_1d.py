@@ -7,7 +7,7 @@ Synopsis:
 
 Read the master file produced by windsave2table for a
 1d spherical  model and produce a file which can be  
-be imported into python
+be imported into Python
 
 
 Command line usage (if any):
@@ -27,10 +27,11 @@ Primary routines:
     doit
 
 Notes:
-                                       
-History:
 
-171106 ksl Coding begun
+    Windsave2table saves the values of rho in the CMF frame,
+    but Python expects models to be in the observer frame
+    so this routine corrects for this.
+                                       
 
 '''
 
@@ -143,12 +144,17 @@ def doit(root='star',outputfile=''):
 
     xdata=data['i','r','v','rho','t_e']
 
+    C=2.997925e10
+
+    gamma=1./numpy.sqrt(1-(xdata['v']/C)**2)
+    xdata['rho']*=gamma
+
     
     print (xdata)
 
 
     # This format is the easy to read back automatically
-    ascii.write(xdata,outputfile,format='fixed_width_two_line')
+    ascii.write(xdata,outputfile,format='fixed_width_two_line',overwrite=True)
 
     return
 
@@ -166,4 +172,4 @@ if __name__ == "__main__":
         # doit(int(sys.argv[1]))
         doit(sys.argv[1])
     else:
-        print ('usage: import_1d.py filename')
+        print (__doc__)

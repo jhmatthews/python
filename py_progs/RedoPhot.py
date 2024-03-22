@@ -92,8 +92,9 @@ def read_phot(photfile='o_2_phot.dat'):
     xhead=[]
     xtab=[] # list of tables with the xsections
     for word in words:
-        #print(word)
-        if word[0].count('PhotMacS'):
+        # print(word)
+        if word[0].count('PhotMacS') or word[0].count('PhotTopS'):
+            # print('Got header')
             lineno.append(i)
             label.append(word[0])
             z.append(int(word[1]))
@@ -110,7 +111,8 @@ def read_phot(photfile='o_2_phot.dat'):
             xhead=[]
             xev=[]
             xsec=[]
-        elif word[0]=='PhotMac':
+        elif word[0]=='PhotMac' or word[0]=='Phot':
+            # print('Got data')
             xhead.append(word[0])
             xev.append(eval(word[1]))
             xsec.append(eval(word[2]))
@@ -254,7 +256,7 @@ def steer(argv):
     This is just a steering routine
     '''
 
-    outroot='test'
+    outroot=''
     infile=''
     i=1
     while i<len(argv):

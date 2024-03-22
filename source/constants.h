@@ -33,4 +33,3 @@
 #define EV2ERGS   			1.602192e-12
 #define RADIAN				57.29577951308232
 #define RYD2ERGS                        2.1798741e-11   /* Rydberg in units of ergs */
-

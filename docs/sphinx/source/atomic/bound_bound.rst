@@ -1,7 +1,7 @@
 Bound Bound
 ###########
 
-This is the data for computing bound bound, or line interactions in simple atoms. 
+This is the data for computing bound bound, or line interactions in simple/macro  atoms. 
 
 Source
 ======
@@ -14,6 +14,7 @@ The file gfall.dat was used, though a few extra lines known to have been missing
 There are two main sources of data currently used in Python.
 
 * Kurucz
+* Verner
 * Chianti
 
 Kurucz is normally used for simple atoms whereas Chianti is the most common source for information about lines used in macro-atom versions
@@ -25,7 +26,7 @@ Translation to Python format
 ============================
 There are several steps to creating the data used in Python from that in gfall.dat, that are carried out by py_read_kurucz and py_link. The first routine reads the gfall.dat file and creates two output files, a file containing the lines and the associated such as the effective oscillatory strength and a file which contains information about the ion levels.  py_read_kurucz chooses only a portion of the Kurucz lines, namely those associated with ions with ionization potentials in a certain range and lines with gf factors exceeding a certain value. The second program py_link attempts to create a model ion with links between the levels and the ions.  Both of these routines are driven by .pf files, similar to what are used in python.  Examples of the .pf files are in the directory py_kurucz
 
-In practice we have not used these data for any Python publications. At some point early in the AGN project, NSH increased the number of lines, and generated lines\_linked\_ver\_2.py and levels\_ver\_2.py. I think this was because there was a small bug which meant the oscillator strength cut that was stated was not that which was applied.
+In practice we have not used these data for any Python publications. At some point early in the AGN project, NSH increased the number of lines, and generated lines\_linked\_ver\_2.dat and levels\_ver\_2.dat. I think this was because there was a small bug which meant the oscillator strength cut that was stated was not that which was applied.
 
 Data format
 ===========
@@ -35,7 +36,7 @@ Data format
 The lines have the following format
 
 For lines, we did not create a specific topbase format, but most of the recent sets of 
-data use a format that is similar to what is need for macro atoms::
+data use a format that is similar to what is used  for macro atoms::
 
   Line  1  1  926.226013  0.003184   2   4     0.000000    13.387685    0    9
   Line  1  1  930.747986  0.004819   2   4     0.000000    13.322634    0    8
@@ -60,6 +61,7 @@ For LinMacro the columns are
 * the absorption oscillator strength, 
 * the lower and upper level multiplicities, 
 * the energy of the lower level and upper level. 
+* the lower and upper level indicies (matched back to the energy levels)
 
 The ultimate source for this information is usually NIST . The main issue with all of this is that 
 one needs to index everything self-consistentl

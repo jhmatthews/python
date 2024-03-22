@@ -9,3 +9,4 @@ py -ignore_partial_cells agn_simple.pf
 # py cv_vert.pf
 # py star.pf
 # py two.pf
+# py cv_standard_import.pf

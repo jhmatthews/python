@@ -271,20 +271,21 @@ main (argc, argv)
 
 /* Read in the wind file */
 
+  zdom = calloc (MAX_DOM, sizeof (domain_dummy));
+  if (zdom == NULL)
+  {
+    printf ("Unable to allocate memory for domain\n");
+    return EXIT_FAILURE;
+  }
+
   if (wind_read (windsavefile) < 0)
   {
     Error ("py_wind: Could not open %s", windsavefile);
     exit (0);
   }
 
-
   printf ("Read wind_file %s\n", windsavefile);
-
-  get_atomic_data (geo.atomic_filename);
-
   printf ("Read Atomic data from %s\n", geo.atomic_filename);
-
-
 
   do_windsave2table (root, ion_switch, edge_switch);
 

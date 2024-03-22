@@ -55,22 +55,26 @@ The main hierarchy is as follows
  * Elements
  * Ions
  * Energy levels
- *  Lines
+ * Lines
 
 Once these sets of data have been read in the order in which other information is read in 
 is irrelevant, that is one can read the collision data (which is indexed to lines) and 
 photoionization cross sections  (which are indexed to energy levels) in either order
 
+*It is important that all of the ions, energy levels, and line for an atom, appear before 
+photoionization cross sections and collisional data for that atom this data is only read in if it can be indexed to the corresponding levels and lines*
+
     
 
-(Note that although the  approach has advantages of allowing one to comment out atoms or ions, it also
-has the disadvantageby ignoring data, the program does not give you a particularly good summary of 
+(Note that although the  approach has advantages of allowing one to remove or add atoms or ions from a model easily, it requires
+one to be careful when doing this.  The 
+program does not give you a good summary of 
 what data has been omitted.  If concerned about this one should use the advanced 
 command::
 
  @Diag.write\_atomicdata(yes,no)
 
-which prints out an ascii version of the input data that was used.
+which prints out an ascii version of the input data that was used.)
 
 More information on the various types of input data can be found below:
 

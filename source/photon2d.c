@@ -445,7 +445,7 @@ translate_in_wind (w, p, tau_scat, tau, nres)
      Note that ds_current does not alter p in any way */
 
 
-  if ( (modes.partial_cells == PC_EXTEND && one->inwind == W_PART_INWIND) || one->inwind == W_IGNORE)
+  if ((modes.partial_cells == PC_EXTEND && one->inwind == W_PART_INWIND) || one->inwind == W_IGNORE)
   {
     ds_current = smax;
     istat = 0;
@@ -481,7 +481,15 @@ translate_in_wind (w, p, tau_scat, tau, nres)
         move_phot (&phot_mid, 0.5 * ds_current);
         observer_to_local_frame (&phot_mid, &phot_mid_cmf);
         ds_cmf = observer_to_local_frame_ds (&phot_mid, ds_current);
-        bf_estimators_increment (&w[p->grid], &phot_mid_cmf, ds_cmf);
+        if (p->grid >= 0 && p->grid < geo.ndim2)
+        {
+          bf_estimators_increment (&w[p->grid], &phot_mid_cmf, ds_cmf);
+        }
+        else
+        {
+          Error ("translate_in_wind: Cannot call bf_estimators for photon not in wind: %d\n", p->np);
+        }
+
       }
     }
     else
@@ -530,8 +538,10 @@ translate_in_wind (w, p, tau_scat, tau, nres)
  * smax can be found in various ways depending on if the photon is in the wind
  * or not.
  *
+ * This routine operates in the global/observer frame.
+ *
  * This section of code was put into its own function in an attempt to avoid
- * code duplication for the optical depth diagnostic ray tracing thing.
+ * code duplication in the optical depth diagnostic ray tracing routine.
  *
  * ************************************************************************** */
 

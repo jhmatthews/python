@@ -68,7 +68,6 @@ endif
 MAKE_PYTHON = \
 	cd $(PYTHON)/source; \
 	make CC=$(CMAKE) INDENT=no all \
-	$(MAKE_CHECK)
 
 # Compile and install the libraries and Python
 install:

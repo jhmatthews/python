@@ -141,9 +141,7 @@ cylind_ds_in_cell (ndom, p)
  **********************************************************/
 
 int
-cylind_make_grid (ndom, w)
-     WindPtr w;
-     int ndom;
+cylind_make_grid (int ndom, WindPtr w)
 {
   double dr, dz, dlogr, dlogz, xfudge;
   int i, j, n;
@@ -305,12 +303,12 @@ cylind_wind_complete (ndom, w)
 
 /**********************************************************/
 /**
- * @brief      Calculates the wind volume for cells in a cylindrical domain
- * 	allowing for the fact that some cells are not necessarily entirely in
+ * @brief      Calculates the volume for a cell in a cylindrical domain
+ * 	allowing for the fact that it may not necessarily be entirely in
  * 	the wind
  *
- * @param [in] ndom   The domain of interest
- * @param [in,out] w   the entire wind
+ * @param [in,out] WindPtr  w   a single wind cell to calculate the volume for
+ *
  * @return     Always returns 0
  *
  * @details
@@ -325,17 +323,12 @@ cylind_wind_complete (ndom, w)
  * ### Notes ###
  * Where_in grid does not tell you whether the photon is in the wind or not.
  *
- * @bug  This routine has unresolved XXX questions that need to be
- * resolved
- *
  **********************************************************/
 
 int
-cylind_volumes (ndom, w)
-     int ndom;                  // domain number
-     WindPtr w;
+cylind_cell_volume (WindPtr w)
 {
-  int i, j, n;
+  int i, j;
   int jj, kk;
   double fraction, cell_volume;
   double num, denom;
@@ -343,108 +336,98 @@ cylind_volumes (ndom, w)
   double rmax, rmin;
   double zmin, zmax;
   double dr, dz, x[3];
-  int n_inwind, ndomain;
+  int n_inwind;
+  int ndom, dom_check;
   DomainPtr one_dom;
 
+  ndom = w->ndom;
   one_dom = &zdom[ndom];
+  wind_n_to_ij (ndom, w->nwind, &i, &j);
 
+  rmin = one_dom->wind_x[i];
+  rmax = one_dom->wind_x[i + 1];
+  zmin = one_dom->wind_z[j];
+  zmax = one_dom->wind_z[j + 1];
 
-  for (i = 0; i < one_dom->ndim; i++)
+  /* this is the full cell volume, which is adjusted by the fraction
+     of the cell that is in the wind later if necessary leading factor of 2
+     added to allow for volume above and below plane (SSMay04) */
+  cell_volume = 2 * PI * (rmax * rmax - rmin * rmin) * (zmax - zmin);
+
+  if (w->inwind == W_NOT_ASSIGNED)
   {
-    for (j = 0; j < one_dom->mdim; j++)
+    if (one_dom->wind_type == IMPORT)
     {
-
-      wind_ij_to_n (ndom, i, j, &n);
-
-      rmin = one_dom->wind_x[i];
-      rmax = one_dom->wind_x[i + 1];
-      zmin = one_dom->wind_z[j];
-      zmax = one_dom->wind_z[j + 1];
-
-      /* this is the full cell volume, which is adjusted by the fraction
-         of the cell that is in the wind later if necessary */
-      //leading factor of 2 added to allow for volume above and below plane (SSMay04)
-      cell_volume = 2 * PI * (rmax * rmax - rmin * rmin) * (zmax - zmin);
-
-      if (w[n].inwind == W_NOT_ASSIGNED)
-      {
-        if (one_dom->wind_type == IMPORT)
-        {
-          Error ("cylind_volumes: Shouldn't be redefining inwind in cylind_volumes with imported model.\n");
-          Exit (0);
-        }
-
-        n_inwind = cylind_is_cell_in_wind (n);
-
-        if (n_inwind == W_NOT_INWIND)
-        {
-          fraction = 0.0;
-          jj = 0;
-          kk = RESOLUTION * RESOLUTION;
-        }
-        else if (n_inwind == W_ALL_INWIND)
-        {
-          fraction = 1.0;
-          jj = kk = RESOLUTION * RESOLUTION;
-        }
-        else
-        {                       /* Determine whether the grid cell is in the wind */
-          num = denom = 0;
-          jj = kk = 0;
-          dr = (rmax - rmin) / RESOLUTION;
-          dz = (zmax - zmin) / RESOLUTION;
-          for (r = rmin + dr / 2; r < rmax; r += dr)
-          {
-            for (z = zmin + dz / 2; z < zmax; z += dz)
-            {
-              denom += r * r;
-              kk++;
-              x[0] = r;
-              x[1] = 0;
-              x[2] = z;
-
-              if (where_in_wind (x, &ndomain) == W_ALL_INWIND && ndom == ndomain)
-              {
-                num += r * r;   /* 0 implies in wind */
-                jj++;
-              }
-            }
-          }
-          fraction = num / denom;
-        }
-
-        /* OK now make the final assignement of nwind and fix the volumes */
-        /* XXX JM - not clear why these additional if statements are necessary */
-        if (jj == 0)
-        {
-          w[n].inwind = W_NOT_INWIND;   // The cell is not in the wind
-          w[n].vol = 0.0;
-        }
-        else if (jj == kk)
-        {
-          w[n].inwind = W_ALL_INWIND;   // All of cell is inwind
-          w[n].vol = cell_volume;
-        }
-        else
-        {
-          w[n].inwind = W_PART_INWIND;  // Some of cell is inwind
-          w[n].vol = cell_volume * fraction;
-        }
-      }
-
-      /* JM 1711 -- the following two if statements are for if the inwind values are
-         already assigned, for example by an imported model */
-      /* need to zero volumes for cells not in the wind */
-      else if (w[n].inwind == W_NOT_INWIND)
-      {
-        w[n].vol = 0.0;
-      }
-
-      else if (w[n].inwind == W_ALL_INWIND)
-      {
-        w[n].vol = cell_volume;
-      }
+      Error ("cylind_volumes: Shouldn't be redefining inwind in cylind_volumes with imported model.\n");
+      Exit (0);
     }
+
+    n_inwind = cylind_is_cell_in_wind (w->nwind);
+
+    if (n_inwind == W_NOT_INWIND)
+    {
+      fraction = 0.0;
+      jj = 0;
+      kk = RESOLUTION * RESOLUTION;
+    }
+    else if (n_inwind == W_ALL_INWIND)
+    {
+      fraction = 1.0;
+      jj = kk = RESOLUTION * RESOLUTION;
+    }
+    else
+    {                           /* Determine whether the grid cell is in the wind */
+      num = denom = 0;
+      jj = kk = 0;
+      dr = (rmax - rmin) / RESOLUTION;
+      dz = (zmax - zmin) / RESOLUTION;
+      for (r = rmin + dr / 2; r < rmax; r += dr)
+      {
+        for (z = zmin + dz / 2; z < zmax; z += dz)
+        {
+          denom += r * r;
+          kk++;
+          x[0] = r;
+          x[1] = 0;
+          x[2] = z;
+
+          if (where_in_wind (x, &dom_check) == W_ALL_INWIND && dom_check == ndom)
+          {
+            num += r * r;       /* 0 implies in wind */
+            jj++;
+          }
+        }
+      }
+      fraction = num / denom;
+    }
+
+    /* OK now make the final assignement of nwind and fix the volumes */
+    /* XXX JM - not clear why these additional if statements are necessary */
+    if (jj == 0)
+    {
+      w->inwind = W_NOT_INWIND; // The cell is not in the wind
+      w->vol = 0.0;
+    }
+    else if (jj == kk)
+    {
+      w->inwind = W_ALL_INWIND; // All of cell is inwind
+      w->vol = cell_volume;
+    }
+    else
+    {
+      w->inwind = W_PART_INWIND;        // Some of cell is inwind
+      w->vol = cell_volume * fraction;
+    }
+  }
+  /* JM 1711 -- the following two if statements are for if the inwind values are
+     already assigned, for example by an imported model */
+  else if (w->inwind == W_NOT_INWIND)
+  {
+    w->vol = 0.0;               /* need to zero volumes for cells not in the wind */
+  }
+  else if (w->inwind == W_ALL_INWIND)
+  {
+    w->vol = cell_volume;
   }
 
   return (0);

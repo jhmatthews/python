@@ -6,36 +6,42 @@
   </head>
   <body>
     <h1>Documentation Overview</h1>
-    <p> Note:&nbsp; Documentation is an ongoing effort, and is not up to
-      date. </p>
+    <p> Note:&nbsp; Documentation is an ongoing effort, and is not
+      always up to date. If you notice a problem, please open an<a
+        moz-do-not-send="true"
+        href="https://github.com/agnwinds/python/issues"> issue on
+        github</a> describing the issue, or, if you are able fix the
+      problem.<br>
+    </p>
     <p> At present the main resources are as follows: </p>
     <ul>
       <li>A draft version of a <a href="cookbook.pdf">cookbook</a>
         which describes how to install&nbsp; and update Python and run a
         first model</li>
       <li> A <a href="sphinx/html/index.html">Sphinx</a> repository,
-        which ultimately will be the main documention for Python</li>
+        which provides the main documentation for Python</li>
       <ul>
-        <li>This is part of the Python distribution.&nbsp; All of the
-          files are tracked in git </li>
-        <li>This is also available on Readthedocs <a
-            href="https://agnwinds.readthedocs.io/en/readthedocs/">here.</a>
-          Note this link may not be the correct one in the end)<br>
-        </li>
+        <li>A fairly up-to-date version of this documentation may be
+          found on Readthedocs <a
+            href="https://agnwinds.readthedocs.io/en/readthedocs/">here</a></li>
+        <li>However, if one wishes to have the latest/local version, or
+          the version for a particular branch, one needs to generate the
+          html files locally from the source (.rst) files which are
+          tracked in git.</li>
+        <li>To generate the Sphinx documentation one needs <a
+            href="http://www.sphinx-doc.org/en/master/">sphinx</a></li>
       </ul>
       <ul>
-        <li> This documentation needs to be updated when parameters have
-          been changed, or if the yaml files have been updated. </li>
-        <li> Instructions on how to do the updates are <href="rst
-            meta.html"="">locally is <a href="./sphinx/html/meta.html">here</a>
-            <br>
-          </href="rst></li>
-        <li> It requires a software package known as <a
-            href="http://www.sphinx-doc.org/en/master/">sphinx</a></li>
+      </ul>
+      <ul>
         <li>The command to generate the repository is currently:</li>
         <ul>
-          <li>cd docs/sphinx/; make html<br>
-          </li>
+          <li>cd docs/sphinx/; make html</li>
+        </ul>
+        <li>More instructions on how to do the updates are locally <a
+            href="file:///Users/long/Python/docs/sphinx/html/meta.html">here<br>
+          </a></li>
+        <ul>
         </ul>
       </ul>
       <li> A <a href="pydocs/doc_py_progs.html">pydocs repository</a>
@@ -56,8 +62,9 @@
         <ul>
           <li>../../py_progs/write_docs.py ../../py_progs</li>
         </ul>
-        <li>No special sofware is required, except that the package
-          MarkupPy may need to be installed <br>
+        <li>No special software is required, except that the package
+          MarkupPy may need to be installed via several methods
+          including<br>
         </li>
         <ul>
           <li>pip install MarkupPy<br>
@@ -67,10 +74,11 @@
       <li>A <a href="doxygen/html/index.html">Doxygen repository, </a>which
 
 
+
         provides information about the source code.</li>
       <ul>
-        <li>Unlike the other documentation, the Doxygen information is
-          not part of the repository.&nbsp;&nbsp; Therefore if you want
+        <li>Like the other documentation, the Doxygen information is not
+          part of the repository.&nbsp;&nbsp; Therefore if you want
           this, one will have to run software to generate the
           documentation.<br>
         </li>
@@ -91,6 +99,7 @@
         </li>
         <ul>
           <li>The Doxygen home page is <a href="http://www.doxygen.nl/">here</a>.&nbsp;
+
 
 
 

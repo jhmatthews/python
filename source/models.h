@@ -21,8 +21,8 @@
 
 
 
-extern int ncomps;                     // The number of components that have been read.  
-extern int nmods_tot;                  // The total number of models that have been read in 
+extern int ncomps;              // The number of components that have been read.  
+extern int nmods_tot;           // The total number of models that have been read in 
 
 
 /** The Model structure that contais the  individual continuum model. 
@@ -38,7 +38,7 @@ typedef struct Model
   double f[NWAVES];  /**< Fluxes in ergs/cm**2/s/A */
   int nwaves;        /**< The number of wavelength flux pairs for this model */
 } model_dummy, *ModelPtr;
-extern ModelPtr  mods;
+extern ModelPtr mods;
 
 /**
   * Modsum is the structure that is used to describe a set of models
@@ -78,4 +78,3 @@ struct ModSum
 };
 
 extern struct ModSum comp[NCOMPS];
-

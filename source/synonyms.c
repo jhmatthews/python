@@ -105,7 +105,7 @@ char *new_names[] = { "Central_object.mass", "Central_object.radius",
   "Central_object.rad_type_to_make_wind", "Central_object.rad_type_in_final_spectrum", "Central_object.power_law_index",
   "Central_object.cloudy.low_energy_break", "Central_object.cloudy.high_energy_break",
   "Boundary_layer.luminosity", "Boundary_layer.power_law_index", "@Boundary_layer.power_law_cutoff",
-  "Central_object.lamp_post_height","Reverb.filter_lines(0=off,-1=continuum,-2=dumpall,>0=count)",
+  "Central_object.lamp_post_height", "Reverb.filter_lines(0=off,-1=continuum,-2=dumpall,>0=count)",
   NULL
 };
 

@@ -251,6 +251,13 @@ be assigned.  Then w can be set to this ptr and all is restored. The
 use of w is endemic in the program. and it is always called through main.
 I did not change this now.  Though it could be done.  02apr ksl */
 
+  zdom = calloc (MAX_DOM, sizeof (domain_dummy));
+  if (zdom == NULL)
+  {
+    printf ("Unable to allocate memory for domain\n");
+    return EXIT_FAILURE;
+  }
+
   if (wind_read (windsavefile) < 0)
   {
     Error ("py_wind: Could not open %s", windsavefile);

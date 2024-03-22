@@ -2,6 +2,8 @@
 #include "mpi.h"
 #endif
 
+
+
 #define UV_low 7.4e14           /**< The lower frequency bound of the UV band as defined in IOS 21348
                                   */
 #define UV_hi 3e16              /**< The lower frequency bound of the UV band as defined in IOS 21348
@@ -15,11 +17,20 @@ extern int rank_global;
 extern int verbosity;          /**< verbosity level for printing out information. 0 low, 10 is high
                                  */
 
+/* Integer representations for the logging level in Python's logging functions,
+ * as defined in xlog.c */
+#define SHOW_PARALLEL	     1
+#define SHOW_ERROR	       2
+#define SHOW_LOG  	       3
+#define SHOW_DEBUG	       4
+#define SHOW_LOG_SILENT    5
+#define SHOW_ERROR_SILENT  5
+
 #define TRUE  1
 #define FALSE 0
 
 
-#define USE_GRADIENTS        TRUE       /**< IF true use interpolated velcity gradients to calculate dv_ds */
+#define USE_GRADIENTS        TRUE       /**< IF true use interpolated velocity gradients to calculate dv_ds */
 
 
 #define REL_MODE_LINEAR 0       /**< Only make v/c corrections when doing frame transfers */
@@ -29,7 +40,6 @@ extern int verbosity;          /**< verbosity level for printing out information
 extern int rel_mode;                   /**< How doppler effects and co-moving frames are  */
 
 extern int run_xtest;                  /**< Variable if TRUE causes a special test mode to be run */
-//OLD int run_ztest;                  /**< Provides a way the optionally run certain code within python */
 
 extern int NDIM2;                      /**< The total number of wind cells in wmain
                                          */
@@ -147,19 +157,19 @@ extern int NWAVE_NOW;         /**< Either NWAVE_IONIZ or NWAVE_EXTRACT depending
  * one reads a spectrum from a list of models these are numbered beginning
  * with zero, see the discussion in get_models.c   080518
  */
-#define SPECTYPE_BB      -1
-#define SPECTYPE_UNIFORM -2
-#define SPECTYPE_POW     -4
-#define SPECTYPE_CL_TAB  -5   // This is to emulate cloudy
-#define SPECTYPE_BREM    -6
-#define SPECTYPE_MONO    -7
-#define SPECTYPE_NONE	   -3
-#define SPECTYPE_BB_FCOL -8     // colour corrected blackbody 
-#define SPECTYPE_MODEL	 -99    // This is just used briefly, before a model number is assigned
+#define SPECTYPE_BB      (-1)
+#define SPECTYPE_UNIFORM (-2)
+#define SPECTYPE_NONE	   (-3)
+#define SPECTYPE_POW     (-4)
+#define SPECTYPE_CL_TAB  (-5)   // This is to emulate cloudy
+#define SPECTYPE_BREM    (-6)
+#define SPECTYPE_MONO    (-7)
+#define SPECTYPE_BB_FCOL (-8)
+#define SPECTYPE_MODEL	 (-99)  // This is just used briefly, before a model number is assigned
 
 /* definitions of types of colour correction */
 #define FCOL_OFF  0
-#define FCOL_DONE 1 
+#define FCOL_DONE 1
 
 /* Number of model_lists that one can have, should be the same as NCOMPS in models.h */
 #define NCOMPS 	10
@@ -193,7 +203,6 @@ enum coord_type_enum
 #define	DISK_ATMOS 		11
 
 
-#define MaxDom			10
 
 /* Next define structures that pertain to possible region geometries
    as well as some used for vector operations
@@ -230,33 +239,25 @@ typedef struct cone
 }
 cone_dummy, *ConePtr;
 
-/* Provide generally for having arrays which descibe the 3 xyz axes.
-these are initialized in main, and used in anisowind  */
-
-
-extern double x_axis[3];
-extern double y_axis[3];
-extern double z_axis[3];
-
-
 extern double velocity_electron[3];     // velocity of the electron when thermal effects are included
-
-
-
 
 /* End of structures which are used to define boundaries to the emission regions */
 /*******************DOMAIN structure***********************************************/
 
-#define NDIM_MAX 1000           /**< maximum size of the grid in each dimension
-                                  */
+#define MAX_DOM			10
+#define NDIM_MAX 3000           /**< maximum size of the grid in each dimension */
+#define NDIM_MAX2D NDIM_MAX * NDIM_MAX  // Maximum dimensions for 2D importing
 
 /**
   * The structure which defines a wind model
   *
-  * In python multtiple domains can be created for different
+  * In python multiple domains can be created for different
   * portion of the wind.
   *
   */
+
+#define COORD_TYPE_LOG 0
+#define COORD_TYPE_LINEAR 1
 
 typedef struct domain
 {
@@ -273,19 +274,21 @@ typedef struct domain
   /* The next few structures define the boundaries of an emission region */
   struct cone windcone[2];      /**< The cones that define the boundary of winds like SV or kwd */
   struct plane windplane[2];    /**< Planes which define the top and bottom of the wind */
-  double rho_min, rho_max;      /**< The values defining inner and outer cylinders that bound the wind */
+//  double rho_min, rho_max;      /**< The values defining inner and outer cylinders that bound the wind */
 
-  double wind_x[NDIM_MAX], wind_z[NDIM_MAX];            /**< Edges of the cells in the x and z directions */
-  double wind_midx[NDIM_MAX], wind_midz[NDIM_MAX];      /**< Midpoints of the cells in the x and z directions */
+  double *wind_x, *wind_z;
+  double *wind_midx, *wind_midz;
 
   ConePtr cones_rtheta;         /**< A ptr to the cones that define boundaries of cells in the theta direction
                                    when rtheta coords  are being used */
 /* Next two lines are for cyl_var coordinates.  They are used primarily for locating where a position is
- * is in a grid with cyl_var ooordinates  See cylvar_where in grid
+ * in a grid with cyl_var coordinates. See cylvar_where in grid
  */
 
-  double wind_z_var[NDIM_MAX][NDIM_MAX];
-  double wind_midz_var[NDIM_MAX][NDIM_MAX];
+  double **wind_z_var, **wind_midz_var;
+
+//  double wind_z_var[NDIM_MAX][NDIM_MAX];
+//  double wind_midz_var[NDIM_MAX][NDIM_MAX];
 
 
   /* Generic parameters for the wind */
@@ -318,11 +321,7 @@ typedef struct domain
 
   /* Parameters describing Castor and Larmors spherical wind */
   double cl_v_zero, cl_v_infinity, cl_beta;     /**< Power law exponent */
-  double cl_rmin, cl_rmax;
-
-  /* Parameters describing a spherical shell test wind */
-  double shell_vmin, shell_vmax, shell_beta;
-  double shell_rmin, shell_rmax;
+  double cl_rmin;
 
   /*Parameters defining a corona in a ring above a disk */
   double corona_rmin, corona_rmax;      /**< the minimum and maximu radius of the corona */
@@ -827,6 +826,7 @@ typedef struct wind
 {
   int ndom;                     /**< The domain associated with this element of the wind */
   int nwind;                    /**< A self-reference to this cell in the wind structure */
+  int nwind_dom;                /**< The element number of the wind cell in its wind domain */
   int nplasma;                  /**< A cross refrence to the corresponding cell in the plasma structure */
   double x[3];                  /**< position of inner vertex of cell */
   double xcen[3];               /**< position of the "center" of a cell */
@@ -1002,15 +1002,17 @@ typedef struct plasma
 
 #define NFLUX_ANGLES 36 /**< The number of bins into which the directional flux is calculated */
 
+
   /*Binned fluxes */
-  double F_UV_ang_x[NFLUX_ANGLES];
-  double F_UV_ang_y[NFLUX_ANGLES];
-  double F_UV_ang_z[NFLUX_ANGLES];
+  double F_UV_ang_theta[NFLUX_ANGLES];
+  double F_UV_ang_phi[NFLUX_ANGLES];
+  double F_UV_ang_r[NFLUX_ANGLES];
+
 
   /*A version of the binned flux that is averaged over cycles */
-  double F_UV_ang_x_persist[NFLUX_ANGLES];
-  double F_UV_ang_y_persist[NFLUX_ANGLES];
-  double F_UV_ang_z_persist[NFLUX_ANGLES];
+  double F_UV_ang_theta_persist[NFLUX_ANGLES];
+  double F_UV_ang_phi_persist[NFLUX_ANGLES];
+  double F_UV_ang_r_persist[NFLUX_ANGLES];
 
   /* The term direct here means from photons which have not been scattered. These are photons which have been
      created by the central object, or the disk, or in the simple case the wind, but which have not undergone
@@ -1047,21 +1049,25 @@ typedef struct plasma
                                                         in BF_SIMPLE_EMISSIVITY_APPROACH
                                                         */
 #define N_PHOT_PROC 500
-  int n_bf_in[N_PHOT_PROC],n_bf_out[N_PHOT_PROC];/**<Counters to track bf excitations and de-exitations.
+  int n_bf_in[N_PHOT_PROC], n_bf_out[N_PHOT_PROC];
+                                                 /**<Counters to track bf excitations and de-exitations.
                                                    */
 
   double comp_nujnu;            /**<  The integral of alpha(nu)nuj(nu) used to
                                    compute compton cooling-  only needs computing once per cycle
                                  */
 
-  double dmo_dt[3];             /**< Radiative force of wind */
-  double rad_force_es[4];       /**< Radiative force of wind - 4th element is sum of magnitudes */
-  double rad_force_ff[4];       /**< Radiative force of wind - 4th element is sum of magnitudes */
-  double rad_force_bf[4];       /**< Radiative force of wind - 4th element is sum of magnitudes */
+#define NUM_RAD_FORCE_DIRECTIONS 3
+#define NFORCE_DIRECTIONS 4
 
-  double rad_force_es_persist[4];       /**< Radiative force of wind - 4th element is sum of magnitudes */
-  double rad_force_ff_persist[4];       /**< Radiative force of wind - 4th element is sum of magnitudes */
-  double rad_force_bf_persist[4];       /**< Radiative force of wind - 4th element is sum of magnitudes */
+  double dmo_dt[NUM_RAD_FORCE_DIRECTIONS];             /**< Radiative force of wind */
+  double rad_force_es[NFORCE_DIRECTIONS];       /**< Radiative force of wind - 4th element is sum of magnitudes */
+  double rad_force_ff[NFORCE_DIRECTIONS];       /**< Radiative force of wind - 4th element is sum of magnitudes */
+  double rad_force_bf[NFORCE_DIRECTIONS];       /**< Radiative force of wind - 4th element is sum of magnitudes */
+
+  double rad_force_es_persist[NFORCE_DIRECTIONS];       /**< Radiative force of wind - 4th element is sum of magnitudes */
+  double rad_force_ff_persist[NFORCE_DIRECTIONS];       /**< Radiative force of wind - 4th element is sum of magnitudes */
+  double rad_force_bf_persist[NFORCE_DIRECTIONS];       /**< Radiative force of wind - 4th element is sum of magnitudes */
 
   double gain;                  /**<  The gain being used in iterations of the structure */
   double converge_t_r, converge_t_e, converge_hc;
@@ -1195,7 +1201,7 @@ typedef struct macro
 
 extern MacroPtr macromain;
 
-extern int xxxpdfwind;          // When 1, line luminosity calculates pdf
+//extern int xxxpdfwind;          // When 1, line luminosity calculates pdf
 
 extern int size_Jbar_est, size_gamma_est, size_alpha_est;
 
@@ -1604,7 +1610,7 @@ struct advanced_modes
                                       * cyles, which is currently controlled directly
                                       * from the normal .pf file
                                       */
-  int turn_off_upweighting_of_simple_macro_atoms; /**< If TURE, use the deprecated method for simple atoms
+  int use_upweighting_of_simple_macro_atoms; /**< If TURE, use the deprecated method for simple atoms
                                                     *in macro scheme
                                                     */
   int run_xtest_diagnostics;     /**< If TRUE, then xtest is being run, which is
@@ -1751,7 +1757,6 @@ extern struct rdpar_choices zz_spec;
  *
  * ************************************************************************** */
 
-#define NDIM_MAX2D NDIM_MAX * NDIM_MAX  // Maximum dimensions for 2D importing
 
 /*
  * The following definitions are used to try and improve the readability for
@@ -1760,12 +1765,12 @@ extern struct rdpar_choices zz_spec;
  */
 
 #define READ_NO_TEMP_1D          4
-#define READ_ELECTRON_TEMP_1D    READ_NO_TEMP_1D + 1
-#define READ_BOTH_TEMP_1D        READ_NO_TEMP_1D + 2
+#define READ_ELECTRON_TEMP_1D    (READ_NO_TEMP_1D + 1)
+#define READ_BOTH_TEMP_1D        (READ_NO_TEMP_1D + 2)
 
 #define READ_NO_TEMP_2D          9
-#define READ_ELECTRON_TEMP_2D    READ_NO_TEMP_2D + 1
-#define READ_BOTH_TEMP_2D        READ_NO_TEMP_2D + 2
+#define READ_ELECTRON_TEMP_2D    (READ_NO_TEMP_2D + 1)
+#define READ_BOTH_TEMP_2D        (READ_NO_TEMP_2D + 2)
 
 /**
  * The Import structure will contain all of the required information for
@@ -1788,7 +1793,7 @@ struct Import
   double *wind_midx, *wind_midz;        /**<  the wind grid mid points */
 };
 
-extern struct Import *imported_model;   // MaxDom is defined in python.h and as such import.h has to be included after
+extern struct Import *imported_model;   // MAX_DOM is defined in python.h and as such import.h has to be included after
 
 /* the functions contained in log., rdpar.c and lineio.c are
    declare separately from templates. This is because some functions

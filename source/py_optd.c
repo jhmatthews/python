@@ -624,6 +624,13 @@ main (int argc, char *argv[])
    * this point (which is also very important)
    */
 
+  zdom = calloc (MAX_DOM, sizeof (domain_dummy));
+  if (zdom == NULL)
+  {
+    printf ("Unable to allocate memory for domain\n");
+    return EXIT_FAILURE;
+  }
+
   if (wind_read (windsave_filename) < 0)
   {
     errormsg ("unable to open %s\n", windsave_filename);

@@ -39,7 +39,7 @@ char rngsave_file[LINELENGTH];
 
 
 /**********************************************************/
-/** @name      randvec
+/** 
  *
  * @brief Get a 3 vector "a" whose direction will be random and whose
  * lenght will be r
@@ -90,8 +90,7 @@ double zzz[] = { 0.0, 0.0, 1.0 };
 int init_vcos = 0;
 
 /**********************************************************/
-/** @name      randvcos
- *
+/** 
  * @brief Create a photon direction "lmn" in the hemisphere with the 
  * vector "north pointing to the north pole based on  the Eddingon
  * approximation
@@ -196,7 +195,7 @@ this is simple. Otherwise one must do a coordinate rotation. */
 
 
 /**********************************************************/
-/** @name      vcos
+/** 
  *
  * @brief get the probability density associated with Eddington limb darkening 
  * for cos theta
@@ -243,7 +242,7 @@ vcos (double x, void *params)
 int init_vdipole = 0;
 
 /**********************************************************/
-/** @name      randvdipole
+/** 
  *
  * @brief Create a photon direction "lmn" in with the 
  * vector "north" pointing in the direction of the the photon
@@ -306,7 +305,6 @@ randvdipole (lmn, north)
 
 
     if ((echeck = cdf_gen_from_func (&cdf_vdipole, &vdipole, -1., 1., 10, jumps)) != 0)
-//    if ((echeck = cdf_gen_from_func (&cdf_vdipole, &vdipole, -1., 1., 10, jumps)) != 0)
     {
       Error ("Randvcos: return from cdf_gen_from_func %d\n", echeck);;
     }
@@ -366,7 +364,7 @@ this is simple. Otherwise one must do a coordinate rotation. */
 
 
 /**********************************************************/
-/** @name      vdipole
+/** 
  *
  * @brief get the probablity density associated with dipole radiation
  * for cos theta

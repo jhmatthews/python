@@ -22,10 +22,12 @@
 #include "atomic.h"
 #include "python.h"
 
+const double MAXDIFF = VCHECK / VLIGHT;
+
 /**********************************************************/
 /**
- * @brief     calculate the distance a photon can travel
- * within a single shell without scattering
+ * @brief     calculate the distance in the observer frame a photon can travel
+ * within a single cell without scattering
  *
  * @param [in] WindPtr  w   the entire wind structure
  * @param [in] PhotPtr  p   A photon (bundle)
@@ -42,7 +44,7 @@
  *                          travel in the cell
  * @param [out] int *  istat   A flag indicating whether the
  *                          photon should scatter if it travels the distance estimated, 0 if no, TAU_SCAT if yes.
- * @return                  The distance the photon can travel
+ * @return                  The distance the photon can travel in the observer frame
  *
  * calculate_ds finds the distance the photon can travel subject to a
  * number of conditions. The possibilites include: 
@@ -52,13 +54,18 @@
  *              not sure that the velocity can be approximated as a linear function of
  *              distance.
  *
- * The routine returns the distance that the photon can travel in the observer frame subject to
+ * The routine returns the distance that the photon can travel subject to
  * these conditions and information about why the photon stopped there 
+ *
+ * Calculate_ds does not modify the p in any way!!
+ *
+ * However, it does provide a status that notes what set the 
+ * distance, and it does update tau, and if there was a scatter 
+ * nres 
  *
  * @details
  *
  * ### Notes ###
- * Calculate_ds does not modify the p in any way!!
  *
  * Any parameters that depend explicitly on the
  * coordinate gridding, such as the maximum distance the photon
@@ -67,7 +74,6 @@
  *
  **********************************************************/
 
-const double MAXDIFF = VCHECK / VLIGHT;
 
 double
 calculate_ds (w, p, tau_scat, tau, nres, smax, istat)
@@ -1111,7 +1117,7 @@ scatter (p, nres, nnscat)
            then the photon weight gets multiplied down by a factor (nu-nu_0)/nu
            and we force a kpkt to be created */
 
-        if (!modes.turn_off_upweighting_of_simple_macro_atoms)
+        if (modes.use_upweighting_of_simple_macro_atoms)
         {
           /* This is the new approach which does not explicityly conserve energy.
              Re record the amount of energy going into the simple ion ionization pool.  This

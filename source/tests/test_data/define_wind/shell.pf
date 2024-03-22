@@ -1,0 +1,30 @@
+System_type(star,cv,bh,agn,previous)                 star
+
+### Parameters for the Central Object
+Central_object.mass(msol)                  0.8
+Central_object.radius(cm)                  1e10
+Central_object.radiation(yes,no)                  yes
+Central_object.rad_type_to_make_wind(bb,models)                   bb
+Central_object.temp                        10000
+
+### Parameters for the Disk (if there is one)
+Disk.type(none,flat,vertically.extended,rmin>central.obj.rad)                 none
+
+### Parameters for Boundary Layer or the compact object in an X-ray Binary or AGN
+Boundary_layer.radiation(yes,no)                   no
+Wind.number_of_components                  1
+Wind.type(SV,star,hydro,corona,kwd,homologous,shell,imported)                shell
+Wind.ionization(on.the.spot,ML93,LTE_tr,LTE_te,fixed,matrix_bb,matrix_pow,matrix_est)                 ml93
+Line_transfer(pure_abs,pure_scat,sing_scat,escape_prob,thermal_trapping,macro_atoms_escape_prob,macro_atoms_thermal_trapping) macro_atoms_thermal_trapping
+Matom_transition_mode(mc_jumps,matrix)               matrix
+Surface.reflection.or.absorption(reflect,absorb,thermalized.rerad)               absorb
+Wind_heating.extra_processes(none,adiabatic,nonthermal,both)                 none
+Atomic_data                                data/h20.dat
+Shell.wind_mdot(msol/yr)                   1e-20
+Shell.wind.radmin(cm)                      1e10
+Shell.wind.radmax(cm)                      1.00001e10
+Shell.wind_v_at_rmin(cm)                   1
+Shell.wind.v_at_rmax(cm)                   1.2
+Shell.wind.acceleration_exponent           1
+Wind.t.init                                10000
+Wind.filling_factor(1=smooth,<1=clumped)   1

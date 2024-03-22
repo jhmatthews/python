@@ -1155,7 +1155,7 @@ string2int (word, string_choices, string_values, string_answer)
      char *string_answer;
 {
   int i;
-  int nchoices, ncommas, vcommas;
+  int nchoices;
   char xs[MAX_CHOICES][LINELEN];
   int xv[MAX_CHOICES];
   char choices[LINELEN];
@@ -1191,25 +1191,21 @@ string2int (word, string_choices, string_values, string_answer)
   }
 
 
-  ncommas = 0;
   for (i = 0; i < strlen (string_choices); i++)
   {
     if (choices[i] == ',')
     {
       choices[i] = ' ';
-      ncommas++;
     }
   }
 
 
 
-  vcommas = 0;
   for (i = 0; i < strlen (string_values); i++)
   {
     if (values[i] == ',')
     {
       values[i] = ' ';
-      vcommas++;
     }
   }
 
@@ -1447,7 +1443,6 @@ get_root (root, total)
     position = pf - total;
     strncpy (root, total, position);
     root[position] = '\0';
-    printf ("xxx %s\n", root);
     return (0);
   }
 

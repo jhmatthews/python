@@ -29,7 +29,7 @@ Primary routines:
 
 Notes:
 
-    If you want to get an html help for a specfic package the python
+    If you want to get an html help for a specific package the python
     command is simply
         pydocs package_name
     The help html files have links to the packages such as pyfits
@@ -81,7 +81,7 @@ def make_toplevel(dirname, names):
     dirname = dirname.split()
     dirname = dirname[len(dirname)-1]
 
-    html_name = 'doc_index.html'
+    html_name = 'doc_py_progs.html'
 
     # Start a page
     page = markup.page()

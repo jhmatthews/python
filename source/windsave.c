@@ -56,7 +56,9 @@ wind_save (filename)
 {
   FILE *fptr;
   char header[LINELENGTH];
-  int n, m;
+  int ndom;
+  int m;
+  int n;
 
   if ((fptr = fopen (filename, "w")) == NULL)
   {
@@ -67,7 +69,22 @@ wind_save (filename)
   sprintf (header, "Version %s\n", VERSION);
   n = fwrite (header, sizeof (header), 1, fptr);
   n += fwrite (&geo, sizeof (geo), 1, fptr);
+
   n += fwrite (zdom, sizeof (domain_dummy), geo.ndomain, fptr);
+  for (ndom = 0; ndom < geo.ndomain; ++ndom)
+  {
+    n += fwrite (zdom[ndom].wind_x, sizeof (double), zdom[ndom].ndim, fptr);
+    n += fwrite (zdom[ndom].wind_z, sizeof (double), zdom[ndom].mdim, fptr);
+    n += fwrite (zdom[ndom].wind_midx, sizeof (double), zdom[ndom].ndim, fptr);
+    n += fwrite (zdom[ndom].wind_midz, sizeof (double), zdom[ndom].mdim, fptr);
+
+    if (zdom[ndom].coord_type == CYLVAR)
+    {
+      n += fwrite (zdom[ndom].wind_z_var, sizeof (double), zdom[ndom].ndim * zdom[ndom].mdim, fptr);
+      n += fwrite (zdom[ndom].wind_midz_var, sizeof (double), zdom[ndom].ndim * zdom[ndom].mdim, fptr);
+    }
+  }
+
   n += fwrite (wmain, sizeof (wind_dummy), NDIM2, fptr);
   n += fwrite (&disk, sizeof (disk), 1, fptr);
   n += fwrite (&qdisk, sizeof (disk), 1, fptr);
@@ -80,21 +97,15 @@ in the plasma structure */
   {
     n += fwrite (plasmamain[m].density, sizeof (double), nions, fptr);
     n += fwrite (plasmamain[m].partition, sizeof (double), nions, fptr);
-
     n += fwrite (plasmamain[m].ioniz, sizeof (double), nions, fptr);
     n += fwrite (plasmamain[m].recomb, sizeof (double), nions, fptr);
     n += fwrite (plasmamain[m].inner_recomb, sizeof (double), nions, fptr);
-
-
     n += fwrite (plasmamain[m].scatters, sizeof (int), nions, fptr);
     n += fwrite (plasmamain[m].xscatters, sizeof (double), nions, fptr);
-
     n += fwrite (plasmamain[m].heat_ion, sizeof (double), nions, fptr);
     n += fwrite (plasmamain[m].cool_rr_ion, sizeof (double), nions, fptr);
     n += fwrite (plasmamain[m].cool_dr_ion, sizeof (double), nions, fptr);
     n += fwrite (plasmamain[m].lum_rr_ion, sizeof (double), nions, fptr);
-
-
     n += fwrite (plasmamain[m].levden, sizeof (double), nlte_levels, fptr);
     n += fwrite (plasmamain[m].recomb_simple, sizeof (double), nphot_total, fptr);
     n += fwrite (plasmamain[m].recomb_simple_upweight, sizeof (double), nphot_total, fptr);
@@ -122,9 +133,7 @@ in the plasma structure */
       n += fwrite (macromain[m].recomb_sp_e, sizeof (double), size_alpha_est, fptr);
       n += fwrite (macromain[m].matom_emiss, sizeof (double), nlevels_macro, fptr);
       n += fwrite (macromain[m].matom_abs, sizeof (double), nlevels_macro, fptr);
-
     }
-
   }
 
   fclose (fptr);
@@ -180,6 +189,7 @@ wind_read (filename)
      char filename[];
 {
   FILE *fptr;
+  int ndom;
   int n, m;
   char header[LINELENGTH];
   char version[LINELENGTH];
@@ -197,7 +207,6 @@ wind_read (filename)
   /* Now read in the geo structure */
 
   n += fread (&geo, sizeof (geo), 1, fptr);
-
 
   /* Read the atomic data file.  This is necessary to do here in order to establish the 
    * values for the dimensionality of some of the variable length structures, associated 
@@ -220,8 +229,21 @@ wind_read (filename)
   NDIM2 = geo.ndim2;
   NPLASMA = geo.nplasma;
 
-  zdom = (DomainPtr) calloc (sizeof (domain_dummy), MaxDom);
   n += fread (zdom, sizeof (domain_dummy), geo.ndomain, fptr);
+  for (ndom = 0; ndom < geo.ndomain; ++ndom)
+  {
+    allocate_domain_wind_coords (ndom);
+    n += fread (zdom[ndom].wind_x, sizeof (double), zdom[ndom].ndim, fptr);
+    n += fread (zdom[ndom].wind_z, sizeof (double), zdom[ndom].mdim, fptr);
+    n += fread (zdom[ndom].wind_midx, sizeof (double), zdom[ndom].ndim, fptr);
+    n += fread (zdom[ndom].wind_midz, sizeof (double), zdom[ndom].mdim, fptr);
+    if (zdom[ndom].coord_type == CYLVAR)
+    {
+      cylvar_allocate_domain (ndom);
+      n += fread (zdom[ndom].wind_z_var, sizeof (double), zdom[ndom].ndim * zdom[ndom].mdim, fptr);
+      n += fread (zdom[ndom].wind_midz_var, sizeof (double), zdom[ndom].ndim * zdom[ndom].mdim, fptr);
+    }
+  }
 
   calloc_wind (NDIM2);
   n += fread (wmain, sizeof (wind_dummy), NDIM2, fptr);
@@ -238,7 +260,6 @@ wind_read (filename)
   /*Allocate space for the dynamically allocated plasma arrays */
 
   calloc_dyn_plasma (NPLASMA);
-
 
   /* Read in the dynamically allocated plasma arrays */
 
@@ -303,7 +324,7 @@ wind_read (filename)
 
   fclose (fptr);
 
-  wind_complete (wmain);
+  wind_complete ();
 
   Log ("Read geometry and wind structures from windsavefile %s\n", filename);
 
@@ -319,7 +340,6 @@ wind_read (filename)
  * @brief      A driver routine that calls coordinate-system specific routines
  * that complete the description of the wind
  *
- * @param [in] WindPtr w  The entire wind
  * @return     Always returns 0
  *
  * @details
@@ -341,39 +361,35 @@ wind_read (filename)
  *
  **********************************************************/
 
-int
-wind_complete (w)
-     WindPtr w;
+void
+wind_complete ()
 {
   int ndom;
-
 
   for (ndom = 0; ndom < geo.ndomain; ndom++)
   {
     if (zdom[ndom].coord_type == SPHERICAL)
     {
-      spherical_wind_complete (ndom, w);
+      spherical_wind_complete (ndom, wmain);
     }
     else if (zdom[ndom].coord_type == CYLIND)
     {
-      cylind_wind_complete (ndom, w);
+      cylind_wind_complete (ndom, wmain);
     }
     else if (zdom[ndom].coord_type == RTHETA)
     {
-      rtheta_wind_complete (ndom, w);
+      rtheta_wind_complete (ndom, wmain);
     }
     else if (zdom[ndom].coord_type == CYLVAR)
     {
-      cylvar_wind_complete (ndom, w);
+      cylvar_wind_complete (ndom, wmain);
     }
     else
     {
       Error ("wind_complete: Don't know how to complete coord_type %d\n", zdom[ndom].coord_type);
       Exit (0);
     }
-
   }
-  return (0);
 }
 
 

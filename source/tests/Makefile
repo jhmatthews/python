@@ -4,7 +4,7 @@ TARGET = py_unit_test
 
 I_FLAGS = -I$(PYTHON)/include
 L_FLAGS = -L$(PYTHON)/lib
-C_FLAGS = -O3 -Wall
+C_FLAGS = -O3 -Wall -Wno-deprecated-non-prototype
 CU_FLAGS = -O3
 
 INCLUDES =
@@ -32,7 +32,8 @@ PYTHON_SOURCES = \
 	spherical.c stellar_wind.c sv.c synonyms.c time.c trans_phot.c  \
 	vvector.c walls.c wind.c wind2d.c wind_sum.c wind_updates2d.c wind_util.c  \
 	windsave.c windsave2table_sub.c xlog.c xtest.c zeta.c get_models.c \
-	rdpar_init.c
+	rdpar_init.c define_wind.c communicate_wind.c communicate_plasma.c \
+	communicate_macro.c communicate_spectra.c
 
 # This is sources to be compiled with NVCC
 CUDA_SOURCES = \
@@ -41,8 +42,11 @@ CUDA_SOURCES = \
 # Source code for unit tests
 TEST_SOURCES = \
 	unit_test_main.c \
+	unit_test_model.c \
 	tests/test_matrix.c \
-	tests/test_compton.c
+	tests/test_compton.c \
+	tests/test_define_wind.c \
+	tests/test_run_mode.c
 
 # Using absolute paths
 PYTHON_SOURCES := $(patsubst %,$(PYTHON)/source/%, $(PYTHON_SOURCES))

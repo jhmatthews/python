@@ -90,8 +90,6 @@ num_int (func, a, b, eps)
   }
   if (zflag == 1)
   {
-    gsl_set_error_handler_off ();       //We need to be able to catch and handle gsl errors 
-
     gsl_integration_workspace *w = gsl_integration_workspace_alloc (1000);
     status = gsl_integration_qags (&F, a, b, 0, eps, 1000, w, &result, &error);
     if (status)
@@ -285,7 +283,6 @@ find_function_minimum (a, m, b, func, tol, xmin)
   T = gsl_min_fminimizer_brent;
 
   s = gsl_min_fminimizer_alloc (T);
-  gsl_set_error_handler_off ();
   status = gsl_min_fminimizer_set (s, &F, m, a, b);
   if (status)
   {

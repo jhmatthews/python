@@ -1773,8 +1773,6 @@ would like to have simple lines for macro-ions */
                 simple_line_ignore[n] += 1;
                 break;
               }
-
-              // atomicdata2file ();
               if (ion[n].macro_info == -1 && mflag == 1)
               {
                 Error ("Getatomic_data: Macro Atom line data supplied for ion %d\n but there is no suitable level data\n", n);
@@ -2527,7 +2525,7 @@ SCUPS    1.132e-01   2.708e-01   5.017e-01   8.519e-01   1.478e+00
               }
 
 
-              /* The number of allowd entries in atomic.h needs to be greater than the number one is trying to read in. 
+              /* The number of allowd entries in atomic.h needs to be greater than the number one is trying to read in.
                * If this needs to be increased be sure to modify the scanf line below
                */
               if (np > N_COLL_STREN_PTS)
@@ -2786,6 +2784,7 @@ or zero so that simple checks of true and false can be used for them */
         Error
           ("There is no PI rate associated with ion %d (element %d ion %d) - add PI rates and check that uppper level/ion is included in level population\n",
            n, ion[n].z, ion[n].istate);
+        Error ("Also check masterfile to see that PI files appear after all of the level files for this atom\n");
         ierr = 1;
       }
     }

@@ -1,20 +1,18 @@
 /** ********************************************************************************************************************
  *
- *  @file tests.h
+ *  @file load_model.c
  *  @author Edward J. Parkinson (e.parkinson@soton.ac.uk)
- *  @date August 2023
+ *  @date Jan 2024
  *
- *  @brief Function prototypes for test suites
+ *  @brief
  *
  * ****************************************************************************************************************** */
 
-#ifndef TESTS_H
-#define TESTS_H
+#ifndef PYTHON_UNIT_TEST_H
+#define PYTHON_UNIT_TEST_H
 
-/* test_compton.c */
-void create_compton_test_suite (void);
-
-/* test_matrix.c */
-void create_matrix_test_suite (void);
+int cleanup_model (const char *root_name);
+int setup_model_grid (const char *root_name, const char *atomic_data_location);
+const char *get_python_env_variable (void);
 
 #endif

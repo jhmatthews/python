@@ -132,9 +132,7 @@ rtheta_ds_in_cell (ndom, p)
  **********************************************************/
 
 int
-rtheta_make_grid (w, ndom)
-     WindPtr w;
-     int ndom;
+rtheta_make_grid (int ndom, WindPtr w)
 {
   double dr, theta, thetacen, dtheta, dlogr;
   int i, j, n;
@@ -358,11 +356,11 @@ rtheta_wind_complete (ndom, w)
 
 /**********************************************************/
 /**
- * @brief      calculates the wind volume of a cell in rtheta coordinate sysem
- * 	allowing for the fact that some cells may not be in the active wind region
+ * @brief      calculates the volume of a cell in rtheta coordinate sysem
+ * 	allowing for the fact that the cells may not be in the active wind region
  *
- * @param [in] int  ndom   The domain of interest
- * @param [in, out] WindPtr  w   the entire wind
+ * @param [in,out] WindPtr  w   a single wind cell to calculate the volume for
+
  * @return     Always returns 0
  *
  * @details
@@ -380,9 +378,7 @@ rtheta_wind_complete (ndom, w)
  **********************************************************/
 
 int
-rtheta_volumes (ndom, w)
-     int ndom;
-     WindPtr w;
+rtheta_cell_volume (WindPtr w)
 {
   int i, j, n;
   int jj, kk;
@@ -393,111 +389,94 @@ rtheta_volumes (ndom, w)
   double rmin, rmax, thetamin, thetamax;
   double cell_volume;
   int n_inwind;
-  int ndim, mdim, ndomain;
+  int ndomain;
+  int ndom;
 
-  ndim = zdom[ndom].ndim;
-  mdim = zdom[ndom].mdim;
+  n = w->nwind;
+  ndom = w->ndom;
+  wind_n_to_ij (ndom, n, &i, &j);
 
-  for (i = 0; i < ndim; i++)
+  rmin = zdom[ndom].wind_x[i];
+  rmax = zdom[ndom].wind_x[i + 1];
+  thetamin = zdom[ndom].wind_z[j] / RADIAN;
+  thetamax = zdom[ndom].wind_z[j + 1] / RADIAN;
+
+  /*leading factor of 2 allows for volume above and below plane */
+  cell_volume = 2. * 2. / 3. * PI * (rmax * rmax * rmax - rmin * rmin * rmin) * (cos (thetamin) - cos (thetamax));
+
+  if (w->inwind == W_NOT_INWIND || w->inwind == W_IGNORE)
   {
-    for (j = 0; j < mdim; j++)
+    w->vol = 0.0;
+  }
+  else if (w->inwind == W_ALL_INWIND)
+  {
+    w->vol = cell_volume;
+  }
+  else if (w->inwind == W_NOT_ASSIGNED)
+  {
+    if (zdom[ndom].wind_type == IMPORT)
     {
-      wind_ij_to_n (ndom, i, j, &n);
+      Error ("rtheta_volumes: Shouldn't be redefining inwind in cylind_volumes with imported model.\n");
+      Exit (EXIT_FAILURE);
+    }
 
-      rmin = zdom[ndom].wind_x[i];
-      rmax = zdom[ndom].wind_x[i + 1];
-      thetamin = zdom[ndom].wind_z[j] / RADIAN;
-      thetamax = zdom[ndom].wind_z[j + 1] / RADIAN;
+    rmin = zdom[ndom].wind_x[i];
+    rmax = zdom[ndom].wind_x[i + 1];
+    thetamin = zdom[ndom].wind_z[j] / RADIAN;
+    thetamax = zdom[ndom].wind_z[j + 1] / RADIAN;
 
-      /*leading factor of 2 allows for volume above and below plane */
-      cell_volume = 2. * 2. / 3. * PI * (rmax * rmax * rmax - rmin * rmin * rmin) * (cos (thetamin) - cos (thetamax));
+    w->vol = cell_volume;
 
+    n_inwind = rtheta_is_cell_in_wind (n);
 
-      if (w[n].inwind == W_NOT_INWIND || w[n].inwind == W_IGNORE)
+    if (n_inwind == W_NOT_INWIND)
+    {
+      fraction = 0.0;           /* Force outside edge volues to zero */
+      jj = 0;
+      kk = RESOLUTION * RESOLUTION;
+    }
+    else if (n_inwind == W_ALL_INWIND)
+    {
+      fraction = 1.0;           /* Force outside edge volues to zero */
+      jj = kk = RESOLUTION * RESOLUTION;
+    }
+    else
+    {                           /* The grid cell is PARTIALLY in the wind */
+      num = denom = 0;
+      jj = kk = 0;
+      dr = (rmax - rmin) / RESOLUTION;
+      dtheta = (thetamax - thetamin) / RESOLUTION;
+      for (r = rmin + dr / 2; r < rmax; r += dr)
       {
-        w[n].vol = 0.0;
-      }
-
-      else if (w[n].inwind == W_ALL_INWIND)
-      {
-        w[n].vol = cell_volume;
-      }
-
-
-      else if (w[n].inwind == W_NOT_ASSIGNED)
-      {
-        if (zdom[ndom].wind_type == IMPORT)
+        for (theta = thetamin + dtheta / 2; theta < thetamax; theta += dtheta)
         {
-          Error ("rtheta_volumes: Shouldn't be redefining inwind in cylind_volumes with imported model.\n");
-          Exit (0);
-        }
-
-
-        rmin = zdom[ndom].wind_x[i];
-        rmax = zdom[ndom].wind_x[i + 1];
-        thetamin = zdom[ndom].wind_z[j] / RADIAN;
-        thetamax = zdom[ndom].wind_z[j + 1] / RADIAN;
-
-        w[n].vol = cell_volume;
-
-        n_inwind = rtheta_is_cell_in_wind (n);
-
-        if (n_inwind == W_NOT_INWIND)
-        {
-          fraction = 0.0;       /* Force outside edge volues to zero */
-          jj = 0;
-          kk = RESOLUTION * RESOLUTION;
-        }
-        else if (n_inwind == W_ALL_INWIND)
-        {
-          fraction = 1.0;       /* Force outside edge volues to zero */
-          jj = kk = RESOLUTION * RESOLUTION;
-        }
-
-
-        else
-        {                       /* The grid cell is PARTIALLY in the wind */
-          num = denom = 0;
-          jj = kk = 0;
-          dr = (rmax - rmin) / RESOLUTION;
-          dtheta = (thetamax - thetamin) / RESOLUTION;
-          for (r = rmin + dr / 2; r < rmax; r += dr)
+          denom += r * r * sin (theta);;
+          kk++;
+          x[0] = r * sin (theta);
+          x[1] = 0;
+          x[2] = r * cos (theta);;
+          if (where_in_wind (x, &ndomain) == W_ALL_INWIND)
           {
-            for (theta = thetamin + dtheta / 2; theta < thetamax; theta += dtheta)
-            {
-              denom += r * r * sin (theta);;
-              kk++;
-              x[0] = r * sin (theta);
-              x[1] = 0;
-              x[2] = r * cos (theta);;
-              if (where_in_wind (x, &ndomain) == W_ALL_INWIND)
-              {
-                num += r * r * sin (theta);     /* 0 implies in wind */
-                jj++;
-              }
-            }
+            num += r * r * sin (theta); /* 0 implies in wind */
+            jj++;
           }
-          fraction = num / denom;
         }
-
-        /* OK now assign inwind value and final volumes */
-
-        if (jj == 0)
-        {
-          w[n].inwind = W_NOT_INWIND;   // The cell is not in the wind
-          w[n].vol = 0.0;
-        }
-        else if (jj == kk)
-          w[n].inwind = W_ALL_INWIND;   // The cell is completely in the wind
-        else
-        {
-          w[n].inwind = W_PART_INWIND;  //The cell is partially in the wind
-          w[n].vol *= fraction;
-        }
-
-
       }
+      fraction = num / denom;
+    }
 
+    /* OK now assign inwind value and final volumes */
+    if (jj == 0)
+    {
+      w->inwind = W_NOT_INWIND; // The cell is not in the wind
+      w->vol = 0.0;
+    }
+    else if (jj == kk)
+      w->inwind = W_ALL_INWIND; // The cell is completely in the wind
+    else
+    {
+      w->inwind = W_PART_INWIND;        //The cell is partially in the wind
+      w->vol *= fraction;
     }
   }
 

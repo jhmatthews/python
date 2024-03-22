@@ -56,10 +56,6 @@ int NWAVE_NOW;                  ///< Either NWAVE_IONIZ or NWAVE_EXTRACT dependi
 
 plane_dummy plane_m2_near, plane_m2_far;
 
-double x_axis[3];
-double y_axis[3];
-double z_axis[3];
-
 DomainPtr zdom;                 ///< This is the array pointer that contains the domains
 int current_domain;             ///<  This integer is used by py_wind only
 
@@ -82,7 +78,7 @@ MatomPhotStorePtr matomphotstoremain;
 
 MacroPtr macromain;
 
-int xxxpdfwind;                 ///< When 1, line luminosity calculates pdf
+//int xxxpdfwind;                 ///< When 1, line luminosity calculates pdf
 
 int size_Jbar_est, size_gamma_est, size_alpha_est;
 
@@ -135,7 +131,7 @@ int xxxbound;
 
 struct rdpar_choices zz_spec;
 
-struct Import *imported_model;  ///<  MaxDom is defined in python.h and as such import.h has to be included after
+struct Import *imported_model;  ///<  MAX_DOM is defined in python.h and as such import.h has to be included after
 
 
 double velocity_electron[3];    // velocity of the electron when thermal effects are included

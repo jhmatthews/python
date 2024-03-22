@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <sys/stat.h>
 
 #include "atomic.h"
 #include "python.h"
@@ -65,6 +66,8 @@ init_geo ()
                                    be called at all if we are simply continuing a previous
                                    run */
   geo.hydro_domain_number = -1;
+  geo.nplasma = 0;
+  geo.nmacro = 0;
 
   if (geo.system_type == SYSTEM_TYPE_CV || geo.system_type == SYSTEM_TYPE_BH)
   {
@@ -76,12 +79,12 @@ init_geo ()
   zdom[0].coord_type = CYLIND;
   zdom[0].ndim = 30;
   zdom[0].mdim = 30;
-  zdom[0].log_linear = 0;       /* Set intervals to be logarithmic */
+  zdom[0].log_linear = COORD_TYPE_LOG;  /* Set intervals to be logarithmic */
 
   zdom[1].coord_type = CYLIND;
   zdom[1].ndim = 30;
   zdom[1].mdim = 10;
-  zdom[1].log_linear = 0;       /* Set intervals to be logarithmic */
+  zdom[1].log_linear = COORD_TYPE_LOG;  /* Set intervals to be logarithmic */
 
 
   geo.disk_z0 = geo.disk_z1 = 0.0;
@@ -123,24 +126,25 @@ init_geo ()
   geo.lamp_post_height = 0.0;   // should only be used if geo.pl_geometry is PL_GEOMETRY_LAMP_POST
   geo.bubble_size = 0.0;        // should only be used if geo.pl_geometry is PL_GEOMETRY_BUBBLE_
 
-
   strcpy (geo.atomic_filename, "data/standard80.dat");
   strcpy (geo.fixed_con_file, "none");
-
-  // Note that geo.model_list is initialized through get_spectype
-
-  /* Initialize a few other variables in python.h */
-  x_axis[0] = 1.0;
-  x_axis[1] = x_axis[2] = 0.0;
-  y_axis[1] = 1.0;
-  y_axis[0] = y_axis[2] = 0.0;
-  z_axis[2] = 1.0;
-  z_axis[1] = z_axis[0] = 0.0;
 
   geo.wcycles = geo.pcycles = 1;
   geo.wcycle = geo.pcycle = 0;
 
+  // Note that geo.model_list is initialized through get_spectype
   geo.model_count = 0;          //The number of models read in
+
+  /* We should set the frame ASAP in the geo struct, so the grid initialisation
+   * functions know what frame we're working with */
+  if (rel_mode == REL_MODE_FULL)
+  {
+    geo.frame = CMF_FRAME;
+  }
+  else
+  {
+    geo.frame = OBS_FRAME;
+  }
 
   return (0);
 }
@@ -324,7 +328,7 @@ init_advanced_modes ()
   modes.use_debug = FALSE;
   modes.print_dvds_info = FALSE;        // print information on velocity gradients
   modes.quit_after_inputs = FALSE;      // check inputs and quit
-  modes.quit_after_wind_defined = FALSE;      // define wind and quit
+  modes.quit_after_wind_defined = FALSE;        // define wind and quit
   modes.fixed_temp = FALSE;     // do not attempt to change temperature 
   modes.zeus_connect = FALSE;   // connect with zeus
 
@@ -336,7 +340,7 @@ init_advanced_modes ()
 
   modes.jumps_for_detailed_spectra = FALSE;     //use old jumps mode for calculating macro atom
   //emissivites
-  modes.turn_off_upweighting_of_simple_macro_atoms = FALSE;     //use old mode for handling 
+  modes.use_upweighting_of_simple_macro_atoms = FALSE;     //use upweighting mode for handling 
   //bf interactions with simple macro atoms
 
   modes.store_matom_matrix = TRUE;      /* default is to store the macro-atom matrix */
@@ -524,7 +528,12 @@ init_observers ()
     }
     strcpy (answer, "no");
     ichoice = rdchoice ("@Spectrum.select_photons_by_position(yes,no)", "1,0", answer);
-    if (ichoice)
+    if (ichoice && !geo.select_extract)
+    {
+      Error ("setup.c: Cannot select photons by position if in Live.or.die mode. Use Extract mode!\n");
+      Exit (0);
+    }
+    else if (ichoice)
     {
       for (n = 0; n < geo.nangles; n++)
       {
@@ -799,21 +808,6 @@ fixed concentration file. \n\
     }
   }
 
-  /* Prevent bf calculation of macro_estimators when no macro atoms are present.   */
-
-  if (nlevels_macro == 0)
-    geo.macro_simple = TRUE;    // Make everything simple if no macro atoms -- 57h
-
-  /* initialise the choice of handling for macro pops. */
-  if (geo.run_type == RUN_TYPE_PREVIOUS)
-  {
-    geo.macro_ioniz_mode = MACRO_IONIZ_MODE_ESTIMATORS; // Now that macro atom properties are available for restarts
-  }
-  else
-  {
-    geo.macro_ioniz_mode = MACRO_IONIZ_MODE_NO_ESTIMATORS;
-  }
-
   return (0);
 
 }
@@ -888,4 +882,78 @@ setup_dfudge ()
 
 
   return (dfudge);
+}
+
+
+
+/**********************************************************/
+/**
+ * @brief Initialise the atomic data
+ *
+ * @details
+ *
+ **********************************************************/
+
+void
+setup_atomic_data (const char *atomic_filename)
+{
+  int rc;                       // Return code from running Setup_Py_Dir
+  struct stat file_stat;        // Used to check the atomic data exists
+  char answer[LINELENGTH];
+
+  /* read a variable which controls whether to save a summary of atomic data
+     this is defined in atomic.h, rather than the modes structure */
+
+  if (modes.iadvanced)
+  {
+    strcpy (answer, "no");
+    write_atomicdata = rdchoice ("@Diag.write_atomicdata(yes,no)", "1,0", answer);
+    if (write_atomicdata)
+      Log ("You have opted to save a summary of the atomic data\n");
+  }
+
+  /*
+   * Check that geo.atomic_filename exists - i.e. that the directory is readable
+   * and in the directory Python is being executed from. If it isn't - then
+   * try to run Setup_Py_Dir. If both fail, then warn the user and exit Python
+   */
+
+  if (stat (atomic_filename, &file_stat))
+  {
+    Log ("Unable to open atomic masterfile %s\n", atomic_filename);
+    Log ("Running Setup_Py_Dir to try and fix the situation\n");
+    rc = system ("Setup_Py_Dir");
+    if (rc)
+    {
+      Error ("Unable to open %s and run Setup_Py_Dir\n", atomic_filename);
+      Exit (1);
+    }
+  }
+
+  get_atomic_data ((char *) atomic_filename);
+
+  /* throw a fatal error if there are macro-atom levels but rt_mode is non macro */
+  if (nlevels_macro > 0 && geo.rt_mode != RT_MODE_MACRO)
+  {
+    Error ("Fatal error: you specified macro-atom data but standard line transfer. Not supported.\n");
+    Log ("Try changing either to a simple data set or to macro-atom line transfer\n");
+    Exit (1);
+  }
+
+  /* Prevent bf calculation of macro_estimators when no macro atoms are present.   */
+  if (nlevels_macro == 0)
+  {
+    geo.macro_simple = TRUE;    // Make everything simple if no macro atoms -- 57h
+  }
+  /* initialise the choice of handling for macro pops. */
+  if (geo.run_type == RUN_TYPE_PREVIOUS)
+  {
+    geo.macro_ioniz_mode = MACRO_IONIZ_MODE_ESTIMATORS; // Now that macro atom properties are available for restarts
+  }
+  else
+  {
+    geo.macro_ioniz_mode = MACRO_IONIZ_MODE_NO_ESTIMATORS;
+  }
+
+
 }

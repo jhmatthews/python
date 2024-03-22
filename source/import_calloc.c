@@ -40,10 +40,10 @@ calloc_import (int coord_type, int ndom)
 {
   if (imported_model == NULL)
   {
-    imported_model = calloc (MaxDom, sizeof *imported_model);
+    imported_model = calloc (MAX_DOM, sizeof *imported_model);
     if (imported_model == NULL)
     {
-      Error ("calloc_import: unable to allocate %i domains for imported_model\n", MaxDom);
+      Error ("calloc_import: unable to allocate %i domains for imported_model\n", MAX_DOM);
       Exit (1);
     }
   }

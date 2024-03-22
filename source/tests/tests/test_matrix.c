@@ -13,11 +13,6 @@
 #include <stdlib.h>
 #include <CUnit/CUnit.h>
 
-#ifndef CUDA_ON
-#include "gsl/gsl_errno.h"
-gsl_error_handler_t *old_handler;
-#endif
-
 #include "../../atomic.h"
 #include "../../python.h"
 #include "../assert.h"
@@ -183,8 +178,8 @@ call_invert_matrix (const char *test_name)
   char matrix_filepath[BUFFER_LENGTH];
   char inverse_filepath[BUFFER_LENGTH];
 
-  sprintf (matrix_filepath, "%s/source/tests/data/matrix/%s/matrix.txt", python_path, test_name);
-  sprintf (inverse_filepath, "%s/source/tests/data/matrix/%s/inverse.txt", python_path, test_name);
+  sprintf (matrix_filepath, "%s/source/tests/test_data/matrix/%s/matrix.txt", python_path, test_name);
+  sprintf (inverse_filepath, "%s/source/tests/test_data/matrix/%s/inverse.txt", python_path, test_name);
 
   int matrix_size;
   const int get_err = get_invert_matrix_test_data (matrix_filepath, inverse_filepath, &matrix, &inverse, &matrix_size);
@@ -200,7 +195,7 @@ call_invert_matrix (const char *test_name)
     CU_FAIL_MSG_FATAL ("`invert_matrix` failed with error");
   }
 
-  CU_CHECK_DOUBLE_ARRAY_EQ_FATAL (test_inverse, inverse, matrix_size, EPSILON);
+  CU_ASSERT_DOUBLE_ARRAY_EQUAL_FATAL (test_inverse, inverse, matrix_size, EPSILON);
 
   free (matrix);
   free (inverse);
@@ -239,9 +234,9 @@ call_solve_matrix (const char *test_name)
   char vector_b_filepath[BUFFER_LENGTH];
   char vector_x_filepath[BUFFER_LENGTH];
 
-  sprintf (matrix_a_filepath, "%s/source/tests/data/matrix/%s/A.txt", python_path, test_name);
-  sprintf (vector_b_filepath, "%s/source/tests/data/matrix/%s/b.txt", python_path, test_name);
-  sprintf (vector_x_filepath, "%s/source/tests/data/matrix/%s/x.txt", python_path, test_name);
+  sprintf (matrix_a_filepath, "%s/source/tests/test_data/matrix/%s/A.txt", python_path, test_name);
+  sprintf (vector_b_filepath, "%s/source/tests/test_data/matrix/%s/b.txt", python_path, test_name);
+  sprintf (vector_x_filepath, "%s/source/tests/test_data/matrix/%s/x.txt", python_path, test_name);
 
   int vector_size;
   const int get_err =
@@ -258,7 +253,7 @@ call_solve_matrix (const char *test_name)
     CU_FAIL ("`solve_matrix` failed with error");
   }
 
-  CU_CHECK_DOUBLE_ARRAY_EQ_FATAL (test_vector_x, vector_x, vector_size, EPSILON);
+  CU_ASSERT_DOUBLE_ARRAY_EQUAL_FATAL (test_vector_x, vector_x, vector_size, EPSILON);
 
   free (matrix_a);
   free (vector_b);
@@ -321,8 +316,6 @@ matrix_suite_init (void)
 
 #ifdef CUDA_ON
   error = cusolver_create ();
-#else
-  old_handler = gsl_set_error_handler_off ();
 #endif
 
   return error;
@@ -347,8 +340,6 @@ matrix_suite_teardown (void)
 
 #ifdef CUDA_ON
   error = cusolver_destroy ();
-#else
-  gsl_set_error_handler (old_handler);
 #endif
 
   return error;
