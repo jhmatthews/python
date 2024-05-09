@@ -306,8 +306,8 @@ check_convergence (void)
 {
   int n;
   int nconverge, nconverging, ntot;
-  int nte, ntr, nhc;            //NSH 70g - three new counters for the different convergence criteria
-  int nmax;                     //NSH 130725 - counter for cells which are marked as converged, but over temp
+  int nte, ntr, nhc;
+  int nmax;
   double xconverge, xconverging;
 
   nconverge = nconverging = ntot = 0;
@@ -315,19 +315,22 @@ check_convergence (void)
 
   for (n = 0; n < NPLASMA; n++)
   {
-    ntot++;
-    if (plasmamain[n].converge_whole == CONVERGENCE_CHECK_PASS)
-      nconverge++;
-    if (plasmamain[n].trcheck == CONVERGENCE_CHECK_PASS)
-      ntr++;
-    if (plasmamain[n].techeck == CONVERGENCE_CHECK_PASS)
-      nte++;
-    if (plasmamain[n].hccheck == CONVERGENCE_CHECK_PASS)
-      nhc++;
-    if (plasmamain[n].techeck == CONVERGENCE_CHECK_OVER_TEMP)
-      nmax++;
-    if (plasmamain[n].converging == CELL_CONVERGING)
-      nconverging++;
+    if (wmain[plasmamain[n].nwind].inwind == W_ALL_INWIND || modes.partial_cells == PC_INCLUDE)
+    {
+      ntot++;
+      if (plasmamain[n].converge_whole == CONVERGENCE_CHECK_PASS)
+        nconverge++;
+      if (plasmamain[n].trcheck == CONVERGENCE_CHECK_PASS)
+        ntr++;
+      if (plasmamain[n].techeck == CONVERGENCE_CHECK_PASS)
+        nte++;
+      if (plasmamain[n].hccheck == CONVERGENCE_CHECK_PASS)
+        nhc++;
+      if (plasmamain[n].techeck == CONVERGENCE_CHECK_OVER_TEMP)
+        nmax++;
+      if (plasmamain[n].converging == CELL_CONVERGING)
+        nconverging++;
+    }
   }
 
   xconverge = ((double) nconverge) / ntot;
