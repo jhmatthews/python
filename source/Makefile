@@ -15,7 +15,7 @@ CC = mpicc
 # CC = gcc	# can use GCC either from command line or by uncommenting this
 FC = g77
 # FC = gfortran
-NVCC =
+NVCC = 
 # NVCC = nvcc  # default (and only?) CUDA compiler
 # specify any extra compiler flags here
 EXTRA_FLAGS =

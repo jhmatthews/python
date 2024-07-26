@@ -40,7 +40,7 @@ import sys
 import numpy
 import pylab
 from astropy.io import ascii
-from scipy.signal import boxcar
+from scipy.signal.windows import boxcar
 from scipy.signal import convolve
 
 
