@@ -525,7 +525,7 @@ fill_kpkt_rates (xplasma, escape, p)
     {
       cooling_ff = mplasma->cooling_ff = total_free (xplasma, xplasma->t_e, freqmin, freqmax) / xplasma->vol / xplasma->ne;
       cooling_ff += mplasma->cooling_ff_lofreq = total_free (xplasma, xplasma->t_e, 0.0, freqmin) / xplasma->vol / xplasma->ne;
-      cooling_compton = mplasma->cooling_compton = total_comp (one, t);
+      cooling_compton = mplasma->cooling_compton = total_comp (one, xplasma->t_e);
     }
     else
     {
@@ -557,7 +557,7 @@ fill_kpkt_rates (xplasma, escape, p)
       p->istat = P_ERROR_MATOM;
       return (0);
     }
-        else
+    else
     {
       cooling_normalisation += cooling_compton;
     }

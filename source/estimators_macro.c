@@ -235,7 +235,7 @@ bf_estimators_increment (one, p, ds)
   /* JM 2402 note that previously we incorrectly included Compton processes in kpkt_abs, which could lead to large 
      amounts of radiation coming out incorrectly in other k->r channels in spectral cycles */
   xplasma->kpkt_abs += heat_contribution;
-     
+
 
 
   /* Now for contribution to heating due to compton processes. (JM, Sep 013) */
@@ -244,6 +244,8 @@ bf_estimators_increment (one, p, ds)
 
   xplasma->heat_comp += y;      // record the compton heating
   heat_contribution += y;       // add compton to the heat contribution
+
+  xplasma->kpkt_abs += heat_contribution;
 
 
   /* Now for contribution to heating due to induced compton processes. (JM, Sep 013) */

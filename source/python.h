@@ -1269,7 +1269,8 @@ typedef struct photon
     P_ADIABATIC = 9,            /**< records that a photon created a kpkt which was destroyed by adiabatic cooling */
     P_ERROR_MATOM = 10,         /**< Some kind of error in processing of a photon which excited a macroattom */
     P_LOFREQ_FF = 11,           /**< records a photon that had too low a frequency */
-    P_REPOSITION_ERROR = 12     /**< A photon passed through the disk due to dfudge pushing it through incorrectly */
+    P_REPOSITION_ERROR = 12,    /**< A photon passed through the disk due to dfudge pushing it through incorrectly */
+    P_COMP_COOL = 13            /*< records that a photon created a kpkt which was destroyed by compton cooling */
   } istat;                      /**< status of photon. */
 
   enum frame
