@@ -1,6 +1,7 @@
 Stellar_wind.radmax
 ===================
-Multi-line description, must keep indentation.
+
+The outermost edge of a stellar wind. 
 
 Type
   Double
@@ -16,6 +17,6 @@ File
 
 
 Parent(s)
-  * :ref:`Wind.type`: star
+  * :ref:`Wind.type`: ``star``
 
 

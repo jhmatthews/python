@@ -1,18 +1,16 @@
 #!/usr/bin/env python 
 
 '''
-                    Space Telescope Science Institute
+Create plots which compare spectra (and other properties) of two runs of Python.
 
-Synopsis:  
-
-Create plots which compare spectra (and possibly other properties
-of two runs of Python.  This may become a basis for some kind
-of ipython notebook
+This may become a basis for some kind of ipython notebook
 
 
 Command line usage (if any):
 
-    usage: regression_plot.py run1 run2 [model]
+    usage::
+
+        regression_plot.py run1 run2 [model]
 
     where run1 and run 2 are in directories containing the runs to compare.
     If model is given, then only that model is compared.  
@@ -40,7 +38,7 @@ import numpy as np
 import pylab
 from glob import glob
 
-from scipy.signal import boxcar
+from scipy.signal.windows import boxcar
 from scipy.signal import convolve
 import time
 
@@ -66,10 +64,8 @@ def read_file(filename,char=''):
 
     History:
     
-    110729    ksl    Added optional delimiters
-    141209    ksl    Reinstalled in my standard startup
-            script so there was flexibility to
-            read any ascii file
+        110729    ksl    Added optional delimiters
+        141209    ksl    Reinstalled in my standard startup script so there was flexibility to read any ascii file
     '''
 
     try:

@@ -28,6 +28,43 @@
 #include "atomic.h"
 #include "python.h"
 
+/**********************************************************/
+/**
+ * @brief Allocate memory for the wind coordinate arrays and for a shell wind
+ *
+ * @param [in] ndom The domain number to allocate for
+ *
+ * @details
+ *
+ * Memory is allocated for the `wind_x`, `wind_z`, `wind_midx` and `wind_midz`
+ * arrays. The shell wind is a special wind case and the inputs and domain setup
+ * are handled in a different order/way. This is why a shell wind has its own
+ * domain allocation function in here.
+ *
+***********************************************************/
+
+static int
+allocate_shell_domain (int ndom)
+{
+  zdom[ndom].wind_x = calloc (zdom[ndom].ndim, sizeof (double));
+  zdom[ndom].wind_midx = calloc (zdom[ndom].ndim, sizeof (double));
+  if (zdom[ndom].wind_x == NULL || zdom[ndom].wind_midx == NULL)
+  {
+    Error ("allocate_domain_wind_coords: Problem allocating memory for x-dim for domain %d\n", ndom);
+    Exit (EXIT_FAILURE);
+  }
+
+  /* Allocate z dimensions */
+  zdom[ndom].wind_z = calloc (zdom[ndom].mdim, sizeof (double));
+  zdom[ndom].wind_midz = calloc (zdom[ndom].mdim, sizeof (double));
+  if (zdom[ndom].wind_z == NULL || zdom[ndom].wind_midz == NULL)
+  {
+    Error ("allocate_domain_wind_coords: Problem allocating memory for z-dim for domain %d\n", ndom);
+    Exit (EXIT_FAILURE);
+  }
+
+  return EXIT_SUCCESS;
+}
 
 /**********************************************************/
 /**
@@ -82,7 +119,7 @@ get_shell_wind_params (ndom)
     zdom[ndom].ndim2 = 4;
   }
 
-
+  allocate_shell_domain (ndom);
   zdom[ndom].stellar_wind_mdot = 1.e-6;
   zdom[ndom].rmin = geo.rstar;
   zdom[ndom].cl_beta = 1.0;
@@ -196,9 +233,7 @@ get_shell_wind_params (ndom)
  **********************************************************/
 
 int
-shell_make_grid (w, ndom)
-     WindPtr w;
-     int ndom;
+shell_make_grid (int ndom, WindPtr w)
 {
   int n;
   int ndim;

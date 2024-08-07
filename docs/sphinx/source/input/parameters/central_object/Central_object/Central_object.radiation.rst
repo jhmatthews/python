@@ -11,9 +11,8 @@ File
 
 
 Child(ren)
-  * :ref:`Central_object.geometry_for_source`
-
   * :ref:`Central_object.rad_type_to_make_wind`
-
+  * :ref:`Central_object.geometry_for_source`
   * :ref:`Central_object.rad_type_in_final_spectrum`
+  * :ref:`Central_object.temp`
 

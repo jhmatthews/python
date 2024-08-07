@@ -1,8 +1,8 @@
 Getting Started
 ###############
 
-What machines will python run on? We have run python various versions of linux and on Mac.
-It is compiled using mpicc, with an option to compile with gcc. 
+What machines will python run on? *Python* is written C.  We have regularly run *Python* on various linux systems as well as a variity of Mac machines.
+It is compiled using mpicc/gcc, but it can be compiled simply with gcc. 
 
 It uses the Gnu Scientific Libraries (gsl)
 
@@ -47,7 +47,15 @@ note that export syntax is for bash- for csh use
 The atomic data needed to run Python is included in the distribution.  
 
 
-(Python is updated fairly ofen.  Normally, one does not need to redo the entire installation proces.   Insstead follow the instuctions in :doc:`updating` )
+The source code for Python is under actively development and is updated fairly often. Normally, one does not need to redo the entire installation process, since this includes GSL setup. 
+Instead, one can pull in changes and recompile the source code by running
+
+.. code:: bash
+
+    $ cd $PYTHON/source
+    $ make python
+
+which will compile the main program. The program plus full set of auxiliary programs (such as windsave2table and py_wind, see below) can be compiled using :code:`make all`.
 
 Running python
 ==============

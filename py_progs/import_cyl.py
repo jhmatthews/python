@@ -2,10 +2,11 @@
 
 
 '''
-Synopsis:  
-    Read the master file produced by windsave2table for a
-    model created in cylindrical coordinates and produce 
-    a file which can be imported into Python and run
+Create a cylindrical `.pf` file from a `windsave2table` file.
+
+Read the master file produced by windsave2table for a
+model created in cylindrical coordinates and produce
+a file which can be imported into Python and run
 
 
 Command line usage (if any):
@@ -20,6 +21,10 @@ Primary routines:
     doit
 
 Notes:
+
+    Windsave2table saves the values of rho in the CMF frame,
+    but Python expects models to be in the observer frame
+    so this routine corrects for this.
                                        
 '''
 
@@ -124,12 +129,18 @@ def doit(root='cv',outputfile=''):
 
     xdata=data['i','j','inwind','x','z','v_x','v_y','v_z','rho','t_r']
 
+    C=2.997925e10
+
+    gamma=1./numpy.sqrt(1-(v/C)**2)
+    xdata['rho']*=gamma
+
+
     
     print (xdata)
 
 
     # This format is the easy to read back automatically
-    ascii.write(xdata,outputfile,format='fixed_width_two_line')
+    ascii.write(xdata,outputfile,format='fixed_width_two_line',overwrite=True)
 
     return
 

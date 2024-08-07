@@ -126,7 +126,7 @@ get_atomic_data (masterfile)
   double auger_branches[NAUGER_ELECTRONS];      /* array to hold branching ratios for number of Auger electrons */
   double Avalue_auger;          /* Auger A value for macro-atom data */
   int ne_records;               /* number of Auger electron entries to read in for each Auger record (normally 4) */
-  int target_istate;
+  int target_istate, n_augertarget;
   char choice;
   int lineno;                   /* the line number in the file beginning with 1 */
   int simple_line_ignore[NIONS], cstren_no_line;
@@ -1429,16 +1429,17 @@ described as macro-levels. */
                    target ion */
                 target_istate = istate + 1 + m;
 
-                n = 0;
-                while ((xconfig[n].z != z || xconfig[n].istate != target_istate || xconfig[n].ilv != 1) && n < nlevels)
-                  n++;
-                if (n == nlevels)
+                n_augertarget = 0;
+                while ((xconfig[n_augertarget].z != z || xconfig[n_augertarget].istate != target_istate || xconfig[n_augertarget].ilv != 1)
+                       && n_augertarget < nlevels)
+                  n_augertarget++;
+                if (n_augertarget == nlevels)
                 {
                   Error ("Get_atomic_data: No target ion configuration found to match Auger macro record %d\n", lineno);
                   exit (0);
                 }
 
-                auger_macro[nauger_macro].nconfig_target[m] = n;
+                auger_macro[nauger_macro].nconfig_target[m] = n_augertarget;
               }
             }
 
@@ -1448,8 +1449,8 @@ described as macro-levels. */
           }
           else
           {
-            Error ("getatomic_data: file %s line %d: More Auger macro-atom records than allowed. Increase NAUGER_MACRO in atomic.h\n", file,
-                   lineno);
+            Error ("getatomic_data: file %s line %d: More Auger macro-atom records than allowed. Increase NAUGER_MACRO (%d) in atomic.h\n",
+                   file, lineno, NAUGER_MACRO);
             exit (0);
           }
 
@@ -1773,8 +1774,6 @@ would like to have simple lines for macro-ions */
                 simple_line_ignore[n] += 1;
                 break;
               }
-
-              // atomicdata2file ();
               if (ion[n].macro_info == -1 && mflag == 1)
               {
                 Error ("Getatomic_data: Macro Atom line data supplied for ion %d\n but there is no suitable level data\n", n);
@@ -2527,7 +2526,7 @@ SCUPS    1.132e-01   2.708e-01   5.017e-01   8.519e-01   1.478e+00
               }
 
 
-              /* The number of allowd entries in atomic.h needs to be greater than the number one is trying to read in. 
+              /* The number of allowd entries in atomic.h needs to be greater than the number one is trying to read in.
                * If this needs to be increased be sure to modify the scanf line below
                */
               if (np > N_COLL_STREN_PTS)
@@ -2786,6 +2785,7 @@ or zero so that simple checks of true and false can be used for them */
         Error
           ("There is no PI rate associated with ion %d (element %d ion %d) - add PI rates and check that uppper level/ion is included in level population\n",
            n, ion[n].z, ion[n].istate);
+        Error ("Also check masterfile to see that PI files appear after all of the level files for this atom\n");
         ierr = 1;
       }
     }

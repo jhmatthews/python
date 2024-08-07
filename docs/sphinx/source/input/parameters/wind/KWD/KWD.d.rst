@@ -1,8 +1,12 @@
 KWD.d
 =====
-The ratio d/d_min is used to describe the degree of geometric collimation of
-the disk wind in the KWD model. However, d (the distance to the focal point in
-central object radii) is used as this provides a more natural parameter.
+The ratio :math:`d/d_{min}` is used to describe the degree of geometric collimation of
+the disk wind in the KWD model. However, only d (the distance to the focal point in
+central object radii) is set by the user as this provides a more natural parameter.
+
+For high values of d, the wind is highly collimated, parallel to the rotational axis. 
+For intermediate values of d (:math:`d\approx d_{min}`), the wind is more spherically symmetric.
+For low values of d, the wind is 'sheet-like' equatorially. 
 
 Type
   Double
@@ -18,6 +22,6 @@ File
 
 
 Parent(s)
-  * :ref:`Wind.type`: kwd
+  * :ref:`Wind.type`: ``kwd``
 
 

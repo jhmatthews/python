@@ -1,5 +1,7 @@
 #!/usr/bin/env python 
 '''
+Reads outputs from simulation runs.
+
 Synopsis:
     This program enables one to read outputs from the Python radiative transfer code.
     Where possible, we use the astropy.io module to read outputs.

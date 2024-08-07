@@ -1,13 +1,14 @@
 Stellar_wind.mdot
 =================
-Mass loss rate for a wind modelled in terms of the
+
+Mass loss rate of the wind. Modelled in terms of the
 Caster and Lamemers prescription for a stellar wind.
 
 Type
   Double
 
 Unit
-  M$\odot$/year
+  :math:`M_{\odot}/year`
 
 Values
   Greater than 0
@@ -17,6 +18,6 @@ File
 
 
 Parent(s)
-  * :ref:`Wind.type`: star
+  * :ref:`Wind.type`: ``star``
 
 

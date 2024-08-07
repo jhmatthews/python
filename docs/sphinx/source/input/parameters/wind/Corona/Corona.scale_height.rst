@@ -1,7 +1,7 @@
 Corona.scale_height
 ===================
 The coronal model is defined in terms of a base density
-and a scale height
+and a scale height. ``scale_height`` asks for the scale height of the corona. 
 
 Type
   Double
@@ -17,6 +17,6 @@ File
 
 
 Parent(s)
-  * :ref:`Wind.type`: corona
+  * :ref:`Wind.type`: ``corona``
 
 

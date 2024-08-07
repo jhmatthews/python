@@ -204,6 +204,13 @@ main (argc, argv)
 
   printf ("Reading %s and writing to %s\n", infile, outfile);
 
+  zdom = calloc (MAX_DOM, sizeof (domain_dummy));
+  if (zdom == NULL)
+  {
+    printf ("Unable to allocate memory for domain\n");
+    return EXIT_FAILURE;
+  }
+
   wind_read (infile);
 
   if (model_flag)

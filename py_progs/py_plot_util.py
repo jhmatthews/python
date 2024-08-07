@@ -1,8 +1,6 @@
 #!/usr/bin/env python 
 '''
-Synopsis:
-    various utilities for processing Python outputs and plotting
-    spectra and wind properties
+various utilities for processing Python outputs and plotting spectra and wind properties
 
 Usage:
     

@@ -8,6 +8,9 @@ dump file for photons of the right wavelength to see what their line is. This
 should almost certainly be changed to be specified using a species and
 wavelength!
 
+Currently, the easiest way to find the line is to use the `Atomix <https://github.com/saultyevil/atomix>`_ tool to
+search for the line number.
+
 Type
   Integer
 

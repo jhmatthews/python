@@ -8,7 +8,7 @@ the number given.
 
 Note that in some situations there may be more than one wind
 component, known technically as a domain.  In that case the user
-will be queried for this value mulitple times, one for each domain
+will be queried for this value multiple times, one for each domain.
 
 Type
   Integer

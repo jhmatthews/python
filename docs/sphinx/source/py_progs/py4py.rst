@@ -8,12 +8,7 @@ Installation instructions can be found in the associated README.md
 A reverberation mapping example using a Jupyter Notebook can be found under :doc:`../examples/reverb/reverb`
 
 
-py4py
-=================================
-.. automodule:: py4py.py4py
-    :members:
+.. toctree::
+    :titlesonly:
 
-py4py.reverb
-=================================
-.. automodule:: py4py.reverb
-    :members:
+    py4py_auto/py4py/index

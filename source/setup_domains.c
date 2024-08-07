@@ -73,11 +73,13 @@ get_domain_params (ndom)
 
   /* Define the coordinate system for the grid and allocate memory for the wind structure */
 
-  strcpy (answer, "cylindrical");
-
   if (geo.system_type == SYSTEM_TYPE_STAR)
   {
     strcpy (answer, "spherical");
+  }
+  else
+  {
+    strcpy (answer, "cylindrical");
   }
 
   zdom[ndom].coord_type = rdchoice ("Wind.coord_system(spherical,cylindrical,polar,cyl_var)", "0,1,2,3", answer);
@@ -89,13 +91,27 @@ get_domain_params (ndom)
   else
   {
     rdint ("Wind.dim.in.x_or_r.direction", &zdom[ndom].ndim);
+    if (zdom[ndom].ndim > NDIM_MAX)
+    {
+      Error
+        ("get_domain_params: %d x-cells for domain %d is greater than the maximum allowed cells of %d. Try increasing NDIM_MAX in python.h\n",
+         zdom[ndom].ndim, ndom, NDIM_MAX);
+      Exit (EXIT_FAILURE);
+    }
     if (zdom[ndom].coord_type > SPHERICAL)
     {
       rdint ("Wind.dim.in.z_or_theta.direction", &zdom[ndom].mdim);
-      if (zdom[ndom].mdim < 4)
+      if (zdom[ndom].mdim > NDIM_MAX)
+      {
+        Error
+          ("get_domain_params: %d z-cells for domain %d is greater than the maximum allowed cells of %d. Try increasing NDIM_MAX in python.h\n",
+           zdom[ndom].mdim, ndom, NDIM_MAX);
+        Exit (EXIT_FAILURE);
+      }
+      else if (zdom[ndom].mdim < 4)
       {
         Error ("python: domain mdim must be at least 4 to allow for boundaries\n");
-        Exit (0);
+        Exit (EXIT_FAILURE);
       }
     }
     else
@@ -104,13 +120,7 @@ get_domain_params (ndom)
     }
   }
 
-  /* Check that NDIM_MAX is greater than NDIM and MDIM.  */
-
-  if ((zdom[ndom].ndim > NDIM_MAX) || (zdom[ndom].mdim > NDIM_MAX))
-  {
-    Error ("NDIM_MAX %d is less than NDIM %d or MDIM %d. Fix in python.h and recompile\n", NDIM_MAX, zdom[ndom].ndim, zdom[ndom].mdim);
-    Exit (0);
-  }
+  allocate_domain_wind_coords (ndom);
 
   /* If we are in advanced then allow the user to modify scale lengths */
   if (modes.iadvanced)
@@ -132,8 +142,60 @@ get_domain_params (ndom)
   return (0);
 }
 
+/**********************************************************/
+/**
+ * @brief Allocate memory for the wind coordinate arrays and for special
+ *        cases for certain coordinate systems.
+ *
+ * @param [in] ndom The domain number to allocate for
+ *
+ * @details
+ *
+ * Memory is allocated for the `wind_x`, `wind_z`, `wind_midx` and `wind_midz`
+ * arrays. For a polar coordinate system an additional wind cone is allocated.
+ * For cylindrical variable coordinate system `wind_z_var` and `wind_midz_var`
+ * are allocated.
+ *
+ * If allocating fails for anything, the program will exit.
+ *
+***********************************************************/
 
+void
+allocate_domain_wind_coords (int ndom)
+{
+  /* Allocate x dimensions */
+  zdom[ndom].wind_x = calloc (zdom[ndom].ndim, sizeof (double));
+  zdom[ndom].wind_midx = calloc (zdom[ndom].ndim, sizeof (double));
+  if (zdom[ndom].wind_x == NULL || zdom[ndom].wind_midx == NULL)
+  {
+    Error ("allocate_domain_wind_coords: Problem allocating memory for x-dim for domain %d\n", ndom);
+    Exit (EXIT_FAILURE);
+  }
 
+  /* Allocate z dimensions */
+  zdom[ndom].wind_z = calloc (zdom[ndom].mdim, sizeof (double));
+  zdom[ndom].wind_midz = calloc (zdom[ndom].mdim, sizeof (double));
+  if (zdom[ndom].wind_z == NULL || zdom[ndom].wind_midz == NULL)
+  {
+    Error ("allocate_domain_wind_coords: Problem allocating memory for z-dim for domain %d\n", ndom);
+    Exit (EXIT_FAILURE);
+  }
+
+  /* allocate any special cases */
+  if (zdom[ndom].coord_type == RTHETA)
+  {
+    zdom[ndom].cones_rtheta = calloc (zdom[ndom].mdim, sizeof (cone_dummy));
+    if (zdom[ndom].cones_rtheta == NULL)
+    {
+      Error ("allocate_domain_wind_coords: Problem allocating memory for the r-theta cone in domain %d\n", ndom);
+      Exit (EXIT_FAILURE);
+    }
+  }
+  else if (zdom[ndom].coord_type == CYLVAR)
+  {
+    cylvar_allocate_domain (ndom);
+  }
+}
 
 /**********************************************************/
 /**   

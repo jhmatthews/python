@@ -290,7 +290,7 @@ The above link contains full documentation of the commands. A module in py_progs
 
 .. code :: rst
 
-    .. automodule:: py_read_output.py
+    .. automodule:: py_read_output
         :members:
 
 For this to work properly, docstrings have to be in a reasonable rst format. We might consider using the `napoleon extension <https://www.sphinx-doc.org/en/master/usage/extensions/napoleon.html>`_ if this is not to our taste.

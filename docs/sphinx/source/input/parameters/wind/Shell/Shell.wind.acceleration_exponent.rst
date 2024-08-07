@@ -1,7 +1,10 @@
 Shell.wind.acceleration_exponent
 ================================
-Exponent beta for the Caster and Lamers description of a stellar wind
-v(r)=v_o + (v_inf - v_o) (1+R_s/r)**beta for a shell wind.
+
+This value is the :math:`\beta` exponent from the Caster & Lamers velocity equation of a stellar wind,
+
+.. math::
+  v(r) = v_0 + (v_\infty-v_0) * (1 - R_s/r)^{\beta}.
 
 Type
   Double
@@ -14,6 +17,6 @@ File
 
 
 Parent(s)
-  * :ref:`Wind.type`: shell
+  * :ref:`Wind.type`: ``shell``
 
 

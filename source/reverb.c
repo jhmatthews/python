@@ -46,7 +46,7 @@ delay_to_observer (PhotPtr pp)
   observer.lmn[0] = pp->lmn[0];
   observer.lmn[1] = pp->lmn[1];
   observer.lmn[2] = pp->lmn[2];
-  return (pp->path + ds_to_plane (&observer, pp));
+  return (pp->path + ds_to_plane (&observer, pp, FALSE));
 }
 
 /**********************************************************/

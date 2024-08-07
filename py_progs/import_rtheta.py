@@ -1,9 +1,7 @@
 #!/usr/bin/env python 
 
 '''
-                    Space Telescope Science Institute
-
-Synopsis:  
+Create a  polar coordinate `.pf` file from a `windsave2table` file.
 
 Read the master file produced by windsave2table for a
 rtheta (polar-coordinate mode model and produce 
@@ -30,6 +28,10 @@ Primary routines:
     doit
 
 Notes:
+
+    Windsave2table saves the values of rho in the CMF frame,
+    but Python expects models to be in the observer frame
+    so this routine corrects for this.
                                        
 History:
 
@@ -52,8 +54,10 @@ def read_file(filename,char=''):
 
     History:
     
-    110729    ksl    Added optional delimiters
-    141209    ksl    Reinstalled in my standard startup
+        110729    ksl
+            Added optional delimiters
+        141209    ksl
+            Reinstalled in my standard startup
             script so there was flexibility to
             read any ascii file
     '''
@@ -142,12 +146,18 @@ def doit(root='rtheta',outputfile=''):
 
     xdata=data['i','j','inwind','r','theta','v_x','v_y','v_z','rho','t_r']
 
+    C=2.997925e10
+
+    v=numpy.sqrt(xdata['v_x']**2+xdata['v_y']**2+xdata['v_z']**2)
+
+    gamma=1./numpy.sqrt(1-(v/C)**2)
+    xdata['rho']*=gamma
     
     print (xdata)
 
 
     # This format is the easy to read back automatically
-    ascii.write(xdata,outputfile,format='fixed_width_two_line')
+    ascii.write(xdata,outputfile,format='fixed_width_two_line',overwrite=True)
 
     return
 
@@ -162,7 +172,6 @@ def doit(root='rtheta',outputfile=''):
 if __name__ == "__main__":
     import sys
     if len(sys.argv)>1:
-        # doit(int(sys.argv[1]))
         doit(sys.argv[1])
     else:
-        print ('usage: import_1d.py filename')
+        print (__doc__)

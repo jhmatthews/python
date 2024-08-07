@@ -1,33 +1,34 @@
 #!/usr/bin/env python 
 
 '''
-                    Space Telescope Science Institute
-
-Synopsis:  
-
-Execute a series of short python runs to test whether a version 
-of python is working.
+Execute a series of short python runs to test whether a version of python is working.
 
 
 Command line usage (if any):
 
-    usage: regression.py [-np 3 -x 'whatever' -pf_dir test -out_dir foo] version 
+    usage::
 
-    where 
+        regression.py [-np 3 -x 'whatever' -pf_dir test -out_dir foo] version
 
-        version         the executable of python
-        -np 3           the number of processors with which to run (default 3)
-        -pf_dir test    the directory containing all of the .pf files which will be run
-                        The defaults is $PYTHON/examples/regress.  One does not need
-                        to provide the full path name to the directory.  The routine doit
-                        first searches the current workind directory for the directory and then
-                        looks in $PYTHON/examples/
-        -x  '-v/c'      Extra switches to be applied to the run, such as using linear Doppler
-                        shifts.  Note that these will be applied to everything except the
-                        hydro calculation so use with caution.  This should be a single string
-        -out_dir foo    The directory (below the current working directory) where the 
-                        tests will run.  The defauld is constructed for the version
-                        and the data
+
+    version
+        the executable of python
+    `-np 3`
+        the number of processors with which to run (default 3)
+    `-pf_dir test`
+        the directory containing all of the .pf files which will be run
+        The defaults is `$PYTHON/examples/regress`.  One does not need
+        to provide the full path name to the directory.  The routine doit
+        first searches the current workind directory for the directory and then
+        looks in `$PYTHON/examples/`
+    `-x  '-v/c'`
+        Extra switches to be applied to the run, such as using linear Doppler
+        shifts.  Note that these will be applied to everything except the
+        hydro calculation so use with caution.  This should be a single string
+    `-out_dir foo`
+        The directory (below the current working directory) where the
+        tests will run. The default is constructed for the version
+        and the data
 
 Description:  
 
@@ -40,10 +41,13 @@ Description:
 
 Primary routines:
 
-    doit:       Internal routine which runs python on all of the pf files of interest.  Use
-                this if working in a python shell
-    steer:      A routine to parse the command lineh
-    check_one:  A routine which oversees checking of the runs
+    doit:
+        Internal routine which runs python on all of the pf files of interest.
+        Use this if working in a python shell
+    steer:
+        A routine to parse the command lineh
+    check_one:
+        A routine which oversees checking of the runs
 
 Notes:
 
@@ -56,9 +60,9 @@ Notes:
     This file should contain lines for at least the pf files to which one wishes to apply
     these switches.  The line in the file should read
 
-    py switches and the pf file name, e.g
+    py switches and the pf file name, e.g::
 
-    py -gamma agn_gamma.pf
+        py -gamma agn_gamma.pf
 
     The global switches obtained from the command line are applied after the individual swithches
 
@@ -69,12 +73,14 @@ Notes:
                                        
 History:
 
-170903 ksl Coding begun
-180225 ksl nsh had added a special test for hydro.  This is useful in the sense that
-           it allows one to deal with situations where several runs must be carreid out
-           sequentially but but the mechanism that he chose makes
-           it difficult to add new tests, because the standard and speciial tests are 
-           not sufficently isolated from one another.
+170903 ksl
+    Coding begun
+180225 ksl
+    nsh had added a special test for hydro.  This is useful in the sense that
+    it allows one to deal with situations where several runs must be carreid out
+    sequentially but but the mechanism that he chose makes
+    it difficult to add new tests, because the standard and speciial tests are
+    not sufficently isolated from one another.
 
 
 '''
@@ -205,11 +211,13 @@ def doit(version='py',pf_dir='',out_dir='',np=3,switches='',outputfile='Summary.
 
     History:
 
-        170903  ksl Bagan work
-        170904  ksl Updated how routine looks for input directories
-                    and attempted to get a more readable stderr output
-                    Also, eliminted pf files with the extension .out.pf
-                    because these are mostlikely duplicates
+        170903  ksl
+            Bagan work
+        170904  ksl
+            Updated how routine looks for input directories
+            and attempted to get a more readable stderr output
+            Also, eliminted pf files with the extension .out.pf
+            because these are mostlikely duplicates
 
     '''
 
@@ -238,10 +246,12 @@ def doit(version='py',pf_dir='',out_dir='',np=3,switches='',outputfile='Summary.
     if os.path.isdir(pf_dir):
         pf_files=glob(pf_dir+'/*pf')
         txt_files=glob(pf_dir+'/*.txt')
+        dat_files=glob(pf_dir+'/*.dat')
         wind_save=glob(pf_dir+'/*.wind_save')
     elif os.path.isdir('%s/examples/%s' % (PYTHON,pf_dir)):
         pf_files=glob('%s/examples/%s/*pf' % (PYTHON,pf_dir))
         txt_files=glob('%s/examples/%s/*.txt' % (PYTHON,pf_dir))
+        dat_files=glob(pf_dir+'/*.dat')
         wind_save=glob(pf_dir+'/*.wind_save')
     else:
         print('Error: The pf directory %s does not appear to exist' % pf_dir)
@@ -269,7 +279,14 @@ def doit(version='py',pf_dir='',out_dir='',np=3,switches='',outputfile='Summary.
 
     for one in txt_files:
         shutil.copy(one,out_dir)
+
+    # Get any windsave files is any
     for one in wind_save:
+        shutil.copy(one,out_dir)
+
+    # get any dat files if any
+
+    for one in dat_files:
         shutil.copy(one,out_dir)
 
     # Lookd for a file with extra switches for some models
@@ -405,22 +422,24 @@ def py_hydro(version,pf_dir,outputfile):
 
     Notes:
 
-    This routine is run from within the current working directory,
-    which is the directory created earlier be doit
+        This routine is run from within the current working directory,
+        which is the directory created earlier be doit
 
+    History:
 
-    History
-
-    1801  nsh
-    1802  ksl Modified this routine so that it is more standalone
-              than previously.  Special regression tests need to
-              be isolated from the internal logic of doit so they
-              can be added/removed easily.
-    2908 kdl  Eliminated the checks for a difference in heating and
-              and cooling rates.  If this is important, a check of
-              these should be done in regression_checks, and the 
-              check should be made between this run and a previous
-              run, not one against a file made in the distant past.
+        1801  nsh
+            Development started
+        1802  ksl
+            Modified this routine so that it is more standalone
+            than previously.  Special regression tests need to
+            be isolated from the internal logic of doit so they
+            can be added/removed easily.
+        2908 kdl
+            Eliminated the checks for a difference in heating and
+            and cooling rates.  If this is important, a check of
+            these should be done in regression_checks, and the
+            check should be made between this run and a previous
+            run, not one against a file made in the distant past.
     '''
 
     out_dir=os.getcwd()

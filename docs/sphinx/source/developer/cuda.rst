@@ -39,7 +39,7 @@ To use the CUDA matrix acceleration in Python, your machine needs to have the fo
 - NVIDIA GPU drivers
 - A supported operating system (Windows or Linux) with a gcc compiler and toolchain
 
-NVIDIA provides a list of CUDA-enabled GPUs `here <https://developer.nvidia.com/cuda-gpus>`_. Whilst the GeForce series
+NVIDIA provides a list of CUDA-enabled GPUs `here <https://developer.nvidia.com/cuda-gpus>`__. Whilst the GeForce series
 of NVIDIA GPUs are more affordable and generally *good enough*, from a purely raw computation standpoint NVIDIA's
 workstation and data center GPUs are more suited due differences (and additional) in hardware not included in
 the GeForce line of GPUs.
@@ -144,7 +144,7 @@ the product for only a single element. If there are enough GPU cores available, 
 effectively a single step which all threads calculating the product for each element at once.
 
 A more detailed and thorough explanation of the CUDA programming model can be found in the `CUDA documentation
-<https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#>`_.
+<https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#>`__.
 
 Basics
 ------
@@ -156,7 +156,7 @@ use cuSolver, it must first be initialised. To do so, we use :code:`cusolverDnCr
 cuSolver is based on the Fortran library `LAPACK <https://www.netlib.org/lapack/>`_ and as such expects arrays to be
 ordered in column-major order like in Fortran. In C, arrays are typically ordered in row-major order and so arrays must
 be transposed into column-major ordering before being passed to cuSolver (an explanation of the differences between row
-and column major ordering can be found `here <https://en.wikipedia.org/wiki/Row-_and_column-major_order>`_). Matrices
+and column major ordering can be found `here <https://en.wikipedia.org/wiki/Row-_and_column-major_order>`__). Matrices
 can be transposed either whilst still on the CPU, or on the GPU by using a CUDA kernel as shown in the example below,
 
 .. code:: cpp
@@ -177,7 +177,7 @@ can be transposed either whilst still on the CPU, or on the GPU by using a CUDA 
     }
 
 The syntax of the above is covered in detail in the `CUDA documentation
-<https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#kernels>`_. The purpose of the kernel is take in a row
+<https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#kernels>`__. The purpose of the kernel is take in a row
 major array and to transpose it to column major.
 
 Every cuSolver (and CUDA) function returns an error status. To make code more readable, a macro is usually defined which
@@ -335,7 +335,7 @@ simplified) example of the cuSolver implementation to solve a linear system.
     }
 
 The naming conventions of cuSolver are discussed `here
-<https://docs.nvidia.com/cuda/cusolver/index.html#naming-conventions>`_. In the case above, :code:`cuSolverDnDgetrf`
+<https://docs.nvidia.com/cuda/cusolver/index.html#naming-conventions>`__. In the case above, :code:`cuSolverDnDgetrf`
 corresponds to: cusolverDn = *cuSolver Dense Matrix*, D = *double precision (double)* and getrf = *get right
 hand factorisation*.
 

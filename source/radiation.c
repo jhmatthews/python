@@ -537,6 +537,14 @@ kappa_ff (xplasma, freq)
   double x1, x2, x3;
   int ndom;
 
+  if (xplasma->nwind < 0)
+  {
+    Error ("kappa_ff: xplasma->nplasma %d xplasma->nwind %d is invalid\n", xplasma->nplasma, xplasma->nwind);
+    return (0.0);
+  }
+
+
+
   ndom = wmain[xplasma->nwind].ndom;
 
   if (gaunt_n_gsqrd == 0)       //Maintain old behaviour if Sutherland gaunt factors are unavailable

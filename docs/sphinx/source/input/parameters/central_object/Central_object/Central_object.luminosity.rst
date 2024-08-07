@@ -1,7 +1,7 @@
 Central_object.luminosity
 =========================
 The luminosity of a non-blackbody AGN central source.
-This is defined as the luminosity from 2-10keV.
+This is defined as the luminosity of the source from the 2 to 10keV spectral band.
 
 Type
   Double

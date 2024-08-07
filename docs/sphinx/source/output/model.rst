@@ -22,7 +22,12 @@ windsave2table
   Produces a set of standard set ascii tables that that show for each grid cell quantities such as wind velocity,
   :math:`n_e`, temperatures, and densities of prominent ions.
 
+  There are varrious options for how much data is to be printed out.  A summary of these can be
+  obtained with code:`windsave2table -h`
+
 py_wind
   Executed from the command line with :code:`py_wind rootname`
 
   Allows the user to query for information about the model interactively.  The results can be written to ascii files for future reference
+
+  Again, there are various options, and a summary can be obtained with :code:`py_wind -h`

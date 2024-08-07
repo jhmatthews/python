@@ -37,7 +37,7 @@ typedef struct Cdf
    * A structure which defines a rotation matrix for
    * corrdinage sytstem transformations.
    */
- struct basis
+struct basis
 {
   double a[3][3];  /**< the rotation matrix */
 

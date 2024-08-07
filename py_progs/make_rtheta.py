@@ -1,20 +1,22 @@
 #!/usr/bin/env python 
 
 '''
-                    Space Telescope Science Institute
+Create a simple rtheta model file.
 
 Synopsis:  
 
-Create a model which can be imported into
-Python of an rtheta grid, with either 
-either equal angles in theta or angles 
-set so that the size of cells at a single
-radius is the same
+    Create a model which can be imported into
+    Python of an rtheta grid, with either
+    either equal angles in theta or angles
+    set so that the size of cells at a single
+    radius is the same
 
 
 Command line usage (if any):
 
-    usage: make_rtheta.py file.pf
+    usage::
+
+        make_rtheta.py file.pf
 
 Description:  
 
@@ -65,7 +67,8 @@ Notes:
                                        
 History:
 
-230601 ksl Coding begun
+    230601 ksl
+        Coding begun
 
 '''
 

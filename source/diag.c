@@ -196,12 +196,11 @@ get_extra_diagnostics ()
   n += modes.jumps_for_detailed_spectra = rdchoice ("@Diag.use_jumps_for_emissivities_in_detailed_spectra(yes,no)", "1,0", answer);
 
   strcpy (answer, "no");
-  n += modes.turn_off_upweighting_of_simple_macro_atoms =
-    rdchoice ("@Diag.turn_off_upweighting_of_simple_macro_atoms(yes,no)", "1,0", answer);
+  n += modes.use_upweighting_of_simple_macro_atoms =
+    rdchoice ("@Diag.use_upweighting_of_simple_macro_atoms(yes,no)", "1,0", answer);
 
   strcpy (answer, "zero_densities");
-  n += modes.partial_cells =
-    rdchoice ("@Diag.partial_cells(include,zero_densities,extend_full_cells)", "0,1,2", answer);
+  n += modes.partial_cells = rdchoice ("@Diag.partial_cells(include,zero_densities,extend_full_cells)", "0,1,2", answer);
 
   strcpy (answer, "no");
   n += modes.searchlight = rdchoice ("@Diag.invoke_searchlight_option(yes,no)", "1,0", answer);

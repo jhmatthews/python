@@ -8,7 +8,7 @@ Type
   Double
 
 Values
-  0 < f <= 1, where 1 is a fully smooth wind.
+  :math:`0\lt f\le1`, where 1 is a fully smooth wind.
 
 File
   `setup_domains.c <https://github.com/agnwinds/python/blob/master/source/setup_domains.c>`_

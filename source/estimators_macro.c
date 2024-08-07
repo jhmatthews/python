@@ -217,13 +217,25 @@ bf_estimators_increment (one, p, ds)
   /* JM1411 -- the below processes have the factor zdom[ndom].fill incorporated directly
      into the kappa subroutines */
 
+  if (xplasma->nwind < 0)
+  {
+    Error ("bf_estimators: Bad plasma cell %d  %d\n", xplasma->nplasma, xplasma->nwind);
+    return (0);
+  }
+
   /* Now for contribution to heating due to ff processes. (SS, Apr 04) */
 
   weight_of_packet = p->w;
 
   y = weight_of_packet * kappa_ff (xplasma, freq_av) * ds;
 
-  xplasma->heat_ff += heat_contribution = y;    // record ff hea        
+  xplasma->heat_ff += heat_contribution = y;    // record ff hea   
+
+  /* This heat contribution is also the contibution to making k-packets in this volume. So we record it. */
+  /* JM 2402 note that previously we incorrectly included Compton processes in kpkt_abs, which could lead to large 
+     amounts of radiation coming out incorrectly in other k->r channels in spectral cycles */
+  xplasma->kpkt_abs += heat_contribution;
+     
 
 
   /* Now for contribution to heating due to compton processes. (JM, Sep 013) */
@@ -244,32 +256,6 @@ bf_estimators_increment (one, p, ds)
 
 
   xplasma->heat_tot += heat_contribution;       // heat contribution is the contribution from compton, ind comp and ff processes
-
-
-
-  /* This heat contribution is also the contibution to making k-packets in this volume. So we record it. */
-
-  xplasma->kpkt_abs += heat_contribution;
-
-
-  /* Now for contribution to inner shell ionization estimators (SS, Dec 08) */
-  /* Commented out by NSH 2018 - data no longer used */
-  // for (n = 0; n < nauger; n++)
-  // {
-  //   ft = augerion[n].freq_t;
-  //   if (freq_av > ft)
-  //   {
-  //     Log ("estimators: Adding a packet to AUGER %g \n", freq_av);
-
-  //     weight_of_packet = p->w;
-  //     x = sigma_phot_verner (&augerion[n], freq_av);    //this is the cross section
-  //     y = weight_of_packet * x * ds;
-
-  //     xplasma->gamma_inshl[n] += y / freq_av / PLANCK / xplasma->vol;
-  //   }
-  // }
-
-
 
   return (0);
 }
@@ -381,7 +367,8 @@ bb_estimators_increment (one, p, tau_sobolev, dvds, nn)
 /**
  * @brief the routine to normalise the matom bb and bf estimators. 
  *
- * @param [in] int n the cell for which the normalisation is to be done
+ * @param [in, out] PlasmaPtr xplasma  The plasma (and associated macro) cell to normalise
+ *
  * @return 0
  *
  * @details
@@ -408,20 +395,17 @@ bb_estimators_increment (one, p, tau_sobolev, dvds, nn)
  **********************************************************/
 
 int
-normalise_macro_estimators (n)
-     int n;
+normalise_macro_estimators (PlasmaPtr xplasma)
 {
   double invariant_volume_time;
   int i, j, nlev_upper;
   double stimfac, line_freq, stat_weight_ratio;
   double heat_contribution, lower_density, upper_density;
   WindPtr one;
-  PlasmaPtr xplasma;
   MacroPtr mplasma;
 
-  one = &wmain[n];
-  xplasma = &plasmamain[one->nplasma];
   mplasma = &macromain[xplasma->nplasma];
+  one = &wmain[xplasma->nwind];
 
   /* one->vol contains the CMF volume. This converts it to
      observer frame volume, or perhaps more correctly, it calculates the
@@ -530,7 +514,6 @@ normalise_macro_estimators (n)
         Error ("normalise_macro_estimators: bb stimulated correction factor is out of bounds, 0 <= stimfac < 1 but got %g\n", stimfac);
         Error ("normalise_macro_estimators: upper_density %g lower_density %g xplasma->levden[config[nlev_upper].nden] %g\n",
                upper_density, lower_density, xplasma->levden[xconfig[nlev_upper].nden]);
-        // Exit (EXIT_FAILURE);
         stimfac = 0.0;
       }
       else
@@ -569,6 +552,10 @@ normalise_macro_estimators (n)
   /* Now that we have estimators, set the flag to use them for the level populations */
 
   geo.macro_ioniz_mode = MACRO_IONIZ_MODE_ESTIMATORS;
+
+  /* force recalculation of k-packet rates and matrices, if applicable */
+  mplasma->kpkt_rates_known = FALSE;
+  mplasma->matrix_rates_known = FALSE;
 
   return (0);
 }

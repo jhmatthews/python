@@ -30,8 +30,9 @@ extern int nlevels;                    /**< These are the actual number of level
 #define NLTE_LEVELS	12000   /**<  Maximum number of levels to treat explicitly */
 extern int nlte_levels;                /**<  Actual number of levels to treat explicityly */
 
+
 /* AUGER NOTE: recommended to increase NLEVELS_MACRO to at least 500 for Auger macro-atoms */
-#define NLEVELS_MACRO   300     /**<  Maximum number of macro atom levels. (SS, June 04) */
+#define NLEVELS_MACRO   600     /**<  Maximum number of macro atom levels. (SS, June 04) */
 extern int nlevels_macro;              /**<  Actual number of macro atom levels. (SS, June 04) */
 #define NLINES 		200000  /**<  Maximum number of lines to be read */
 extern int nlines;                     /**<  Actual number of lines that were read in */
@@ -41,15 +42,25 @@ extern int nlines_macro;               /**<  Actual number of Macro Atom lines t
 extern int n_inner_tot;                /**< The actual number of inner shell ionization cross sections in total */
 
 
-/* AUGER NOTE: recommended to increase these values to at least 200 for Auger macro-atoms */
-#define NBBJUMPS         100    /**<  Maximum number of Macro Atom bound-bound jumps from any one configuration (SS) */
-#define NBFJUMPS         100    /**<  Maximum number of Macro Atom Bound-free jumps from any one configuration (SS) */
+#define LARGE_MACRO_ATOMS FALSE 
+/* sometimes we have to compile with larger hardwired values here for large macro-atoms e.g. Fe17to27 dataset */
+#if LARGE_MACRO_ATOMS
+  #define NBBJUMPS         200    /**<  Maximum number of Macro Atom bound-bound jumps from any one configuration (SS) */
+  #define NBFJUMPS         200    /**<  Maximum number of Macro Atom Bound-free jumps from any one configuration (SS) */
+  #define NAUGER_MACRO     2000        /* number of Auger processes */
+#else
+  /* AUGER NOTE: recommended to increase these values to at least 200 for Auger macro-atoms */
+  #define NBBJUMPS         100    /**<  Maximum number of Macro Atom bound-bound jumps from any one configuration (SS) */
+  #define NBFJUMPS         100    /**<  Maximum number of Macro Atom Bound-free jumps from any one configuration (SS) */
+  #define NAUGER_MACRO     200        /* number of Auger processes */
+#endif
+
+extern int nauger_macro;        /* the number of auger processes read in associated with macro atoms */
+#define NAUGER_ELECTRONS 4
+
 
 #define MAXJUMPS          1000000       /**<  The maximum number of Macro Atom jumps before emission (if this is exceeded
                                            it gives up (SS) */
-// XXXX  - the maxium number of jumps has been reduced for testing
-// #define MAXJUMPS          10000      /* The maximum number of Macro Atom jumps before emission (if this is exceeded
-//                                           it gives up (SS) */
 #define NAUGER 2                /**< Maximum number of "auger" processes */
 extern int nauger;                     /**< Actual number of innershell edges for which autoionization is to be computed */
 
@@ -60,7 +71,7 @@ extern int nauger;                     /**< Actual number of innershell edges fo
    */
 
 typedef struct elements
-{                               
+{
   char name[20];                /**<  Element name */
   int z;                        /**<  Atomic number */
   int firstion;                 /**<  Index into struct ions  ion[firstion] is the lowest ionization state of this ion */
@@ -91,7 +102,7 @@ typedef struct ions
   int istate;                   /**<  1=neutral, 2 = once ionized, etc. */
   int nelem;                    /**<  index to elements structure */
   double ip;                    /**<  ionization potential of this ion (converted from eV to ergs by get_atomic) */
-  double g,log_g;               /**<  multiplicity of ground state, note that this is not totally consistent
+  double g, log_g;              /**<  multiplicity of ground state, note that this is not totally consistent
                                    with energy levels and this needs to be reconciled  
 	                               there is also a log version for use in freebound calculations*/
   int nmax;                     /**<  The maximum number of allowed lte configurations for this ion. 
@@ -185,7 +196,7 @@ typedef struct configurations
                                   */
   int n_bbu_jump, n_bbd_jump;   /**<  No. of bound-bound upward/downward jumps available to this configuration (SS) */
   int n_bfu_jump, n_bfd_jump;   /**<  No. of bound-free upward/downward jumps available to this configuration (SS) */
-  double g,log_g;                     /* multiplicity for level and log version for use in freebound integrations */
+  double g, log_g;              /* multiplicity for level and log version for use in freebound integrations */
   double q_num;                 /* principal quantum number.  In Topbase this has non-integer values */
   double ex;                    /*excitation energy of level */
   double rad_rate;              /* Total spontaneous radiative de-excitation rate for level */
@@ -204,20 +215,15 @@ config_dummy, *ConfigPtr;
 
 extern ConfigPtr xconfig;
 
-
-extern int nauger_macro;               /* the number of auger processes read in associated with macro atoms */
-#define NAUGER_MACRO 200        /* number of Auger processes */
-#define NAUGER_ELECTRONS 4
-
-typedef struct auger 
+typedef struct auger
 {
-  int nion;                                    /* The ion no (in python) of the transition */
-  int z, istate;                               /* element and ion associated with the line */
-  int nconfig;                                 /* the entry in the config structure where the vacancy state lies */
-  int iauger;                                  /* the index to this auger entry */
-  int nauger;                                  /* number of Auger jumps */
-  double Avalue_auger;                         /* the total A value associated with creating Auger electrons */
-  int nconfig_target[NAUGER_ELECTRONS];        /* the configuration of the upper ion we are jumping to */
+  int nion;                     /* The ion no (in python) of the transition */
+  int z, istate;                /* element and ion associated with the line */
+  int nconfig;                  /* the entry in the config structure where the vacancy state lies */
+  int iauger;                   /* the index to this auger entry */
+  int nauger;                   /* number of Auger jumps */
+  double Avalue_auger;          /* the total A value associated with creating Auger electrons */
+  int nconfig_target[NAUGER_ELECTRONS]; /* the configuration of the upper ion we are jumping to */
   double branching_ratio[NAUGER_ELECTRONS];     /* probability of creating 0-3 Auger electrons */
 } auger_dummy, *AugerPtr;
 
@@ -305,7 +311,7 @@ typedef struct coll_stren
                                           */
 } Coll_stren, *Coll_strenptr;
 
-extern Coll_stren coll_stren[NLINES];  
+extern Coll_stren coll_stren[NLINES];
 
 
 
@@ -314,8 +320,13 @@ extern double phot_freq_min;           /**< The lowest frequency for which photo
 extern double inner_freq_min;          /**< The lowest frequency for which inner shell ionization can take place */
 
 #define NCROSS 3000            /**<  Maximum number of x-sections for a single photionization process */
-#define NTOP_PHOT 400           /**<  Maximum number of photoionisation processes.  */
-/* AUGER NOTE: recommended to increase NTOP_PHOT to 1000 for Auger macro-atoms */
+
+#if LARGE_MACRO_ATOMS
+  #define NTOP_PHOT 600           /**<  Maximum number of photoionisation processes.  */
+#else
+  /* AUGER NOTE: recommended to increase NTOP_PHOT to 1000 for Auger macro-atoms */
+  #define NTOP_PHOT 1000           /**<  Maximum number of photoionisation processes.  */
+#endif
 extern int ntop_phot;                  /**<  The actual number of TopBase photoionzation x-sections */
 extern int nphot_total;                /**<  total number of photoionzation x-sections = nxphot + ntop_phot */
 
@@ -327,7 +338,7 @@ extern int nphot_total;                /**<  total number of photoionzation x-se
                                    can be dropped - need for backward compatibility? (SS) 
   */
 typedef struct topbase_phot
-{                               
+{
   int nlev;                     /**< Internal index to the config structure for the lower state */
   int uplev;                    /**< Internal index to the config structure for the upper state (SS) */
   int nion;                     /**< Internal index to the    ion structure for this x-section */
@@ -353,8 +364,9 @@ typedef struct topbase_phot
                                    configuration (nlev) and then up_index. (SS) */
   int up_index;
   int use;                      /**< It we are to use this cross section. This allows unused VFKY cross sections to sit in the array. */
-  double freq[NCROSS],log_freq[NCROSS], x[NCROSS],log_x[NCROSS]; /**< frequency and cross sections, plus log versions for FB integrals*/
-  double f,log_f, sigma,log_sigma;              /**< last freq, last x-section and log versions*/
+  double freq[NCROSS], log_freq[NCROSS], x[NCROSS], log_x[NCROSS];
+                                                                 /**< frequency and cross sections, plus log versions for FB integrals*/
+  double f, log_f, sigma, log_sigma;            /**< last freq, last x-section and log versions*/
 } Topbase_phot, *TopPhotPtr;
 
 extern Topbase_phot phot_top[NLEVELS];
@@ -408,7 +420,7 @@ extern struct ground_fracs ground_frac[NIONS];
 #define MAX_DR_PARAMS 9         //This is the maximum number of c or e parameters.
 #define DRTYPE_BADNELL	    0
 #define DRTYPE_SHULL	    1
-extern int ndrecomb;                   //This is the actual number of DR parameters
+extern int ndrecomb;            //This is the actual number of DR parameters
 
 /** This is the struture to store information about dielectronic recombination
   * 081115 nsh New structure and variables to hold the dielectronic recombination rate data
@@ -428,12 +440,12 @@ typedef struct dielectronic_recombination
 } Drecomb, *Drecombptr;
 
 
-extern Drecomb drecomb[NIONS];         //set up the actual structure
+extern Drecomb drecomb[NIONS];  //set up the actual structure
 
-extern double dr_coeffs[NIONS];        //this will be an array to temprarily store the volumetric dielectronic recombination rate coefficients for the current cell under interest. We may want to make this 2D and store the coefficients for a range of temperatures to interpolate.
+extern double dr_coeffs[NIONS]; //this will be an array to temprarily store the volumetric dielectronic recombination rate coefficients for the current cell under interest. We may want to make this 2D and store the coefficients for a range of temperatures to interpolate.
 
 
-#define T_RR_PARAMS         6           //This is the number of parameters.
+#define T_RR_PARAMS         6   //This is the number of parameters.
 #define RRTYPE_BADNELL	    0
 #define RRTYPE_SHULL	    1
 extern int n_total_rr;
@@ -449,7 +461,7 @@ typedef struct total_rr
   int type;                     /**< NSH 23/7/2012 - What type of parampeters we have for this ion */
 } Total_rr, *total_rrptr;
 
-extern Total_rr total_rr[NIONS];       //Set up the structure
+extern Total_rr total_rr[NIONS];        //Set up the structure
 
 #define BAD_GS_RR_PARAMS 19     //This is the number of points in the fit.
 extern int n_bad_gs_rr;
@@ -462,7 +474,7 @@ typedef struct badnell_gs_rr
   double rates[BAD_GS_RR_PARAMS];       //rates corresponding to those temperatures
 } Bad_gs_rr, *Bad_gs_rrptr;
 
-extern Bad_gs_rr bad_gs_rr[NIONS];     //Set up the structure
+extern Bad_gs_rr bad_gs_rr[NIONS];      //Set up the structure
 
 
 #define DERE_DI_PARAMS 20       //This is the maximum number of points in the fit.
@@ -477,14 +489,14 @@ typedef struct dere_di_rate
   double min_temp;
 } Dere_di_rate, *Dere_di_rateptr;
 
-extern Dere_di_rate dere_di_rate[NIONS];       //Set up the structure
+extern Dere_di_rate dere_di_rate[NIONS];        //Set up the structure
 
-extern double di_coeffs[NIONS];        //This is an array to store the di_coeffs 
-extern double qrecomb_coeffs[NIONS];   //JM 1508 analogous array for three body recombination 
+extern double di_coeffs[NIONS]; //This is an array to store the di_coeffs 
+extern double qrecomb_coeffs[NIONS];    //JM 1508 analogous array for three body recombination 
 
 #define MAX_GAUNT_N_GSQRD 100   //Space set aside for the number of parameters for scaled inverse temperature
 
-extern int gaunt_n_gsqrd;              //The actual number of scaled temperatures
+extern int gaunt_n_gsqrd;       //The actual number of scaled temperatures
 
 typedef struct gaunt_total
 {
@@ -493,13 +505,13 @@ typedef struct gaunt_total
   float s1, s2, s3;
 } Gaunt_total, *Gaunt_totalptr;
 
-extern Gaunt_total gaunt_total[MAX_GAUNT_N_GSQRD];     //Set up the structure
+extern Gaunt_total gaunt_total[MAX_GAUNT_N_GSQRD];      //Set up the structure
 
 
 
 #define MAX_CHARGE_EXCHANGE 100 //Space set aside for charge exchange parameters
 
-extern int n_charge_exchange;          //The actual number of scaled temperatures
+extern int n_charge_exchange;   //The actual number of scaled temperatures
 
 typedef struct charge_exchange
 {
@@ -513,11 +525,11 @@ typedef struct charge_exchange
 
 } Charge_exchange, *Charge_exchange_ptr;
 
-extern Charge_exchange charge_exchange[MAX_CHARGE_EXCHANGE];   //Set up the structure
+extern Charge_exchange charge_exchange[MAX_CHARGE_EXCHANGE];    //Set up the structure
 
-extern double charge_exchange_recomb_rates[NIONS];     //An array to store the actual recombination rates for a given temperature - 
+extern double charge_exchange_recomb_rates[NIONS];      //An array to store the actual recombination rates for a given temperature - 
 //there is an estimated rate for ions without an actual rate, so we need to dimneions for ions.
-extern double charge_exchange_ioniz_rates[MAX_CHARGE_EXCHANGE];        //An array to store the actual ionization rates for a given temperature
+extern double charge_exchange_ioniz_rates[MAX_CHARGE_EXCHANGE]; //An array to store the actual ionization rates for a given temperature
 
 
 

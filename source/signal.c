@@ -136,6 +136,43 @@ xsignal (char *root, char *format, ...)
 }
 
 
+/**********************************************************/
+/**
+ * @brief xsignal which only shows in debug mode
+ *
+ * @param [in] char *  root   root name of the file to write to
+ * @param [in] char *  format   A format string
+ * @param [in]   ...   The remaining inputs for the fprintf statement
+ * @return     Always  returns 0
+ *
+ * If one cannot write to the .sig file, Python will exit
+ *
+ * @details
+ *
+ * This is a simple wrapper around xsignal which will only print to the signal
+ * file or to the log/screen when the verbosity of the program is high enough to
+ * enable debug printing.
+ *
+ * This is good for having performance timing implemented for the MPI
+ * communication functions, for example, which can vary quite a bit between MPI
+ * implementations and hardware.
+ *
+ **********************************************************/
+
+int
+d_xsignal (char *root, char *format, ...)
+{
+  va_list ap;
+
+  if (verbosity > SHOW_LOG)
+  {
+    va_start (ap, format);
+    xsignal (root, format, ap);
+    va_end (ap);
+  }
+
+  return 0;
+}
 
 /**********************************************************/
 /** 

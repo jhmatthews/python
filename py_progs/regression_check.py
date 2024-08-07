@@ -1,12 +1,7 @@
 #!/usr/bin/env python 
 
 '''
-                    Space Telescope Science Institute
-
-Synopsis:  
-
-Compare two regression runs, highligting the differences
-between them
+Compare two regression runs, highligting the differences between them
 
 
 Command line usage (if any):

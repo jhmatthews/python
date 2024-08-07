@@ -1,5 +1,4 @@
 #!/usr/bin/env python 
-
 '''
                     Space Telescope Science Institute
 
@@ -47,7 +46,7 @@ import sys
 import numpy
 import matplotlib.pyplot as pylab
 import matplotlib.ticker as mtick
-from scipy.signal import boxcar
+from scipy.signal.windows import boxcar
 from scipy.signal import convolve
 from scipy.optimize import leastsq
 # from ksl import io

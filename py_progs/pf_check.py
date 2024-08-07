@@ -1,18 +1,20 @@
 #!/usr/bin/env python 
 
 '''
-                    Space Telescope Science Institute
+Checks if `.pf` files in a directory need modification.
 
 Synopsis:  
 
-Check all of the pf files in a directory to see if
-they require modification, alternatively run pieces of travis 
-to make sure the parameter files will run.  
+    Check all of the pf files in a directory to see if
+    they require modification, alternatively run pieces of travis
+    to make sure the parameter files will run.
 
 
 Command line usage (if any):
 
-    usage: pf_check.py directory_name
+    usage::
+
+        pf_check.py directory_name
 
 Description:  
 
@@ -23,13 +25,16 @@ Description:
 
     In order that ther original directory not be affected,
     it first copies all of the .pf files to a directory 
-    with the name
+    with the name::
+
         pf_check_directory_date
 
-    The full path names to directories in the $PYTHON/examples
-    do not need to be given, so for example
+    The full path names to directories in the `$PYTHON/examples`
+    do not need to be given, so for example::
+
         pf_check.py beta
-    will test the parameter files in $PYTHON/examples/beta.
+
+    will test the parameter files in `$PYTHON/examples/beta`.
 
     After running Python in -i mode for each of the files, 
     the routine diffs the .out.pf file with the original.pf
@@ -51,10 +56,13 @@ Description:
 
 Primary routines:
 
-    doit - the main routine which runs everything
-    travis - the special routine for parsing the .travis.yaml file to
+    doit
+        the main routine which runs everything
+    travis
+        the special routine for parsing the .travis.yaml file to
         get the commands to run
-    steer - interpret the command line
+    steer
+        interpret the command line
 
 Notes:
 
@@ -65,7 +73,8 @@ Notes:
                                        
 History:
 
-190304 ksl Coding begun
+    190304 ksl
+        Coding begun
 
 '''
 

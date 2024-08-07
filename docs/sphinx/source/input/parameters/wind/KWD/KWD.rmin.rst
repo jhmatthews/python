@@ -1,6 +1,7 @@
 KWD.rmin
 ========
-The radius at which the disk wind begins, in units of central object radii.
+
+This radius defines the inner boundary and closest distance from the central object that the wind launches off the disk.
 
 Type
   Double
@@ -16,6 +17,6 @@ File
 
 
 Parent(s)
-  * :ref:`Wind.type`: kwd
+  * :ref:`Wind.type`: ``kwd``
 
 

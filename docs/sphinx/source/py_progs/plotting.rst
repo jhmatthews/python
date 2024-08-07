@@ -1,12 +1,10 @@
 Plotting
 ----------
+Several scripts have been developed to plot **Python** output files.
 
-py_plot_output
-=================================
-.. automodule:: py_plot_output
-    :members:
 
-plot_wind
-=================================
-.. automodule:: plot_wind
-    :members:
+.. toctree::
+    :maxdepth: 2
+    :glob:
+
+    plotting/*

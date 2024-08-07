@@ -79,7 +79,7 @@ get_stellar_wind_params (ndom)
 
   /* define the the variables that determine the gridding */
   zdom[ndom].wind_rhomin_at_disk = 0;
-  zdom[ndom].wind_rhomax_at_disk = zdom[ndom].rho_max = zdom[ndom].rmax;
+  zdom[ndom].wind_rhomax_at_disk = zdom[ndom].rmax;
   zdom[ndom].zmax = zdom[ndom].rmax;
 
 

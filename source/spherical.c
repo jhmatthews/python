@@ -124,9 +124,7 @@ spherical_ds_in_cell (ndom, p)
  **********************************************************/
 
 int
-spherical_make_grid (w, ndom)
-     WindPtr w;
-     int ndom;
+spherical_make_grid (int ndom, WindPtr w)
 {
   double dr, dlogr;
   int j, n;
@@ -209,14 +207,13 @@ spherical_wind_complete (ndom, w)
   ndim = zdom[ndom].ndim;
   nstart = zdom[ndom].nstart;
 
-
   for (i = 0; i < ndim; i++)
     zdom[ndom].wind_x[i] = w[nstart + i].r;
   for (i = 0; i < ndim - 1; i++)
     zdom[ndom].wind_midx[i] = w[nstart + i].rcen;
   /* Add something plausible for the edges */
   zdom[ndom].wind_midx[ndim - 1] = 2. * zdom[ndom].wind_x[ndim - 1] - zdom[ndom].wind_midx[ndim - 2];
-  zdom[ndom].wind_midz[ndim - 1] = 2. * zdom[ndom].wind_z[ndim - 1] - zdom[ndom].wind_midz[ndim - 2];
+  zdom[ndom].wind_midz[0] = zdom[ndom].wind_z[0] / 2;
 
   return (0);
 }
@@ -231,11 +228,10 @@ spherical_wind_complete (ndom, w)
 
 /**********************************************************/
 /**
- * @brief      spherical_volume(w) calculates the wind volume of cell
- * 	allowing for the fact that some cells are partially in the wind
+ * @brief      calculate the volume of a cell
+ * 	allowing for the fact that a cell may be partially in the wind
  *
- * @param [in] int  ndom   the domain number
- * @param [in] WindPtr  w   the entire wind
+ * @param [in,out] WindPtr  w   a single wind cell to calculate the volume for
  * @return     Always returns 0
  *
  * @details
@@ -254,80 +250,73 @@ spherical_wind_complete (ndom, w)
  **********************************************************/
 
 int
-spherical_volumes (ndom, w)
-     int ndom;
-     WindPtr w;
+spherical_cell_volume (WindPtr w)
 {
-  int i, n;
+  int i;
   double fraction;
   double num, denom;
   double r, theta;
   double dr, dtheta, x[3];
   double rmin, rmax;
-  double thetamin, thetamax;
-  int jj, kk;
-  int ndim, nstart, ndomain;
+  int kk, jj;
+  int ndim;
+  int ndom;
 
+  const double thetamin = 0.0;
+  const double thetamax = 0.5 * PI;
+
+  i = w->nwind;
+  ndom = w->ndom;
   ndim = zdom[ndom].ndim;
-  nstart = zdom[ndom].nstart;
+  rmin = zdom[ndom].wind_x[i];
+  rmax = zdom[ndom].wind_x[i + 1];
 
+  w->vol = 4. / 3. * PI * (rmax * rmax * rmax - rmin * rmin * rmin);
 
-  thetamin = 0.0;
-  thetamax = 0.5 * PI;
-
-  for (i = 0; i < ndim; i++)
+  if (i == ndim - 1 || i == ndim - 2)
   {
-    n = i + nstart;             /* nstart is the offset into the wind structure */
-    rmin = zdom[ndom].wind_x[i];
-    rmax = zdom[ndom].wind_x[i + 1];
-
-    w[n].vol = 4. / 3. * PI * (rmax * rmax * rmax - rmin * rmin * rmin);
-
-    if (i == ndim - 1 || i == ndim - 2)
+    fraction = 0.0;             /* Force outside edge volues to zero */
+    jj = 0;
+    kk = RESOLUTION;
+  }
+  else
+  {                             /* Determine whether the cell is in the wind */
+    num = denom = 0;
+    jj = kk = 0;
+    dr = (rmax - rmin) / RESOLUTION;
+    dtheta = (thetamax - thetamin) / RESOLUTION;
+    for (r = rmin + dr / 2; r < rmax; r += dr)
     {
-      fraction = 0.0;           /* Force outside edge volues to zero */
-      jj = 0;
-      kk = RESOLUTION;
-    }
-    else
-    {                           /* Determine whether the cell is in the wind */
-      num = denom = 0;
-      jj = kk = 0;
-      dr = (rmax - rmin) / RESOLUTION;
-      dtheta = (thetamax - thetamin) / RESOLUTION;
-      for (r = rmin + dr / 2; r < rmax; r += dr)
+      for (theta = thetamin + dtheta / 2; theta < thetamax; theta += dtheta)
       {
-        for (theta = thetamin + dtheta / 2; theta < thetamax; theta += dtheta)
+        denom += r * r * sin (theta);
+        kk++;
+        x[0] = r * sin (theta);
+        x[1] = 0;
+        x[2] = r * cos (theta);
+        if (where_in_wind (x, &ndom) == W_ALL_INWIND)
         {
-          denom += r * r * sin (theta);;
-          kk++;
-          x[0] = r * sin (theta);
-          x[1] = 0;
-          x[2] = r * cos (theta);
-          if (where_in_wind (x, &ndomain) == W_ALL_INWIND)
-          {
-            num += r * r * sin (theta);
-            jj++;
-          }
+          num += r * r * sin (theta);
+          jj++;
         }
       }
-      fraction = num / denom;
     }
+    fraction = num / denom;
+  }
 
-    if (jj == 0)
-    {
-      w[n].inwind = W_NOT_INWIND;       // The cell is not in the wind
-      w[n].vol = 0.0;
-    }
-    else if (jj == kk)
-    {
-      w[n].inwind = W_ALL_INWIND;       // The cell is completely in the wind
-    }
-    else
-    {
-      w[n].inwind = W_PART_INWIND;      //The cell is partially in the wind
-      w[n].vol *= fraction;
-    }
+  if (jj == 0)
+  {
+    w->inwind = W_NOT_INWIND;   // The cell is not in the wind
+    w->vol = 0.0;
+  }
+  else if (jj == kk)
+  {
+    w->inwind = W_ALL_INWIND;   // The cell is completely in the wind
+  }
+  else
+  {
+    w->inwind = W_PART_INWIND;  //The cell is partially in the wind
+    w->vol *= fraction;
   }
 
   return (0);

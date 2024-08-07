@@ -30,7 +30,7 @@ import sys
 from astropy.io import ascii
 import numpy
 import matplotlib.pyplot as pylab
-from scipy.signal import boxcar
+from scipy.signal.windows import boxcar
 from scipy.signal import convolve
 import subprocess
 from matplotlib import tri

@@ -286,7 +286,6 @@ pillbox (p, smin, smax)
   double root[2], ss[2];
   int i, n;
   struct photon pp;
-  double ds_to_plane ();
 
   n = 0;
 
@@ -343,7 +342,7 @@ root is really only possible if the photon is already in the pillbox  */
 planes of the two end caps and then checking the cylindrical radius. Negative
 distances are valid only if the photon is in the pillbox already */
 
-  x1 = ds_to_plane (&plane_m2_near, p); /* Calculate the distance to the L1 plane */
+  x1 = ds_to_plane (&plane_m2_near, p, FALSE);  /* Calculate the distance to the L1 plane */
   stuff_phot (p, &pp);
   move_phot (&pp, x1);          /* So pp is now located at the l1 plane */
   if ((pp.x[1] * pp.x[1] + pp.x[2] * pp.x[2]) <= geo.r2_width * geo.r2_width)
@@ -352,7 +351,7 @@ distances are valid only if the photon is in the pillbox already */
     n++;
   }
 
-  x2 = ds_to_plane (&plane_m2_far, p);  /* Calculate the distance to the plane behind the the star.  */
+  x2 = ds_to_plane (&plane_m2_far, p, FALSE);   /* Calculate the distance to the plane behind the the star.  */
   stuff_phot (p, &pp);
   move_phot (&pp, x2);          /* So pp is now located at the r2_far plane */
   if ((pp.x[1] * pp.x[1] + pp.x[2] * pp.x[2]) <= geo.r2_width * geo.r2_width)

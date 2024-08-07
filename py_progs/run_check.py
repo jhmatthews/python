@@ -1,8 +1,6 @@
 #!/usr/bin/env python 
 '''
-Synopsis:  
-    Sumarize a model run with python, ultimately generating
-    an html file with various plots, etc.
+Sumarize a model run with python, ultimately generating an html file with various plots, etc.
 
 
 Command line usage (if any):
@@ -43,6 +41,7 @@ import sys
 from glob import glob
 import os
 from astropy.io import ascii
+from astropy.table import Table
 import numpy
 import subprocess
 import matplotlib.pyplot as pylab
@@ -51,6 +50,7 @@ import plot_wind
 import plot_wind_1d
 import plot_spec
 import plot_tot
+import numpy as np
 
 
 def read_diag(root):
@@ -113,6 +113,10 @@ def read_diag(root):
             hc=[]
             print('Read diag file, but there is not evidence of ionization cycles')
 
+
+        ncycle=np.arange(len(converged))
+        x=Table([ncycle,converged,converging,t_r,t_e,hc],names=['Ncycle','Converged','Converging','T_r_converged','T_e_converged','hc_converged'])
+        x.write('%s.convergence.txt' % root,format='ascii.fixed_width_two_line',overwrite=True)
 
         return converged,converging,t_r,t_e,hc
 

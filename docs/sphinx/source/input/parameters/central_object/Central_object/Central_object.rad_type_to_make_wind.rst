@@ -1,6 +1,7 @@
 Central_object.rad_type_to_make_wind
 ====================================
-Multi-line description, must keep indentation.
+
+Determines the spectral energy distribution of the central object that illuminates the wind during the ionisation cycles. 
 
 Type
   Enumerator
@@ -18,19 +19,19 @@ Values
 
   brems
     Available for :ref:`System_type` of ``agn`` or ``bh``.
-    Central object radiates with SED of a brehmsstralung spectrum as $L_\nu=\nu^{\alpha}e^{-h\nu/kT}$.
+    Central object radiates with spectral energy distribution of a brehmsstralung spectrum as :math:`L_\nu=\nu^{\alpha}e^{-h\nu/kT}`.
     This was originally developed to allow comparison to spectra generated
     according to Blondin heating and cooling rates.
 
   cloudy
     Available for :ref:`System_type` of ``agn`` or ``bh``.
     Central object radiates with a 'broken' power law, intended largely for testing purposes against Cloudy.
-    The SED form is $L_\nu=K\nu^\alpha$, but beyond the provided high and low energy
-    breakpoints the luminosity falls off sharply.
+    The spectral energy distribution form is :math:`L_\nu=K\nu^\alpha`. However, beyond the provided high and low energy
+    breakpoints, the luminosity falls off sharply.
 
   power
     Available for :ref:`System_type` of ``agn`` or ``bh``.
-    Radiate following a power-law model as $L_\nu=K\nu^\alpha$.
+    Radiate following a power-law model as :math:`L_\nu=K\nu^\alpha`.
     The total luminosity will be set by :ref:`Boundary_layer.luminosity`.
 
 

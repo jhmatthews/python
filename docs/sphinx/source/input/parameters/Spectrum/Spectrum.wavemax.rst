@@ -1,6 +1,6 @@
 Spectrum.wavemax
 ================
-The maximum wavelength of the detailed spectra that are to be produced
+The maximum wavelength of the detailed spectra that are to be produced.
 
 Type
   Double
@@ -9,8 +9,7 @@ Unit
   Angstroms
 
 Values
-  Spectrum.wavemin
-    Greater than
+    Greater than :ref:`Spectrum.wavemin`
 
 
 File

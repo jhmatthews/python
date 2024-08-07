@@ -62,6 +62,26 @@ check_frame (p, desired_frame, msg)
 
 /**********************************************************/
 /**
+ * @brief  Calculate the gamma factor for a given velocity
+ *
+ * @param [in]  double vel[3]  the velocity vector
+ *
+ * @return double the value of gamma
+ *
+ * @details
+ *
+ * ### Notes ###
+ *
+ **********************************************************/
+
+double
+calculate_gamma_factor (double vel[3])
+{
+  return 1.0 / sqrt (1.0 - dot (vel, vel) / (VLIGHT * VLIGHT));
+}
+
+/**********************************************************/
+/**
  * @brief      carries out the transformation of a all the quantities
  *      in a photon structure
  *      from the observer (or global) frame to the local (or co-moving)

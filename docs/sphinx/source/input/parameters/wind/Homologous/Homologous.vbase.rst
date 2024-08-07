@@ -1,12 +1,13 @@
 Homologous.vbase
 ================
-Velocity at the base of the wind
+
+The parameter setting the velocity at the base of the wind (at :math:`r_{min}`).
 
 Type
   Double
 
 Unit
-  cm
+  cm/s
 
 Values
   Greater than 0
@@ -16,6 +17,6 @@ File
 
 
 Parent(s)
-  * :ref:`Wind.type`: homologous
+  * :ref:`Wind.type`: ``homologous``
 
 

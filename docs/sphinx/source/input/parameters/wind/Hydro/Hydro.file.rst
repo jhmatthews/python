@@ -10,6 +10,6 @@ File
 
 
 Parent(s)
-  * :ref:`Wind.type`: hydro
+  * :ref:`Wind.type`: ``hydro``
 
 

@@ -1,14 +1,15 @@
 Shell.wind_mdot
 ===============
+
 The mass loss through a diagnostic shell type wind. One normally sets
 this experimentally in order to get a required hydrogen density in
-the shell
+the shell.
 
 Type
   Double
 
 Unit
-  M$\odot$/year
+  :math:`M_{\odot}/year`
 
 Values
   Greater than 0
@@ -18,6 +19,6 @@ File
 
 
 Parent(s)
-  * :ref:`Wind.type`: shell
+  * :ref:`Wind.type`: ``shell``
 
 

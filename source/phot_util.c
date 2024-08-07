@@ -453,6 +453,8 @@ quadratic (a, b, c, r)
  *
  * @param [in] struct plane *  pl   A structure which descibes a plane in terms of a position and vector normal to the surface
  * @param [in] struct photon *  p   A photon
+ * @param [in] int force_postive_z  Whether to force the photon to be moving towards the positve z quadrant (appropriate for planes that 
+               are symmetric about z=0, but only defined once, such as the windplanes.)
  * @return     The distance to the plane, or VERY_BIG if the photon does not hit the plane (in the positive direction)
  *
  * @details
@@ -469,25 +471,29 @@ quadratic (a, b, c, r)
  **********************************************************/
 
 double
-ds_to_plane (pl, p)
+ds_to_plane (pl, p, force_positive_z)
      struct plane *pl;
      struct photon *p;
+     int force_positive_z;
 {
   double denom, diff[3], numer;
-  double dot ();
+  struct photon ptest;
 
+  stuff_phot (p, &ptest);
+  if (ptest.lmn[2] < 0 && (force_positive_z == TRUE))
+  {
+    ptest.x[2] = -ptest.x[2];   /* force the photon to be in the positive x,z quadrant */
+    ptest.lmn[2] = -ptest.lmn[2];       /* force the photon to moving in the positive z direction */
+  }
 
-  if ((denom = dot (p->lmn, pl->lmn)) == 0)
+  if ((denom = dot (ptest.lmn, pl->lmn)) == 0)
     return (VERY_BIG);
 
-  vsub (pl->x, p->x, diff);
+  vsub (pl->x, ptest.x, diff);
 
   numer = dot (diff, pl->lmn);
 
   return (numer / denom);
-
-
-
 }
 
 

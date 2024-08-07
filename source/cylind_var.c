@@ -32,7 +32,6 @@
 #include "atomic.h"
 #include "python.h"
 
-
 /**********************************************************/
 /**
  * @brief      cylin_ds_in_cell calculates the distance to the far
@@ -152,9 +151,7 @@ cylvar_ds_in_cell (ndom, p)
  **********************************************************/
 
 int
-cylvar_make_grid (w, ndom)
-     WindPtr w;
-     int ndom;
+cylvar_make_grid (int ndom, WindPtr w)
 {
   double dr, dz, dlogr, dlogz;
   double r, z_offset;
@@ -361,10 +358,8 @@ cylvar_wind_complete (ndom, w)
 /**********************************************************/
 /**
  * @brief      calculates the wind volume of a cylindrical cell
- * 	allowing for the fact that some cells
  *
- * @param [in] int  ndom   the domain poiinter
- * @param [in,out] WindPtr  w   the entire wind
+ * @param [in,out] WindPtr  w   a single wind cell to calculate the volume for
  * @return   Always returns 0
  *
  * @details
@@ -378,9 +373,7 @@ cylvar_wind_complete (ndom, w)
  **********************************************************/
 
 int
-cylvar_volumes (ndom, w)
-     int ndom;
-     WindPtr w;
+cylvar_cell_volume (WindPtr w)
 {
   int i, j, n;
   int jj, kk;
@@ -390,102 +383,87 @@ cylvar_volumes (ndom, w)
   double dr, dz, x[3];
   double volume;
   double f, g;
-  int ndim, mdim, nstart, nstop;
+  int mdim;
   int ndomain;
 
-
-  ndim = zdom[ndom].ndim;
+  int ndom = w->ndom;
+  n = w->nwind;
   mdim = zdom[ndom].mdim;
-  nstart = zdom[ndom].nstart;
-  nstop = zdom[ndom].nstop;
 
+  wind_n_to_ij (ndom, n, &i, &j);
 
-  /* Initialize all the volumes to 0 */
-  for (n = nstart; n < nstop; n++)
+  /* Encapsulate the grid cell with a rectangle for integrating */
+  rmin = w[n].x[0];
+  if (rmin > w[n + 1].x[0])
+    rmin = w[n + 1].x[0];
+  if (rmin > w[n + mdim].x[0])
+    rmin = w[n + mdim].x[0];
+  if (rmin > w[n + mdim + 1].x[0])
+    rmin = w[n + mdim + 1].x[0];
+
+  rmax = w[n].x[0];
+  if (rmax < w[n + 1].x[0])
+    rmax = w[n + 1].x[0];
+  if (rmax < w[n + mdim].x[0])
+    rmax = w[n + mdim].x[0];
+  if (rmax < w[n + mdim + 1].x[0])
+    rmax = w[n + mdim + 1].x[0];
+
+  zmin = w[n].x[2];
+  if (zmin > w[n + 1].x[2])
+    zmin = w[n + 1].x[2];
+  if (zmin > w[n + mdim].x[2])
+    zmin = w[n + mdim].x[2];
+  if (zmin > w[n + mdim + 1].x[2])
+    zmin = w[n + mdim + 1].x[2];
+
+  zmax = w[n].x[2];
+  if (zmax < w[n + 1].x[2])
+    zmax = w[n + 1].x[2];
+  if (zmax < w[n + mdim].x[2])
+    zmax = w[n + mdim].x[2];
+  if (zmax < w[n + mdim + 1].x[2])
+    zmax = w[n + mdim + 1].x[2];
+
+  volume = 0;
+  jj = kk = 0;
+  dr = (rmax - rmin) / RESOLUTION;
+  dz = (zmax - zmin) / RESOLUTION;
+  for (r = rmin + dr / 2; r < rmax; r += dr)
   {
-    w[n].vol = 0;
-    w[n].inwind = W_NOT_INWIND;
+    for (z = zmin + dz / 2; z < zmax; z += dz)
+    {
+      x[0] = r;
+      x[1] = 0;
+      x[2] = z;
+      if (bilin (x, w[i * mdim + j].x, w[i * mdim + j + 1].x, w[(i + 1) * mdim + j].x, w[(i + 1) * mdim + j + 1].x, &f, &g) == 0)
+      {
+        kk++;
+        if (where_in_wind (x, &ndomain) == W_ALL_INWIND)
+        {
+          volume += r;
+          jj++;
+        }
+      }
+
+    }
+
   }
 
-  for (i = 0; i < ndim - 1; i++)
+  w->vol = 4. * PI * dr * dz * volume;
+
+  /* OK now make the final assignement of nwind and fix the volumes */
+  if (jj == 0)
   {
-    for (j = 0; j < mdim - 1; j++)
-    {
-      wind_ij_to_n (ndom, i, j, &n);
-
-      /* Encapsulate the grid cell with a rectangle for integrating */
-      rmin = w[n].x[0];
-      if (rmin > w[n + 1].x[0])
-        rmin = w[n + 1].x[0];
-      if (rmin > w[n + mdim].x[0])
-        rmin = w[n + mdim].x[0];
-      if (rmin > w[n + mdim + 1].x[0])
-        rmin = w[n + mdim + 1].x[0];
-
-      rmax = w[n].x[0];
-      if (rmax < w[n + 1].x[0])
-        rmax = w[n + 1].x[0];
-      if (rmax < w[n + mdim].x[0])
-        rmax = w[n + mdim].x[0];
-      if (rmax < w[n + mdim + 1].x[0])
-        rmax = w[n + mdim + 1].x[0];
-
-      zmin = w[n].x[2];
-      if (zmin > w[n + 1].x[2])
-        zmin = w[n + 1].x[2];
-      if (zmin > w[n + mdim].x[2])
-        zmin = w[n + mdim].x[2];
-      if (zmin > w[n + mdim + 1].x[2])
-        zmin = w[n + mdim + 1].x[2];
-
-      zmax = w[n].x[2];
-      if (zmax < w[n + 1].x[2])
-        zmax = w[n + 1].x[2];
-      if (zmax < w[n + mdim].x[2])
-        zmax = w[n + mdim].x[2];
-      if (zmax < w[n + mdim + 1].x[2])
-        zmax = w[n + mdim + 1].x[2];
-
-
-      volume = 0;
-      jj = kk = 0;
-      dr = (rmax - rmin) / RESOLUTION;
-      dz = (zmax - zmin) / RESOLUTION;
-      for (r = rmin + dr / 2; r < rmax; r += dr)
-      {
-        for (z = zmin + dz / 2; z < zmax; z += dz)
-        {
-          x[0] = r;
-          x[1] = 0;
-          x[2] = z;
-          if (bilin (x, w[i * mdim + j].x, w[i * mdim + j + 1].x, w[(i + 1) * mdim + j].x, w[(i + 1) * mdim + j + 1].x, &f, &g) == 0)
-          {
-            kk++;
-            if (where_in_wind (x, &ndomain) == W_ALL_INWIND)
-            {
-              volume += r;
-              jj++;
-            }
-          }
-
-        }
-
-      }
-      w[n].vol = 4. * PI * dr * dz * volume;
-      /* OK now make the final assignement of nwind and fix the volumes */
-      if (jj == 0)
-      {
-        w[n].inwind = W_NOT_INWIND;     // The cell is not in the wind
-      }
-      else if (jj == kk)
-      {
-        w[n].inwind = W_ALL_INWIND;     // All of cell is inwind
-      }
-      else
-      {
-        w[n].inwind = W_PART_INWIND;    // Some of cell is inwind
-      }
-    }
+    w->inwind = W_NOT_INWIND;   // The cell is not in the wind
+  }
+  else if (jj == kk)
+  {
+    w[n].inwind = W_ALL_INWIND; // All of cell is inwind
+  }
+  else
+  {
+    w[n].inwind = W_PART_INWIND;        // Some of cell is inwind
   }
 
   return (0);
@@ -942,4 +920,48 @@ cylvar_coord_fraction (ndom, ichoice, x, ii, frac, nelem)
 
   return (1);
 
+}
+
+/**********************************************************/
+/**
+ * @brief Allocate memory for a cylindrical variable domain.
+ *
+ * @param [in] ndom  The domain to allocate for
+ *
+ * @details
+ *
+ * Allocates memory for `wind_z_var` and `wind_midz_var`, both of which are
+ * 2D arrays. Memory for each array should be contiguous, as we are using a
+ * pointer arithmetic trick to allocate the memory required to element 0 and
+ * then manually arranging the memory for the other elements.
+ *
+ **********************************************************/
+
+void
+cylvar_allocate_domain (int ndom)
+{
+  /* Allocate memory for rows, then allocate enough memory for the entire
+   * array to element 0 */
+  zdom[ndom].wind_z_var = calloc (zdom[ndom].ndim, sizeof (double *));
+  zdom[ndom].wind_midz_var = calloc (zdom[ndom].ndim, sizeof (double *));
+  if (zdom[ndom].wind_z_var == NULL || zdom[ndom].wind_midz_var == NULL)
+  {
+    Error ("cylvar_allocate_domain: failed to allocate memory for cylvar domain coordinates\n");
+    Exit (EXIT_FAILURE);
+  }
+  zdom[ndom].wind_z_var[0] = calloc (zdom[ndom].ndim * zdom[ndom].mdim, sizeof (double));
+  zdom[ndom].wind_midz_var[0] = calloc (zdom[ndom].ndim * zdom[ndom].mdim, sizeof (double));
+  if (zdom[ndom].wind_z_var[0] == NULL || zdom[ndom].wind_midz_var[0])
+  {
+    Error ("cylvar_allocate_domain: failed to allocate memory for cylvar domain coordinates\n");
+    Exit (EXIT_FAILURE);
+  }
+
+  /* Now manually rearrange the memory from element 0 to fill out the other
+   * rows with columns */
+  for (int row = 1; row < zdom[ndom].ndim; ++row)
+  {
+    zdom[ndom].wind_z_var[row] = zdom[ndom].wind_z_var[row - 1] + zdom[ndom].mdim;
+    zdom[ndom].wind_midz_var[row] = zdom[ndom].wind_midz_var[row - 1] + zdom[ndom].mdim;
+  }
 }

@@ -351,81 +351,105 @@ shock_heating (one)
  **********************************************************/
 
 double
-wind_cooling ()
+wind_cooling (void)
 {
-  double cool, lum_lines, cool_rr, lum_ff, cool_comp, cool_dr, cool_di, cool_adiab, heat_adiab, cool_ch_ex;
+  int n_plasma;
+  int n_start;
+  int n_stop;
+  int n_do;
+  double cool_tot;
+  double lum_lines;
+  double cool_rr;
+  double lum_ff;
+  double cool_comp;
+  double cool_dr;
+  double cool_di;
+  double cool_adiab;
+  double heat_adiab;
   double nonthermal;
-  int n;
-  double x;
-  int nplasma;
+  double cool_tot_cell;
 
+#ifdef MPI_ON
+  n_do = get_parallel_nrange (rank_global, NPLASMA, np_mpi_global, &n_start, &n_stop);
+#else
+  n_start = 0;
+  n_stop = NPLASMA;
+  n_do = NPLASMA;
+#endif
 
-  cool = lum_lines = cool_rr = lum_ff = cool_comp = cool_ch_ex = 0;
-  cool_dr = cool_di = cool_adiab = heat_adiab = 0;      //1108 NSH Zero the new counter 1109 including DR counter 1408 and the DI counter
-  nonthermal = 0;
+  cool_tot = 0.0;
+  lum_lines = 0.0;
+  cool_rr = 0.0;
+  lum_ff = 0.0;
+  cool_comp = 0.0;
+  cool_dr = 0.0;
+  cool_di = 0.0;
+  cool_adiab = 0.0;
+  heat_adiab = 0.0;
+  nonthermal = 0.0;
 
-  for (n = 0; n < NDIM2; n++)
+  /* We are going to do this bit in parallel, as cooling evaluates some expensive integrals */
+  for (n_plasma = n_start; n_plasma < n_stop; ++n_plasma)
   {
-
-    if (wmain[n].inwind >= 0)
+    cool_tot_cell = cooling (&plasmamain[n_plasma], plasmamain[n_plasma].t_e);
+    if (cool_tot_cell < 0)
     {
-      nplasma = wmain[n].nplasma;
-      cool += x = cooling (&plasmamain[nplasma], plasmamain[nplasma].t_e);
-      lum_lines += plasmamain[nplasma].lum_lines;
-      cool_rr += plasmamain[nplasma].cool_rr;
-      lum_ff += plasmamain[nplasma].lum_ff;
-      cool_comp += plasmamain[nplasma].cool_comp;       //1108 NSH Increment the compton luminosity for that cell.
-      cool_dr += plasmamain[nplasma].cool_dr;   //1109 NSH Increment the DR luminosity for the cell.
-      cool_di += plasmamain[nplasma].cool_di;   //1408 NSH Increment the DI luminosity for the cell.
-
-      if (geo.adiabatic)        //Caculate the total adiatbaic heating/cooling separating these into two variables
-      {
-
-        if (plasmamain[nplasma].cool_adiabatic >= 0.0)
-        {
-          cool_adiab += plasmamain[nplasma].cool_adiabatic;
-        }
-        else
-        {
-          heat_adiab += plasmamain[nplasma].cool_adiabatic;
-        }
-      }
-
-      else
-      {
-        cool_adiab = 0.0;
-      }
-
-      /* Caculate the non-thermal heating (for FU Ori models with extra wind heating */
-      if (geo.nonthermal)
-      {
-        nonthermal += plasmamain[nplasma].heat_shock;
-      }
-
-
-
-      if (x < 0)
-        Error ("wind_cooling: xtotal emission %8.4e is < 0!\n", x);
-
+      Error ("wind_cooling: xtotal emission %8.4e is < 0!\n", cool_tot_cell);
     }
   }
 
+  broadcast_wind_cooling (n_start, n_stop, n_do);
 
-  /* Store the results into the geo structure */
+  /* This part probably does not need to be done in parallel, as NPLASMA will
+   * generally always be small enough to not cause a huge bottleneck from summing
+   * up some numbers */
+  for (n_plasma = 0; n_plasma < NPLASMA; ++n_plasma)
+  {
+    cool_tot += plasmamain[n_plasma].cool_tot;
+    cool_rr += plasmamain[n_plasma].cool_rr;
+    cool_comp += plasmamain[n_plasma].cool_comp;
+    cool_dr += plasmamain[n_plasma].cool_dr;
+    cool_di += plasmamain[n_plasma].cool_di;
 
+    lum_lines += plasmamain[n_plasma].lum_lines;
+    lum_ff += plasmamain[n_plasma].lum_ff;
 
+    // Calculate the total adiabatic heating/cooling separating these into two variables
+    if (geo.adiabatic)
+    {
+
+      if (plasmamain[n_plasma].cool_adiabatic >= 0.0)
+      {
+        cool_adiab += plasmamain[n_plasma].cool_adiabatic;
+      }
+      else
+      {
+        heat_adiab += plasmamain[n_plasma].cool_adiabatic;
+      }
+    }
+    else
+    {
+      cool_adiab = 0.0;
+      heat_adiab = 0.0;
+    }
+
+    /* Calculate the non-thermal heating (for FU Ori models with extra wind heating) */
+    if (geo.nonthermal)
+    {
+      nonthermal += plasmamain[n_plasma].heat_shock;
+    }
+  }
+
+  /* Store the total/global results into the geo structure */
   geo.lum_lines = lum_lines;
   geo.cool_rr = cool_rr;
   geo.lum_ff = lum_ff;
-  geo.cool_comp = cool_comp;    //The compton luminosity
-  geo.cool_dr = cool_dr;        //the DR luminosity
-  geo.cool_di = cool_di;        //the DI luminosity 
+  geo.cool_comp = cool_comp;
+  geo.cool_dr = cool_dr;
+  geo.cool_di = cool_di;
   geo.cool_adiabatic = cool_adiab;
   geo.heat_adiabatic = heat_adiab;
   geo.heat_shock = nonthermal;
 
-
-
-
-  return (cool);
+  return (cool_tot);
 }

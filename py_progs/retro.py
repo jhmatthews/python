@@ -1,14 +1,14 @@
 #!/usr/bin/env python 
 
 '''
-                    Space Telescope Science Institute
+Run multiple commits on the same `.pf` file to see where changes arose.
+
 
 Synopsis:  
 
-The functions here are intended to ease running a collection 
-of commits on the same parameter file so that one can locate
-where a change in Python occured. 
-
+    The functions here are intended to ease running a collection
+    of commits on the same parameter file so that one can locate
+    where a change in Python occured.
 
 
 Command line usage (if any):
@@ -19,20 +19,25 @@ Command line usage (if any):
 Description:  
 
 Primary routines:
-    log2table  - create an ascii table that summarizes the log and contains
+
+    log2table  -
+        create an ascii table that summarizes the log and contains
         entries for compiling and running python many times
-    compile_many - create at lot of Python executables in a local directory
-    run_many  - runs a set of python executables
-    plot_many  - plot consecutive sets of the outputs 
+    compile_many -
+        create at lot of Python executables in a local directory
+    run_many  -
+        runs a set of python executables
+    plot_many  -
+        plot consecutive sets of the outputs
 
 
 Notes:
 
     To use this, create a directory where one wants to run
 
-    Create a text file by running 
+    Create a text file by running::
 
-    git log > commit.txt (or whatever
+        git log > commit.txt (or whatever
 
     Edit this file so it includes only the commit range in which you are interested.
 
@@ -60,7 +65,7 @@ Notes:
                                        
 History:
 
-210220 ksl Coding begun
+    210220 ksl Coding begun
 
 '''
 
@@ -77,7 +82,7 @@ import matplotlib.pyplot as plt
 
 
 
-from scipy.signal import boxcar
+from scipy.signal.windows import boxcar
 from scipy.signal import convolve
 
 

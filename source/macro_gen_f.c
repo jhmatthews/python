@@ -19,14 +19,16 @@
 
 /**********************************************************/
 /**
- * @brief      returns the specific band-limited luminosity in macro-atoms
+ * @brief      returns the specific band-limited luminosity in macro-atoms (and depending
+ * on the mode calculates the band-limited emisivities for the cells in the wind for
+ * use in detailed spectral models via a MC process.
  *
  * @param [in] int  mode   variable which controls whether or not we need to compute the
  *            emissivities (CALCULATE_MATOM_EMISSIVITIES) or use stored ones
  *            because we are restarting a spectral cycle (USE_STORED_MATOM_EMISSIVITIES)
  *            see #define statements in python.h and code in xdefine_phot().
  * @return double lum  The energy radiated by the deactivation of macro atoms in the wind in the
- *            wavelength range required for the specrum calculation.
+ *            wavelength range required for the spectrum calculation.
  *
  * @details
  * this routine calculates the luminosity in the band needed for the computation of the
@@ -35,8 +37,10 @@
  * (at least with our method) to work out where a photon is going to come out when a
  * macro-atom is generated
  *
+ * This routine has been largely replaced by get_matom_f_accelerate()
+ *
  * ### Notes ###
- * Consult Matthews thesis.
+ * Consult Matthews thesis section 3.6.1.
  *
  **********************************************************/
 
@@ -49,8 +53,9 @@ get_matom_f (mode)
   int n_tries, n_tries_local;
   double norm;
   int which_out;
+  int nreport;
   int my_nmin, my_nmax;         //These variables are used even if not in parallel mode
-
+  int my_n_cells;
 
   if (mode == USE_STORED_MATOM_EMISSIVITIES)
   {
@@ -59,18 +64,6 @@ get_matom_f (mode)
 
   else                          // we need to compute the emissivities
   {
-#ifdef MPI_ON
-    int position, ndo, n_mpi, num_comm, n_mpi2;
-    int size_of_commbuffer;
-    char *commbuffer;
-
-    /* the commbuffer needs to communicate 2 variables and the number of macor levels,
-       plus the variable for how many cells each thread is doing */
-    size_of_commbuffer = 8 * (3 + nlevels_macro) * (floor (NPLASMA / np_mpi_global) + 1);
-
-    commbuffer = (char *) malloc (size_of_commbuffer * sizeof (char));
-#endif
-
     /* if we are using the accelerated macro-atom scheme then we want to allocate an array
        for the macro-atom probabilities and various other quantities */
     /* these variables are only used in the non-accelerated scheme */
@@ -107,25 +100,27 @@ get_matom_f (mode)
         Error ("kpkt_abs is %8.4e in matom %i\n", plasmamain[n].kpkt_abs, n);
     }
 
-
-
-    Log ("Calculating macro-atom and k-packet emissivities- this might take a while...\n");
-    Log ("Number of macro-atom levels: %d\n", nlevels_macro);
-
-
     /* For MPI parallelisation, the following loop will be distributed over multiple tasks.
        Note that the mynmim and mynmax variables are still used even without MPI on */
     my_nmin = 0;
     my_nmax = NPLASMA;
+    my_n_cells = NPLASMA;
 
 #ifdef MPI_ON
-
-    ndo = get_parallel_nrange (rank_global, NPLASMA, np_mpi_global, &my_nmin, &my_nmax);
-
-    Log_parallel ("Thread %d is calculating macro atom emissivities for macro atoms %d to %d\n", rank_global, my_nmin, my_nmax);
-
+    my_n_cells = get_parallel_nrange (rank_global, NPLASMA, np_mpi_global, &my_nmin, &my_nmax);
 #endif
 
+    Log ("Calculating macro-atom and k-packet emissivities- this might take a while...\n");
+    Log ("Number of cells for rank: %d\n", my_n_cells);
+    Log ("Number of macro-atom levels: %d\n", nlevels_macro);
+    if (my_n_cells <= 10)
+    {
+      nreport = my_n_cells;
+    }
+    else
+    {
+      nreport = my_n_cells / 10;
+    }
 
     for (n = my_nmin; n < my_nmax; n++)
     {
@@ -133,12 +128,12 @@ get_matom_f (mode)
       /* JM 1309 -- these lines are just log statements which track progress, as this section
          can take a long time */
 #ifdef MPI_ON
-      if (n % 50 == 0)
+      if (n % nreport == 0)
         Log
-          ("Thread %d is calculating  macro atom emissivity for macro atom %7d of %7d or %6.3f per cent\n",
+          ("Rank %d is calculating  macro atom emissivity for macro atom %7d of %7d or %6.3f per cent\n",
            rank_global, n, my_nmax, n * 100. / my_nmax);
 #else
-      if (n % 50 == 0)
+      if (n % nreport == 0)
         Log ("Calculating macro atom emissivity for macro atom %7d of %7d or %6.3f per cent\n", n, my_nmax, n * 100. / my_nmax);
 #endif
 
@@ -337,70 +332,7 @@ get_matom_f (mode)
 
     /*This is the end of the update loop that is parallelised. We now need to exchange data between the tasks.
        This is done much the same way as in wind_update */
-#ifdef MPI_ON
-
-    /* JM Add an MPI Barrier here */
-    MPI_Barrier (MPI_COMM_WORLD);
-
-    for (n_mpi = 0; n_mpi < np_mpi_global; n_mpi++)
-    {
-      /* here we loop over the number of threads. If the thread is this thread then we pack the macromain information
-         into memory and then broadcast it to ther other threads */
-      position = 0;
-
-      if (rank_global == n_mpi)
-      {
-
-        Log ("MPI task %d is working on matoms %d to max %d (total size %d).\n", rank_global, my_nmin, my_nmax, NPLASMA);
-
-        MPI_Pack (&ndo, 1, MPI_INT, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
-        for (n = my_nmin; n < my_nmax; n++)
-        {
-
-          /* pack the number of the cell, and the kpkt and macro atom emissivites for that cell // */
-          MPI_Pack (&n, 1, MPI_INT, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
-          MPI_Pack (&plasmamain[n].kpkt_emiss, 1, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
-          MPI_Pack (macromain[n].matom_emiss, nlevels_macro, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
-
-        }
-
-        Log_silent ("MPI task %d broadcasting matom emissivity information.\n", rank_global);
-      }
-
-
-      /* Set MPI_Barriers and broadcast information to other threads */
-      MPI_Barrier (MPI_COMM_WORLD);
-      MPI_Bcast (commbuffer, size_of_commbuffer, MPI_PACKED, n_mpi, MPI_COMM_WORLD);
-      MPI_Barrier (MPI_COMM_WORLD);
-      Log_parallel ("MPI task %d survived broadcasting matom emissivity information.\n", rank_global);
-
-
-
-      position = 0;
-
-      /* If not this thread then we unpack the macromain information from the other threads */
-
-      if (rank_global != n_mpi)
-      {
-        MPI_Unpack (commbuffer, size_of_commbuffer, &position, &num_comm, 1, MPI_INT, MPI_COMM_WORLD);
-        for (n_mpi2 = 0; n_mpi2 < num_comm; n_mpi2++)
-        {
-
-          /* unpack the number of the cell, and the kpkt and macro atom emissivites for that cell */
-          MPI_Unpack (commbuffer, size_of_commbuffer, &position, &n, 1, MPI_INT, MPI_COMM_WORLD);
-          MPI_Unpack (commbuffer, size_of_commbuffer, &position, &plasmamain[n].kpkt_emiss, 1, MPI_DOUBLE, MPI_COMM_WORLD);
-          MPI_Unpack (commbuffer, size_of_commbuffer, &position, macromain[n].matom_emiss, nlevels_macro, MPI_DOUBLE, MPI_COMM_WORLD);
-        }
-      }
-    }                           // end of parallelised section
-
-    /* add an MPI Barrier after unpacking stage */
-    MPI_Barrier (MPI_COMM_WORLD);
-#endif
-
-#ifdef MPI_ON
-    free (commbuffer);
-#endif
+    broadcast_macro_atom_emissivities (my_nmin, my_nmax, my_n_cells);
 
   }                             // end of if loop which controls whether to compute the emissivities or not
 
@@ -429,7 +361,9 @@ get_matom_f (mode)
 
 /**********************************************************/
 /**
- * @brief      returns the specific band-limited luminosity in macro-atoms
+ * @brief      returns the specific band-limited luminosity in macro-atoms (and depending
+ * on the mode) calcuates the emisivities in each cell in the wind (using a matrix approach)
+ * used for the generation of detailed spectra.
  *
  * @param [in] int  mode   vvariable which controls whether or not we need to compute the
  *            emissivities (CALCULATE_MATOM_EMISSIVITIES) or use stored ones
@@ -441,12 +375,15 @@ get_matom_f (mode)
  * @details
  * this routine calculates the luminosity in the band needed for the computation of the
  * spectrum. It gets the total energy radiated by the deactivation of macro atoms in the
- * required wavelength range. This can be a slow process, as there is no priori way
- * (at least with our method) to work out where a photon is going to come out when a
- * macro-atom is generated
+ * required wavelength range.
+ *
+ * When called in (CALCULATE_MATOM_EMISSIVITIES) mode it also calculatees the emissities
+ * that are used to generate kpkts from the wind.
  *
  * ### Notes ###
- * Consult Matthews thesis.
+ * Consult Matthews thesis section 3.6.1.
+ *
+ * This routine is considerably faster thasn get_matom_f()
  *
  **********************************************************/
 
@@ -457,11 +394,10 @@ get_matom_f_accelerate (mode)
   int n, m, mm;
   double lum;
   double level_emit_doub[NLEVELS_MACRO], kpkt_emit_doub;
-//OLD  int n_tries, n_tries_local;
-//OLD  double norm;
-//OLD  int which_out;
+  int my_n_cells;
   int i, j;
   int my_nmin, my_nmax;         //These variables are used even if not in parallel mode
+  int nreport;
 
 
   if (mode == USE_STORED_MATOM_EMISSIVITIES)
@@ -471,92 +407,72 @@ get_matom_f_accelerate (mode)
 
   else                          // we need to compute the emissivities
   {
-#ifdef MPI_ON
-    int position, ndo, n_mpi, num_comm, n_mpi2;
-    int size_of_commbuffer;
-    char *commbuffer;
-
-    /* the commbuffer needs to communicate 2 variables and the number of macor levels,
-       plus the variable for how many cells each thread is doing */
-    size_of_commbuffer = 8 * (3 + nlevels_macro) * (floor (NPLASMA / np_mpi_global) + 1);
-
-    commbuffer = (char *) malloc (size_of_commbuffer * sizeof (char));
-#endif
-
     /* if we are using the accelerated macro-atom scheme then we want to allocate an array
        for the macro-atom probabilities and various other quantities */
     PlasmaPtr xplasma;
-    int nrows = nlevels_macro + 1;
-    double **matom_matrix = (double **) calloc (sizeof (double *), nrows);
+    int matrix_size = nlevels_macro + 1;
 
-    for (i = 0; i < nrows; i++)
-    {
-      matom_matrix[i] = (double *) calloc (sizeof (double), nrows);
-    }
-
+    /* We'll be using a pointer arithmetic trick to allocate a contiguous chunk
+     * or memory -- see `calloc_matom_matrix()` in gridwind.c. It has to be allocated
+     * like this as MPI expects contiguous memory blocks */
+    double **matom_matrix;
+    allocate_macro_matrix (&matom_matrix, matrix_size);
 
     /* add the non-radiative k-packet heating to the kpkt_abs quantity */
     get_kpkt_heating_f ();
 
-//OLD    which_out = 0;
-//OLD    n_tries = 5000000;
     geo.matom_radiation = 0;
-//OLD    n_tries_local = 0;
-
-
 
     /* zero all the emissivity counters and check absorbed quantities */
-//OLD    norm = 0;
     for (n = 0; n < NPLASMA; n++)
     {
       for (m = 0; m < nlevels_macro; m++)
       {
-//OLD        norm += macromain[n].matom_abs[m];
         macromain[n].matom_emiss[m] = 0.0;
         if (sane_check (macromain[n].matom_abs[m]))
           Error ("matom_abs is %8.4e in matom %i level %i\n", macromain[n].matom_abs[m], n, m);
       }
-//OLD      norm += plasmamain[n].kpkt_abs;
       plasmamain[n].kpkt_emiss = 0.0;
       if (sane_check (plasmamain[n].kpkt_abs))
         Error ("kpkt_abs is %8.4e in matom %i\n", plasmamain[n].kpkt_abs, n);
     }
 
 
-
-    Log ("Calculating macro-atom and k-packet emissivities- this might take a while...\n");
-    Log ("Number of macro-atom levels: %d\n", nlevels_macro);
-
-
     /* For MPI parallelisation, the following loop will be distributed over multiple tasks.
        Note that the mynmim and mynmax variables are still used even without MPI on */
     my_nmin = 0;
     my_nmax = NPLASMA;
+    my_n_cells = NPLASMA;
 
 #ifdef MPI_ON
-
-    ndo = get_parallel_nrange (rank_global, NPLASMA, np_mpi_global, &my_nmin, &my_nmax);
-
-    Log_parallel ("Thread %d is calculating macro atom emissivities for macro atoms %d to %d\n", rank_global, my_nmin, my_nmax);
-
+    my_n_cells = get_parallel_nrange (rank_global, NPLASMA, np_mpi_global, &my_nmin, &my_nmax);
 #endif
 
+    Log ("Calculating macro-atom and k-packet emissivities- this might take a while...\n");
+    Log ("Number of cells for rank: %d\n", my_n_cells);
+    Log ("Number of macro-atom levels: %d\n", nlevels_macro);
+    if (my_n_cells <= 10)
+    {
+      nreport = my_n_cells;
+    }
+    else
+    {
+      nreport = my_n_cells / 10;
+    }
 
     for (n = my_nmin; n < my_nmax; n++)
     {
-
-      /* JM 1309 -- these lines are just log statements which track progress, as this section
+      /* JM 1309 -- these lines are just log statements which track nreport, as this section
          can take a long time */
 #ifdef MPI_ON
-      if (n % 50 == 0)
+      if (n % nreport == 0)
         Log
-          ("Thread %d is calculating  macro atom emissivity for macro atom %7d of %7d or %6.3f per cent\n",
+          ("Rank %d is calculating macro atom emissivity for macro atom %7d of %7d or %6.3f per cent\n",
            rank_global, n, my_nmax, n * 100. / my_nmax);
 #else
-      if (n % 50 == 0)
+      if (n % nreport == 0)
         Log ("Calculating macro atom emissivity for macro atom %7d of %7d or %6.3f per cent\n", n, my_nmax, n * 100. / my_nmax);
 #endif
-
 
       /* use the accelerated macro-atom scheme */
       xplasma = &plasmamain[n];
@@ -594,77 +510,10 @@ get_matom_f_accelerate (mode)
 
     /*This is the end of the update loop that is parallelised. We now need to exchange data between the tasks.
        This is done much the same way as in wind_update */
-#ifdef MPI_ON
+    broadcast_macro_atom_emissivities (my_nmin, my_nmax, my_n_cells);
 
-    /* JM Add an MPI Barrier here */
-    MPI_Barrier (MPI_COMM_WORLD);
-
-    for (n_mpi = 0; n_mpi < np_mpi_global; n_mpi++)
-    {
-      /* here we loop over the number of threads. If the thread is this thread then we pack the macromain information
-         into memory and then broadcast it to ther other threads */
-      position = 0;
-
-      if (rank_global == n_mpi)
-      {
-
-        Log ("MPI task %d is working on matoms %d to max %d (total size %d).\n", rank_global, my_nmin, my_nmax, NPLASMA);
-
-        MPI_Pack (&ndo, 1, MPI_INT, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
-        for (n = my_nmin; n < my_nmax; n++)
-        {
-
-          /* pack the number of the cell, and the kpkt and macro atom emissivites for that cell // */
-          MPI_Pack (&n, 1, MPI_INT, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
-          MPI_Pack (&plasmamain[n].kpkt_emiss, 1, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
-          MPI_Pack (macromain[n].matom_emiss, nlevels_macro, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
-
-        }
-
-        Log_silent ("MPI task %d broadcasting matom emissivity information.\n", rank_global);
-      }
-
-
-      /* Set MPI_Barriers and broadcast information to other threads */
-      MPI_Barrier (MPI_COMM_WORLD);
-      MPI_Bcast (commbuffer, size_of_commbuffer, MPI_PACKED, n_mpi, MPI_COMM_WORLD);
-      MPI_Barrier (MPI_COMM_WORLD);
-      Log_parallel ("MPI task %d survived broadcasting matom emissivity information.\n", rank_global);
-
-
-
-      position = 0;
-
-      /* If not this thread then we unpack the macromain information from the other threads */
-
-      if (rank_global != n_mpi)
-      {
-        MPI_Unpack (commbuffer, size_of_commbuffer, &position, &num_comm, 1, MPI_INT, MPI_COMM_WORLD);
-        for (n_mpi2 = 0; n_mpi2 < num_comm; n_mpi2++)
-        {
-
-          /* unpack the number of the cell, and the kpkt and macro atom emissivites for that cell */
-          MPI_Unpack (commbuffer, size_of_commbuffer, &position, &n, 1, MPI_INT, MPI_COMM_WORLD);
-          MPI_Unpack (commbuffer, size_of_commbuffer, &position, &plasmamain[n].kpkt_emiss, 1, MPI_DOUBLE, MPI_COMM_WORLD);
-          MPI_Unpack (commbuffer, size_of_commbuffer, &position, macromain[n].matom_emiss, nlevels_macro, MPI_DOUBLE, MPI_COMM_WORLD);
-        }
-      }
-    }                           // end of parallelised section
-
-    /* add an MPI Barrier after unpacking stage */
-    MPI_Barrier (MPI_COMM_WORLD);
-#endif
-
-#ifdef MPI_ON
-    free (commbuffer);
-#endif
-    for (i = 0; i < nrows; i++)
-    {
-      free (matom_matrix[i]);
-    }
-
+    free (matom_matrix[0]);
     free (matom_matrix);
-
   }                             // end of if loop which controls whether to compute the emissivities or not
 
 

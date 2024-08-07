@@ -263,7 +263,7 @@ init_atomic_data ()
 
   for (i = 0; i < NLEVELS; i++)
   {
-    xconfig[i].n_bbu_jump = 0;   // initialising the number of jumps from each level to 0. (SS)
+    xconfig[i].n_bbu_jump = 0;  // initialising the number of jumps from each level to 0. (SS)
     xconfig[i].n_bbd_jump = 0;
     xconfig[i].n_bfu_jump = 0;
     xconfig[i].n_bfd_jump = 0;

@@ -150,10 +150,8 @@ setup_created_files ()
      This is intended so that files which you really want to keep have unique names, while
      those which are for short-term diagnostics are overwritten.   */
 
-  strcpy (files.wspec, files.root);     //generated photons
   strcpy (files.lwspec, files.root);    //generated photon in log space
 
-  strcpy (files.wspec_wind, files.root);
   strcpy (files.lwspec_wind, files.root);
 
   strcpy (files.spec, files.root);
@@ -176,10 +174,8 @@ setup_created_files ()
 
   sprintf (files.disk, "%.100s/%.100s", files.diagfolder, files.root);
 
-  strcat (files.wspec, ".spec_tot");
   strcat (files.lwspec, ".log_spec_tot");
 
-  strcat (files.wspec_wind, ".spec_tot_wind");
   strcat (files.lwspec_wind, ".log_spec_tot_wind");
 
 

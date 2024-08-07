@@ -16,17 +16,16 @@
 #include "atomic.h"
 #include "python.h"
 
-
 /**********************************************************/
 /**
- * @brief      calculate the energy radiated by the wind 
+ * @brief      calculate the energy radiated by the wind
  * wind between freqencies f1 and f2 either using a the co-moving
  * frame time step or an observer frame time step
  *
- * @param [in] double  f1         The minimum frequency 
+ * @param [in] double  f1         The minimum frequency
  * @param [in] double  f2         The maximum frequency
  * @param [in] int     mode       A switch indicating whether energy
- *  is to be calculated in the observer (MODE_OBSERVER_TIME) or 
+ *  is to be calculated in the observer (MODE_OBSERVER_TIME) or
  *  co-moving frame (MODE_CMF_TIME).
  * @return     The luminosity of the entire wind
  *
@@ -54,229 +53,90 @@
  * ### Notes ###
  * @bug The do loop might be simpler if made over the plasma cells
  * instead of the wind, but one should be careful of the dummy cell
- * 
- * 
- * CK20180801: 
- * 
- *           in non-macro atom mode, the only continuum process treated as scattering is 
- *           electron scattering, and this is assigned nres = -1. The only valid values 
+ *
+ *
+ * CK20180801:
+ *
+ *           in non-macro atom mode, the only continuum process treated as scattering is
+ *           electron scattering, and this is assigned nres = -1. The only valid values
  *           of nres in non-macro-atom mode are therefore nres = -1 and 0 <= nres <= nlines-1
  *           (with the lattter range covering the lines).
- * 
- *           in macro atom mode, nres = -1 indicates electron scattering, 
- *           nres = -2 indicates ff, and nres > NLINES indicates bound-free. 
+ *
+ *           in macro atom mode, nres = -1 indicates electron scattering,
+ *           nres = -2 indicates ff, and nres > NLINES indicates bound-free.
  * 	     [nres == NLINES is never used. Note also that NLINES is the *max* number of lines, whereas nlines
- *	     is the *actual* number of lines. So, actually, it's not just nres = NLINES that's never used, but 
+ *	     is the *actual* number of lines. So, actually, it's not just nres = NLINES that's never used, but
  *	     the entire range of nlines <= nres <= NLINES]
- * 
+ *
  **********************************************************/
 
 double
-xwind_luminosity (f1, f2, mode)
-     double f1, f2;
-     int mode;
+wind_luminosity (double f1, double f2, int mode)
 {
-  double lum, lum_lines, lum_rr, lum_ff, factor;
-  double x;
-  int nplasma;
-
-
-  lum = lum_lines = lum_rr = lum_ff = factor = 0.0;
-  for (nplasma = 0; nplasma < NPLASMA; nplasma++)
-  {
-
-    if (wmain[plasmamain[nplasma].nwind].inwind < 0)
-    {
-      Error ("wind_luminosty: Trying to calculate luminosity for a wind cell %d that has plasma cell %d but is not in the wind\n",
-             plasmamain[nplasma].nwind, nplasma);
-    }
-
-
-    if (mode == MODE_OBSERVER_FRAME_TIME)
-      factor = 1.0 / plasmamain[nplasma].xgamma;        /* this is dt_cmf */
-    else if (mode == MODE_CMF_TIME)
-      factor = 1.0;
-
-    lum += x = total_emission (&plasmamain[nplasma], f1, f2) * factor;
-    lum_lines += plasmamain[nplasma].lum_lines * factor;
-    lum_rr += plasmamain[nplasma].lum_rr * factor;
-    lum_ff += plasmamain[nplasma].lum_ff * factor;
-  }
-
-  if (mode == MODE_CMF_TIME)
-  {
-    geo.lum_lines = lum_lines;
-    geo.lum_rr = lum_rr;
-    geo.lum_ff = lum_ff;
-  }
-
-  Log ("wind_luminosity: f1 %e f2 %e mode %d --> %.3e\n", f1, f2, mode, lum);
-
-  return (lum);
-}
-
-
-
-double
-wind_luminosity (f1, f2, mode)
-     double f1, f2;
-     int mode;
-{
-  double lum, lum_lines, lum_rr, lum_ff, factor;
-  int nplasma;
-//OLD  int ndo, my_nmin, my_nmax, n;
-  int my_nmin, my_nmax;
-
-
-  lum = lum_lines = lum_rr = lum_ff = factor = 0.0;
-
-
+  int n_plasma;
+  int n_start;
+  int n_stop;
+  double total_lum;
+  double lum_lines;
+  double lum_rad_recomb;
+  double lum_free_free;
+  double gamma_factor;
+  int n_cells_rank;
 
 #ifdef MPI_ON
-  int n, ndo;
-  ndo = get_parallel_nrange (rank_global, NPLASMA, np_mpi_global, &my_nmin, &my_nmax);
-  // Log parallel gets each thread as does printf
-  Log_parallel ("xxxwind_luminosity: thread %d lum %d to %d %d \n", rank_global, my_nmin, my_nmax, ndo);
-  Log ("wind_luminosity: thread %d lum %d to %d %d \n", rank_global, my_nmin, my_nmax, ndo);
+  n_cells_rank = get_parallel_nrange (rank_global, NPLASMA, np_mpi_global, &n_start, &n_stop);
 #else
-  my_nmin = 0;
-  my_nmax = NPLASMA;
-//OLD  ndo = NPLASMA;
+  n_start = 0;
+  n_stop = NPLASMA;
+  n_cells_rank = 0;
 #endif
 
-
-
-
-  for (nplasma = my_nmin; nplasma < my_nmax; nplasma++)
+  /* Each rank will find the total emission for a subset of the wind grid */
+  for (n_plasma = n_start; n_plasma < n_stop; ++n_plasma)
   {
-
-    if (wmain[plasmamain[nplasma].nwind].inwind < 0)
+    if (wmain[plasmamain[n_plasma].nwind].inwind < W_ALL_INWIND)
     {
       Error ("wind_luminosty: Trying to calculate luminosity for a wind cell %d that has plasma cell %d but is not in the wind\n",
-             plasmamain[nplasma].nwind, nplasma);
+             plasmamain[n_plasma].nwind, n_plasma);
     }
 
-
-    total_emission (&plasmamain[nplasma], f1, f2);
+    total_emission (&plasmamain[n_plasma], f1, f2);
   }
 
-  /* So at this point I have calculated the lumiosities in one of the threads for all of the plasma cells,
-     but i now need to get this informationm to all of the threads.   Presumably the values are undetermined
-     in the cells I have not calculated
-   */
+  broadcast_wind_luminosity (n_start, n_stop, n_cells_rank);
 
-#ifdef MPI_ON
-  int size_of_commbuffer, n_mpi, n_mpi2, num_comm;
-  int position;
-  char *commbuffer;
+  total_lum = 0.0;
+  lum_lines = 0.0;
+  lum_free_free = 0.0;
+  lum_rad_recomb = 0.0;
 
-  // We are currently transmtting 1 integer (4) and 1 double, but we need to add 4 bits for the process number
-
-  /* We need to transmit 
-     process #  only 4 bits  once
-
-     The remainder need to be transimitted for each cell
-
-     cell number     4
-     lum_tot         8
-     lum_lines       8
-     lum_rr          8
-     lum_ff          8
-
-     Total          36
-   */
-
-
-
-  size_of_commbuffer = 36 * (floor (NPLASMA / np_mpi_global) + 1) + 4;
-
-  commbuffer = (char *) malloc (size_of_commbuffer * sizeof (char));
-
-  Log ("commbuffer size %d  %d\n", size_of_commbuffer, (floor (NPLASMA / np_mpi_global) + 1));
-
-
-  MPI_Barrier (MPI_COMM_WORLD);
-
-  for (n_mpi = 0; n_mpi < np_mpi_global; n_mpi++)
-  {
-//    Log ("MPI task %d is working on cells %d to max %d (total size %d).\n", rank_global, my_nmin, my_nmax, NPLASMA);
-
-    position = 0;
-
-    if (rank_global == n_mpi)
-    {
-      // First tansmit ndo, whikch is the number of tasks (elements) this thread is working on (4)
-
-      MPI_Pack (&ndo, 1, MPI_INT, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
-      // Log ("Position1 %d %d\n", n, position);
-      for (n = my_nmin; n < my_nmax; n++)
-      {
-        // Next  transimit number of the the plasma cell (4) 
-        MPI_Pack (&n, 1, MPI_INT, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
-        //   Log ("Position2 %d %d\n", n, position);
-        // Now transimit the values we want (8)
-        MPI_Pack (&plasmamain[n].lum_tot, 1, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
-        MPI_Pack (&plasmamain[n].lum_lines, 1, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
-        MPI_Pack (&plasmamain[n].lum_rr, 1, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
-        MPI_Pack (&plasmamain[n].lum_ff, 1, MPI_DOUBLE, commbuffer, size_of_commbuffer, &position, MPI_COMM_WORLD);
-
-        //    Log ("Position3 %d %d\n", n, position);
-      }
-    }
-//    Log ("Luminoisity,MPI task %d broadcasting plasma update information.\n", rank_global);
-
-    MPI_Barrier (MPI_COMM_WORLD);
-    MPI_Bcast (commbuffer, size_of_commbuffer, MPI_PACKED, n_mpi, MPI_COMM_WORLD);
-    MPI_Barrier (MPI_COMM_WORLD);
-    Log ("Luminosity: MPI task %d survived plasma update information.\n", rank_global);
-
-    position = 0;
-
-    if (rank_global != n_mpi)
-    {
-      MPI_Unpack (commbuffer, size_of_commbuffer, &position, &num_comm, 1, MPI_INT, MPI_COMM_WORLD);
-      for (n_mpi2 = 0; n_mpi2 < num_comm; n_mpi2++)
-      {
-        MPI_Unpack (commbuffer, size_of_commbuffer, &position, &n, 1, MPI_INT, MPI_COMM_WORLD);
-        MPI_Unpack (commbuffer, size_of_commbuffer, &position, &plasmamain[n].lum_tot, 1, MPI_DOUBLE, MPI_COMM_WORLD);
-        MPI_Unpack (commbuffer, size_of_commbuffer, &position, &plasmamain[n].lum_lines, 1, MPI_DOUBLE, MPI_COMM_WORLD);
-        MPI_Unpack (commbuffer, size_of_commbuffer, &position, &plasmamain[n].lum_rr, 1, MPI_DOUBLE, MPI_COMM_WORLD);
-        MPI_Unpack (commbuffer, size_of_commbuffer, &position, &plasmamain[n].lum_ff, 1, MPI_DOUBLE, MPI_COMM_WORLD);
-
-      }
-    }
-  }
-  free (commbuffer);
-
-#endif
-
-
-  lum = lum_lines = lum_rr = lum_ff = factor = 0.0;
-
-  for (nplasma = 0; nplasma < NPLASMA; nplasma++)
+  for (n_plasma = 0; n_plasma < NPLASMA; n_plasma++)
   {
 
     if (mode == MODE_OBSERVER_FRAME_TIME)
-      factor = 1.0 / plasmamain[nplasma].xgamma;        /* this is dt_cmf */
-    else if (mode == MODE_CMF_TIME)
-      factor = 1.0;
+    {
+      gamma_factor = 1.0 / plasmamain[n_plasma].xgamma; /* this is dt_cmf */
+    }
+    else
+    {
+      gamma_factor = 1.0;
+    }
 
-    lum_lines += plasmamain[nplasma].lum_lines * factor;
-    lum_rr += plasmamain[nplasma].lum_rr * factor;
-    lum_ff += plasmamain[nplasma].lum_ff * factor;
+    lum_lines += plasmamain[n_plasma].lum_lines * gamma_factor;
+    lum_rad_recomb += plasmamain[n_plasma].lum_rr * gamma_factor;
+    lum_free_free += plasmamain[n_plasma].lum_ff * gamma_factor;
   }
 
-  lum = lum_lines + lum_rr + lum_ff;
+  total_lum = lum_lines + lum_rad_recomb + lum_free_free;
 
   if (mode == MODE_CMF_TIME)
   {
     geo.lum_lines = lum_lines;
-    geo.lum_rr = lum_rr;
-    geo.lum_ff = lum_ff;
+    geo.lum_rr = lum_rad_recomb;
+    geo.lum_ff = lum_free_free;
   }
 
-  Log ("wind_luminosity: f1 %e f2 %e mode %d --> %.3e\n", f1, f2, mode, lum);
-  return (lum);
+  return (total_lum);
 }
 
 
@@ -288,11 +148,11 @@ wind_luminosity (f1, f2, mode)
  * @param [in] double  f1   The minimum frequency for the calculation
  * @param [in] double  f2   The maximum frequency for the calculation
  * @return
- * It returns the total luminosity (within frequency limits) 
+ * It returns the total luminosity (within frequency limits)
  *
- * The routine also stores 
+ * The routine also stores
  * the luminosity due
- * to various emission processes, e.g ff, fb, lines, compton into 
+ * to various emission processes, e.g ff, fb, lines, compton into
  * varius variables in thea associated Plasma cell
  *
  * @details
@@ -303,7 +163,7 @@ wind_luminosity (f1, f2, mode)
  *
  * The name total emission is a misnomer.  The returns a
  * band limited luminosity.  This is because the routine can be used
- * to establish the number of photons to be emitted by the wind. 
+ * to establish the number of photons to be emitted by the wind.
  *
  * Comment:  Compton cooling is not included here because this
  * does not result in new photons.
@@ -442,8 +302,8 @@ photo_gen_wind (p, weight, freqmin, freqmax, photstart, nphot)
     p[kkk].nres = -1;
     p[kkk].nnscat = 1;
 
-    /* Locate the wind_cell in which the photon bundle originates, allowing for the 
-       fact that we want to create the correct number of photons using observer 
+    /* Locate the wind_cell in which the photon bundle originates, allowing for the
+       fact that we want to create the correct number of photons using observer
        an obsever frame time step. geo.f_wind is the energy generated by the wind
        in the desired band in the observer frame, wherease plaama_main[].lum_tot is
        was calculated in the CMF. */
@@ -528,9 +388,9 @@ photo_gen_wind (p, weight, freqmin, freqmax, photstart, nphot)
       else
       {
 
-        /* fill the lin_ptr->pow array. This must be done because it is not stored for all cells.  
-           The if statement is intended to prevent recalculating the power if more than one 
-           line photon is generated from this cell in this cycle. 
+        /* fill the lin_ptr->pow array. This must be done because it is not stored for all cells.
+           The if statement is intended to prevent recalculating the power if more than one
+           line photon is generated from this cell in this cycle.
          */
         if (icell != icell_old)
         {
@@ -565,8 +425,8 @@ photo_gen_wind (p, weight, freqmin, freqmax, photstart, nphot)
       }
       p[np].nnscat = nnscat;
 
-      /* Photons are generated in the local frame and so must be Doppler shifted into 
-         the observer frame.  
+      /* Photons are generated in the local frame and so must be Doppler shifted into
+         the observer frame.
        */
 
       p[np].istat = P_INWIND;
@@ -620,7 +480,7 @@ photo_gen_wind (p, weight, freqmin, freqmax, photstart, nphot)
  *
  * ### Notes ###
  *
- * 
+ *
  **********************************************************/
 
 double
@@ -686,9 +546,9 @@ one_line (xplasma, nres)
  * from the atomic data files.  If it is, then the gaunt factor determined
  * using data from Sutherland (1998).  If not, the gaunt factor is set
  * to 1.
- * 
- * Total free free emission in this function is calculated CMF. 
- * 
+ *
+ * Total free free emission in this function is calculated CMF.
+ *
  **********************************************************/
 
 double

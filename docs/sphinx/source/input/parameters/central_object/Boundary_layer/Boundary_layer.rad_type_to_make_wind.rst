@@ -20,7 +20,7 @@ Values
     luminosity will be set by :ref:`Boundary_layer.luminosity`.
 
   power
-    Radiate following a power-law model as $L_\nu=K\nu^\alpha$. The total luminosity will be set by :ref:`Boundary_layer.luminosity`.
+    Radiate following a power-law model as :math:`L_\nu=K\nu^\alpha`. The total luminosity will be set by :ref:`Boundary_layer.luminosity`.
 
 
 File

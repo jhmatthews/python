@@ -8,6 +8,9 @@ bin/modify_wind*
 
 # Run files
 *.spec*
+*.pf.old
+*.out.pf
+mod.pf
 
 # Object files
 *.o
@@ -79,9 +82,12 @@ wiki/
 *.Plo
 *.Po
 
-# atomic data files should not be tracked by this repository
+# Some atomic data files should not be tracked by this repository
 data/
 xmod/
+
+# avoid tracking symbolic links errenously put in xdata
+xdata/xdata
 
 # we shouldn't be tracking version.h either
 source/version.h
@@ -105,3 +111,4 @@ logfile
 **/*.vscode/
 py_progs/.idea/
 scratch/
+

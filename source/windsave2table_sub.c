@@ -88,6 +88,7 @@ do_windsave2table (root, ion_switch, edge_switch)
       create_ion_table (ndom, rootname, 8, ion_switch);
       create_ion_table (ndom, rootname, 11, ion_switch);
       create_ion_table (ndom, rootname, 14, ion_switch);
+      create_ion_table (ndom, rootname, 20, ion_switch);
       create_ion_table (ndom, rootname, 26, ion_switch);
     }
     else

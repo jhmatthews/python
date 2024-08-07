@@ -86,5 +86,12 @@ without the -guess option to produce a final set of files
 **Note that at present the routine does not handle the collisional x-sections, though this should be straightforward to add**
 
 
+API Documentation
+=================
 
+.. autosummary::
+    :toctree: MakeMacro
 
+    MakeMacro
+    MacroCombine
+    RedoPhot

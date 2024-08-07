@@ -1,10 +1,7 @@
 #!/usr/bin/env python 
 
 '''
-
-University of Southampton, James Matthews, 130722
-
-"watchdog.py"
+During-run parser for error logs from parallel simulation runs.
 	
 This is the during-processing watchdog code to deal with the error logs in 
 PYTHON's parallel mode. Very similar to py_error.py

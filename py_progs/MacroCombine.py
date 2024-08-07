@@ -1,12 +1,7 @@
 #!/usr/bin/env python 
 
 '''
-                    Space Telescope Science Institute
-
-Synopsis:  
-
-Combine Chianti levels to create a more succint
-MacroAtom model
+Combine Chianti levels to create a more succinct MacroAtom model
 
 
 Command line usage (if any):

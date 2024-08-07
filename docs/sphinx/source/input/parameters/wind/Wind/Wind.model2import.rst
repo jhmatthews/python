@@ -13,6 +13,6 @@ File
 
 
 Parent(s)
-  * :ref:`Wind.type`: imported
+  * :ref:`Wind.type`: ``imported``
 
 

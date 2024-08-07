@@ -142,7 +142,7 @@ int
 translate_in_space (pp)
      PhotPtr pp;
 {
-  double ds, delta, s, smax;
+  double ds, delta, s, smax, prhosq;
   int ndom, ndom_next;
   struct photon ptest;
 
@@ -160,16 +160,23 @@ translate_in_space (pp)
     ds += DFUDGE;               //Fix for Bug #592 - we need to keep track of the little DFUDGE we moved the test photon
 
 
-
     /* Note there is a possibility that we reach the other side 
      * of the grid without actually encountering a
      * wind cell
      */
 
+    prhosq = (pp->x[0] * pp->x[0]) + (pp->x[1] * pp->x[1]);
+
+    if ((prhosq > (zdom[ndom].wind_rhomin_at_disk * zdom[ndom].wind_rhomin_at_disk)) &&
+        (prhosq < (zdom[ndom].wind_rhomax_at_disk * zdom[ndom].wind_rhomax_at_disk)))
+    {
+      stuff_phot (pp, &ptest);
+      ds = 0.0;
+    }
+
 
     if (where_in_wind (ptest.x, &ndom_next) < 0)
     {
-
       smax = ds_to_wind (&ptest, &ndom_next);   // This is the maximum distance can go in this domain
       s = 0;
       while (s < smax && where_in_wind (ptest.x, &ndom_next) < 0)
@@ -196,7 +203,6 @@ translate_in_space (pp)
   }
 
   move_phot (pp, ds + DFUDGE);
-
 
   return (pp->istat);
 }
@@ -311,7 +317,7 @@ ds_to_wind (pp, ndom_current)
 
     else if (zdom[ndom].wind_type == CORONA || (zdom[ndom].wind_type == IMPORT && zdom[ndom].coord_type == CYLIND))
     {
-      x = ds_to_plane (&zdom[ndom].windplane[0], &ptest);
+      x = ds_to_plane (&zdom[ndom].windplane[0], &ptest, TRUE);
       if (x > 0 && x < ds)
       {
         stuff_phot (pp, &qtest);
@@ -324,7 +330,7 @@ ds_to_wind (pp, ndom_current)
           xxxbound = BOUND_ZMIN;
         }
       }
-      x = ds_to_plane (&zdom[ndom].windplane[1], &ptest);
+      x = ds_to_plane (&zdom[ndom].windplane[1], &ptest, TRUE);
       if (x > 0 && x < ds)
       {
         stuff_phot (pp, &qtest);
@@ -445,7 +451,7 @@ translate_in_wind (w, p, tau_scat, tau, nres)
      Note that ds_current does not alter p in any way */
 
 
-  if ( (modes.partial_cells == PC_EXTEND && one->inwind == W_PART_INWIND) || one->inwind == W_IGNORE)
+  if ((modes.partial_cells == PC_EXTEND && one->inwind == W_PART_INWIND) || one->inwind == W_IGNORE)
   {
     ds_current = smax;
     istat = 0;
@@ -458,9 +464,9 @@ translate_in_wind (w, p, tau_scat, tau, nres)
   {
     ds_current = calculate_ds (w, p, tau_scat, tau, nres, smax, &istat);
 
-    if (p->nres < 0)
+    if (p->nres == NRES_ES)
       xplasma->nscat_es++;
-    if (p->nres > 0)
+    else if (p->nres > 0)
       xplasma->nscat_res++;
 
     /* We now increment the radiation field in the cell, translate the photon and wrap
@@ -481,7 +487,15 @@ translate_in_wind (w, p, tau_scat, tau, nres)
         move_phot (&phot_mid, 0.5 * ds_current);
         observer_to_local_frame (&phot_mid, &phot_mid_cmf);
         ds_cmf = observer_to_local_frame_ds (&phot_mid, ds_current);
-        bf_estimators_increment (&w[p->grid], &phot_mid_cmf, ds_cmf);
+        if (p->grid >= 0 && p->grid < geo.ndim2)
+        {
+          bf_estimators_increment (&w[p->grid], &phot_mid_cmf, ds_cmf);
+        }
+        else
+        {
+          Error ("translate_in_wind: Cannot call bf_estimators for photon not in wind: %d\n", p->np);
+        }
+
       }
     }
     else
@@ -530,8 +544,10 @@ translate_in_wind (w, p, tau_scat, tau, nres)
  * smax can be found in various ways depending on if the photon is in the wind
  * or not.
  *
+ * This routine operates in the global/observer frame.
+ *
  * This section of code was put into its own function in an attempt to avoid
- * code duplication for the optical depth diagnostic ray tracing thing.
+ * code duplication in the optical depth diagnostic ray tracing routine.
  *
  * ************************************************************************** */
 

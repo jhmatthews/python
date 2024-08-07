@@ -7,7 +7,7 @@ Type
 
 Values
   Done12
-    Temperature dependent form of colour correction from Done 2012 (see :doc:`Disk <../radiation/disk>`)
+    Temperature dependent form of colour correction from Done 2012 (see :doc:`Disk </radiation/disk>`)
 
 
 File

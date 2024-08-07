@@ -1,9 +1,11 @@
 KWD.acceleration_exponent
 =========================
-Sets the length scale over which the accleration to v_inf is accomplished.
-It is the value of the exponent beta for the Caster & Lamers equation of a
-stellar wind,
-v(r) = v_0 + (v_inf - v_0) * (1 - R_s/r) ** beta.
+
+The acceleration_exponent sets the length scale over which the accleration to :math:`v_\infty` is accomplished.
+This value is the :math:`\beta` exponent from the Caster & Lamers equation of a stellar wind,
+
+.. math::
+  v(r) = v_0 + (v_\infty-v_0) * (1 - R_s/r)^{\beta}.
 
 Type
   Double
@@ -16,6 +18,6 @@ File
 
 
 Parent(s)
-  * :ref:`Wind.type`: kwd
+  * :ref:`Wind.type`: ``kwd``
 
 

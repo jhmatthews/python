@@ -1,7 +1,11 @@
 SV.mdot_r_exponent
 ==================
-The exponent for the mass loss rate as defined in the Shlosman Vitelo model,
-See lambda in equation (4) Shlosman & Vitelo,ApJ,1993,409,372.
+The exponent :math:`\lambda` for the mass loss rate per unit area as defined in the Shlosman Vitelo model. 
+
+.. math::        
+    \frac{\delta\dot{m}}{\delta A} \propto \dot{m}_{wind} r_o^{\lambda} cos(\theta(r_o))
+
+Equation (4) Shlosman & Vitelo,ApJ,1993,409,372.
 
 Type
   Double
@@ -14,6 +18,6 @@ File
 
 
 Parent(s)
-  * :ref:`Wind.type`: SV
+  * :ref:`Wind.type`: ``SV``
 
 

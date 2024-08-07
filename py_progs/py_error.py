@@ -1,10 +1,7 @@
 #!/usr/bin/env python 
 
 '''
-
-University of Southampton, James Matthews, 130722
-
-"py_error.py"
+Post-run parser for error logs from parallel simulation runs.
     
 This is the post-processing code to deal with the error logs in 
 PYTHON's parallel mode. It basically sums the number of errors
@@ -22,9 +19,8 @@ returns:
 
 History:
 
-1307    JM  Coding began -- initial tests conducted successfully
-1802    ksl Updated to be Python3 compatable, to write the results
-            to an astropy table, and to be callable from another routine
+    1307    JM  Coding began -- initial tests conducted successfully
+    1802    ksl Updated to be Python3 compatable, to write the results to an astropy table, and to be callable from another routine
 
 '''
 

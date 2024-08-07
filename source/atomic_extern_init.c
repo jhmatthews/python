@@ -12,7 +12,7 @@ int nlines_macro;               /* Actual number of Macro Atom lines that were r
 int n_inner_tot;                /*The actual number of inner shell ionization cross sections in total */
 
 int nauger;                     /*Actual number of innershell edges for which autoionization is to be computed */
-int nauger_macro;                     
+int nauger_macro;
 
 ElemPtr ele;
 

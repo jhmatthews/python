@@ -161,9 +161,7 @@ import_set_wind_boundaries (ndom)
  **********************************************************/
 
 int
-import_make_grid (w, ndom)
-     WindPtr w;
-     int ndom;
+import_make_grid (int ndom, WindPtr w)
 {
   if (zdom[ndom].coord_type == SPHERICAL)
   {

@@ -1,6 +1,8 @@
 Homologous.radmax
 =================
-Maximum extent of the homologous wind.
+
+This radius defines the outer boundary and maximum extent of the homologous wind.
+The wind's velocity is proportional to the radius at any given point. 
 
 Type
   Double
@@ -16,6 +18,6 @@ File
 
 
 Parent(s)
-  * :ref:`Wind.type`: homologous
+  * :ref:`Wind.type`: ``homologous``
 
 

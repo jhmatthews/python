@@ -1,13 +1,7 @@
 #!/usr/bin/env python 
 
 '''
-                    Space Telescope Science Institute
-
-Synopsis:  
-
-Extend phot tables retrieved from Topbase to higher energies
-and produce a plot file which shows the extended x-section
-file
+Extend phot tables retrieved from Topbase to higher energies and produce a plot file which shows the extended x-section file
 
 Command line usage (if any):
 
@@ -66,7 +60,7 @@ def read_phot(photfile='o_2_phot.dat'):
     try: 
         f=open(photfile)
     except:
-        print('Error: %s not found' % photfile)
+        print('Error: RedoPhot.read_phot: %s not found' % photfile)
         return [],[]
 
     rlines=f.readlines()
@@ -92,8 +86,9 @@ def read_phot(photfile='o_2_phot.dat'):
     xhead=[]
     xtab=[] # list of tables with the xsections
     for word in words:
-        #print(word)
-        if word[0].count('PhotMacS'):
+        # print(word)
+        if word[0].count('PhotMacS') or word[0].count('PhotTopS'):
+            # print('Got header')
             lineno.append(i)
             label.append(word[0])
             z.append(int(word[1]))
@@ -110,7 +105,8 @@ def read_phot(photfile='o_2_phot.dat'):
             xhead=[]
             xev=[]
             xsec=[]
-        elif word[0]=='PhotMac':
+        elif word[0]=='PhotMac' or word[0]=='Phot':
+            # print('Got data')
             xhead.append(word[0])
             xev.append(eval(word[1]))
             xsec.append(eval(word[2]))
@@ -210,6 +206,7 @@ def write_phot_tab(out_name,xsum,xcross):
     Note that this routine is not prevented from
     writing data to an existing file.
     '''
+    print('RedoPhot: Starting to write phot file to %s' % (out_name))
 
     f=open(out_name,'w')
     i=0
@@ -223,16 +220,18 @@ def write_phot_tab(out_name,xsum,xcross):
             string='%s %12.4f %12.4e' % (one_x['Label'],one_x['e'],one_x['sigma'])
             # print(string)
             f.write('%s\n' % string)
-                                           
         i+=1
+
     f.close()
+    print('RedoPhot: Write extended phot file to %s' % (out_name))
+
 
 
 
 def redo_one(phot_file='o_2_phot.dat',outroot=''):
     phot_tab,xtab=extrap(phot_file,1e5)
     if len(phot_tab)==0:
-        print('Error: Exiting because of previous problems')
+        print('Error: RedoPhot - Exiting because of previous problems')
         return
 
     plot_phot(phot_sum=phot_tab,xcross=xtab)
@@ -254,7 +253,7 @@ def steer(argv):
     This is just a steering routine
     '''
 
-    outroot='test'
+    outroot=''
     infile=''
     i=1
     while i<len(argv):
@@ -275,7 +274,7 @@ def steer(argv):
         i+=1
 
     if infile=='':
-        print('Error: not enught arguments: ',argv)
+        print('Error: not enough arguments: ',argv)
         return
 
     redo_one(infile,outroot)
