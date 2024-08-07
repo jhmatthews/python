@@ -30,6 +30,7 @@ extern int nlevels;                    /**< These are the actual number of level
 #define NLTE_LEVELS	12000   /**<  Maximum number of levels to treat explicitly */
 extern int nlte_levels;                /**<  Actual number of levels to treat explicityly */
 
+
 /* AUGER NOTE: recommended to increase NLEVELS_MACRO to at least 500 for Auger macro-atoms */
 #define NLEVELS_MACRO   600     /**<  Maximum number of macro atom levels. (SS, June 04) */
 extern int nlevels_macro;              /**<  Actual number of macro atom levels. (SS, June 04) */
@@ -45,11 +46,13 @@ extern int n_inner_tot;                /**< The actual number of inner shell ion
 #define NBBJUMPS         100    /**<  Maximum number of Macro Atom bound-bound jumps from any one configuration (SS) */
 #define NBFJUMPS         100    /**<  Maximum number of Macro Atom Bound-free jumps from any one configuration (SS) */
 
+extern int nauger_macro;        /* the number of auger processes read in associated with macro atoms */
+#define NAUGER_MACRO 200        /* number of Auger processes */
+#define NAUGER_ELECTRONS 4
+
+
 #define MAXJUMPS          1000000       /**<  The maximum number of Macro Atom jumps before emission (if this is exceeded
                                            it gives up (SS) */
-// XXXX  - the maxium number of jumps has been reduced for testing
-// #define MAXJUMPS          10000      /* The maximum number of Macro Atom jumps before emission (if this is exceeded
-//                                           it gives up (SS) */
 #define NAUGER 2                /**< Maximum number of "auger" processes */
 extern int nauger;                     /**< Actual number of innershell edges for which autoionization is to be computed */
 
@@ -203,11 +206,6 @@ typedef struct configurations
 config_dummy, *ConfigPtr;
 
 extern ConfigPtr xconfig;
-
-
-extern int nauger_macro;        /* the number of auger processes read in associated with macro atoms */
-#define NAUGER_MACRO 200        /* number of Auger processes */
-#define NAUGER_ELECTRONS 4
 
 typedef struct auger
 {
