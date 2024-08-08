@@ -340,13 +340,15 @@ init_advanced_modes ()
 
   modes.jumps_for_detailed_spectra = FALSE;     //use old jumps mode for calculating macro atom
   //emissivites
-  modes.use_upweighting_of_simple_macro_atoms = FALSE;     //use upweighting mode for handling 
+  modes.use_upweighting_of_simple_macro_atoms = FALSE;  //use upweighting mode for handling 
   //bf interactions with simple macro atoms
 
   modes.store_matom_matrix = TRUE;      /* default is to store the macro-atom matrix */
 
   modes.run_xtest_diagnostics = FALSE;  /* allow special xtest_diagnostics in the various routines */
   modes.partial_cells = PC_ZERO_DEN;    /* Default is to omit partial cells in calculation */
+
+  modes.no_macro_pops_for_ions = FALSE; /* use the ion densities from macro_pops where applicable */
 
   return (0);
 }

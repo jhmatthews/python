@@ -1625,6 +1625,8 @@ struct advanced_modes
                                   as they pass through the grid.  There are lots of
                                   issues with how the detailed spectra are constucted
                                   that make it less useful than it might seem. */
+  int no_macro_pops_for_ions;     /* if true, then use the ion densities from the ionization mode
+                                     for macro-atoms, rather than from macro_pops */
 };
 
 extern struct advanced_modes modes;

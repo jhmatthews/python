@@ -311,7 +311,8 @@ matrix_ion_populations (xplasma, mode)
       newden[nn] = 0.0;
 
       /* if the ion is being treated by macro_pops then use the populations just computed */
-      if ((ion[nn].macro_info == TRUE) && (geo.macro_simple == FALSE) && (geo.macro_ioniz_mode == MACRO_IONIZ_MODE_ESTIMATORS))
+      if ((ion[nn].macro_info == TRUE) && (geo.macro_simple == FALSE) && (geo.macro_ioniz_mode == MACRO_IONIZ_MODE_ESTIMATORS)
+          && (modes.no_macro_pops_for_ions == FALSE))
       {
         newden[nn] = xplasma->density[nn] / elem_dens[ion[nn].z];
       }
