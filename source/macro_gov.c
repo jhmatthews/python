@@ -176,7 +176,6 @@ macro_gov (p, nres, matom_or_kpkt, which_out)
     {
       /* XMACRO improve this so that kpkt only deals with k->r in certain modes */
       kpkt (p, nres, &escape, KPKT_MODE_CONT_PLUS_SINK);
-      Log ("1. istat is %d\n", p->istat);
 
       *which_out = KPKT;
     }
@@ -262,7 +261,6 @@ macro_gov (p, nres, matom_or_kpkt, which_out)
       else if (matom_or_kpkt == KPKT)
       {
         kpkt (p, nres, &escape, KPKT_MODE_ALL); // 1 implies include the possibility of deactivation due to non-thermal processes
-        Log ("1. istat is %d\n", p->istat);
         /* if it did not escape then the k-packet must have been
            destroyed by collisionally exciting a macro atom so...
          */

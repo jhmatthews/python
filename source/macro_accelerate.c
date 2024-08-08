@@ -598,10 +598,6 @@ fill_kpkt_rates (xplasma, escape, p)
     mplasma->cooling_adiabatic = cooling_adiabatic;
     mplasma->cooling_normalisation = cooling_normalisation;
     mplasma->kpkt_rates_known = TRUE;
-
-    Log ("Compton cooling is %8.4e recomb %8.4e ff %8.4e vol %8.4e\n", mplasma->cooling_compton, mplasma->cooling_bftot,
-         mplasma->cooling_ff, xplasma->vol);
-
   }
 
   return (0);

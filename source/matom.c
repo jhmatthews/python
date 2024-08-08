@@ -1090,7 +1090,6 @@ kpkt (p, nres, escape, mode)
     /* It is a k-packat that is destroyed by Compton cooling */
     /* we treat Compton cooling as a sync process -- the energy should be made up 
        on a scatter by scatter basis by rewighting of r-packets */
-    Log ("kpkt: Destroying kpkt by Compton cooling\n");
     if (mode == KPKT_MODE_CONTINUUM)
     {
       Error ("kpkt: Destroying kpkt by Compton cooling in mode KPKT_MODE_CONTINUUM (used in spectral cycles).\n");
