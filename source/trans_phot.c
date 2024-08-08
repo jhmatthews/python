@@ -129,7 +129,7 @@ trans_phot (WindPtr w, PhotPtr p, int iextract)
     }
 
     trans_phot_single (w, &p[nphot], iextract);
-
+    Log ("p[nphot].istat %d\n", p[nphot].istat);
   }
 
   Log ("\n");
@@ -432,6 +432,8 @@ trans_phot_single (WindPtr w, PhotPtr p, int iextract)
         Error ("trans_phot_single: photon %d returned error code %d whilst scattering \n", pp.np, ierr);
       }
 
+      Log ("2. istat is %d\n", pp.istat);
+
       if (geo.matom_radiation == 1 && geo.rt_mode == RT_MODE_MACRO && pp.w < weight_min)
       {
         pp.istat = P_ABSORB;
@@ -464,6 +466,22 @@ trans_phot_single (WindPtr w, PhotPtr p, int iextract)
           stuff_phot (&pp, p);
           break;
         }
+      }
+
+      if (pp.w < weight_min)
+      {
+        pp.istat = P_ABSORB;
+        pp.tau = VERY_BIG;
+        stuff_phot (&pp, p);
+        break;
+      }
+
+      if (pp.istat == P_ERROR_MATOM || pp.istat == P_LOFREQ_FF || pp.istat == P_ADIABATIC || pp.istat == P_COMP_COOL)
+      {
+          pp.istat = P_ABSORB;
+          pp.tau = VERY_BIG;
+          stuff_phot (&pp, p);
+          break;
       }
 
       /* Now extract photons if we are in detailed the detailed spectrum portion of the program
@@ -520,7 +538,6 @@ trans_phot_single (WindPtr w, PhotPtr p, int iextract)
 
     /* This is an insurance policy but it is not obvious that, for example nscat
      * and nrscat, need to be updated */
-
     p->istat = istat;
     p->nscat = pp.nscat;
     p->nrscat = pp.nrscat;

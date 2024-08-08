@@ -525,7 +525,6 @@ fill_kpkt_rates (xplasma, escape, p)
     {
       cooling_ff = mplasma->cooling_ff = total_free (xplasma, xplasma->t_e, freqmin, freqmax) / xplasma->vol / xplasma->ne;
       cooling_ff += mplasma->cooling_ff_lofreq = total_free (xplasma, xplasma->t_e, 0.0, freqmin) / xplasma->vol / xplasma->ne;
-      cooling_compton = mplasma->cooling_compton = total_comp (one, xplasma->t_e) / xplasma->vol / xplasma->ne;
     }
     else
     {
@@ -550,7 +549,9 @@ fill_kpkt_rates (xplasma, escape, p)
     {
       cooling_normalisation += cooling_ff;
     }
-    if (cooling_compton < 0)
+
+    /* the Compton cooling rate is copied from plasmamain in wind_cooling() to avoid recalculation */
+    if (mplasma->cooling_compton < 0)
     {
       Error ("kpkt: np %d Compton cooling rate negative. Abort.\n", p->np);
       *escape = TRUE;
@@ -559,7 +560,7 @@ fill_kpkt_rates (xplasma, escape, p)
     }
     else
     {
-      cooling_normalisation += cooling_compton;
+      cooling_normalisation += mplasma->cooling_compton;
     }
 
 
@@ -597,6 +598,9 @@ fill_kpkt_rates (xplasma, escape, p)
     mplasma->cooling_adiabatic = cooling_adiabatic;
     mplasma->cooling_normalisation = cooling_normalisation;
     mplasma->kpkt_rates_known = TRUE;
+
+    Log ("Compton cooling is %8.4e recomb %8.4e ff %8.4e vol %8.4e\n", mplasma->cooling_compton, mplasma->cooling_bftot,
+         mplasma->cooling_ff, xplasma->vol);
 
   }
 
@@ -928,6 +932,7 @@ f_kpkt_emit_accelerate (xplasma, freq_min, freq_max)
   }
 
   penorm += eprbs = mplasma->cooling_adiabatic;
+  penorm += eprbs = mplasma->cooling_compton;
 
   for (i = 0; i < nphot_total; i++)
   {
