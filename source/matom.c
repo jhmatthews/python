@@ -842,7 +842,7 @@ kpkt (p, nres, escape, mode)
 {
 
   int i;
-  double cooling_adiabatic;
+  double cooling_adiabatic, cooling_compton;
   double cooling_normalisation;
   double destruction_choice;
   double upweight_factor;
@@ -904,11 +904,13 @@ kpkt (p, nres, escape, mode)
    */
 
   cooling_normalisation = mplasma->cooling_normalisation - mplasma->cooling_adiabatic - mplasma->cooling_bbtot - mplasma->cooling_bf_coltot;
-  cooling_adiabatic = 0.0;
+  cooling_adiabatic = cooling_compton = 0.0;
 
   /* if kpkt mode is all processes, or continuum + adiabatic, then include adiabatic cooling */
-  if (mode == KPKT_MODE_ALL || mode == KPKT_MODE_CONT_PLUS_ADIABATIC)
+  if (mode == KPKT_MODE_ALL || mode == KPKT_MODE_CONT_PLUS_SINK)
   {
+    cooling_compton = mplasma->cooling_compton;
+
     if (KPKT_NET_HEAT_MODE && geo.nonthermal)
     {
       if (xplasma->cool_adiabatic > xplasma->heat_shock)
@@ -1063,7 +1065,7 @@ kpkt (p, nres, escape, mode)
 
 
   else if (destruction_choice <
-           (mplasma->cooling_bftot + cooling_bbtot + mplasma->cooling_ff + mplasma->cooling_ff_lofreq + mplasma->cooling_compton))
+           (mplasma->cooling_bftot + cooling_bbtot + mplasma->cooling_ff + mplasma->cooling_ff_lofreq + cooling_adiabatic))
   {
     /* It is a k-packat that is destroyed by adiabatic cooling */
 
@@ -1079,11 +1081,16 @@ kpkt (p, nres, escape, mode)
   }
 
   else if (destruction_choice <
-           (mplasma->cooling_bftot + cooling_bbtot + mplasma->cooling_ff + mplasma->cooling_ff_lofreq + mplasma->cooling_compton + cooling_adiabatic))
+           (mplasma->cooling_bftot + cooling_bbtot + mplasma->cooling_ff + mplasma->cooling_ff_lofreq + cooling_adiabatic +
+            cooling_compton))
   {
     /* It is a k-packat that is destroyed by Compton cooling */
     /* we treat Compton cooling as a sync process -- the energy should be made up 
-       on a scatter by scatter basis by rewighting of r-packets*/
+       on a scatter by scatter basis by rewighting of r-packets */
+    if (mode == KPKT_MODE_CONTINUUM)
+    {
+      Error ("kpkt: Destroying kpkt by Compton cooling in mode KPKT_MODE_CONTINUUM (used in spectral cycles).\n");
+    }
     *escape = TRUE;
     *nres = NRES_FF;
     p->istat = P_COMP_COOL;
@@ -1096,7 +1103,8 @@ kpkt (p, nres, escape, mode)
   {
     /* It is a k-packed destroyed by collisional ionization in a macro atom. */
     destruction_choice =
-      destruction_choice - mplasma->cooling_bftot - cooling_bbtot - mplasma->cooling_ff - mplasma->cooling_ff_lofreq - mplasma->cooling_compton - cooling_adiabatic;
+      destruction_choice - mplasma->cooling_bftot - cooling_bbtot - mplasma->cooling_ff - mplasma->cooling_ff_lofreq -
+      cooling_compton - cooling_adiabatic;
 
     for (i = 0; i < nphot_total; i++)
     {
@@ -1122,7 +1130,7 @@ kpkt (p, nres, escape, mode)
     }
   }
 
-  
+
 
 
 
@@ -1130,7 +1138,7 @@ kpkt (p, nres, escape, mode)
   Error
     ("kpkt: choice %8.4e norm %8.4e cooling_bftot %g, cooling_bbtot %g, cooling_ff %g, cooling_ff_lofreq %g, cooling_bf_coltot %g cooling_adiabatic %g cooling_adiabatic %g cooling_compton %g\n",
      destruction_choice, cooling_normalisation, mplasma->cooling_bftot, cooling_bbtot, mplasma->cooling_ff,
-     mplasma->cooling_ff_lofreq, cooling_bf_coltot, mplasma->cooling_adiabatic, cooling_adiabatic, mplasma->cooling_compton);
+     mplasma->cooling_ff_lofreq, cooling_bf_coltot, mplasma->cooling_adiabatic, cooling_adiabatic, cooling_compton);
 
   *escape = TRUE;
   p->istat = P_ERROR_MATOM;

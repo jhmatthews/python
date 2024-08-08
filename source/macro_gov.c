@@ -175,7 +175,7 @@ macro_gov (p, nres, matom_or_kpkt, which_out)
     if (new_uplvl == nlevels_macro)
     {
       /* XMACRO improve this so that kpkt only deals with k->r in certain modes */
-      kpkt (p, nres, &escape, KPKT_MODE_CONT_PLUS_ADIABATIC);
+      kpkt (p, nres, &escape, KPKT_MODE_CONT_PLUS_SINK);
 
       *which_out = KPKT;
     }

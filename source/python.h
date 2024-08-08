@@ -1254,7 +1254,7 @@ typedef struct photon
   double w, w_orig;             /**<  current and original weight of this packet */
   double tau;                   /**<  optical depth of the photon since its creation or last interaction */
 
-#define N_ISTAT 13              /**<  number of entries in the istat_enum */
+#define N_ISTAT 14              /**<  number of entries in the istat_enum */
   enum istat_enum
   {
     P_INWIND = 0,               /**< in wind, */
@@ -1683,7 +1683,7 @@ extern struct filenames files;
 /* modes for kpkt calculations */
 #define KPKT_MODE_CONTINUUM  0  /* only account for k->r processes */
 #define KPKT_MODE_ALL        1  /* account for all cooling processes */
-#define KPKT_MODE_CONT_PLUS_ADIABATIC 2 /* account for k->r and adiabatic destruction */
+#define KPKT_MODE_CONT_PLUS_SINK 2 /* account for k->r and adiabatic destruction */
 
 
 /* whether or not to use the implicit/accelerated macro-atom scheme, in which
