@@ -15,15 +15,25 @@ File
 Child(ren)
   * :ref:`Diag.save_cell_statistics`
 
-  * :ref:`Diag.make_ioncycle_tables`
+  * :ref:`Diag.keep_ioncycle_windsaves`
 
-  * :ref:`Diag.print_dvds_info`
+  * :ref:`Diag.keep_ioncycle_spectra` 
+
+  * :ref:`Diag.make_ioncycle_tables`
 
   * :ref:`Diag.save_photons`
 
   * :ref:`Diag.save_extract_photons`
 
-  * :ref:`Diag.keep_ioncycle_windsaves`
+  * :ref:`Diag.print_dvds_info`
 
   * :ref:`Diag.track_resonant_scatters`
+
+  * :ref:`Diag.use_jumps_for_emissivities_in_detailed_spectra`
+
+  * :ref:`Diag.use_upweighting_of_simple_macro_atoms`
+
+  * :ref:`Diag.partial_cells`
+
+  * :ref:`Diag.invoke_searchlight_option`
 

@@ -1,7 +1,8 @@
 Central_object.bremsstrahlung_temp
 ==================================
-The temperature T in bremstrahlung SED of the form
-$L_\nu=\nu^{\alpha}e^{-h\nu/kT}$
+
+The temperature T for the bremsstrahlung spectral energy distribution in the form of
+:math:`L_\nu=\nu^{\alpha}e^{-h\nu/kT}``
 
 Type
   Double

@@ -1,7 +1,7 @@
 Stellar_wind.radmin
 ===================
-Inner edge in cm for a stellar wind, normally the
-radius of the star.
+
+The innermost edge of a stellar wind. This is usually set to the radius of the star.
 
 Type
   Double
@@ -17,6 +17,6 @@ File
 
 
 Parent(s)
-  * :ref:`Wind.type`: star
+  * :ref:`Wind.type`: ``star``
 
 

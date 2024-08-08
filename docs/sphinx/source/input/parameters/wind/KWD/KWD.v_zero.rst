@@ -1,6 +1,7 @@
 KWD.v_zero
 ==========
-Multiple of the local sound speed at the base of the wind, this results in
+
+A multiple of the local sound speed at the base of the wind. This results in
 the initial velocity of the wind being able to be greater or less than the
 local sound speed.
 
@@ -18,6 +19,6 @@ File
 
 
 Parent(s)
-  * :ref:`Wind.type`: kwd
+  * :ref:`Wind.type`: ``kwd``
 
 

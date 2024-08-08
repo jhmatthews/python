@@ -70,6 +70,12 @@ Mandy Hewitt
 Nicolas Scepi
   Univ. Grenoble Alpes, CNRS, IPAG, 38000 Grenoble, France
 
+Austen Wallis
+  Department of Physics and Astronomy, University of Southampton, Southampton, SO17 1BJ, UK
+
+Amin Mosallanezhad
+  Department of Physics and Astronomy, University of Southampton, Southampton, SO17 1BJ, UK
+
 ----------------------------------------
 
 .. toctree::

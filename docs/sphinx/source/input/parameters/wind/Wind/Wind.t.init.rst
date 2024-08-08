@@ -1,6 +1,7 @@
 Wind.t.init
 ===========
-Starting temperature of the wind.
+
+Set the initial temperature of the wind.
 
 Type
   Double

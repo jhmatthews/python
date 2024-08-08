@@ -23,26 +23,32 @@ it should be fairly clear from the code what the various routines do.
 
 The routines used to generate data for MacroAtoms are described in :doc:`Generating Macro Atom data <./py_progs/MakeMacro>`
 
-
-
+Choosing a dataset 
+-----------------------
 The "masterfile" that determines what data will be read into Python is determined by the
 line in the parameter file, which will read something like::
 
     Atomic_data                                data/standard80.dat
    
-where the file data/standard80.txt will contain names (one to a line) of files which will
+where the file `data/standard80.dat` will contain names (one to a line) of files which will
 be read in sequentially.  
-All of the atomic data that comes 
-standardly with Python is stored
-in the data directory (and its subdirectories) but users are not required to put their data
-there.  
 
-Every line in the atomic data files read by Python consists of a keyword that defines the type
+All of the atomic data that comes as standard with Python is stored in the `xdata` directory (and its subdirectories) but users are not required to put their data
+there. Various experimental or testing dataset masterfiles are stored in the `zdata` directory. Symbolic links to these directories
+are setup by running `Setup_Py_Dir`.
+
+.. todo::
+
+    Add table of recommended data sets
+
+Data hierarchy and I/O 
+-----------------------
+As mentioned above, the masterfile will contain names (one to a line) of files which will
+be read in sequentially. Every line in the atomic data files read by Python consists of a keyword that defines the type
 of data and various data values that are required for that particular data type.  Lines that
 beging with # or are empty are ignored.
 
-The data from the various files are read as if they were one long file,
-so how the data is split up into files is a matter of convenience.  
+The data from the various files are read as if they were one long file, so how the data is split up into files is a matter of convenience.  
 
 However, the data must be read in a logical order.  As an simple example, information about elements 
 must be read in prior to information about ions.  This allows one to remove all data about, say Si,

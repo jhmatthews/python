@@ -1,7 +1,7 @@
 KWD.rmax
 ========
-The radius at which the disk wind terminates, in units of central object
-radii. This has to be greater than rmin.
+
+This radius defines the outer boundary and greatest distance from the central object that the wind launches off the disk. 
 
 Type
   Double
@@ -17,6 +17,6 @@ File
 
 
 Parent(s)
-  * :ref:`Wind.type`: kwd
+  * :ref:`Wind.type`: ``kwd``
 
 

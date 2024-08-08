@@ -38,7 +38,7 @@
  * sense that for an AGN we cannot estimate a luminosity. This
  * reflects the fact that we have not completely setlled on how
  * to homogenize inputs for diffent system types.  It's not 
- * clear that we need to retun anything.
+ * clear that we need to rerun anything.
  *
  **********************************************************/
 

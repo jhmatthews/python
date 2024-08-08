@@ -1,7 +1,7 @@
 Boundary_layer.power_law_cutoff
 ===============================
 This is a low frequency cutoff for an AGN-style power law spectrum
-of a form $L_\nu=K\nu^\alpha$, as applied to the boundary layer of a star.
+of a form :math:`L_\nu=K\nu^\alpha`, as applied to the boundary layer of a star.
 It prevents the power-law being applied to low frequencies and giving an odd SED.
 
 Type

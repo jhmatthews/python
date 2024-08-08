@@ -10,7 +10,7 @@ Type
 
 
 Values
-  >0:>0:>1:>0
+  :math:`>0`: :math:`>0`: :math:`>1`: :math:`>0`
 
 
 File

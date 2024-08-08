@@ -1,8 +1,8 @@
 SV.thetamin
 ===========
-The angle at which the wind rises from the innermost launching radius in a Shlossman-Vitello type disk wind.
-This angle is measured with respect to the vertical (z) direction. I.e. zero descirbes a vertical wind.
-See figure 1 of Shlossman & Vitello 1993, ApJ, 409, 372.
+The angle at which the wind rises from the innermost launching radius in a Shlosman Vitello type disk wind.
+This angle is measured with respect to the vertical (z) direction, i.e. zero describes a vertical wind.
+See figure 1 of Shlosman & Vitello 1993, ApJ, 409, 372.
 
 Type
   Double
@@ -18,6 +18,6 @@ File
 
 
 Parent(s)
-  * :ref:`Wind.type`: SV
+  * :ref:`Wind.type`: ``SV``
 
 

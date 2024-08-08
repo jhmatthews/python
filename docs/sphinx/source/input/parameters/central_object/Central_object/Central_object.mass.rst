@@ -1,12 +1,13 @@
 Central_object.mass
 ===================
-Mass of the central object. This is very important, affecting wind speeds, gravitational heating and such.
+
+Mass of the central object. This parameter is very important. The mass affects the model's wind speeds, gravitational heating and such.
 
 Type
   Double
 
 Unit
-  M$\odot$
+  :math:`M_{\odot}`
 
 Values
   Greater than 0

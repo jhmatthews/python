@@ -19,6 +19,6 @@ File
 
 
 Parent(s)
-  * :ref:`Wind.type`: shell
+  * :ref:`Wind.type`: ``shell``
 
 

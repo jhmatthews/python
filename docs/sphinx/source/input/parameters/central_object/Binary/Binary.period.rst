@@ -1,9 +1,8 @@
 Binary.period
 =============
-The perids of a binary system. Along with a mass, the binary period is
+The period of a binary system. Along with a mass, the binary period is
 used to define the Roche lobe of the system, which in turn can be used
-to see the effect of eclipses on the spectrum.  Defining the system as
-a secondary also initializes the outer radius of the disk.
+to see the effect of eclipses on the spectrum.  Defining the system with a secondary also initializes the outer radius of the disk.
 
 Type
   Double

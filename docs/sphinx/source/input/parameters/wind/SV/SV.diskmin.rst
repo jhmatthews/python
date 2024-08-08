@@ -2,7 +2,7 @@ SV.diskmin
 ==========
 The innermost radius from which the wind rises in a Shlossman-Vitello type disk wind.
 This radius is measured along the radial disk (r) direction i.e. zero describes the centre of the central object
-(white dwarf)
+(white dwarf).
 See figure 1 of Shlosman & Vitello 1993, ApJ 409,372.
 
 Type
@@ -19,6 +19,6 @@ File
 
 
 Parent(s)
-  * :ref:`Wind.type`: SV
+  * :ref:`Wind.type`: ``SV``
 
 

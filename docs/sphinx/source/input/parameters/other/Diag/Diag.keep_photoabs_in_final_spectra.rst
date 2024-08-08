@@ -1,8 +1,7 @@
 Diag.keep_photoabs_in_final_spectra
 ===================================
-This advanced options allows you to include or exclude photoabsorpiotn
-in calculating the final spectra.  (but ksl does not know what the
-default is)
+This advanced options allows you to include or exclude photoabsorption
+in calculating the final spectra.
 
 Type
   Boolean (yes/no)

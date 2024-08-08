@@ -1,6 +1,7 @@
 Wind.radmax
 ===========
-Multi-line description, must keep indentation.
+
+Set the radius of the wind's outermost edge from the central object. 
 
 Type
   Double
@@ -17,5 +18,6 @@ File
 
 Parent(s)
   * :ref:`Wind.number_of_components`: Greater than 0. Once per domain.
+  * :ref:`Wind.type`: ``SV``, ``KWD``
 
 

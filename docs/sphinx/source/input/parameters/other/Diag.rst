@@ -7,8 +7,7 @@ or allow more precise control. Advanced commands have an @ symbol in front of th
 Note that some of these commands will also change the radiative transfer treatment in the code. 
 A number of them are also only accessed when the ``Diag.extra`` command is answered with yes. 
 
-.. todo::
-   Fill in
+Below is all possible diagnostic options. Some diagnostics may not be available depending on options selected.
 
 
 .. toctree::

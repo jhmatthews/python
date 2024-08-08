@@ -1,7 +1,7 @@
 Corona.radmin
 =============
 The corona is a box-shaped region which sits immediately
-above the disk. radmin defines the inner edge of the box.
+above the disk. ``radmin`` defines the inner edge of the box.
 
 Type
   Double
@@ -17,6 +17,6 @@ File
 
 
 Parent(s)
-  * :ref:`Wind.type`: corona
+  * :ref:`Wind.type`: ``corona``
 
 

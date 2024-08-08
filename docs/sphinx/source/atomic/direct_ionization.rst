@@ -33,12 +33,12 @@ The scaled temperatures are  given by
 
 :math:`x=1-\frac{\log{f}}{\log(t+f)}`
 
-where t=kT/I. I is the ionization potential, and f=2.0.
-The rate coefficient R(T) is recovered from the scaled rate coefficient in the table, $\rho$ using
+where :math:`t=kT/I`. :math:`I` is the ionization potential, and :math:`f=2.0`.
+The rate coefficient R(T) is recovered from the scaled rate coefficient in the table, :math:`\rho` using
 
 :math:`\rho=t^{1/2}I^{3/2}R(T)/E_{1}(1/t)`
 
-where :math:`E\_{1}` is the first exponential integral. In python we use the  gsl_sf_expint_E1 routine in gsl.
+where :math:`E_{1}` is the first exponential integral. In python we use the  gsl_sf_expint_E1 routine in gsl.
 
 Python structure
 ================

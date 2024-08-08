@@ -1430,7 +1430,8 @@ described as macro-levels. */
                 target_istate = istate + 1 + m;
 
                 n_augertarget = 0;
-                while ((xconfig[n_augertarget].z != z || xconfig[n_augertarget].istate != target_istate || xconfig[n_augertarget].ilv != 1) && n_augertarget < nlevels)
+                while ((xconfig[n_augertarget].z != z || xconfig[n_augertarget].istate != target_istate || xconfig[n_augertarget].ilv != 1)
+                       && n_augertarget < nlevels)
                   n_augertarget++;
                 if (n_augertarget == nlevels)
                 {
@@ -1448,8 +1449,8 @@ described as macro-levels. */
           }
           else
           {
-            Error ("getatomic_data: file %s line %d: More Auger macro-atom records than allowed. Increase NAUGER_MACRO in atomic.h\n", file,
-                   lineno);
+            Error ("getatomic_data: file %s line %d: More Auger macro-atom records than allowed. Increase NAUGER_MACRO (%d) in atomic.h\n",
+                   file, lineno, NAUGER_MACRO);
             exit (0);
           }
 

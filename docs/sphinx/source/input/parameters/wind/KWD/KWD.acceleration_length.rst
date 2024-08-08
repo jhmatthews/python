@@ -1,7 +1,7 @@
 KWD.acceleration_length
 =======================
-The size of the acceleration length scale for a disk wind described by the
-KWD model.
+
+Sets the distance of the length scale which the wind is accelerated over. 
 
 Type
   Double
@@ -17,6 +17,6 @@ File
 
 
 Parent(s)
-  * :ref:`Wind.type`: kwd
+  * :ref:`Wind.type`: ``kwd``
 
 

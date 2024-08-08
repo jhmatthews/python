@@ -1,8 +1,8 @@
 Getting Started
 ###############
 
-What machines will python run on? We have run python various versions of linux and on Mac.
-It is compiled using mpicc, with an option to compile with gcc. 
+What machines will python run on? *Python* is written C.  We have regularly run *Python* on various linux systems as well as a variity of Mac machines.
+It is compiled using mpicc/gcc, but it can be compiled simply with gcc. 
 
 It uses the Gnu Scientific Libraries (gsl)
 

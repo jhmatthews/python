@@ -1,7 +1,7 @@
 Corona.radmax
 =============
 The corona is a box-shaped region which sits immediately
-above the disk.  radmax defines the outer edge of the box.
+above the disk. ``radmax`` defines the outer edge of the box.
 
 Type
   Double
@@ -17,6 +17,6 @@ File
 
 
 Parent(s)
-  * :ref:`Wind.type`: corona
+  * :ref:`Wind.type`: ``corona``
 
 

@@ -1,6 +1,7 @@
 Shell.wind.radmax
 =================
-Multi-line description, must keep indentation.
+
+The outermost edge of a single (ideally thin) shell.
 
 Type
   Double
@@ -16,6 +17,6 @@ File
 
 
 Parent(s)
-  * :ref:`Wind.type`: shell
+  * :ref:`Wind.type`: ``shell``
 
 

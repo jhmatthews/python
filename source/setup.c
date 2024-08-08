@@ -208,7 +208,7 @@ get_spectype (yesno, question, spectype)
        SPEC_TYPE_MODEL.  Note that this assume that all other spectrum types
        have negative values
      */
-
+ 
     if (*spectype >= 0 && (geo.run_type == RUN_TYPE_RESTART || geo.run_type == RUN_TYPE_PREVIOUS || geo.ioniz_or_extract == CYCLE_IONIZ))
     {
       *spectype = SPECTYPE_MODEL;

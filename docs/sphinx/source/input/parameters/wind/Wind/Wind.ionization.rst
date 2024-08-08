@@ -26,7 +26,7 @@ Values
 
   fixed
     Read the ion aboundances in from a file.  All cells will have
-    the same abundances.  (This is intended
+    the same abundances. (This is intended
     as a diagnostic mode, mainly to investigate the details of raditive transrfer.
     It should be used with caution.  In particular, if the elements for which
     abundances are provided differ from the elements to be used as described in the
@@ -41,11 +41,11 @@ Values
   matrix_pow
     Estimate photionization rates by approximating the spectrum in a cell by a piecewise
     approximation, usually a power law.  Invert the rate matrix equation to
-    calculate the ionization.  (This is the preferred ionization mode for most
+    calculate the ionization. (This is the preferred ionization mode for most
     calculations)
 
   matrix_est
-    Estimate photionization rates by calculating rates directly from the photons that pass
+    Estimate photoionization rates by calculating rates directly from the photons that pass
     through a cell.  There is no attempt to model the spectrum. Invert the rate matrix equation to
     calculate the ionization.
 

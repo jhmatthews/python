@@ -1,13 +1,12 @@
 Corona.base_den
 ===============
-The coronal model is defined in terms of a base density
-and a scale height
+The coronal model is defined in terms of a base density and a scale height. ``base_den`` ask for the base density of the corona.
 
 Type
   Double
 
 Unit
-  number/cm**3
+  :math:`number/cm^3`
 
 Values
   Greater than 0
@@ -17,6 +16,6 @@ File
 
 
 Parent(s)
-  * :ref:`Wind.type`: corona
+  * :ref:`Wind.type`: ``corona``
 
 

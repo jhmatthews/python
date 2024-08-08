@@ -1,7 +1,8 @@
 Corona.zmax
 ===========
 The corona is a box-shaped region which sits immediately
-above the disk.  zmax defines the height of the box.
+above the disk. ``zmax`` defines the vertical height of the box where the corona ends.
+The bottom of the corona's box shape starts at 0. 
 
 Type
   Double
@@ -17,6 +18,6 @@ File
 
 
 Parent(s)
-  * :ref:`Wind.type`: corona
+  * :ref:`Wind.type`: ``corona``
 
 

@@ -1,7 +1,8 @@
 Homologous.radmin
 =================
-The starting point of for madel of a homologous flow, a model in
-which the velocity at any radius is proportional to the radius
+
+This radius defines the inner boundary and starting point of the homologous wind.
+The wind's velocity is proportional to the radius at any given point. 
 
 Type
   Double
@@ -17,6 +18,6 @@ File
 
 
 Parent(s)
-  * :ref:`Wind.type`: homologous
+  * :ref:`Wind.type`: ``homologous``
 
 
