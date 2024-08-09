@@ -476,7 +476,7 @@ trans_phot_single (WindPtr w, PhotPtr p, int iextract)
       if (pp.istat == P_ERROR_MATOM || pp.istat == P_LOFREQ_FF || pp.istat == P_ADIABATIC || pp.istat == P_COMP_COOL)
       {
         p->istat = pp.istat;
-        //pp.tau = VERY_BIG;
+        pp.tau = VERY_BIG;
         stuff_phot (&pp, p);
         break;
       }

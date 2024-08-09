@@ -1212,9 +1212,10 @@ scatter (p, nres, nnscat)
    */
 
 
-  if (*nres == NRES_ES && geo.rt_mode == RT_MODE_2LEVEL)
+  if (*nres == NRES_ES)
   {
-    compton_scatter (p);
+    if (geo.rt_mode == RT_MODE_2LEVEL)
+      compton_scatter (p);
   }
   else if (*nres == NRES_FF || *nres > NRES_BF || geo.scatter_mode == SCATTER_MODE_ISOTROPIC)
   {
