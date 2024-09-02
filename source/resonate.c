@@ -1180,9 +1180,14 @@ scatter (p, nres, nnscat)
         kpkt_choice = random_number (0.0, 1.0); //random number for kpkt choice
         if (prob_kpkt > kpkt_choice)
         {
+          geo.heat_comp_kpkt += p->w;
           macro_gov (p, nres, 2, &which_out);   //routine to deal with kpkt
         }
         /* if we don't excite a k-packet, we just carry on */
+      }
+      else
+      {
+        geo.cool_comp_kpkt += p->w - w_before_scatter;
       }
     }
 

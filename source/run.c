@@ -297,6 +297,7 @@ calculate_ionization (restart_stat)
            nphot_istat[P_ADIABATIC]);
       Log ("!!python: luminosity lost by Compton kpkt destruction %18.12e number of packets %d\n", z_abs[P_COMP_COOL],
            nphot_istat[P_COMP_COOL]);
+      Log ("!!python: geo.heat_comp_kpkt %8.4e, geo.cool_comp_kpkt %8.4e", geo.heat_comp_kpkt, geo.cool_comp_kpkt);
       Log ("!!python: luminosity lost to low-frequency free-free    %18.12e number of packets %d\n", z_abs[P_LOFREQ_FF],
            nphot_istat[P_LOFREQ_FF]);
     }

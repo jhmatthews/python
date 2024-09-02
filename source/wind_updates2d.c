@@ -466,6 +466,7 @@ report_bf_simple_ionpool (void)
 void
 wind_rad_init ()
 {
+  geo.heat_comp_kpkt = geo.cool_comp_kpkt = 0.0;
   init_plasma_rad_properties ();
   init_macro_rad_properties ();
 }
