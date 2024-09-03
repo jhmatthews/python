@@ -41,7 +41,7 @@ compton_scatter (p)
 {
   double t_e;
   double vel[3];
-  double v;
+  double v, f;
 
 
   WindPtr one;
@@ -115,14 +115,14 @@ compton_scatter (p)
   lorentz_transform (p, p, velocity_electron);
   if (modes.save_extract_photons)
     save_photons (p, "BeforeC");
-  compton_dir (p);
+  f = compton_dir (p);          /* f is the fractional energy change in the rest frame of the electron */
   if (modes.save_extract_photons)
     save_photons (p, "AfterC");
   rescale (velocity_electron, -1, vel);
   lorentz_transform (p, p, vel);
 
 
-  return (0);
+  return (f);
 }
 
 
@@ -450,7 +450,7 @@ set_comp_func_values (double rand_cs, double max_cs, double energy_ratio)
  *
  **********************************************************/
 
-int
+double
 compton_dir (p)
      PhotPtr p;                 // Pointer to the current photon
 
@@ -518,7 +518,7 @@ compton_dir (p)
     p->freq = p->freq / f;      //reduce the photon frequency by the fractional energy change
     p->w = p->w / f;            //reduce the photon weight by the same ammount to conserve photon numbers
   }
-  return (0);
+  return (f);                   /* return the fractional energy change. This is the ratio of the old freq to the new freq */
 }
 
 /**********************************************************/
