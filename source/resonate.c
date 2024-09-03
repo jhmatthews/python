@@ -1171,19 +1171,16 @@ scatter (p, nres, nnscat)
       w_before_scatter = p->w;
       compton_scatter (p);
 
-      /* if the photon has lost weight then we have a heating process
-         and there is a chance to create a k-packet */
-      if (w_before_scatter > p->w)
+      /* we choose whether to go to k-packet based on a factor (f-1)/f, where 
+         "f" is the ratio of the frequency of the packet before scatter to that after scattering */
+      prob_kpkt = ((w_before_scatter / p->w) - 1.0) / (w_before_scatter / p->w);
+      kpkt_choice = random_number (0.0, 1.0);   //random number for kpkt choice
+      if (prob_kpkt > kpkt_choice)
       {
-        prob_kpkt = (w_before_scatter - p->w) / w_before_scatter;
-        p->w = w_before_scatter;
-        kpkt_choice = random_number (0.0, 1.0); //random number for kpkt choice
-        if (prob_kpkt > kpkt_choice)
-        {
-          macro_gov (p, nres, 2, &which_out);   //routine to deal with kpkt
-        }
-        /* if we don't excite a k-packet, we just carry on */
+        p->w = w_before_scatter;        // we need to reset the weight to go to kpkt 
+        macro_gov (p, nres, 2, &which_out);     //routine to deal with kpkt
       }
+      /* if we don't excite a k-packet, we just carry on */
     }
 
 
