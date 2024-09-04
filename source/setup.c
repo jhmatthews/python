@@ -68,6 +68,7 @@ init_geo ()
   geo.hydro_domain_number = -1;
   geo.nplasma = 0;
   geo.nmacro = 0;
+  geo.heat_comp_kpkt = geo.cool_comp_kpkt = 0.0;
 
   if (geo.system_type == SYSTEM_TYPE_CV || geo.system_type == SYSTEM_TYPE_BH)
   {
@@ -208,7 +209,7 @@ get_spectype (yesno, question, spectype)
        SPEC_TYPE_MODEL.  Note that this assume that all other spectrum types
        have negative values
      */
- 
+
     if (*spectype >= 0 && (geo.run_type == RUN_TYPE_RESTART || geo.run_type == RUN_TYPE_PREVIOUS || geo.ioniz_or_extract == CYCLE_IONIZ))
     {
       *spectype = SPECTYPE_MODEL;

@@ -894,7 +894,7 @@ scatter (p, nres, nnscat)
   double p_init[3], p_final[3], dp[3], dp_cyl[3];
   WindPtr one;
   double prob_kpkt, kpkt_choice, freq_comoving, w_before_scatter;
-  double gamma_twiddle, gamma_twiddle_e, stim_fact;
+  double gamma_twiddle, gamma_twiddle_e, stim_fact, f_compton;
   int m, llvl, ulvl;
   PlasmaPtr xplasma;
   MacroPtr mplasma;
@@ -1169,17 +1169,21 @@ scatter (p, nres, nnscat)
     else if (*nres == NRES_ES)
     {
       w_before_scatter = p->w;
-      compton_scatter (p);
+      f_compton = compton_scatter (p);
 
       /* we choose whether to go to k-packet based on a factor (f-1)/f, where 
-         "f" is the ratio of the frequency of the packet before scatter to that after scattering */
-      prob_kpkt = ((w_before_scatter / p->w) - 1.0) / (w_before_scatter / p->w);
+         "f" is the ratio of the frequency of the packet before scatter to that after scattering 
+         in the rest frame of the electron */
+      prob_kpkt = (f_compton - 1.0) / f_compton;
       kpkt_choice = random_number (0.0, 1.0);   //random number for kpkt choice
       if (prob_kpkt > kpkt_choice)
       {
         p->w = w_before_scatter;        // we need to reset the weight to go to kpkt 
         macro_gov (p, nres, 2, &which_out);     //routine to deal with kpkt
+        geo.heat_comp_kpkt += p->w;
       }
+      else
+        geo.cool_comp_kpkt += p->w - w_before_scatter;
       /* if we don't excite a k-packet, we just carry on */
     }
 
