@@ -23,7 +23,7 @@
 
 #include "log.h"
 #include "atomic.h"
-#include "python.h"
+#include "sirocco.h"
 
 /* the form of the structure which contains
  * the map from words to values

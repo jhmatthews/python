@@ -15,7 +15,7 @@
 #include <math.h>
 
 #include "atomic.h"
-#include "python.h"
+#include "sirocco.h"
 
 #include "log.h"
 // If routines are added cproto > atomic_proto.h should be run
@@ -85,8 +85,8 @@
  * other than Python, e.g for another routine intended to calculate the ionization state of
  * a plasma in collisional equilibrium.
  *
- * To this end, the routines populate stuctures in atomic.h, which are not part of python.h, and 
- * one should avoid calling routines like Exit(0) that are very python centric.  It's important
+ * To this end, the routines populate stuctures in atomic.h, which are not part of sirocco.h, and 
+ * one should avoid calling routines like Exit(0) that are very sirocco centric.  It's important
  * that future modifications to get_atomic_data maintain this independence.
  *
  *
@@ -544,7 +544,7 @@ structure does not have this property! */
 */
 
 /* ?? ksl This mix and match situation may be too much.  We are storing both macro level densities and so-called
-topbase level densities in some of the same arrays in python.  Leave for now, but it may be difficult to keep
+topbase level densities in some of the same arrays in sirocco.  Leave for now, but it may be difficult to keep
 the program working in both cases, and certainly mixed cases  04apr ksl  */
 
 /* 080810 -- ksl -- 62 -- I have changed the way levels are created so that one can only read one type
@@ -2295,7 +2295,7 @@ would like to have simple lines for macro-ions */
  * @section Electron yield - goes with auger ionization rates
  * #This is electron yield data from Kaastra & Mewe (1993) -1993A&AS...97..443K
  * #It is processed from data downloaded from http://vizier.cfa.harvard.edu/viz-bin/VizieR?-source=J/A+AS/97/443
- * #Via the python script kaastra_2_py.py. Example lines of file below
+ * #Via the sirocco script kaastra_2_py.py. Example lines of file below
  * #
  * @verbatim
  * #Label z state n l IP mean_electron_energy Prob_of_1e Prob_of_2e Prob_of_3e ....
@@ -2408,7 +2408,7 @@ would like to have simple lines for macro-ions */
 		  now not read in - see #499
  * #This is fluorescent yield data from Kaastra & Mewe (1993) -1993A&AS...97..443K
  * #It is processed from data downloaded from http://vizier.cfa.harvard.edu/viz-bin/VizieR?-source=J/A+AS/97/443
- * #Via the python script kaastra_2_py.py.
+ * #Via the sirocco script kaastra_2_py.py.
  * Data format below
  * #
  * @verbatim
@@ -2455,7 +2455,7 @@ would like to have simple lines for macro-ions */
  * The lines below read in collision strength data from Chianti (after Burgess and Tully). The original
  * is stored in .scups files in chianti. 
  * 
- * To create the input data files,  a python script searches for matches to the lines_linked_ver_2.py
+ * To create the input data files,  a sirocco script searches for matches to the lines_linked_ver_2.py
  * data file, on the basis of energy and oscillator strength (and z and state). 
  *
  * As a rather hamfisted
