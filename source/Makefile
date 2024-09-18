@@ -219,11 +219,11 @@ sirocco_objects := $(sirocco_source:.c=.o) get_models.o
 # kpar_source is now declared separately from sirocco_source so that the file log.h
 # can be made using cproto
 kpar_source = rdpar.c xlog.c synonyms.c
-additional_py_wind_source = py_wind_sub.c py_wind_ion.c py_wind_write.c py_wind_macro.c py_wind.c windsave2table.c windsave2table_sub.c
+additional_swind_source = swind_sub.c swind_ion.c swind_write.c swind_macro.c swind.c windsave2table.c windsave2table_sub.c
 
 prototypes:
 	cp templates.h templates.h.old
-	cproto -I$(INCLUDE) $(sirocco_source) ${additional_py_wind_source} > foo.h
+	cproto -I$(INCLUDE) $(sirocco_source) ${additional_swind_source} > foo.h
 	cp foo.h templates.h
 	rm foo.h
 	cproto -I$(INCLUDE) $(kpar_source) > log.h
@@ -258,20 +258,20 @@ D:
 # Define the objects for the helper programs. They, in general, they all need
 # to link with all of Python due to how interlinked a lot of it is.
 
-py_wind_objects = py_wind.o py_wind_ion.o py_wind_macro.o py_wind_sub.o py_wind_write.o $(sirocco_objects)
+swind_objects = swind.o swind_ion.o swind_macro.o swind_sub.o swind_write.o $(sirocco_objects)
 table_objects = windsave2table.o $(sirocco_objects) # windsave2table_sub.o is already part of $(sirocco_objects)
 rhf_objects = rad_hydro_files.o $(sirocco_objects)
 modify_wind_objects = modify_wind.o $(sirocco_objects)
 inspect_wind_objects = inspect_wind.o $(sirocco_objects)
-py_optd_obj = py_optd.o py_optd_output.o py_optd_trans.o py_optd_util.o py_optd_extern_init.o $(sirocco_objects)
+sirocco_optd_obj = sirocco_optd.o sirocco_optd_output.o sirocco_optd_trans.o sirocco_optd_util.o sirocco_optd_extern_init.o $(sirocco_objects)
 
 run_indent:
 	../py_progs/run_indent.py -all_no_headers
 
-py_wind: startup $(py_wind_objects) $(CUDA_OBJECTS)
-	$(CC) $(CFLAGS) $(py_wind_objects) $(CUDA_OBJECTS) $(LDFLAGS) -o py_wind
+swind: startup $(swind_objects) $(CUDA_OBJECTS)
+	$(CC) $(CFLAGS) $(swind_objects) $(CUDA_OBJECTS) $(LDFLAGS) -o swind
 	cp $@ $(BIN)
-	mv $@ $(BIN)/py_wind$(VERSION)
+	mv $@ $(BIN)/swind$(VERSION)
 	@if [ $(INDENT) = yes ] ; then  ../py_progs/run_indent.py -changed ; fi
 
 windsave2table: startup $(table_objects) $(CUDA_OBJECTS)
@@ -298,10 +298,10 @@ inspect_wind: startup $(inspect_wind_objects) $(CUDA_OBJECTS)
 	mv $@ $(BIN)/inspect_wind$(VERSION)
 	@if [ $(INDENT) = yes ] ; then  ../py_progs/run_indent.py -changed ; fi
 
-py_optd: startup $(py_optd_obj) $(CUDA_OBJECTS)
-	$(CC) $(CFLAGS) $(py_optd_obj) $(CUDA_OBJECTS) $(LDFLAGS) -o $@
+sirocco_optd: startup $(sirocco_optd_obj) $(CUDA_OBJECTS)
+	$(CC) $(CFLAGS) $(sirocco_optd_obj) $(CUDA_OBJECTS) $(LDFLAGS) -o $@
 	cp $@ $(BIN)
-	mv $@ $(BIN)/py_optd$(VERSION)
+	mv $@ $(BIN)/sirocco_optd$(VERSION)
 	@if [ $(INDENT) = yes ] ; then  ../py_progs/run_indent.py -changed ; fi
 
 # unit_tests allows one to test low level routines, but one must be aware that one needs to define
@@ -319,8 +319,8 @@ check:
 	cd tests; make check NVCC=$(NVCC) CC=$(CC) MATOM_VER=$(MATOM_VER)
 
 # The next line runs recompiles all of the routines after first cleaning the directory
-# all: clean run_indent sirocco windsave2table py_wind
-all: clean sirocco windsave2table py_wind indent rad_hydro_files modify_wind inspect_wind py_optd
+# all: clean run_indent sirocco windsave2table swind
+all: clean sirocco windsave2table swind indent rad_hydro_files modify_wind inspect_wind sirocco_optd
 
 FILE = atomicdata.o atomicdata_init.o atomicdata_sub.o atomic.o
 
